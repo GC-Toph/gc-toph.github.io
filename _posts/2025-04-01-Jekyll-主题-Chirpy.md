@@ -1,5 +1,11 @@
 ---
+title: Chirpy写作
+date: 2025-04-01 00:00:00 +0800
+categories: [Meta] # 最多两层
+tags: [Meta, Jekyll, Chirpy]
+# toc: false # 关闭目录
 math: true
+mermaid: true # diagram generation
 ---
 
 ## 写作
