@@ -1,6 +1,7 @@
 ---
 title: Chirpy写作
 date: 2025-04-01 00:00:00 +0800
+last_modified_at: 2025-04-03 00:00:00 +0800
 categories: [Meta] # 最多两层
 tags: [Meta, Jekyll, Chirpy]
 # toc: false # 关闭目录
@@ -14,7 +15,7 @@ mermaid: true # diagram generation
 
 [Text and Typography](https://chirpy.cotes.page/posts/text-and-typography/)
 
-blockquote
+## blockquote
 
 > \> 内容  {: .prompt-tip }
 {: .prompt-tip }
@@ -28,13 +29,17 @@ blockquote
 > \> 内容  {: .prompt-danger }
 {: .prompt-danger }
 
+## 代码
+
 ```bash
-echo hi
+echo lambda
 ```
 
 ```
-hi
+delta
 ```
+
+## 公式
 
 $$
 \lambda \delta
@@ -43,3 +48,73 @@ $$
 $$
 \Lambda \Delta
 $$
+
+## mermaid
+
+### demo
+
+```mermaid
+graph TD;
+    A[Start] --> B[Decision];
+    B -->|Yes| C[Do Task];
+    B -->|No| D[End];
+```
+
+### Flowchart
+
+```mermaid
+graph LR;
+    A[User logs in] --> B{Valid credentials?};
+    B -->|Yes| C[Grant access];
+    B -->|No| D[Show error];
+    C --> E[Load dashboard];
+```
+
+### Sequence Diagram
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant System
+    User->>System: Login request
+    System-->>User: Authenticate
+    System->>Database: Verify credentials
+    Database-->>System: Credentials valid
+    System-->>User: Access granted
+```
+
+### Class Diagram
+
+```mermaid
+classDiagram
+    Animal <|-- Dog
+    Animal <|-- Cat
+    Animal : +String name
+    Animal : +int age
+    Animal : +makeSound()
+    Dog : +fetch()
+    Cat : +scratch()
+```
+
+### Gantt Chart  
+
+```mermaid
+gantt
+    title Project Timeline
+    dateFormat  YYYY-MM-DD
+    section Phase 1
+    Task A       :a1, 2023-10-01, 5d
+    Task B       :after a1, 3d
+    section Phase 2
+    Task C       :2023-10-10, 4d
+```
+
+### Customizing Appearance 
+
+```mermaid
+graph TD;
+    A[Start] --> B[Process];
+    B --> C[End];
+    style A fill:#f96,stroke:#333,stroke-width:2px;
+    style C fill:#bbf,stroke:#333,stroke-width:2px;
+```
