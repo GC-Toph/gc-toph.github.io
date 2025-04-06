@@ -9,6 +9,43 @@ math: true
 mermaid: true # diagram generation
 ---
 
+## 搭建
+
+[使用Jekyll + GitHub Pages搭建个人博客](https://zzy979.github.io/posts/creating-personal-blog-site/)
+
+### 安装
+
+[ruby](https://rubyinstaller.org/downloads/)
+
+将`MSYS2`目录添加到环境变量中
+
+```bash
+ridk
+ridk enable
+```
+
+检查
+
+```bash
+ruby -v
+gem -v
+```
+
+安装`jekyll`
+
+``` bash
+gem install jekyll bundler
+jekyll -v
+```
+
+安装依赖的theme模板库，在项目目录运行 `bundle`
+
+使用:
+
+构建 `jekyll build` 或 `jekyll b`
+
+本地部署 `jekyll serve` 或 `jekyll s`
+
 ## 写作
 
 [Writing a New Post](https://chirpy.cotes.page/posts/write-a-new-post/)
