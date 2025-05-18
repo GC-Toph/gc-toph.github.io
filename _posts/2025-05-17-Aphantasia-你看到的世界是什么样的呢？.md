@@ -128,7 +128,7 @@ hyperphantasia 更有可能在传统的视觉艺术行业工作。
 ### 不同的视觉认知策略
 
 [研究](https://www.sciencedirect.com/science/article/pii/S1053810024000618)发现：
-- Aphantasia在两项心理旋转（mental rotation）任务中（维积木形状旋转任务和人体模型旋转任务），速度较慢但更准确。
+- Aphantasia在两项心理旋转（mental rotation）任务中（3维积木形状旋转任务和人体模型旋转任务），速度较慢但更准确。
 - 在三维积木旋转任务中，对照组表现出速度与准确性的权衡，而Aphantasia组则相反（即速度快的人准确性也高）
 - 认知策略存在差异，Aphantasia倾向于使用分析式策略。
 
