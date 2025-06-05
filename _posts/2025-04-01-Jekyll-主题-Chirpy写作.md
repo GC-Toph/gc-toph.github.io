@@ -66,6 +66,13 @@ jekyll -v
 > 欺骗、狂妄、病态的利己主义、满腹怨恨、极端自怜、受害妄想症，这些都阻止成功。你们要找到所有这些阻碍成功的东西，将它们当作瘟疫，绕道而走。
 {: .prompt-danger }
 
+> God grant me the serenity to accept the things I can not change,\
+请赐我平静的心，去接受我无法改变的事；\
+courage to change the things I can,\
+赐我勇气，去改变我能够改变的事；\
+And the wisdom to know the difference.\
+并赐我智慧，去分辨这两者的不同。
+
 ## 代码
 
 ```bash
