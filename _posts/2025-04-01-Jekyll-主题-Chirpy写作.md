@@ -54,16 +54,16 @@ jekyll -v
 
 ## blockquote
 
-> 查理芒格 2017
+> 一个领域专家的标准：犯过这个领域内几乎所有的错误。
 {: .prompt-tip }
 
-> 关于地狱
+> For we walk by faith, not by sight.
 {: .prompt-info }
 
-> 很多东西更重要，不要浪费在根本**不存在**的东西上。
+> 己所不欲，勿施于人。
 {: .prompt-warning }
 
-> 欺骗、狂妄、病态的利己主义、满腹怨恨、极端自怜、受害妄想症，这些都阻止成功。你们要找到所有这些阻碍成功的东西，将它们当作瘟疫，绕道而走。
+> 很多东西更重要，不要浪费在根本**不存在**的东西上。欺骗、狂妄、病态的利己主义、满腹怨恨、极端自怜、受害妄想症，这些都阻止成功。你们要找到所有这些阻碍成功的东西，将它们当作瘟疫，绕道而走。 -- 查理芒格 2017
 {: .prompt-danger }
 
 > God grant me the serenity to accept the things I can not change,\
