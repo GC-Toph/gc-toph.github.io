@@ -162,3 +162,29 @@ graph TD;
     style A fill:#f96,stroke:#333,stroke-width:2px;
     style C fill:#bbf,stroke:#333,stroke-width:2px;
 ```
+
+### schema
+
+```mermaid
+graph TD
+    subgraph Entities
+        U[用户 User]
+        T[推文 Tweet]
+        TG[标签 Tag]
+        C[分类 Category]
+    end
+
+    subgraph Relationships
+        U -- FOLLOWS --> U
+        U -- POSTS --> T
+        U -- LIKES --> T
+        T -- HAS_TAG --> TG
+        TG -- HAS_TYPE --> C
+        U -- HAS_INTEREST --> TG
+    end
+
+    style U fill:#87CEEB
+    style T fill:#98FB98
+    style TG fill:#FFD700
+    style C fill:#FFA07A
+```
