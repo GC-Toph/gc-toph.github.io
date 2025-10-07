@@ -136,3 +136,5 @@ hyperphantasia 更有可能在传统的视觉艺术行业工作。
 ### 性格
 
 Revised NEO Personality Inventory中提到，aphantasia更为内向；hyperphantasia 更为外向。
+
+![warning](/assets/images/warning.jpg)

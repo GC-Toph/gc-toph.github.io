@@ -188,3 +188,5 @@ graph TD
     style TG fill:#FFD700
     style C fill:#FFA07A
 ```
+
+![warning](/assets/images/warning.jpg)

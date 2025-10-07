@@ -150,7 +150,7 @@ $$
 \frac{\partial \rho}{\partial t} + \nabla \cdot (\mathbf{v} \rho) = 0
 $$
 
-
+<!-- 
 ### 拉格朗日(粒子)视角：$$\ln \rho(\mathbf{x}, t)$$ 对时间 $$t$$ 的随体导数(全导数)
 
 $$ \ln \rho(\mathbf{x}(t), t) $$ 是关于时间 $$t$$ 的复合函数。对其求全导数：
@@ -201,7 +201,7 @@ $$
 \boxed{
 \frac{d}{dt} \ln \rho(\mathbf{x}(t), t) = - \nabla \cdot \mathbf{v}(\mathbf{x}(t), t)
 }
-$$
+$$ -->
 
 
 
@@ -287,7 +287,7 @@ $$
 $$
 
 ---
-
+<!-- 
 ### 寻找高密度中心 (mode)
 
 $$ \frac{d}{dt} \ln \rho(\mathbf{x}(t), t) = - \nabla \cdot \mathbf{v}(\mathbf{x}(t), t) $$ 
@@ -380,7 +380,7 @@ def get_guidance_vector(v_model, x, t):
 
 > **说明**: `create_graph=True` 告诉 PyTorch 在计算第一个梯度（`vjp_u`）时保留计算图，这样我们才能对结果（`divergence_estimate`）再次求导。这会消耗更多内存，但是实现高阶导数的标准方法。
 >
-> 这种随机估计方法将计算引导项的成本从 $$O(D \cdot C)$$ 降低到与**两次**标准反向传播相当的 $$O(C)$$，使其在实践中变得可行。
+> 这种随机估计方法将计算引导项的成本从 $$O(D \cdot C)$$ 降低到与**两次**标准反向传播相当的 $$O(C)$$，使其在实践中变得可行。 -->
 
 ## 附 torch.autograd.grad (vjp: vector-Jacobian product)
 
@@ -536,3 +536,4 @@ $$
 \boldsymbol{\mu}_{reverse} = - \boldsymbol{\mu}_{rev} = -\boldsymbol{\mu}(\mathbf{X}_t, t) + \boldsymbol{\sigma}(t)^2 \nabla_{\mathbf{X}_t} \log p_t(\mathbf{X}_t)
 $$
 
+![warning](/assets/images/warning.jpg)
