@@ -50,6 +50,9 @@ jobs:
         env:
           JEKYLL_ENV: "production"
 
+      - name: Debug _site structure
+        run: find _site -type f && ls _site/assets/images
+
       - name: Test site
         run: |
           bundle exec htmlproofer _site \
