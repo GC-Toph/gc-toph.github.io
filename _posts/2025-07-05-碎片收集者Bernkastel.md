@@ -11,10 +11,10 @@ tags: [Anki, Bernkastel, 碎片, 拼图]
 
 全文：[间隔重复](https://ncase.me/remember/)
 
-![不带回忆的遗忘曲线](assets/images/20250705/sci_b_back.png)
+![不带回忆的遗忘曲线](/assets/images/20250705/sci_b_back.png)
 不带回忆的遗忘曲线，指数级衰减
 
-![适时主动回忆的遗忘曲线](assets/images/20250705/sci_c_back.png)
+![适时主动回忆的遗忘曲线](/assets/images/20250705/sci_c_back.png)
 在黄色区域（不是太难，也不是太简单，难度刚刚好）主动回忆的遗忘曲线，半衰期变长。
 
 同样回忆次数的情况下，效率最大化的方式是逐渐拉长复习时间，并根据每次的难度反馈调整。
@@ -22,14 +22,15 @@ tags: [Anki, Bernkastel, 碎片, 拼图]
 ## 卡片特性
 
 理想的Anki卡片如同拼图的碎片，
+
 - **小**: 每一张都包含一个独立的知识点，
 - **可相互连接**: 但又能与其他卡片相互关联，共同构成一个完整的知识体系，
 - **有意义**: 并且每个碎片本身都承载着明确的学习价值。
 这种方法有助于学习者构建知识网络，而非孤立地记忆零散信息。
 
-![Small Connected Meaningful](assets/images/20250705/cards2.png)
+![Small Connected Meaningful](/assets/images/20250705/cards2.png)
 
-![Small Connected Meaningful](assets/images/20250705/cards.png)
+![Small Connected Meaningful](/assets/images/20250705/cards.png)
 
 ## 流程
 
@@ -41,7 +42,6 @@ Python库:
 - `PyMuPDF4LLM`
 
 ### Prompt
-
 
 *   **阶段一：提取核心事实。**
     ```
