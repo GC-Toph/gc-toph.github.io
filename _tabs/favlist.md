@@ -30,8 +30,6 @@ mermaid: true
 
 ## 在线书籍
 
-[Deep Learning - Foundations and Concepts](https://www.bishopbook.com/)
-
 [The Modern JavaScript Tutorial](https://javascript.info/)
 
 Interactive graphs and explanations about key [economic](https://www.econgraphs.org/) concepts for use in teaching and exploring

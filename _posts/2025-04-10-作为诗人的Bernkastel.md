@@ -961,6 +961,160 @@ Frederica Bernkastel
 ### ep1
 
 ```text
+Ne regole
+Ne comandamenti
+Ne ragione In altre
+parole: imprevedibile
+既无规则
+亦无戒律
+更无理性
+换言之：不可预料
+
+Ma succede
+Cose spiacevoli succedono
+E io ne sono la causa
+Ancora non capisci?
+但终究发生了
+不幸之事终究降临
+而我即是那祸端
+你至今仍未明了？
+
+Niente di cui nutrirmi
+Mi fanno morire di fame
+Mi fanno morire credendo
+di poter prevedere
+无物可供果腹
+他们任我饥饿至死
+他们让我至死都坚信
+一切皆可预见
+
+Pagliacci, Pagliacci,
+impazzite in sogni dorati
+滑稽的小丑啊，小丑们
+在黄金的梦境中癫狂吧
+
+Sulla scena
+bagnata di colpe
+在这早已被
+罪孽浸透的舞台之上
+
+Caricato l'orologio rotto
+anche stanotte si rialza
+il sipario della tragedia
+给毁坏的时钟上紧发条
+今夜依旧
+升起这悲剧的帷幕
+
+Su, tenendoci per
+mano danziamo
+in infinita disperazione
+来吧，让我们手牵着手
+在无尽的绝望中
+共舞
+
+Aperto il catenaccio,
+verso una nuova gabbia
+打开了门闩
+却只是通向一座新的牢笼
+
+Fino alla fine di una
+notte che non avra alba
+直至这无尽长夜的尽头
+直至那绝不会到来的黎明
+
+Beatrice! Maga crudele!
+Di bellezza senza pari
+贝阿朵莉切！残酷的魔女！
+拥有举世无双的美貌
+
+Beatrice! Oh!
+Di dolcezza capricciosa
+贝阿朵莉切！噢！
+那任性无常的甜蜜
+
+Mai potro liberarmi dal
+tuo incantesimo Se questa
+pena deve durare almeno
+una volta abbi pieta
+我永无可能从你的魔咒中解脱
+若这惩罚注定长存
+只求你至少哪怕一次
+施舍慈悲
+
+Piena di pianto e
+l'isola cupa e deserta
+Sul suolo si riversa
+inesauribile tristezza
+这座阴郁荒芜的孤岛
+充满了哭泣与哀号
+那取之不尽的悲伤
+倾泻在每一寸土地
+
+Piu volte s'attraversa il
+dedalo della disperazione
+Aperta la porta sbarrata,
+ride la verita
+哪怕无数次穿越
+这绝望的迷宫
+当冲破紧锁的大门之时
+唯有“真相”在发笑
+
+Miscuglio d'amore e odio
+s'alza stanotte il sipario
+d'una nuova commedia
+爱与恨交织混沌
+今夜再次升起
+新一轮喜剧的帷幕
+
+Notte del giudizio
+in cui ogni cosa
+e ridotta in cenere
+审判之夜
+万事万物
+皆化为灰烬
+
+L'afflizione delle
+offerte sacrificali
+那名为祭品的羔羊
+所受之苦难
+
+sara avvolta nelle
+fiamme del purgatorio
+终将被炼狱的
+业火吞噬
+
+(Numerose le trappole
+gia predisposte
+Il segreto delle
+streghe rimarra tale)
+（无数的陷阱
+早已布下
+魔女的秘密
+将永远尘封）
+
+Su, affondate le unghie!
+Fino a farle cadere
+来吧，深深嵌入指甲！
+直至其剥落脱离
+
+Su, piangete e urlate!
+Fino a perdere la voce
+来吧，哭喊嘶吼！
+直至声嘶力竭
+
+Su, fuggite!
+Fino a perdere il respiro
+来吧，四散奔逃！
+直至气息断绝
+
+Sull'isola arsa
+dalla malvagita
+在这座被邪恶
+灼烧殆尽的岛屿之上
+```
+
+
+```text
 嘉音
 「…………就连姐姐她，…也是家具。
 ……哪怕是装作人的样子，…以后也只会使自己痛苦。
