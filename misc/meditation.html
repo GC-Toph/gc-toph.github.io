@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>冥想</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --circle-color: #38bdf8;
+            --text-color: #f1f5f9;
+            --accent-color: #94a3b8;
+        }
+
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            overflow: hidden;
+        }
+
+        /* --- 1. 界面放大 --- */
+        .container {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            /* 基础尺寸扩大 */
+            width: min(90vw, 500px);
+            height: min(90vw, 500px);
+        }
+
+        .breathing-circle {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(56, 189, 248, 0.35) 0%, rgba(15, 23, 42, 0) 70%);
+            transform: scale(0.8);
+            opacity: 0.8;
+            will-change: transform, opacity;
+            box-shadow: 0 0 60px rgba(56, 189, 248, 0.15);
+        }
+
+        .status-text {
+            z-index: 10;
+            text-align: center;
+            pointer-events: none;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        }
+
+        /* 字体放大 */
+        .action {
+            font-size: 3.5rem; /* 增大 */
+            font-weight: 200;
+            display: block;
+            margin-bottom: 15px;
+            letter-spacing: 4px;
+        }
+
+        .instruction {
+            font-size: 1.4rem; /* 增大 */
+            color: var(--accent-color);
+            font-weight: 300;
+            opacity: 1;
+            transition: opacity 1s ease;
+            line-height: 1.6;
+        }
+
+        /* --- 底部控制栏 --- */
+        .controls {
+            position: absolute;
+            bottom: 8%; /* 稍微上移 */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            width: 100%;
+            z-index: 20;
+        }
+
+        /* --- 3. 定时器样式 --- */
+        .timer-setup {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.1rem;
+            color: var(--accent-color);
+        }
+
+        input[type="number"] {
+            background: transparent;
+            border: 1px solid var(--accent-color);
+            color: var(--text-color);
+            padding: 5px 10px;
+            border-radius: 8px;
+            width: 50px;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+
+        button {
+            background: rgba(56, 189, 248, 0.1);
+            border: 1px solid var(--circle-color);
+            color: var(--circle-color);
+            padding: 15px 45px;
+            border-radius: 40px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+
+        button:hover {
+            background: rgba(56, 189, 248, 0.25);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(56, 189, 248, 0.2);
+        }
+
+        .timer-display {
+            font-variant-numeric: tabular-nums;
+            font-size: 1.2rem;
+            color: #64748b;
+        }
+
+        /* 动画关键帧 */
+        .inhale-anim {
+            animation: breathe-in 4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+        .exhale-anim {
+            animation: breathe-out 6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        @keyframes breathe-in {
+            0% { transform: scale(0.8); opacity: 0.5; }
+            100% { transform: scale(1.3); opacity: 1; }
+        }
+        @keyframes breathe-out {
+            0% { transform: scale(1.3); opacity: 1; }
+            100% { transform: scale(0.8); opacity: 0.5; }
+        }
+
+        /* 隐藏设置项的类 */
+        .hidden { display: none !important; }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="breathing-circle" id="circle"></div>
+        <div class="status-text">
+            <span class="action" id="main-text">准备</span>
+            <span class="instruction" id="sub-text">脊柱伸展 · 感受身体<br>聆听声音引导</span>
+        </div>
+    </div>
+
+    <div class="controls">
+        <div class="timer-setup" id="setup-panel">
+            <span>定时</span>
+            <input type="number" id="duration-input" value="10" min="1" max="60">
+            <span>分钟</span>
+        </div>
+
+        <div class="timer-display hidden" id="countdown-display">剩余: 10:00</div>
+
+        <button id="toggle-btn" onclick="toggleMeditation()">开始冥想</button>
+    </div>
+
+    <script>
+        const INHALE_TIME = 4000;
+        const EXHALE_TIME = 6000;
+        
+        let isMeditating = false;
+        let audioContext = null;
+        let timerInterval = null;
+        let breathTimeout = null;
+        let remainingSeconds = 0;
+
+        // DOM
+        const circle = document.getElementById('circle');
+        const mainText = document.getElementById('main-text');
+        const subText = document.getElementById('sub-text');
+        const btn = document.getElementById('toggle-btn');
+        const setupPanel = document.getElementById('setup-panel');
+        const countdownDisplay = document.getElementById('countdown-display');
+        const durationInput = document.getElementById('duration-input');
+
+        function initAudio() {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioContext.state === 'suspended') {
+                audioContext.resume();
+            }
+        }
+
+        // 音频合成函数
+        function playTone(freq, duration, volume = 0.3) {
+            if (!audioContext) return;
+            const osc = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, audioContext.currentTime);
+            
+            gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+            gainNode.gain.linearRampToValueAtTime(volume, audioContext.currentTime + 0.1); 
+            gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + duration);
+
+            osc.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            osc.start();
+            osc.stop(audioContext.currentTime + duration);
+        }
+
+        function playBowlSound(baseFreq, duration) {
+            playTone(baseFreq, duration, 0.3);
+            playTone(baseFreq * 1.5, duration * 0.8, 0.1); // 泛音
+        }
+        
+        function playEndChime() {
+            // 结束时的清脆铃声
+            playTone(880, 2.0, 0.2);
+            setTimeout(() => playTone(1100, 2.5, 0.1), 200);
+        }
+
+        // --- 主逻辑 ---
+
+        function toggleMeditation() {
+            if (isMeditating) {
+                userStop();
+            } else {
+                startMeditation();
+            }
+        }
+
+        function startMeditation() {
+            initAudio();
+            
+            // 获取时间设置
+            const minutes = parseInt(durationInput.value) || 10;
+            remainingSeconds = minutes * 60;
+
+            isMeditating = true;
+            
+            // UI 更新
+            btn.innerText = "停止";
+            btn.style.borderColor = "#ef4444";
+            btn.style.color = "#ef4444";
+            
+            setupPanel.classList.add('hidden');
+            countdownDisplay.classList.remove('hidden');
+            updateCountdownText();
+
+            // 初始引导变化
+            subText.style.opacity = 0; // 先淡出准备文字
+            setTimeout(() => {
+                runBreathCycle(); // 开始循环
+                startTimer();     // 开始倒计时
+            }, 500);
+        }
+
+        function userStop() {
+            stopMeditationLogic();
+            resetUI();
+        }
+
+        function finishMeditation() {
+            stopMeditationLogic();
+            playEndChime();
+            
+            // 完成后的 UI
+            btn.innerText = "冥想完成";
+            mainText.innerText = "理智 += 1";
+            subText.innerText = "感受当下的平静";
+            subText.style.opacity = 1;
+            circle.classList.remove('inhale-anim', 'exhale-anim');
+            
+            setTimeout(() => {
+                resetUI();
+            }, 7000);
+        }
+
+        function stopMeditationLogic() {
+            isMeditating = false;
+            clearTimeout(breathTimeout);
+            clearInterval(timerInterval);
+        }
+
+        function resetUI() {
+            btn.innerText = "开始冥想";
+            btn.style.borderColor = "#38bdf8";
+            btn.style.color = "#38bdf8";
+
+            setupPanel.classList.remove('hidden');
+            countdownDisplay.classList.add('hidden');
+
+            circle.classList.remove('inhale-anim', 'exhale-anim');
+            mainText.innerText = "准备";
+            subText.innerText = "脊柱伸展 · 感受身体\n聆听声音引导";
+            subText.style.opacity = 1;
+        }
+
+        // --- 倒计时逻辑 ---
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                remainingSeconds--;
+                updateCountdownText();
+
+                if (remainingSeconds <= 0) {
+                    finishMeditation();
+                }
+            }, 1000);
+        }
+
+        function updateCountdownText() {
+            const m = Math.floor(remainingSeconds / 60).toString().padStart(2, '0');
+            const s = (remainingSeconds % 60).toString().padStart(2, '0');
+            countdownDisplay.innerText = `剩余: ${m}:${s}`;
+        }
+
+        // --- 呼吸循环逻辑 ---
+        function runBreathCycle() {
+            if (!isMeditating) return;
+
+            // 吸气
+            performInhale();
+
+            breathTimeout = setTimeout(() => {
+                if (!isMeditating) return;
+                
+                // 呼气
+                performExhale();
+
+                breathTimeout = setTimeout(runBreathCycle, EXHALE_TIME);
+
+            }, INHALE_TIME);
+        }
+
+        function performInhale() {
+            circle.classList.remove('exhale-anim');
+            void circle.offsetWidth; 
+            circle.classList.add('inhale-anim');
+
+            mainText.innerText = "吸气";
+            // 引导闭眼聆听
+            subText.innerText = "专注：鼻尖微凉 "; 
+            subText.style.opacity = 1;
+
+            playBowlSound(523.25, INHALE_TIME/1000); // 高音
+        }
+
+        function performExhale() {
+            circle.classList.remove('inhale-anim');
+            void circle.offsetWidth; 
+            circle.classList.add('exhale-anim');
+
+            mainText.innerText = "呼气";
+            subText.innerText = "专注：鼻尖温暖\n(可闭眼)";
+            subText.style.opacity = 1;
+
+            playBowlSound(261.63, EXHALE_TIME/1000); // 低音
+        }
+    </script>
+</body>
+</html>
