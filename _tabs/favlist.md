@@ -33,3 +33,7 @@ mermaid: true
 [The Modern JavaScript Tutorial](https://javascript.info/)
 
 Interactive graphs and explanations about key [economic](https://www.econgraphs.org/) concepts for use in teaching and exploring
+
+## misc
+
+- [冥想训练](/misc/meditation.html)

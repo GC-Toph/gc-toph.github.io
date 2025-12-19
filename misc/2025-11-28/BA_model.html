@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <title>幂律分布生成机制：优先连接 (BA模型) 可视化</title>
+    <style>
+      body {
+        font-family: "Segoe UI", sans-serif;
+        background: #1a1a1a;
+        color: #eee;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+        overflow: hidden;
+      }
+      header {
+        padding: 10px 20px;
+        background: #2a2a2a;
+        border-bottom: 1px solid #444;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      h1 {
+        font-size: 18px;
+        margin: 0;
+      }
+      .controls button {
+        background: #007acc;
+        border: none;
+        color: white;
+        padding: 5px 15px;
+        cursor: pointer;
+        border-radius: 3px;
+        font-size: 14px;
+        margin-left: 10px;
+      }
+      .controls button:hover {
+        background: #005f9e;
+      }
+      .controls button.stop {
+        background: #cc3300;
+      }
+
+      #main-container {
+        display: flex;
+        flex: 1;
+        height: 100%;
+      }
+
+      /* 左侧网络视图 */
+      #network-view {
+        flex: 2;
+        position: relative;
+        border-right: 1px solid #444;
+        background: #000;
+      }
+      canvas#netCanvas {
+        display: block;
+        width: 100%;
+        height: 100%;
+      }
+
+      /* 右侧图表视图 */
+      #chart-view {
+        flex: 1;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        background: #222;
+      }
+      .stat-box {
+        margin-bottom: 20px;
+        font-size: 14px;
+        color: #aaa;
+      }
+      .stat-value {
+        color: #fff;
+        font-weight: bold;
+        font-size: 18px;
+      }
+      canvas#plotCanvas {
+        background: #333;
+        width: 100%;
+        height: 300px;
+        border: 1px solid #555;
+      }
+      .plot-label {
+        text-align: center;
+        font-size: 12px;
+        margin-top: 5px;
+        color: #888;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Barabási–Albert模型演示</h1>
+      <div class="controls">
+        <span id="node-count">节点数: 0</span>
+        <button onclick="toggleSim()" id="btn-toggle">暂停</button>
+        <button onclick="resetSim()" class="stop">重置</button>
+      </div>
+    </header>
+
+    <div id="main-container">
+      <div id="network-view">
+        <canvas id="netCanvas"></canvas>
+      </div>
+      <div id="chart-view">
+        <div class="stat-box">
+          <div>生成机制: <span style="color: #4caf50">优先连接 (Preferential Attachment)</span></div>
+          <div style="margin-top: 5px; font-size: 12px; line-height: 1.4">
+            新节点加入时，连接到老节点 i 的概率为：<br />
+            P(i) = k_i / Σk_j <br />
+            (k 为度数)
+          </div>
+        </div>
+
+        <canvas id="plotCanvas"></canvas>
+        <div class="plot-label">Log-Log 度分布图 (X: log度, Y: log概率)</div>
+      </div>
+    </div>
+
+    <script>
+      /**
+       * 简单的力导向图 + BA模型模拟
+       */
+
+      const canvas = document.getElementById("netCanvas");
+      const ctx = canvas.getContext("2d");
+      const pCanvas = document.getElementById("plotCanvas");
+      const pCtx = pCanvas.getContext("2d");
+
+      let width, height, pWidth, pHeight;
+
+      // 模拟参数
+      const MAX_POINTS = 1000;
+      const M = 6; // 新节点每次产生 M 条边
+      let nodes = [];
+      let edges = [];
+      let isRunning = true;
+      let animationId;
+
+      // 物理参数
+      const REPULSION = 25;
+      const SPRING_LENGTH = 100;
+      const SPRING_K = 0.001;
+      const CENTER_GRAVITY = 0.001; // 稍微拉向中心防止飞出
+      const FRAC = 0.95; // 摩擦力
+
+      class Node {
+        constructor(id) {
+          this.id = id;
+          this.x = Math.random() * width;
+          this.y = Math.random() * height;
+          this.vx = 0;
+          this.vy = 0;
+          this.degree = 0;
+          this.color = "#ccc";
+          this.radius = 1;
+        }
+
+        get mass() {
+          return Math.sqrt(this.degree);
+        }
+
+        update() {
+          this.x += this.vx;
+          this.y += this.vy;
+
+          this.vx *= FRAC;
+          this.vy *= FRAC;
+        }
+
+        draw() {
+          // 根据度数调整大小和颜色 (可视化 Hub)
+          const size = 1 + this.mass;
+          this.radius = size;
+
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, size, 0, Math.PI * 2);
+
+          // 简单的热度图颜色
+          if (this.mass > 9) ctx.fillStyle = "#ff3333"; // Super Hub
+          else if (this.mass > 5) ctx.fillStyle = "#ffaa33"; // Hub
+          else ctx.fillStyle = "#4da6ff"; // Normal
+
+          ctx.fill();
+        }
+      }
+
+      function resize() {
+        width = canvas.width = canvas.offsetWidth;
+        height = canvas.height = canvas.offsetHeight;
+        pWidth = pCanvas.width = pCanvas.offsetWidth;
+        pHeight = pCanvas.height = pCanvas.offsetHeight;
+      }
+      window.addEventListener("resize", resize);
+      resize();
+
+      function init() {
+        nodes = [];
+        edges = [];
+        // 初始完全连接图
+        const initialSize = 7;
+        for (let i = 0; i < initialSize; i++) {
+          nodes.push(new Node(i));
+          // 放在中心附近
+          nodes[i].x = width / 2 + (Math.random() - 0.5) * 50;
+          nodes[i].y = height / 2 + (Math.random() - 0.5) * 50;
+        }
+        // 全连接
+        for (let i = 0; i < initialSize; i++) {
+          for (let j = i + 1; j < initialSize; j++) {
+            addEdge(i, j);
+          }
+        }
+        drawPlot();
+      }
+
+      function addEdge(sourceIdx, targetIdx) {
+        edges.push({ source: sourceIdx, target: targetIdx });
+        nodes[sourceIdx].degree++;
+        nodes[targetIdx].degree++;
+      }
+
+      // 核心：优先连接算法
+      function addNode() {
+        if (nodes.length > MAX_POINTS) {
+          // 限制节点总数防止卡顿
+          document.getElementById("btn-toggle").innerText = "已达上限";
+          return;
+        }
+
+        const newNodeIdx = nodes.length;
+        const newNode = new Node(newNodeIdx);
+
+        // 新节点从随机位置出生
+        newNode.x = Math.random() * width;
+        newNode.y = Math.random() * height;
+        nodes.push(newNode);
+
+        // 计算总度数
+        let totalDegree = 0;
+        for (let n of nodes) totalDegree += n.degree;
+
+        // 选择 M 个已有节点进行连接
+        // 使用轮盘赌算法 (Roulette Wheel Selection)
+        let targets = [];
+        let attempts = 0;
+
+        while (targets.length < M && attempts < 100) {
+          attempts++;
+          const rand = Math.random() * totalDegree;
+          let cumulative = 0;
+          let selected = -1;
+
+          for (let i = 0; i < nodes.length - 1; i++) {
+            // 不包括自己
+            cumulative += nodes[i].degree;
+            if (cumulative >= rand) {
+              selected = i;
+              break;
+            }
+          }
+
+          if (selected !== -1 && !targets.includes(selected)) {
+            targets.push(selected);
+          }
+        }
+
+        // 建立连接
+        targets.forEach((targetIdx) => {
+          addEdge(newNodeIdx, targetIdx);
+        });
+
+        document.getElementById("node-count").innerText = `节点数: ${nodes.length}`;
+      }
+
+      // 物理引擎步骤
+      function physics() {
+        // 1. 库仑力 (斥力)
+        for (let i = 0; i < nodes.length; i++) {
+          for (let j = i + 1; j < nodes.length; j++) {
+            const dx = nodes[i].x - nodes[j].x;
+            const dy = nodes[i].y - nodes[j].y;
+            const distSq = dx * dx + dy * dy;
+            if (distSq === 0) continue;
+            const dist = Math.sqrt(distSq);
+            const force = (REPULSION * nodes[i].mass * nodes[j].mass) / (distSq + 100);
+            const fx = (dx / dist) * force;
+            const fy = (dy / dist) * force;
+
+            nodes[i].vx += fx / nodes[i].mass;
+            nodes[i].vy += fy / nodes[i].mass;
+            nodes[j].vx -= fx / nodes[j].mass;
+            nodes[j].vy -= fy / nodes[j].mass;
+          }
+
+          // 重力向中心
+          nodes[i].vx += (width / 2 - nodes[i].x) * CENTER_GRAVITY;
+          nodes[i].vy += (height / 2 - nodes[i].y) * CENTER_GRAVITY;
+        }
+
+        // 2. 弹簧力
+        for (let e of edges) {
+          const u = nodes[e.source];
+          const v = nodes[e.target];
+          const dx = v.x - u.x;
+          const dy = v.y - u.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+
+          const force = (dist - SPRING_LENGTH) * SPRING_K;
+          const fx = (dx / dist) * force;
+          const fy = (dy / dist) * force;
+
+          u.vx += fx / u.mass;
+          u.vy += fy / u.mass;
+          v.vx -= fx / v.mass;
+          v.vy -= fy / v.mass;
+        }
+
+        // 3. 更新位置
+        for (let n of nodes) n.update();
+      }
+
+      function drawNetwork() {
+        ctx.clearRect(0, 0, width, height);
+
+        // 画边
+        ctx.strokeStyle = "#333";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        for (let e of edges) {
+          const u = nodes[e.source];
+          const v = nodes[e.target];
+          ctx.moveTo(u.x, u.y);
+          ctx.lineTo(v.x, v.y);
+        }
+        ctx.stroke();
+
+        // 画点
+        for (let n of nodes) n.draw();
+      }
+
+      // 绘制 Log-Log Plot
+      function drawPlot() {
+        // 统计度分布
+        const frequencies = {};
+        let maxDegree = 0;
+
+        nodes.forEach((n) => {
+          const d = n.degree;
+          if (d === 0) return;
+          if (!frequencies[d]) frequencies[d] = 0;
+          frequencies[d]++;
+          if (d > maxDegree) maxDegree = d;
+        });
+
+        pCtx.clearRect(0, 0, pWidth, pHeight);
+
+        // 准备数据点: [log(k), log(P(k))]
+        // 这里用 log(Frequency) 代替 log(P(k))，形状是一样的
+        const points = [];
+        for (let k in frequencies) {
+          const x = Math.log10(parseInt(k));
+          const y = Math.log10(frequencies[k]);
+          const mass = Math.sqrt(parseInt(k));
+          points.push({ x, y, mass });
+        }
+
+        if (points.length < 2) return;
+
+        // 计算绘图范围
+        const minX = 1;
+        const maxX = Math.log10(maxDegree) * 1.05; // 留点余地
+
+        // Y轴最大值通常是 log(节点总数) 或 log(count=1的度数)
+        let maxY = 0;
+        points.forEach((p) => {
+          if (p.y > maxY) maxY = p.y;
+        });
+        maxY *= 1.1;
+
+        const mapX = (val) => (val / maxX) * (pWidth - 40) + 20;
+        const mapY = (val) => pHeight - 20 - (val / maxY) * (pHeight - 40);
+
+        // 画坐标轴
+        pCtx.strokeStyle = "#666";
+        pCtx.beginPath();
+        pCtx.moveTo(20, pHeight - 20);
+        pCtx.lineTo(pWidth - 10, pHeight - 20); // X axis
+        pCtx.moveTo(20, pHeight - 20);
+        pCtx.lineTo(20, 10); // Y axis
+        pCtx.stroke();
+
+        // 画点
+
+        points.forEach((p) => {
+          if (p.mass > 9) pCtx.fillStyle = "#ff3333"; // Super Hub
+          else if (p.mass > 5) pCtx.fillStyle = "#ffaa33"; // Hub
+          else pCtx.fillStyle = "#4da6ff"; // Normal
+
+          const px = mapX(p.x);
+          const py = mapY(p.y);
+          pCtx.beginPath();
+          pCtx.arc(px, py, 3, 0, Math.PI * 2);
+          pCtx.fill();
+        });
+      }
+
+      // 主循环
+      let frameCount = 0;
+      function loop() {
+        if (!isRunning) return;
+
+        physics();
+        drawNetwork();
+
+        // 每隔几帧加一个节点
+        if (frameCount % 5 === 0 && nodes.length < MAX_POINTS) {
+          addNode();
+          drawPlot();
+        }
+
+        systemEnergy = 0;
+        nodes.forEach((n) => {
+          systemEnergy += 0.5 * n.mass * (n.vx * n.vx + n.vy * n.vy);
+        });
+
+        if (MAX_POINTS == nodes.length && systemEnergy / MAX_POINTS < 1e-2) {
+          toggleSim();
+        }
+
+        frameCount++;
+        animationId = requestAnimationFrame(loop);
+      }
+
+      function toggleSim() {
+        isRunning = !isRunning;
+        const btn = document.getElementById("btn-toggle");
+        btn.innerText = isRunning ? "暂停" : "继续";
+        if (isRunning) loop();
+      }
+
+      function resetSim() {
+        isRunning = false;
+        cancelAnimationFrame(animationId);
+        document.getElementById("btn-toggle").innerText = "暂停";
+        init();
+        isRunning = true;
+        frameCount = 0;
+        loop();
+      }
+
+      // 启动
+      init();
+      loop();
+    </script>
+  </body>
+</html>

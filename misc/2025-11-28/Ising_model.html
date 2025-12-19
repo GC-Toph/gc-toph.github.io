@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>Ising Model</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            background-color: #111;
+            color: #eee;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+        }
+        
+        .container {
+            position: relative;
+            margin-top: 20px;
+        }
+
+        /* 关键：CSS控制显示大小，image-rendering保证放大不模糊 */
+        canvas {
+            width: 400px;         /* 显示宽度 */
+            height: 400px;        /* 显示高度 */
+            image-rendering: pixelated; /* 像素化放大，关键 */
+            image-rendering: crisp-edges;
+            border: 2px solid #555;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            background-color: #000; /* 默认黑色背景 */
+        }
+
+        .controls {
+            background: #222;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        input[type=range] { width: 200px; cursor: pointer; }
+        
+        button {
+            padding: 8px 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover { background-color: #0056b3; }
+        
+        .legend { font-size: 0.9em; display: flex; gap: 15px; }
+        .dot { width: 10px; height: 10px; display: inline-block; margin-right: 5px; }
+    </style>
+</head>
+<body>
+
+    <h2>2D Ising Model</h2>
+
+    <div class="controls">
+        <div>
+            <label>温度 (T): <span id="tempDisplay" style="color:yellow; font-weight:bold;">2.27</span></label>
+            <br>
+            <input type="range" id="tempSlider" min="0.1" max="5.0" step="0.01" value="2.27">
+        </div>
+        <button onclick="resetGrid()">重置随机场</button>
+        <button onclick="togglePause()" id="pauseBtn">暂停</button>
+        
+        <div class="legend">
+            <div><span class="dot" style="background:#FF3333"></span>自旋 +1</div>
+            <div><span class="dot" style="background:#00CC00"></span>自旋 -1</div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- 关键：物理分辨率设为 100x100，与网格大小一致 -->
+        <canvas id="simCanvas" width="100" height="100"></canvas>
+    </div>
+    
+    <p style="color:#888; font-size:0.9em; text-align:center;">
+        T < 2.27: 有序 | T ≈ 2.27: 临界分形 | T > 2.27: 热噪点
+    </p>
+
+<script>
+    // --- 参数配置 ---
+    const GRID_SIZE = 100; // 网格尺寸
+    let T = 2.27;          // 温度
+    const J = 1.0;         // 交换相互作用强度
+
+    // --- 状态变量 ---
+    const canvas = document.getElementById('simCanvas');
+    const ctx = canvas.getContext('2d');
+    
+    // 使用一维数组存储二维网格，性能更好
+    // grid[y * GRID_SIZE + x]
+    let grid = new Int8Array(GRID_SIZE * GRID_SIZE); 
+    
+    // 创建图像缓冲区 (Image Buffer)
+    // 这是一个 100x100 的图像数据，每个点对应一个像素
+    const imgData = ctx.createImageData(GRID_SIZE, GRID_SIZE);
+    // 使用 32位视图操作像素，比操作 8位数组快 4倍
+    // 每个像素是 0xAABBGGRR (Alpha, Blue, Green, Red)
+    const buf32 = new Uint32Array(imgData.data.buffer);
+
+    let isRunning = true;
+    let frameId;
+
+    // --- 颜色定义 (ABGR 格式, 因为是小端序) ---
+    // Red: Alpha=FF(255), B=00, G=33, R=FF -> 0xFF0033FF
+    const COLOR_UP = 0xFF3333FF;   // 红色 (自旋 +1)
+    // Green: Alpha=FF(255), B=00, G=CC, R=00 -> 0xFF00CC00
+    const COLOR_DOWN = 0xFF00CC00; // 绿色 (自旋 -1)
+
+    // --- 初始化 ---
+    function init() {
+        // 绑定滑块
+        const slider = document.getElementById('tempSlider');
+        const display = document.getElementById('tempDisplay');
+        slider.oninput = function() {
+            T = parseFloat(this.value);
+            display.innerText = T.toFixed(2);
+        };
+
+        resetGrid();
+        loop();
+    }
+
+    function resetGrid() {
+        for (let i = 0; i < grid.length; i++) {
+            grid[i] = Math.random() > 0.5 ? 1 : -1;
+        }
+    }
+
+    function togglePause() {
+        isRunning = !isRunning;
+        document.getElementById('pauseBtn').innerText = isRunning ? "暂停" : "继续";
+        if (isRunning) loop();
+    }
+
+    // --- 核心物理引擎 (Metropolis 算法) ---
+    function updatePhysics() {
+        // 每帧尝试翻转 N次，保证演化速度
+        const steps = GRID_SIZE * GRID_SIZE; 
+
+        for (let k = 0; k < steps; k++) {
+            // 随机选点
+            const x = (Math.random() * GRID_SIZE) | 0; // | 0 是快速取整
+            const y = (Math.random() * GRID_SIZE) | 0;
+            const idx = y * GRID_SIZE + x;
+            
+            const s = grid[idx];
+
+            // 周期性边界条件 (取模运算的快速写法)
+            const left  = grid[y * GRID_SIZE + (x - 1 + GRID_SIZE) % GRID_SIZE];
+            const right = grid[y * GRID_SIZE + (x + 1) % GRID_SIZE];
+            const up    = grid[((y - 1 + GRID_SIZE) % GRID_SIZE) * GRID_SIZE + x];
+            const down  = grid[((y + 1) % GRID_SIZE) * GRID_SIZE + x];
+
+            // 计算能量差 dE = 2 * J * s * (Neighbors)
+            const dE = 2 * J * s * (left + right + up + down);
+
+            // Metropolis 判据
+            if (dE <= 0 || Math.random() < Math.exp(-dE / T)) {
+                grid[idx] = -s; // 翻转
+            }
+        }
+    }
+
+    // --- 渲染引擎 ---
+    function draw() {
+        // 直接更新 32位 buffer，速度极快
+        for (let i = 0; i < grid.length; i++) {
+            // 如果是 1 用红色，否则用绿色
+            buf32[i] = (grid[i] === 1) ? COLOR_UP : COLOR_DOWN;
+        }
+        // 将数据一次性推送到 Canvas
+        ctx.putImageData(imgData, 0, 0);
+    }
+
+    // --- 动画循环 ---
+    function loop() {
+        if (!isRunning) return;
+
+        updatePhysics();
+        draw();
+        
+        frameId = requestAnimationFrame(loop);
+    }
+
+    // 启动
+    init();
+
+</script>
+</body>
+</html>

@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>Metropolis vs MH Comparison</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #121212;
+            color: #eee;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+        }
+        
+        .title-group { text-align: center; margin-bottom: 20px; }
+        h2 { margin: 0 0 10px 0; }
+        p { color: #aaa; font-size: 0.9em; max-width: 900px; margin: 0 auto; line-height: 1.5; }
+
+        .container {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .panel {
+            background: #1e1e1e;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid #333;
+            width: 320px;
+        }
+
+        canvas {
+            background: #000;
+            border: 1px solid #444;
+            margin-top: 10px;
+        }
+
+        h3 { margin: 5px 0; font-size: 1.1em; }
+        .blue { color: #4da6ff; }
+        .red { color: #ff5555; }
+        .green { color: #00cc66; }
+
+        .stats {
+            margin-top: 8px;
+            font-size: 0.85em;
+            color: #888;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 10px;
+        }
+
+        .desc {
+            font-size: 0.8em;
+            color: #666;
+            margin-top: 8px;
+            min-height: 40px;
+        }
+
+        .controls {
+            margin-top: 25px;
+            background: #252525;
+            padding: 15px 30px;
+            border-radius: 30px;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+        }
+
+        button {
+            padding: 8px 24px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+        button:hover { background-color: #0056b3; }
+        button.reset { background-color: #555; }
+        button.reset:hover { background-color: #777; }
+        
+        input[type=range] { cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <div class="title-group">
+        <h2>Metropolis vs. Metropolis-Hastings</h2>
+        <p>目标分布：高度相关的二维高斯分布（细长椭圆）。<br>背景白线为理论上的 2σ 轮廓。</p>
+    </div>
+
+    <div class="container">
+        <!-- 1. Symmetric Metropolis -->
+        <div class="panel">
+            <h3 class="blue">1. Symmetric Metropolis</h3>
+            <div class="desc">提议是对称的随机游走。<br>无需校正。</div>
+            <canvas id="canvasSym" width="300" height="300"></canvas>
+            <div class="stats">
+                <span>Steps: <span id="cntSym">0</span></span>
+                <span>Accept: <span id="accSym">0%</span></span>
+            </div>
+        </div>
+
+        <!-- 2. Biased Wrong -->
+        <div class="panel">
+            <h3 class="red">2. Biased (Wrong)</h3>
+            <div class="desc">提议偏向原点 (向心)。<br><b>未加校正</b> -> 结果塌缩。</div>
+            <canvas id="canvasWrong" width="300" height="300"></canvas>
+            <div class="stats">
+                <span>Steps: <span id="cntWrong">0</span></span>
+                <span>Accept: <span id="accWrong">0%</span></span>
+            </div>
+        </div>
+
+        <!-- 3. Biased Correct (MH) -->
+        <div class="panel">
+            <h3 class="green">3. Metropolis-Hastings</h3>
+            <div class="desc">提议偏向原点。<br><b>加上 Hastings 校正</b> -> 结果正确。</div>
+            <canvas id="canvasCorrect" width="300" height="300"></canvas>
+            <div class="stats">
+                <span>Steps: <span id="cntCorrect">0</span></span>
+                <span>Accept: <span id="accCorrect">0%</span></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <label style="color:#ccc">演化速度:</label>
+        <input type="range" id="speedRange" min="1" max="100" value="10">
+        <button onclick="toggleRun()" id="btnPause">暂停 / 继续</button>
+        <button class="reset" onclick="resetSim()">重置</button>
+    </div>
+
+<script>
+
+    // 目标分布：协方差 Sigma = [[1, 0.9], [0.9, 1]]
+    const det = 1 - 0.9*0.9; 
+    const invSigma = [
+        [1/det, -0.9/det],
+        [-0.9/det, 1/det]
+    ];
+
+    // 提议参数
+    const ALPHA = 0.8;      // 向心系数 (0.8 表示下一步均值在 0.8*当前位置)
+    const SIGMA_PROP = 0.6; // 提议步长的噪声
+    
+    // 对称游走的步长 (为了公平对比，稍作调整)
+    const SIGMA_SYM = 0.6;  
+
+    // 计算目标对数概率: -0.5 * x^T * Sigma^-1 * x
+    function getLogTarget(x, y) {
+        const val = x * (invSigma[0][0]*x + invSigma[0][1]*y) +
+                    y * (invSigma[1][0]*x + invSigma[1][1]*y);
+        return -0.5 * val;
+    }
+
+    // 计算提议对数概率 log q(to | from)
+    // 对于对称游走，这个函数其实用不到 (结果会消掉)
+    // 对于非对称，q(y|x) 是均值为 alpha*x 的高斯分布
+    function getLogProposal(toX, toY, fromX, fromY) {
+        const muX = ALPHA * fromX;
+        const muY = ALPHA * fromY;
+        const distSq = (toX - muX)**2 + (toY - muY)**2;
+        return -0.5 * distSq / (SIGMA_PROP**2);
+    }
+
+    // 标准正态分布随机数生成器 (Box-Muller)
+    function randn() {
+        let u = 0, v = 0;
+        while(u === 0) u = Math.random(); 
+        while(v === 0) v = Math.random();
+        return Math.sqrt( -2.0 * Math.log( u ) ) * Math.cos( 2.0 * Math.PI * v );
+    }
+
+    // --- 模拟类 ---
+    class Simulation {
+        constructor(canvasId, type, color) {
+            this.canvas = document.getElementById(canvasId);
+            this.ctx = this.canvas.getContext('2d');
+            this.type = type; // 'symmetric', 'wrong', 'correct'
+            this.color = color;
+            
+            this.history = [];
+            this.reset();
+            
+            // 视图参数
+            this.scale = 35; 
+            this.cx = this.canvas.width / 2;
+            this.cy = this.canvas.height / 2;
+        }
+
+        reset() {
+            this.x = 3.5; // 初始点放远一点，观察收敛
+            this.y = 3.5;
+            this.history = [];
+            this.total = 0;
+            this.accepted = 0;
+        }
+
+        step() {
+            this.total++;
+            let nextX, nextY;
+            let logCorrection = 0;
+
+            // 1. 生成提议 (Proposal)
+            if (this.type === 'symmetric') {
+                // 对称游走: next = current + noise
+                nextX = this.x + randn() * SIGMA_SYM;
+                nextY = this.y + randn() * SIGMA_SYM;
+                // 对称提议，校正因子 log(1) = 0
+                logCorrection = 0;
+            } else {
+                // 非对称游走: next = 0.8 * current + noise
+                const muX = ALPHA * this.x;
+                const muY = ALPHA * this.y;
+                nextX = muX + randn() * SIGMA_PROP;
+                nextY = muY + randn() * SIGMA_PROP;
+                
+                if (this.type === 'correct') {
+                    // Hastings Correction
+                    // log [ q(old|new) / q(new|old) ]
+                    const logQ_back = getLogProposal(this.x, this.y, nextX, nextY);
+                    const logQ_fwd  = getLogProposal(nextX, nextY, this.x, this.y);
+                    logCorrection = logQ_back - logQ_fwd;
+                } else {
+                    // 'wrong' 类型，忽略校正
+                    logCorrection = 0;
+                }
+            }
+
+            // 2. 计算接受率
+            const logTargetDiff = getLogTarget(nextX, nextY) - getLogTarget(this.x, this.y);
+            const logAlpha = logTargetDiff + logCorrection;
+
+            // 3. 接受/拒绝
+            if (Math.log(Math.random()) < logAlpha) {
+                this.x = nextX;
+                this.y = nextY;
+                this.accepted++;
+            }
+
+            // 存入历史 (限制长度以保证性能)
+            this.history.push({x: this.x, y: this.y});
+            if (this.history.length > 2000) this.history.shift();
+        }
+
+        draw() {
+            // 清屏
+            this.ctx.fillStyle = "#000";
+            this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+            // 画理论椭圆 (2 Sigma)
+            // 协方差矩阵特征值 approx 1.9, 0.1
+            // 2 Sigma 长轴 ~ 2*sqrt(1.9) ~ 2.75, 短轴 ~ 2*sqrt(0.1) ~ 0.63
+            // 旋转 45度
+            this.ctx.strokeStyle = "rgba(255, 255, 255, 0.85)";
+            this.ctx.lineWidth = 2;
+            this.ctx.beginPath();
+            for (let t = 0; t <= Math.PI * 2; t += 0.1) {
+                const a = 2.75; const b = 0.63;
+                const _x = a * Math.cos(t);
+                const _y = b * Math.sin(t);
+                // 旋转变换
+                const rX = _x * 0.707 - _y * 0.707;
+                const rY = _x * 0.707 + _y * 0.707;
+                this.ctx.lineTo(this.cx + rX * this.scale, this.cy - rY * this.scale);
+            }
+            this.ctx.closePath();
+            this.ctx.stroke();
+
+            // 画点
+            this.ctx.fillStyle = this.color;
+            // 为了视觉效果，旧点暗一些，新点亮一些
+            for (let i = 0; i < this.history.length; i++) {
+                const p = this.history[i];
+                const alpha = 0.2 + 0.8 * (i / this.history.length); // 透明度渐变
+                this.ctx.globalAlpha = alpha;
+                this.ctx.fillRect(this.cx + p.x * this.scale - 1, this.cy - p.y * this.scale - 1, 2, 2);
+            }
+            this.ctx.globalAlpha = 1.0;
+
+            // 画当前位置大点
+            this.ctx.beginPath();
+            this.ctx.arc(this.cx + this.x * this.scale, this.cy - this.y * this.scale, 5, 0, Math.PI*2);
+            this.ctx.fillStyle = "#fff";
+            this.ctx.fill();
+        }
+    }
+
+    // --- 主控逻辑 ---
+    const simSym = new Simulation('canvasSym', 'symmetric', '#4da6ff');
+    const simWrong = new Simulation('canvasWrong', 'wrong', '#ff5555');
+    const simCorrect = new Simulation('canvasCorrect', 'correct', '#00cc66');
+    
+    let isRunning = true;
+    let speed = 10;
+    
+    // UI 引用
+    const uis = [
+        {sim: simSym, cnt: 'cntSym', acc: 'accSym'},
+        {sim: simWrong, cnt: 'cntWrong', acc: 'accWrong'},
+        {sim: simCorrect, cnt: 'cntCorrect', acc: 'accCorrect'}
+    ];
+
+    function loop() {
+        if (isRunning) {
+            for (let k = 0; k < speed; k++) {
+                simSym.step();
+                simWrong.step();
+                simCorrect.step();
+            }
+            
+            uis.forEach(u => {
+                u.sim.draw();
+                document.getElementById(u.cnt).innerText = u.sim.total;
+                document.getElementById(u.acc).innerText = (u.sim.accepted / u.sim.total * 100).toFixed(1) + "%";
+            });
+        }
+        requestAnimationFrame(loop);
+    }
+
+    function toggleRun() {
+        isRunning = !isRunning;
+    }
+
+    function resetSim() {
+        simSym.reset();
+        simWrong.reset();
+        simCorrect.reset();
+        uis.forEach(u => u.sim.draw());
+    }
+
+    document.getElementById('speedRange').oninput = function() {
+        speed = parseInt(this.value);
+    };
+
+    loop();
+
+</script>
+</body>
+</html>
