@@ -15,7 +15,11 @@ mermaid: true # diagram generation
 
 ### 安装
 
-[ruby](https://rubyinstaller.org/downloads/)
+[Ruby+Devkit 版本](https://rubyinstaller.org/downloads/)
+
+Run 'ridk install' to set up MSYS2 and development toolchain.
+
+MSYS2 and MINGW development tool chain
 
 将`MSYS2`目录添加到环境变量中
 
@@ -38,7 +42,11 @@ gem install jekyll bundler
 jekyll -v
 ```
 
-安装依赖的theme模板库，在项目目录运行 `bundle`
+安装依赖的theme模板库，在项目目录运行 
+
+```bash
+bundle
+```
 
 使用:
 
