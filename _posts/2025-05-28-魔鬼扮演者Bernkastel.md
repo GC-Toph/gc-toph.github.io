@@ -2,7 +2,7 @@
 title: 魔鬼扮演者Bernkastel
 date: 2025-05-28 00:01:00 +0800
 last_modified_at: 2025-05-28 00:02:00 +0800
-categories: [不可解] # 最多两层
+categories: [不可解, 信念管理] # 最多两层
 tags: [Bernkastel, 挑战]
 # toc: false # 关闭目录
 ---

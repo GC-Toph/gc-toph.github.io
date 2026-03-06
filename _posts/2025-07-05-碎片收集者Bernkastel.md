@@ -2,7 +2,7 @@
 title: 碎片收集者Bernkastel
 date: 2025-07-05 00:01:00 +0800
 last_modified_at: 2025-07-05 00:02:00 +0800
-categories: [不可解] # 最多两层
+categories: [不可解, 记忆管理] # 最多两层
 tags: [Anki, Bernkastel, 碎片, 拼图]
 # toc: false # 关闭目录
 ---

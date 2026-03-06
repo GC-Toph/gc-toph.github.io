@@ -2,8 +2,8 @@
 title: Trade Balance
 date: 2025-04-05 00:01:00 +0800
 last_modified_at: 2025-04-05 00:02:00 +0800
-categories: [转载] # 最多两层
-tags: [Warren Buffett]
+categories: [不可解, 市场] # 最多两层
+tags: [Warren Buffett, 转载]
 # toc: false # 关闭目录
 ---
 

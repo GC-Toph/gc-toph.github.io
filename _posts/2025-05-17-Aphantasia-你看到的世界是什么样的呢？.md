@@ -2,7 +2,7 @@
 title: Aphantasia 你看到的世界是什么样的呢？
 date: 2025-05-17 00:01:00 +0800
 last_modified_at: 2025-11-11 00:02:00 +0800
-categories: [不可解] # 最多两层
+categories: [不可解, 亚种] # 最多两层
 tags: [我]
 # toc: false # 关闭目录
 ---

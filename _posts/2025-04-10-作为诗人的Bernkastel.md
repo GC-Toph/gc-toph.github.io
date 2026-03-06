@@ -2,7 +2,7 @@
 title: 作为诗人的Frederica Bernkastel
 date: 2025-04-10 00:00:00 +0800
 last_modified_at: 2025-11-20 00:01:00 +0800
-categories: [不可解] # 最多两层
+categories: [不可解, 鸣泣之时] # 最多两层
 tags: [Bernkastel]
 # toc: false # 关闭目录
 # math: true
