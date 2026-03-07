@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>EMDR 辅助工具</title>
+    <style>
+        :root {
+            --bg-color: #1a1a1a;
+            --ball-color: #00ffcc;
+            --panel-bg: rgba(40, 40, 40, 0.95);
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: #ffffff;
+            font-family: system-ui, -apple-system, sans-serif;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 控制面板 */
+        #control-panel {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--panel-bg);
+            padding: 15px 25px;
+            border-radius: 12px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            z-index: 100;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+            border: 1px solid #444;
+            backdrop-filter: blur(10px);
+            max-width: 90vw;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        label { font-size: 11px; color: #bbb; text-transform: uppercase; letter-spacing: 1px; }
+        input[type="range"] { width: 100px; }
+        input[type="color"] { border: none; width: 30px; height: 30px; cursor: pointer; background: none; }
+
+        /* 动画区域 */
+        #stage {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        #ball {
+            width: 45px;
+            height: 45px;
+            background-color: var(--ball-color);
+            border-radius: 50%;
+            position: absolute;
+            left: 50%;
+            box-shadow: 0 0 25px var(--ball-color);
+            transition: background-color 0.3s, box-shadow 0.3s;
+        }
+
+        /* 指南侧边栏 */
+        #guide-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            background: #444;
+            border-radius: 20px;
+            cursor: pointer;
+            z-index: 101;
+        }
+
+        #guide-content {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            width: 300px;
+            background: var(--panel-bg);
+            padding: 20px;
+            border-radius: 12px;
+            display: none;
+            font-size: 14px;
+            line-height: 1.6;
+            border: 1px solid #555;
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+
+        h3 { color: #00ffcc; margin-top: 0; }
+        .step { margin-bottom: 15px; border-left: 2px solid #00ffcc; padding-left: 10px; }
+        button { cursor: pointer; border: none; border-radius: 4px; padding: 8px 12px; background: #00ffcc; color: #000; font-weight: bold; }
+        button:hover { opacity: 0.8; }
+    </style>
+</head>
+<body>
+
+    <div id="control-panel">
+        <div class="control-group">
+            <label>球色</label>
+            <input type="color" id="ballColor" value="#00ffcc">
+        </div>
+        <div class="control-group">
+            <label>背景</label>
+            <input type="color" id="bgColor" value="#1a1a1a">
+        </div>
+        <div class="control-group">
+            <label>速度</label>
+            <input type="range" id="speedRange" min="1" max="15" value="7">
+        </div>
+        <div class="control-group">
+            <label>随机变向(秒)</label>
+            <div style="display:flex; align-items:center; gap:5px;">
+                <input type="number" id="minTime" value="1.2" style="width:45px; background:#333; color:white; border:1px solid #555;">
+                <span>-</span>
+                <input type="number" id="maxTime" value="3.5" style="width:45px; background:#333; color:white; border:1px solid #555;">
+            </div>
+        </div>
+        <div class="control-group">
+            <label>声音</label>
+            <button id="soundToggle" style="background:#555; color:white;">开启滴答声</button>
+        </div>
+        <div class="control-group" style="justify-content: center;">
+            <button id="mainToggle" style="background:#ff4757; color:white;">停止</button>
+        </div>
+    </div>
+
+    <div id="stage">
+        <div id="ball"></div>
+    </div>
+
+    <div id="guide-btn" onclick="toggleGuide()">使用指南 & EMDR 步骤</div>
+    <div id="guide-content">
+        <h3>EMDR 标准步骤简述</h3>
+        <div class="step">
+            <strong>1. 稳定化：</strong> 确保你处于安全环境中。深呼吸，找到一个让你感到平静的“安全地带”。
+        </div>
+        <div class="step">
+            <strong>2. 评估：</strong> 锁定一个让你困扰的负面记忆或信念（如“我分手了”），感受它在身体哪个部位产生不适。
+        </div>
+        <div class="step">
+            <strong>3. 脱敏 (BLS)：</strong> 保持头部不动，双眼跟随小球移动。同时在脑海中轻轻“观察”那个负面记忆，像坐在火车上看窗外的风景。
+        </div>
+        <div class="step">
+            <strong>4. 植入：</strong> 思考一个你想要的正面信念（如“接受这段关系永久结束的事实，然后开启新生活。”），在移动眼球的同时强化这个想法。
+        </div>
+        <div class="step">
+            <strong>注意：</strong> 若情绪过于激动，请立即点击停止并深呼吸。本工具不能替代专业心理治疗。
+        </div>
+    </div>
+
+    <script>
+        const ball = document.getElementById('ball');
+        const speedInput = document.getElementById('speedRange');
+        const ballColorInput = document.getElementById('ballColor');
+        const bgColorInput = document.getElementById('bgColor');
+        const mainToggle = document.getElementById('mainToggle');
+        const soundToggle = document.getElementById('soundToggle');
+
+        let posX = window.innerWidth / 2;
+        let direction = 1;
+        let isRunning = true;
+        let soundEnabled = false;
+
+        // 音频上下文（左右声道立体声）
+        let audioCtx;
+        function initAudio() {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+
+        function playTick(panValue) {
+            if (!soundEnabled || !audioCtx) return;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            const pan = audioCtx.createStereoPanner();
+
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+            pan.pan.setValueAtTime(panValue, audioCtx.currentTime);
+
+            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+
+            osc.connect(pan);
+            pan.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.1);
+        }
+
+        // 动画逻辑
+        function animate() {
+            if (!isRunning) return;
+
+            const speed = parseInt(speedInput.value);
+            const ballWidth = 45;
+            posX += speed * direction;
+
+            if (posX + ballWidth >= window.innerWidth) {
+                direction = -1;
+                posX = window.innerWidth - ballWidth;
+                playTick(direction); // 根据当前方向播放声音
+            } else if (posX <= 0) {
+                direction = 1;
+                posX = 0;
+                playTick(direction); // 根据当前方向播放声音
+            }
+            ball.style.left = posX + 'px';
+            requestAnimationFrame(animate);
+        }
+
+        // 随机变向逻辑
+        function randomTurn() {
+            if (!isRunning) return;
+            const min = parseFloat(document.getElementById('minTime').value) * 1000;
+            const max = parseFloat(document.getElementById('maxTime').value) * 1000;
+            
+            setTimeout(() => {
+                if (isRunning && Math.random() > 0.2) { // 80%概率变向
+                    direction *= -1;
+                    playTick(direction); // 根据当前方向播放声音
+                }
+                randomTurn();
+            }, Math.random() * (max - min) + min);
+        }
+
+        // 交互事件
+        ballColorInput.oninput = (e) => {
+            document.documentElement.style.setProperty('--ball-color', e.target.value);
+        };
+
+        bgColorInput.oninput = (e) => {
+            document.documentElement.style.setProperty('--bg-color', e.target.value);
+        };
+
+        mainToggle.onclick = () => {
+            isRunning = !isRunning;
+            mainToggle.innerText = isRunning ? "停止" : "开始";
+            mainToggle.style.background = isRunning ? "#ff4757" : "#2ed573";
+            if (isRunning) { animate(); }
+        };
+
+        soundToggle.onclick = () => {
+            initAudio();
+            soundEnabled = !soundEnabled;
+            soundToggle.innerText = soundEnabled ? "关闭滴答声" : "开启滴答声";
+            soundToggle.style.background = soundEnabled ? "#00ffcc" : "#555";
+            soundToggle.style.color = soundEnabled ? "#000" : "#fff";
+        };
+
+        function toggleGuide() {
+            const content = document.getElementById('guide-content');
+            content.style.display = content.style.display === 'block' ? 'none' : 'block';
+        }
+
+        // 启动
+        animate();
+        randomTurn();
+    </script>
+</body>
+</html>
