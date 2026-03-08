@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>冥想训练 - 外感受</title>
+    <style>
+        body { 
+            margin: 0; overflow: hidden; background-color: #020617;
+            font-family: -apple-system, system-ui, sans-serif; color: #f1f5f9;
+        }
+        #ui-panel {
+            position: absolute; top: 15px; left: 50%; transform: translateX(-50%);
+            background: rgba(15, 23, 42, 0.95); padding: 12px 20px; border-radius: 12px;
+            display: flex; flex-wrap: wrap; gap: 15px; align-items: flex-end;
+            border: 1px solid #1e293b; z-index: 100; backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+        #ui-panel.hidden { transform: translateX(-50%) translateY(-150%); opacity: 0; pointer-events: none; }
+        .group { display: flex; flex-direction: column; gap: 4px; }
+        label { font-size: 11px; color: #94a3b8; font-weight: bold; }
+        input, select { background: #0f172a; border: 1px solid #334155; color: white; padding: 4px; border-radius: 4px; }
+        #timer-box { font-family: monospace; font-size: 24px; color: #60a5fa; min-width: 75px; text-align: center; }
+        .btn-group { display: flex; gap: 8px; }
+        button { cursor: pointer; padding: 8px 15px; border: none; border-radius: 6px; font-weight: bold; transition: 0.2s; }
+        #startBtn { background: #63738d; color: white; }
+        #hideBtn { background: #475569; color: white; }
+        #show-hint { position: absolute; bottom: 10px; left: 10px; font-size: 12px; color: #334155; pointer-events: none; }
+    </style>
+</head>
+<body>
+
+    <div id="ui-panel">
+        <div class="group">
+            <label>追踪模式</label>
+            <select id="mode">
+                <option value="1">单球模式</option>
+                <option value="2" selected>双球耦合(150px弹簧)</option>
+            </select>
+        </div>
+        <div class="group">
+            <label>初始速度</label>
+            <input type="range" id="speedBase" min="100" max="800" value="350">
+        </div>
+        <div class="group">
+            <label>方向切换(秒)</label>
+            <input type="range" id="freq" min="0.5" max="3" step="0.5" value="1.5">
+        </div>
+        <div class="group"><label>球1颜色</label><input type="color" id="c1" value="#00f2ff"></div>
+        <div class="group"><label>球2颜色</label><input type="color" id="c2" value="#ff007b"></div>
+        <div id="timer-box">05:00</div>
+        <div class="btn-group">
+            <button id="startBtn">开始训练</button>
+            <button id="hideBtn">隐藏界面 (H)</button>
+        </div>
+    </div>
+
+    <div id="show-hint">按 H 键显示/隐藏设置栏</div>
+    <canvas id="canvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        // 优化 5: 渲染上下文启用 desynchronized 以降低延迟
+        const ctx = canvas.getContext('2d', { alpha: false, desynchronized: true });
+        
+        let audioCtx, mainGain;
+        let balls = [];
+        let isRunning = false;
+        let lastTime = 0;
+        let timeLeft = 300;
+        let timerId, directionId;
+
+        // 优化 1: 预计算三角函数查找表 (LUT)
+        const sinTable = new Float32Array(360);
+        const cosTable = new Float32Array(360);
+        for (let i = 0; i < 360; i++) {
+            const rad = (i * Math.PI) / 180;
+            sinTable[i] = Math.sin(rad);
+            cosTable[i] = Math.cos(rad);
+        }
+
+        const getFastSin = (deg) => sinTable[Math.floor(((deg % 360) + 360) % 360)];
+        const getFastCos = (deg) => cosTable[Math.floor(((deg % 360) + 360) % 360)];
+
+        // 物理常量
+        const REST_LENGTH = 150; 
+        const K = 1.5; 
+        const FRICTION = 0.99;
+
+        class Ball {
+            constructor(color) {
+                this.radius = 14;
+                this.color = color;
+                this.x = Math.random() * (window.innerWidth - 100) + 50;
+                this.y = Math.random() * (window.innerHeight - 100) + 50;
+                this.vx = 0;
+                this.vy = 0;
+                this.angleDeg = Math.random() * 360; // 改用角度制方便查表
+                
+                // 优化 2: 预创建径向渐变替代 shadowBlur
+                this.updateGlow();
+            }
+
+            updateGlow() {
+                // 创建一个比球体稍大的渐变区域实现发光
+                this.glowGradient = ctx.createRadialGradient(0, 0, this.radius * 0.2, 0, 0, this.radius * 3);
+                this.glowGradient.addColorStop(0, this.color);
+                this.glowGradient.addColorStop(0.4, this.color);
+                this.glowGradient.addColorStop(1, 'rgba(0,0,0,0)');
+            }
+
+            applyImpulse() {
+                const speed = parseInt(document.getElementById('speedBase').value);
+                const offset = (Math.random() * 270 + 45); // 随机偏转 45-315 度
+                this.angleDeg = (this.angleDeg + offset) % 360;
+                
+                // 使用预计算表
+                this.vx = getFastCos(this.angleDeg) * speed;
+                this.vy = getFastSin(this.angleDeg) * speed;
+                
+                playTone(600, 0.1, 'triangle');
+            }
+
+            update(dt, other) {
+                if (other) {
+                    const dx = other.x - this.x;
+                    const dy = other.y - this.y;
+                    const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+                    const displacement = dist - REST_LENGTH;
+                    const force = displacement * K;
+                    this.vx += (dx / dist) * force * dt;
+                    this.vy += (dy / dist) * force * dt;
+                }
+
+                this.vx *= FRICTION;
+                this.vy *= FRICTION;
+                this.x += this.vx * dt;
+                this.y += this.vy * dt;
+
+                // 边界反弹
+                const bounceFreq = 150;
+                if (this.x < this.radius) { this.x = this.radius; this.vx *= -1; playTone(bounceFreq, 0.05, 'sine'); }
+                if (this.x > canvas.width - this.radius) { this.x = canvas.width - this.radius; this.vx *= -1; playTone(bounceFreq, 0.05, 'sine'); }
+                if (this.y < this.radius) { this.y = this.radius; this.vy *= -1; playTone(bounceFreq, 0.05, 'sine'); }
+                if (this.y > canvas.height - this.radius) { this.y = canvas.height - this.radius; this.vy *= -1; playTone(bounceFreq, 0.05, 'sine'); }
+            }
+
+            draw() {
+                // 优化: 减少状态切换，通过 translate 一次性绘制
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                
+                // 绘制发光层
+                ctx.fillStyle = this.glowGradient;
+                ctx.beginPath();
+                ctx.arc(0, 0, this.radius * 2, 0, Math.PI * 2);
+                ctx.fill();
+
+                // 绘制球体核心
+                ctx.fillStyle = '#ffffff'; // 核心白色增加亮度感
+                ctx.beginPath();
+                ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.restore();
+            }
+        }
+
+        // 优化 3: 音频节点复用 (避免重复创建 Gain 节点)
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                mainGain = audioCtx.createGain();
+                mainGain.connect(audioCtx.destination);
+            }
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+        }
+
+        function playTone(freq, dur, type) {
+            if (!audioCtx) return; // 等待点击初始化
+            
+            const osc = audioCtx.createOscillator();
+            const noteGain = audioCtx.createGain(); // 每个音符仍需独立 gain 控制 envelope
+            
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            
+            noteGain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+            noteGain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + dur);
+            
+            osc.connect(noteGain);
+            noteGain.connect(mainGain);
+            
+            osc.start();
+            osc.stop(audioCtx.currentTime + dur);
+        }
+
+        // 优化 4: 分离物理更新与渲染
+        function loop(timestamp) {
+            if (!isRunning) return;
+            const dt = Math.min((timestamp - lastTime) / 1000, 0.05);
+            lastTime = timestamp;
+
+            // 1. 物理更新阶段
+            balls.forEach((b, i) => {
+                const other = balls.length === 2 ? balls[1 - i] : null;
+                b.update(dt, other);
+            });
+
+            // 2. 渲染阶段
+            render();
+
+            requestAnimationFrame(loop);
+        }
+
+        function render() {
+            // 批量渲染：背景
+            ctx.fillStyle = "#020617";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // 批量渲染：连线 (降低透明度减少视觉负担)
+            if (balls.length === 2) {
+                ctx.beginPath();
+                ctx.setLineDash([5, 15]);
+                ctx.moveTo(balls[0].x, balls[0].y);
+                ctx.lineTo(balls[1].x, balls[1].y);
+                ctx.strokeStyle = "rgba(255,255,255,0.08)";
+                ctx.stroke();
+                ctx.setLineDash([]); // 重置连线样式
+            }
+
+            // 渲染球体
+            balls.forEach(b => b.draw());
+        }
+
+        function start() {
+            initAudio(); // 首次点击初始化音频
+            
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            
+            const mode = parseInt(document.getElementById('mode').value);
+            balls = [new Ball(document.getElementById('c1').value)];
+            if (mode === 2) balls.push(new Ball(document.getElementById('c2').value));
+
+            balls.forEach(b => b.applyImpulse());
+
+            isRunning = true;
+            lastTime = performance.now();
+            
+            const switchFreq = parseFloat(document.getElementById('freq').value) * 1000;
+            directionId = setInterval(() => {
+                balls.forEach(b => b.applyImpulse());
+            }, switchFreq);
+
+            timerId = setInterval(() => {
+                timeLeft--;
+                const m = Math.floor(timeLeft/60), s = timeLeft%60;
+                document.getElementById('timer-box').textContent = `${m}:${s.toString().padStart(2,'0')}`;
+                if (timeLeft <= 0) stop(true);
+            }, 1000);
+
+            document.getElementById('startBtn').textContent = "停止训练";
+            requestAnimationFrame(loop);
+        }
+
+        function stop(done = false) {
+            isRunning = false;
+            clearInterval(timerId);
+            clearInterval(directionId);
+            document.getElementById('startBtn').textContent = "开始训练";
+            timeLeft = 300;
+            document.getElementById('timer-box').textContent = "05:00";
+            if (done) alert("训练完成！");
+        }
+
+        // UI 交互与适配
+        const panel = document.getElementById('ui-panel');
+        function toggleUI() { panel.classList.toggle('hidden'); }
+
+        document.getElementById('startBtn').onclick = () => {
+            if (isRunning) stop(); else start();
+        };
+        document.getElementById('hideBtn').onclick = toggleUI;
+        
+        window.onresize = () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            // 重新计算球体的渐变（防止窗口缩放导致位图失效）
+            balls.forEach(b => b.updateGlow());
+        };
+
+        document.onkeydown = (e) => {
+            if (e.key.toLowerCase() === 'h') toggleUI();
+            if (e.code === 'Space') {
+                e.preventDefault();
+                if (isRunning) stop(); else start();
+            }
+        };
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    </script>
+</body>
+</html>

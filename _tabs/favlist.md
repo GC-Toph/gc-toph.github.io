@@ -48,3 +48,4 @@ Interactive graphs and explanations about key [economic](https://www.econgraphs.
 ## misc
 
 - [冥想训练](/misc/meditation.html)
+- [冥想训练 - 外感受](/misc/meditation-alert.html)
