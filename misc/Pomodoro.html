@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>番茄钟</title>
+    <style>
+        :root {
+            --bg-color: #f5f6fa;
+            --text-color: #2f3640;
+            --card-bg: #ffffff;
+            --primary: #e84118;
+            --break-color: #4cd137;
+            --btn-hover: #c23616;
+            --tip-bg: #f1f2f6;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            transition: background-color 0.8s ease;
+        }
+
+        /* 状态背景色反馈 */
+        body.work-phase { background-color: #ffeaa7; }
+        body.break-phase { background-color: #dff9fb; }
+
+        .container {
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            text-align: center;
+            width: 90%;
+            max-width: 420px;
+            margin: 20px 0;
+        }
+
+        h1 {
+            margin-top: 0;
+            color: var(--text-color);
+            font-size: 1.6rem;
+        }
+
+        .settings {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .settings label {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #718093;
+        }
+
+        .settings input {
+            width: 50px;
+            text-align: center;
+            margin-top: 5px;
+            padding: 6px;
+            border: 1px solid #dcdde1;
+            border-radius: 6px;
+            font-weight: bold;
+            color: #2f3640;
+        }
+
+        .status {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: var(--primary);
+            transition: color 0.3s;
+        }
+
+        .timer {
+            font-size: 5.5rem;
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
+            margin: 5px 0 15px 0;
+            color: #2f3640;
+            letter-spacing: -2px;
+        }
+
+        .cycle-info {
+            font-size: 1rem;
+            margin-bottom: 25px;
+            color: #718093;
+            font-weight: 500;
+        }
+
+        .controls button {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+            margin: 0 5px;
+            transition: all 0.2s;
+            box-shadow: 0 4px 6px rgba(232, 65, 24, 0.2);
+        }
+
+        .controls button:hover:not(:disabled) {
+            background-color: var(--btn-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 10px rgba(232, 65, 24, 0.3);
+        }
+
+        .controls button:disabled {
+            background-color: #dcdde1;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+
+        .noise-controls {
+            margin-top: 30px;
+            padding-top: 25px;
+            border-top: 1px solid #f1f2f6;
+            text-align: left;
+        }
+
+        .noise-controls label {
+            display: block;
+            margin-bottom: 15px;
+            font-size: 0.95rem;
+            color: #2f3640;
+            font-weight: 500;
+        }
+
+        .noise-controls select, .noise-controls input[type="range"] {
+            width: 100%;
+            margin-top: 8px;
+            padding: 8px;
+            border-radius: 6px;
+            border: 1px solid #dcdde1;
+        }
+
+        .tips-container {
+            margin-top: 25px;
+            padding: 18px;
+            background: var(--tip-bg);
+            border-radius: 12px;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            color: #576574;
+            text-align: left;
+            border-left: 5px solid var(--primary);
+            transition: border-color 0.5s ease;
+        }
+        
+        body.break-phase .tips-container {
+            border-left-color: var(--break-color);
+        }
+
+        .tip-title {
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #2f3640;
+            display: flex;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>番茄钟 | Pomodoro</h1>
+        
+        <div class="settings">
+            <label>工作 (分钟)<input type="number" id="workTime" value="25" min="1"></label>
+            <label>休息 (分钟)<input type="number" id="breakTime" value="5" min="1"></label>
+            <label>循环次数<input type="number" id="totalCycles" value="3" min="1"></label>
+        </div>
+
+        <div class="status" id="statusText">准备就绪</div>
+        <div class="timer" id="timerDisplay">25:00</div>
+        <div class="cycle-info" id="cycleDisplay">当前循环: 0 / 3</div>
+
+        <div class="controls">
+            <button id="startBtn">开始</button>
+            <button id="pauseBtn" disabled>暂停</button>
+            <button id="resetBtn">重置</button>
+        </div>
+
+        <div class="noise-controls">
+            <label>
+                专注背景音 (工作时自动播放):
+                <select id="noiseSelect">
+                    <option value="white" selected>白噪音 (White Noise)</option>
+                    <option value="pink">粉红噪音 (Pink Noise)</option>
+                </select>
+            </label>
+            <label>
+                背景音量调节:
+                <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="0.15">
+            </label>
+        </div>
+
+        <div class="tips-container">
+            <div class="tip-title">💡 tips</div>
+            <div id="tipText">加载中...</div>
+        </div>
+    </div>
+
+    <script>
+        // ==========================================
+        // 1. 小贴士 (Tips) 轮播系统
+        // ==========================================
+        const tipsArray = [
+            "尝试将屏幕或平板电脑放置在眼睛平视的高度，甚至稍微高一点。当我们的眼睛向上看时，会产生一种高度警觉和专注的状态。",
+            "大脑 Ultradian Cycles：每90分钟，我们就会从非常警觉的状态转换到不那么警觉的状态，然后再回到警觉。跟随番茄钟合理安排工作和休息至关重要。",
+            "参与注意力、认知和记忆的大脑区域在有背景低水平白噪音时会更活跃，大脑中与多巴胺释放相关的区域也会被激活。",
+            "把最困难的任务放在一天中认知资源最高的时间段（对大多数人是起床后2–4小时）。匹配‘生物节律’比硬逼自己‘随时高效’有效得多。",
+            "单一任务原则：一次只做一件事。切换任务会产生注意力残渣。",
+            "在开始重要任务前，内心模拟一遍该任务的流程会显著降低启动难度。",
+            "把手机放在另一个房间，或至少放到视线以外。并关闭IM（即时通讯）软件。"
+        ];
+        
+        // 随机初始化一条提示
+        let currentTipIndex = Math.floor(Math.random() * tipsArray.length);
+        const tipTextEl = document.getElementById('tipText');
+
+        function updateTip() {
+            tipTextEl.textContent = tipsArray[currentTipIndex];
+            // 轮换到下一条，到头后重置
+            currentTipIndex = (currentTipIndex + 1) % tipsArray.length;
+        }
+        
+        // 页面加载时先显示一条
+        updateTip();
+
+        // ==========================================
+        // 2. Web Audio API 音频系统 (噪音 + 提示钟声)
+        // ==========================================
+        let audioCtx;
+        let noiseNode;
+        let gainNode;
+
+        const noiseProcessorCode = `
+            class NoiseProcessor extends AudioWorkletProcessor {
+                constructor() {
+                    super();
+                    this.noiseType = 'none'; // 初始为静音
+                    this.b0 = 0; this.b1 = 0; this.b2 = 0; 
+                    this.b3 = 0; this.b4 = 0; this.b5 = 0; this.b6 = 0;
+
+                    this.port.onmessage = (event) => {
+                        this.noiseType = event.data;
+                    };
+                }
+
+                process(inputs, outputs, parameters) {
+                    const output = outputs[0];
+                    for (let channel = 0; channel < output.length; ++channel) {
+                        const outputChannel = output[channel];
+                        for (let i = 0; i < outputChannel.length; ++i) {
+                            if (this.noiseType === 'white') {
+                                outputChannel[i] = Math.random() * 2 - 1;
+                            } else if (this.noiseType === 'pink') {
+                                let white = Math.random() * 2 - 1;
+                                this.b0 = 0.99886 * this.b0 + white * 0.0555179;
+                                this.b1 = 0.99332 * this.b1 + white * 0.0750759;
+                                this.b2 = 0.96900 * this.b2 + white * 0.1538520;
+                                this.b3 = 0.86650 * this.b3 + white * 0.3104856;
+                                this.b4 = 0.55000 * this.b4 + white * 0.5329522;
+                                this.b5 = -0.7616 * this.b5 - white * 0.0168980;
+                                outputChannel[i] = (this.b0 + this.b1 + this.b2 + this.b3 + this.b4 + this.b5 + this.b6 + white * 0.5362) * 0.11;
+                                this.b6 = white * 0.115926;
+                            } else {
+                                outputChannel[i] = 0; // none 的时候输出静音以节约算力
+                            }
+                        }
+                    }
+                    return true;
+                }
+            }
+            registerProcessor('noise-processor', NoiseProcessor);
+        `;
+
+        async function initAudio() {
+            if (audioCtx) return; 
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            
+            const blob = new Blob([noiseProcessorCode], { type: 'application/javascript' });
+            const url = URL.createObjectURL(blob);
+            
+            await audioCtx.audioWorklet.addModule(url);
+            
+            noiseNode = new AudioWorkletNode(audioCtx, 'noise-processor');
+            gainNode = audioCtx.createGain();
+            
+            noiseNode.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            
+            updateVolume();
+            applyNoiseSettings();
+        }
+
+        // 应用噪音设置：仅在【运行中】且【工作阶段】才发声
+        function applyNoiseSettings() {
+            if (!noiseNode) return;
+            if (isRunning && isWorkPhase) {
+                noiseNode.port.postMessage(noiseSelect.value);
+            } else {
+                noiseNode.port.postMessage('none');
+            }
+        }
+
+        function updateVolume() {
+            if (gainNode) {
+                // 指数音量曲线更贴合人耳听觉
+                const fraction = parseFloat(volumeSlider.value);
+                gainNode.gain.value = fraction * fraction; 
+            }
+        }
+
+        // 纯代码合成三声提示钟声 (类似柔和的颂钵/铃声)
+        function playChime() {
+            if (!audioCtx) return;
+            const now = audioCtx.currentTime;
+            
+            // 连敲3声，间隔0.9秒
+            for (let i = 0; i < 3; i++) {
+                const startTime = now + (i * 0.9);
+                
+                const osc = audioCtx.createOscillator();
+                const chimeGain = audioCtx.createGain();
+                
+                // 频率 659.25Hz (E5音阶)，一种能让人平静且清晰的声音
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(659.25, startTime); 
+                
+                // 动态包络线：极快地敲击(Attack)，缓慢空灵地衰减(Decay)
+                chimeGain.gain.setValueAtTime(0, startTime);
+                chimeGain.gain.linearRampToValueAtTime(0.7, startTime + 0.02);
+                chimeGain.gain.exponentialRampToValueAtTime(0.001, startTime + 2.0);
+                
+                osc.connect(chimeGain);
+                // 直接连到主音轨，不受噪音音量滑块控制
+                chimeGain.connect(audioCtx.destination); 
+                
+                osc.start(startTime);
+                osc.stop(startTime + 2.5);
+            }
+        }
+
+
+        // ==========================================
+        // 3. 番茄钟核心逻辑
+        // ==========================================
+        let timerInterval;
+        let isRunning = false;
+        let isWorkPhase = true;
+        let currentCycle = 1;
+        let timeLeft = 25 * 60; 
+        let expectedEndTime = 0;
+
+        const workInput = document.getElementById('workTime');
+        const breakInput = document.getElementById('breakTime');
+        const cyclesInput = document.getElementById('totalCycles');
+        const statusText = document.getElementById('statusText');
+        const timerDisplay = document.getElementById('timerDisplay');
+        const cycleDisplay = document.getElementById('cycleDisplay');
+        
+        const startBtn = document.getElementById('startBtn');
+        const pauseBtn = document.getElementById('pauseBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        
+        const noiseSelect = document.getElementById('noiseSelect');
+        const volumeSlider = document.getElementById('volumeSlider');
+
+        function formatTime(seconds) {
+            const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+            const s = Math.floor(seconds % 60).toString().padStart(2, '0');
+            return `${m}:${s}`;
+        }
+
+        function updateUI() {
+            timerDisplay.textContent = formatTime(timeLeft);
+            cycleDisplay.textContent = `当前循环: ${currentCycle} / ${cyclesInput.value}`;
+            
+            if (!isRunning && timeLeft === parseInt(workInput.value) * 60) {
+                statusText.textContent = "准备就绪";
+                statusText.style.color = "var(--text-color)";
+            } else if (isWorkPhase) {
+                statusText.textContent = "💻 深度工作中...";
+                statusText.style.color = "var(--primary)";
+            } else {
+                statusText.textContent = "☕ 休息放松一下";
+                statusText.style.color = "var(--break-color)";
+            }
+        }
+
+        // 阶段切换：工作->休息，或休息->工作
+        function switchPhase() {
+            // 播放三声钟声提醒
+            playChime();
+            
+            // 每次切换状态时，轮换一个小贴士
+            updateTip();
+
+            if (isWorkPhase) {
+                // 转入休息
+                isWorkPhase = false;
+                timeLeft = parseInt(breakInput.value) * 60;
+                document.body.className = 'break-phase';
+            } else {
+                // 休息结束
+                if (currentCycle >= parseInt(cyclesInput.value)) {
+                    // 全部完成
+                    finishTimer();
+                    return;
+                }
+                currentCycle++;
+                isWorkPhase = true;
+                timeLeft = parseInt(workInput.value) * 60;
+                document.body.className = 'work-phase';
+            }
+            
+            // 根据新状态，决定是否重新播放噪音 (休息时不播放)
+            applyNoiseSettings();
+            
+            // 重置基准时间，继续计时
+            expectedEndTime = Date.now() + timeLeft * 1000;
+            updateUI();
+        }
+
+        function finishTimer() {
+            clearInterval(timerInterval);
+            isRunning = false;
+            statusText.textContent = "🎉 恭喜！离开屏幕，进行一次15分钟以上的长休息吧！（站起、喝水、远眺、冥想、卫生间）";
+            statusText.style.color = "var(--primary)";
+            document.body.className = '';
+            
+            startBtn.disabled = true;
+            pauseBtn.disabled = true;
+            
+            applyNoiseSettings(); // 停止噪音
+        }
+
+        async function startTimer() {
+            await initAudio();
+            if(audioCtx.state === 'suspended') {
+                await audioCtx.resume();
+            }
+
+            if (isRunning) return;
+
+            isRunning = true;
+            startBtn.disabled = true;
+            pauseBtn.disabled = false;
+            
+            document.body.className = isWorkPhase ? 'work-phase' : 'break-phase';
+            
+            expectedEndTime = Date.now() + timeLeft * 1000;
+            
+            timerInterval = setInterval(() => {
+                const now = Date.now();
+                timeLeft = Math.round((expectedEndTime - now) / 1000);
+
+                if (timeLeft <= 0) {
+                    switchPhase();
+                } else {
+                    updateUI();
+                }
+            }, 200);
+
+            applyNoiseSettings(); // 开始倒计时，决定是否播噪音
+        }
+
+        function pauseTimer() {
+            if (!isRunning) return;
+            
+            clearInterval(timerInterval);
+            isRunning = false;
+            startBtn.disabled = false;
+            pauseBtn.disabled = true;
+            
+            applyNoiseSettings(); // 暂停时停止噪音
+            
+            statusText.textContent = "⏸️ 已暂停";
+            document.body.className = '';
+        }
+
+        function resetTimer() {
+            clearInterval(timerInterval);
+            isRunning = false;
+            isWorkPhase = true;
+            currentCycle = 1;
+            timeLeft = parseInt(workInput.value) * 60;
+            
+            startBtn.disabled = false;
+            pauseBtn.disabled = true;
+            
+            document.body.className = '';
+            
+            applyNoiseSettings(); // 停止噪音
+            updateUI();
+        }
+
+        // ==========================================
+        // 4. 事件监听与初始化
+        // ==========================================
+        startBtn.addEventListener('click', startTimer);
+        pauseBtn.addEventListener('click', pauseTimer);
+        resetBtn.addEventListener('click', resetTimer);
+
+        [workInput, breakInput, cyclesInput].forEach(input => {
+            input.addEventListener('change', () => {
+                if (!isRunning) resetTimer();
+            });
+        });
+
+        noiseSelect.addEventListener('change', applyNoiseSettings);
+        volumeSlider.addEventListener('input', updateVolume);
+
+        updateUI();
+
+    </script>
+</body>
+</html>
