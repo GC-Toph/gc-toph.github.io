@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>生命之轮 (Wheel of Life)</title>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --bg-color: #f8fafc;
+            --surface: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --radius: 16px;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* 视图切换控制 */
+        .view-section {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .view-section.active {
+            display: block;
+            opacity: 1;
+        }
+
+        /* ---------------- 欢迎与问卷界面 ---------------- */
+        .quiz-container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 2rem;
+            background: var(--surface);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            text-align: center;
+        }
+
+        .welcome-header h1 {
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .welcome-header p {
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+        }
+
+        /* 进度条 */
+        .progress-wrapper {
+            width: 100%;
+            height: 8px;
+            background: var(--border);
+            border-radius: 4px;
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: var(--primary);
+            width: 0%;
+            transition: width 0.4s ease;
+        }
+
+        .progress-text {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+            text-align: right;
+            font-weight: 500;
+        }
+
+        /* 题目展示 */
+        .question-box {
+            min-height: 150px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .question-text {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-main);
+            line-height: 1.4;
+        }
+
+        /* 1-10 评分按钮 */
+        .rating-container {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 10px;
+            margin: 2rem 0;
+        }
+
+        .rating-btn {
+            aspect-ratio: 1;
+            border: 2px solid var(--border);
+            background: var(--surface);
+            color: var(--text-main);
+            border-radius: 12px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .rating-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .rating-btn.selected {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+            transform: scale(1.05);
+        }
+
+        .rating-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+        }
+
+        /* 通用按钮 */
+        .btn {
+            padding: 0.75rem 2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            border: none;
+            transition: var(--transition);
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+        }
+
+        .btn-primary:disabled {
+            background: var(--border);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-main);
+        }
+
+        .btn-outline:hover {
+            background: var(--bg-color);
+        }
+
+
+        /* ---------------- 仪表盘界面 ---------------- */
+        .dashboard {
+            max-width: 1200px;
+            margin: 40px auto;
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 1.5rem;
+            padding: 0 1.5rem;
+        }
+
+        .header {
+            grid-column: 1 / -1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--surface);
+            padding: 1.5rem 2rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+        }
+
+        .header-title h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .card {
+            background: var(--surface);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+        }
+
+        .card-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* 图表区 */
+        .chart-container {
+            position: relative;
+            height: 450px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-box {
+            background: var(--bg-color);
+            padding: 1rem;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        .insights {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            padding: 1rem;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            color: #1e3a8a;
+        }
+
+        .insights.warning {
+            background: #fef2f2;
+            border-color: #fecaca;
+            color: #991b1b;
+        }
+
+        /* 折叠面板 (评估明细) */
+        .accordion-item {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 0.75rem;
+            overflow: hidden;
+        }
+
+        .accordion-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: #fafafa;
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .accordion-header:hover {
+            background: #f1f5f9;
+        }
+
+        .dim-score {
+            background: #e0e7ff;
+            color: var(--primary);
+            padding: 0.2rem 0.6rem;
+            border-radius: 12px;
+            font-size: 0.9rem;
+        }
+
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            background: white;
+        }
+
+        .accordion-content.open {
+            max-height: 400px;
+        }
+
+        .question-detail {
+            padding: 0.75rem 1rem;
+            border-top: 1px solid var(--border);
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .q-score {
+            font-weight: bold;
+            color: var(--text-main);
+            min-width: 30px;
+            text-align: right;
+        }
+
+        /* 响应式 */
+        @media (max-width: 992px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .rating-container {
+                grid-template-columns: repeat(5, 1fr);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- 阶段 1：欢迎与测试界面 -->
+    <div id="view-quiz" class="view-section">
+        <div class="quiz-container">
+            <div id="welcome-screen">
+                <div class="welcome-header">
+                    <h1>生命之轮 评估</h1>
+                    <p>通过回答24个问题，诊断生活的8大核心维度。<br>请根据第一直觉，给出1-10分的评价（1 代表极其不认同/极不满意，10 代表完全认同/极其满意）。</p>
+                </div>
+                <button class="btn btn-primary" onclick="startQuiz()"
+                    style="font-size: 1.2rem; padding: 1rem 3rem;">开始测评</button>
+                <div id="resume-btn-container" style="display: none; margin-top: 1rem;">
+                    <button class="btn btn-outline" onclick="showDashboard()">直接查看上次报告</button>
+                </div>
+            </div>
+
+            <div id="question-screen" style="display: none;">
+                <div class="progress-text" id="progress-text">进度: 1 / 24</div>
+                <div class="progress-wrapper">
+                    <div class="progress-bar" id="progress-bar"></div>
+                </div>
+
+                <div class="question-box">
+                    <div class="question-text" id="question-text">加载题目中...</div>
+                </div>
+
+                <div class="rating-container" id="rating-buttons">
+                    <!-- JS 动态生成 1-10 按钮 -->
+                </div>
+                <div class="rating-labels">
+                    <span>极不满意 / 完全不符合</span>
+                    <span>极其满意 / 完全符合</span>
+                </div>
+
+                <button class="btn btn-primary" id="next-btn" onclick="nextQuestion()" disabled>下一题</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 阶段 2：仪表盘结果界面 -->
+    <div id="view-dashboard" class="view-section dashboard">
+        <header class="header">
+            <div class="header-title">
+                <h1>生命之轮 评估报告</h1>
+                <p>基于24项答题数据生成，反映当前生活状态。</p>
+            </div>
+            <div>
+                <button class="btn btn-outline" onclick="resetQuiz()" style="margin-right: 10px;">重新测评</button>
+                <button class="btn btn-primary" onclick="window.print()">打印报告</button>
+            </div>
+        </header>
+
+        <main style="display: flex; flex-direction: column; gap: 1.5rem;">
+            <div class="card">
+                <div class="card-title">多维平衡雷达图</div>
+                <div class="chart-container" id="chart-container">
+                    <!-- 替换为原生 Canvas -->
+                    <canvas id="wheelChart"></canvas>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">深度洞察 (Insights)</div>
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <div class="stat-value" id="avg-score">0.0</div>
+                        <div class="stat-label">综合满意度平均分</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" id="balance-score">0%</div>
+                        <div class="stat-label">生活平衡指数</div>
+                    </div>
+                </div>
+                <div class="insights" id="insights-text"></div>
+            </div>
+        </main>
+
+        <aside>
+            <div class="card">
+                <div class="card-title">评估明细</div>
+                <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 1rem;">
+                    点击各维度，查看你对具体问题的打分，找出具体原因。</p>
+                <div id="accordion-container">
+                    <!-- JS 动态生成折叠面板 -->
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <script>
+        // --- 1. 数据配置 (8大维度，24个问题) ---
+        const dimensions = [
+            { id: 'health', name: "健康与体能", color: "#ef4444" },
+            { id: 'career', name: "事业与工作", color: "#3b82f6" },
+            { id: 'finance', name: "财务与金钱", color: "#f59e0b" },
+            { id: 'family', name: "家庭与朋友", color: "#10b981" },
+            { id: 'romance', name: "爱情与伴侣", color: "#8b5cf6" },
+            { id: 'growth', name: "个人成长", color: "#ec4899" },
+            { id: 'leisure', name: "娱乐与休闲", color: "#06b6d4" },
+            { id: 'environment', name: "物理环境", color: "#84cc16" }
+        ];
+
+        const rawQuestions = [
+            // 健康与体能
+            { dimId: 'health', text: "我对目前的体能、精力和整体身体状况感到满意。" },
+            { dimId: 'health', text: "我有能力去维持规律的饮食和睡眠，不会因为极度焦虑而导致躯体化症状。" },
+            { dimId: 'health', text: "我有固定的习惯去活动身体，并能在其中感受到身体的活力。" },
+            // 事业与工作
+            { dimId: 'career', text: "我对目前的工作充满热情，并能从中获得价值感和成就感。" },
+            { dimId: 'career', text: "我认为自己目前的工作/事业有清晰的发展前景和成长空间。" },
+            { dimId: 'career', text: "我的工作压力在可控范围内，工作外我依然有精力生活。" },
+            // 财务与金钱
+            { dimId: 'finance', text: "我目前的收入能够满足我的期望，我很少为日常开销发愁。" },
+            { dimId: 'finance', text: "我有清晰的储蓄、投资计划，以及应对突发风险的财务储备。" },
+            { dimId: 'finance', text: "我对自己的消费习惯感到满意，占固定收入的合理比例，没有失控或沉重的负债。" },
+            // 家庭与朋友
+            { dimId: 'family', text: "我能感到被家人接纳，而不是被持续的情感勒索。" },
+            { dimId: 'family', text: "我有一群可以交心、相互信任、在我脆弱时能托住我的好朋友。" },
+            { dimId: 'family', text: "我能够建立健康的心理边界，敢于拒绝和远离持续消耗我的人。" },
+            // 情感与伴侣
+            { dimId: 'romance', text: "这段伴侣关系（或独处状态）滋养了我的能量，而不是让我感到被极度抽干或患得患失。没有经历单方面的牺牲、打压或创伤联结。" },
+            { dimId: 'romance', text: "我和伴侣之间有着良好的沟通，能够建设性地解决分歧与冲突。" },
+            { dimId: 'romance', text: "我和伴侣之间可以做到稳定见面（黄金标准：一周一次）" },
+            // 个人成长
+            { dimId: 'growth', text: "我有精力去接触新技能、新事物，保持对世界的好奇。" },
+            { dimId: 'growth', text: "我清楚自己的优缺点，并有意识地在持续进行自我提升。" },
+            { dimId: 'growth', text: "我允许自己犯错，能够带着自我悲悯进行内在探索，而不是严厉地评判自己。" },
+            // 娱乐与休闲
+            { dimId: 'leisure', text: "在工作和责任之外，我有让自己真正感到快乐的兴趣爱好。" },
+            { dimId: 'leisure', text: "我没有因为愧疚感而剥夺自己享受平淡生活的权利。" },
+            { dimId: 'leisure', text: "我的娱乐休闲活动丰富多样，能够真正帮我恢复精力、让自己彻底放松。" },
+            // 物理环境
+            { dimId: 'environment', text: "我对我目前居住的房屋（整洁度、舒适度、空间）感到非常满意。" },
+            { dimId: 'environment', text: "我觉得目前的居住环境非常安全、便利，能让我感到彻底放松。" },
+            { dimId: 'environment', text: "我喜欢我所在的城市或社区，这里的环境氛围让我心情愉悦。" }
+        ];
+
+        // --- 2. 状态管理 ---
+        let testQuestions = [];
+        let currentQuestionIndex = 0;
+        let selectedScore = null;
+        let answers = [];
+
+        // --- 3. 核心测评逻辑 ---
+        window.onload = () => {
+            const savedData = localStorage.getItem('wheelOfLifeResults');
+            if (savedData) {
+                document.getElementById('resume-btn-container').style.display = 'block';
+            }
+            switchView('view-quiz');
+            generateRatingButtons();
+
+            // 监听窗口大小变化重绘图表
+            window.addEventListener('resize', () => {
+                if (document.getElementById('view-dashboard').classList.contains('active')) {
+                    const dataStr = localStorage.getItem('wheelOfLifeResults');
+                    if (dataStr) drawNativeChart(JSON.parse(dataStr));
+                }
+            });
+        };
+
+        function switchView(viewId) {
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+            document.getElementById(viewId).classList.add('active');
+        }
+
+        function shuffleArray(array) {
+            let curId = array.length;
+            while (0 !== curId) {
+                let randId = Math.floor(Math.random() * curId);
+                curId -= 1;
+                let tmp = array[curId];
+                array[curId] = array[randId];
+                array[randId] = tmp;
+            }
+            return array;
+        }
+
+        function generateRatingButtons() {
+            const container = document.getElementById('rating-buttons');
+            container.innerHTML = '';
+            for (let i = 1; i <= 10; i++) {
+                const btn = document.createElement('div');
+                btn.className = 'rating-btn';
+                btn.innerText = i;
+                btn.onclick = () => selectScore(i, btn);
+                container.appendChild(btn);
+            }
+        }
+
+        function selectScore(score, btnElement) {
+            selectedScore = score;
+            document.querySelectorAll('.rating-btn').forEach(b => b.classList.remove('selected'));
+            btnElement.classList.add('selected');
+            document.getElementById('next-btn').disabled = false;
+        }
+
+        function startQuiz() {
+            testQuestions = shuffleArray(JSON.parse(JSON.stringify(rawQuestions)));
+            currentQuestionIndex = 0;
+            answers = [];
+
+            document.getElementById('welcome-screen').style.display = 'none';
+            document.getElementById('question-screen').style.display = 'block';
+
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            selectedScore = null;
+            document.querySelectorAll('.rating-btn').forEach(b => b.classList.remove('selected'));
+            document.getElementById('next-btn').disabled = true;
+
+            const q = testQuestions[currentQuestionIndex];
+            document.getElementById('question-text').innerText = q.text;
+
+            const progress = ((currentQuestionIndex) / testQuestions.length) * 100;
+            document.getElementById('progress-bar').style.width = `${progress}%`;
+            document.getElementById('progress-text').innerText = `进度: ${currentQuestionIndex + 1} / ${testQuestions.length}`;
+
+            if (currentQuestionIndex === testQuestions.length - 1) {
+                document.getElementById('next-btn').innerText = '完成测评，生成报告';
+            } else {
+                document.getElementById('next-btn').innerText = '下一题';
+            }
+        }
+
+        function nextQuestion() {
+            if (selectedScore === null) return;
+            answers.push({
+                dimId: testQuestions[currentQuestionIndex].dimId,
+                text: testQuestions[currentQuestionIndex].text,
+                score: selectedScore
+            });
+            currentQuestionIndex++;
+            if (currentQuestionIndex >= testQuestions.length) {
+                finishQuiz();
+            } else {
+                renderQuestion();
+            }
+        }
+
+        function finishQuiz() {
+            document.getElementById('progress-bar').style.width = `100%`;
+            let resultsMap = {};
+            dimensions.forEach(d => {
+                resultsMap[d.id] = { dimData: d, totalScore: 0, count: 0, questions: [] };
+            });
+
+            answers.forEach(ans => {
+                resultsMap[ans.dimId].totalScore += ans.score;
+                resultsMap[ans.dimId].count += 1;
+                resultsMap[ans.dimId].questions.push({ text: ans.text, score: ans.score });
+            });
+
+            let finalResults = dimensions.map(d => {
+                let r = resultsMap[d.id];
+                let avg = r.count > 0 ? (r.totalScore / r.count).toFixed(1) : 0;
+                return {
+                    id: d.id,
+                    name: d.name,
+                    color: d.color,
+                    score: parseFloat(avg),
+                    questions: r.questions
+                };
+            });
+
+            localStorage.setItem('wheelOfLifeResults', JSON.stringify(finalResults));
+            showDashboard();
+        }
+
+        function resetQuiz() {
+            if (confirm("确定要放弃当前的报告，重新进行测评吗？")) {
+                document.getElementById('welcome-screen').style.display = 'block';
+                document.getElementById('question-screen').style.display = 'none';
+                switchView('view-quiz');
+            }
+        }
+
+
+        // --- 4. 仪表盘渲染与原生 Canvas 画图逻辑 ---
+
+        function showDashboard() {
+            const dataStr = localStorage.getItem('wheelOfLifeResults');
+            if (!dataStr) return;
+            const finalResults = JSON.parse(dataStr);
+
+            switchView('view-dashboard');
+
+            // 延时绘制确保DOM已经渲染，获取到正确的宽高
+            setTimeout(() => {
+                drawNativeChart(finalResults);
+            }, 50);
+
+            renderAccordion(finalResults);
+            calculateMetrics(finalResults);
+        }
+
+        // 颜色转换辅助函数
+        function hexToRgba(hex, alpha) {
+            let r = parseInt(hex.slice(1, 3), 16);
+            let g = parseInt(hex.slice(3, 5), 16);
+            let b = parseInt(hex.slice(5, 7), 16);
+            return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+        }
+
+        // 纯原生 Canvas 绘制极坐标面积图
+        function drawNativeChart(data) {
+            const container = document.getElementById('chart-container');
+            const canvas = document.getElementById('wheelChart');
+            const ctx = canvas.getContext('2d');
+
+            // 适配高清屏幕 (Retina Display)
+            const dpr = window.devicePixelRatio || 1;
+            const width = container.clientWidth;
+            const height = container.clientHeight;
+
+            canvas.width = width * dpr;
+            canvas.height = height * dpr;
+            canvas.style.width = width + 'px';
+            canvas.style.height = height + 'px';
+
+            ctx.scale(dpr, dpr);
+            ctx.clearRect(0, 0, width, height);
+
+            const centerX = width / 2;
+            const centerY = height / 2;
+            // 留出边距给文字标签
+            const maxRadius = Math.min(centerX, centerY) - 50;
+            const segmentAngle = (Math.PI * 2) / data.length;
+
+            // 1. 绘制背景网格线 (2, 4, 6, 8, 10分)
+            ctx.lineWidth = 1;
+            ctx.strokeStyle = 'rgba(0, 0, 0, 0.08)';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.font = '10px sans-serif';
+            ctx.fillStyle = '#94a3b8';
+
+            for (let i = 2; i <= 10; i += 2) {
+                const r = (i / 10) * maxRadius;
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, r, 0, Math.PI * 2);
+                ctx.stroke();
+                // 绘制刻度数值
+                ctx.fillText(i.toString(), centerX, centerY - r - 6);
+            }
+
+            // 2. 绘制各个维度的数据扇形区
+            // 调整起始角度，让第一个画在正上方
+            const startOffset = -Math.PI / 2;
+
+            data.forEach((dim, index) => {
+                const angle = startOffset + index * segmentAngle;
+                const r = (dim.score / 10) * maxRadius;
+
+                // 绘制扇形区
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.arc(centerX, centerY, r, angle, angle + segmentAngle);
+                ctx.closePath();
+
+                ctx.fillStyle = hexToRgba(dim.color, 0.4);
+                ctx.fill();
+                ctx.lineWidth = 2;
+                ctx.strokeStyle = dim.color;
+                ctx.stroke();
+
+                // 绘制分割线
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.lineTo(
+                    centerX + Math.cos(angle) * maxRadius,
+                    centerY + Math.sin(angle) * maxRadius
+                );
+                ctx.strokeStyle = 'rgba(0, 0, 0, 0.08)';
+                ctx.stroke();
+            });
+
+            // 3. 绘制外部标签文字
+            ctx.font = 'bold 12px sans-serif';
+            ctx.fillStyle = '#334155';
+
+            data.forEach((dim, index) => {
+                // 计算标签位置（取扇形中间的角度）
+                const midAngle = startOffset + index * segmentAngle + segmentAngle / 2;
+                const labelRadius = maxRadius + 20; // 文字偏移量
+
+                const labelX = centerX + Math.cos(midAngle) * labelRadius;
+                const labelY = centerY + Math.sin(midAngle) * labelRadius;
+
+                // 根据左右位置调整文本对齐，防重叠
+                if (Math.cos(midAngle) > 0.1) {
+                    ctx.textAlign = 'left';
+                } else if (Math.cos(midAngle) < -0.1) {
+                    ctx.textAlign = 'right';
+                } else {
+                    ctx.textAlign = 'center';
+                }
+
+                // 添加分数显示
+                ctx.fillText(`${dim.name} (${dim.score})`, labelX, labelY);
+            });
+        }
+
+        function renderAccordion(data) {
+            const container = document.getElementById('accordion-container');
+            container.innerHTML = '';
+
+            data.forEach((dim, index) => {
+                const item = document.createElement('div');
+                item.className = 'accordion-item';
+
+                let qHtml = dim.questions.map(q => `
+                    <div class="question-detail">
+                        <span>${q.text}</span>
+                        <span class="q-score">${q.score} 分</span>
+                    </div>
+                `).join('');
+
+                item.innerHTML = `
+                    <div class="accordion-header" onclick="toggleAccordion(${index})">
+                        <div style="display:flex; align-items:center; gap: 10px;">
+                            <span style="display:inline-block; width:12px; height:12px; border-radius:50%; background:${dim.color}"></span>
+                            ${dim.name}
+                        </div>
+                        <div class="dim-score">${dim.score} 分 ▾</div>
+                    </div>
+                    <div class="accordion-content" id="acc-content-${index}">
+                        ${qHtml}
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        function toggleAccordion(index) {
+            const content = document.getElementById(`acc-content-${index}`);
+            content.classList.toggle('open');
+        }
+
+        function calculateMetrics(data) {
+            const scores = data.map(d => d.score);
+            const sum = scores.reduce((a, b) => a + b, 0);
+            const avg = (sum / scores.length).toFixed(1);
+            document.getElementById('avg-score').innerText = avg;
+
+            const variance = scores.reduce((a, b) => a + Math.pow(b - avg, 2), 0) / scores.length;
+            const stdDev = Math.sqrt(variance);
+            let balanceScore = Math.round(Math.max(0, 100 - (stdDev / 4.5) * 100));
+            document.getElementById('balance-score').innerText = balanceScore + '%';
+
+            const sortedData = [...data].sort((a, b) => a.score - b.score);
+            const bottom1 = sortedData[0];
+
+            let insightsDiv = document.getElementById('insights-text');
+            insightsDiv.className = 'insights';
+            let insightHtml = '';
+
+            if ((bottom1.id === 'romance' || bottom1.id === 'family') && bottom1.score <= 3.5) {
+                insightsDiv.classList.add('warning');
+                insightHtml += `<p style="margin-bottom: 0.8rem; font-size: 1.05rem;">🫂 <strong>特别提醒：</strong></p>`;
+                insightHtml += `<p style="margin-bottom: 0.5rem">你的 <strong>${bottom1.name}</strong> 得分极低（${bottom1.score}分）。结合问题模型，这通常意味着你正处于一段高内耗、丧失心理边界、甚至存在暴力或创伤联结的关系中。</p>`;
+                insightHtml += `<p style="color: #991b1b; font-weight: 600; margin-bottom: 0.5rem;">请务必记住：有毒的人际关系无法靠你单方面的调整来修复。</p>`;
+                insightHtml += `<p>你现在的首要任务不是提升这个分数，而是<strong>保护自己的核心能量，建立物理与心理边界，停止自证陷阱</strong>。</p>`
+                insightHtml += `<p> <strong>如果感到极度痛苦</strong>，请不要孤军奋战，<strong>彻底隔离（no contact）</strong>、寻求专业的医院支持是当前最正确的做法。</p>`;
+            } else if (balanceScore >= 80) {
+                insightHtml += `<p style="margin-bottom: 0.5rem">📊 综合来看，你的状态相对平稳。</p>`;
+            } else {
+                insightHtml += `<p style="margin-bottom: 0.5rem">当前最不平衡的领域是 <strong>${bottom1.name}</strong>（${bottom1.score}分）。</p>`;
+                insightHtml += `<p>建议本月不要贪多，点击右侧展开该项明细。如果是客观困难，试着将其拆解为每天一个小行动；如果是环境/他人造成的消耗，试着与有问题的环境保持合理的距离。</p>`;
+            }
+
+            insightsDiv.innerHTML = insightHtml;
+        }
+
+    </script>
+</body>
+
+</html>
