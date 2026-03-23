@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>弱视 远近聚焦训练</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: #ffffff;
+            font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        #control-panel {
+            position: absolute;
+            top: 20px;
+            z-index: 10;
+            text-align: center;
+            background: rgba(240, 240, 240, 0.95);
+            padding: 15px 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+
+        #timer {
+            font-size: 32px;
+            font-weight: bold;
+            color: #333;
+            margin: 10px 0;
+            font-variant-numeric: tabular-nums;
+        }
+
+        button {
+            padding: 10px 25px;
+            font-size: 18px;
+            cursor: pointer;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+
+        .instructions {
+            font-size: 14px;
+            color: #d9534f;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        .status-text {
+            font-size: 14px;
+            color: #555;
+            margin-top: 5px;
+        }
+
+        #canvas {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #symbol {
+            font-family: Arial, sans-serif;
+            font-weight: bold;
+            color: #000000;
+            font-size: 40px; 
+            line-height: 1;
+            opacity: 0;
+            transform: scale(0.05);
+            /* 设定变换基准点为中心，保证缩放不偏移 */
+            transform-origin: center center;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="control-panel">
+        <h2>弱视 远近聚焦训练</h2>
+        <div id="timer">10:00</div>
+        <button id="startBtn">开始训练</button>
+        <button id="stopBtn" disabled>停止</button>
+        <div class="status-text" id="statusText">等待开始...</div>
+        <div class="instructions">⚠️ 请佩戴屈光矫正眼镜，保持头部固定，遮住主导眼，用弱视眼追踪视标</div>
+    </div>
+
+    <div id="canvas">
+        <div id="symbol">E</div>
+    </div>
+
+    <script>
+        const TOTAL_TIME = 600; // 总时长：10分钟 (600秒)
+        const HALF_CYCLE_TIME = 10000; // 单向时长：10秒 (10000毫秒)
+        
+        let timeLeft = TOTAL_TIME;
+        let timerInterval;
+        let currentTimeout;
+        let isRunning = false;
+
+        const timerDisplay = document.getElementById('timer');
+        const startBtn = document.getElementById('startBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const symbol = document.getElementById('symbol');
+        const statusText = document.getElementById('statusText');
+
+        // 上、右、下、左
+        const directions = [0, 90, 180, 270];
+
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            timerDisplay.textContent = 
+                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        // 第 1 阶段：由远及近 (出现并放大)
+        function approach() {
+            if (!isRunning) return;
+
+            // 随机抽取新方向
+            const randomAngle = directions[Math.floor(Math.random() * directions.length)];
+            
+            // 瞬间重置到最远端（极小、极淡）
+            symbol.style.transition = 'none';
+            symbol.style.transform = `scale(0.05) rotate(${randomAngle}deg)`;
+            symbol.style.opacity = '0.5';
+
+            // 强制重绘，使重置立即生效
+            void symbol.offsetWidth;
+
+            statusText.textContent = "状态：视标正在靠近 🟢";
+
+            // 开启【由远及近】动画：
+            // 使用 ease-in (先慢后快)，完美模拟物体匀速靠近时，视觉面积先变化慢、最后猛增的物理现象
+            symbol.style.transition = `transform ${HALF_CYCLE_TIME}ms ease-in, opacity ${HALF_CYCLE_TIME}ms ease-in`;
+            symbol.style.transform = `scale(12) rotate(${randomAngle}deg)`;
+            symbol.style.opacity = '1';
+
+            // 10秒后，无缝切换到远离阶段
+            currentTimeout = setTimeout(() => recede(randomAngle), HALF_CYCLE_TIME);
+        }
+
+        // 第 2 阶段：由近及远 (缩小并消失)
+        function recede(angle) {
+            if (!isRunning) return;
+
+            statusText.textContent = "状态：视标正在远离 🔵";
+
+            // 开启【由近及远】动画：
+            // 使用 ease-out (先快后慢)，模拟物体刚离开眼前时缩小得快，越远缩小得越慢的现象
+            // 注意保留同一个 angle，防止 E 字在倒退时发生旋转
+            symbol.style.transition = `transform ${HALF_CYCLE_TIME}ms ease-out, opacity ${HALF_CYCLE_TIME}ms ease-out`;
+            symbol.style.transform = `scale(0.05) rotate(${angle}deg)`;
+            symbol.style.opacity = '0.5';
+
+            // 10秒后，开始下一轮全新的出现
+            currentTimeout = setTimeout(approach, HALF_CYCLE_TIME);
+        }
+
+        // 开始训练
+        function startTraining() {
+            if (isRunning) return;
+            isRunning = true;
+            timeLeft = TOTAL_TIME;
+            updateTimerDisplay();
+
+            startBtn.disabled = true;
+            stopBtn.disabled = false;
+
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                updateTimerDisplay();
+
+                if (timeLeft <= 0) {
+                    endTraining(true);
+                }
+            }, 1000);
+
+            // 启动循环
+            approach();
+        }
+
+        // 停止/结束训练
+        function endTraining(completed = false) {
+            isRunning = false;
+            clearInterval(timerInterval);
+            clearTimeout(currentTimeout);
+
+            startBtn.disabled = false;
+            stopBtn.disabled = true;
+            statusText.textContent = completed ? "训练完成！" : "训练已停止";
+
+            // 平滑隐藏视标
+            symbol.style.transition = 'opacity 0.5s';
+            symbol.style.opacity = '0.5';
+
+            if (completed) {
+                setTimeout(() => {
+                    alert("🎉 每日10分钟训练完成！请取下眼罩，眺望远处休息一下。");
+                    timeLeft = TOTAL_TIME;
+                    updateTimerDisplay();
+                }, 500);
+            }
+        }
+
+        startBtn.addEventListener('click', startTraining);
+        stopBtn.addEventListener('click', () => endTraining(false));
+
+        updateTimerDisplay();
+    </script>
+</body>
+</html>

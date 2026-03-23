@@ -52,3 +52,4 @@ Interactive graphs and explanations about key [economic](https://www.econgraphs.
 - [眼动脱敏再加工 \| EMDR](/misc/EMDR.html)
 - [Wheel of Life - 生活评估](/misc/Wheel_of_Life.html)
 - [番茄钟 \| Pomodoro](/misc/Pomodoro.html)
+- [眼睛 - 远近训练](/misc/eyes-near-far-training.html)
