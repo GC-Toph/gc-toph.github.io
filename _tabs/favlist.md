@@ -46,10 +46,14 @@ Interactive graphs and explanations about key [economic](https://www.econgraphs.
 
 
 ## misc
+- [Wheel of Life - 生活评估](/misc/Wheel_of_Life.html)
 
 - [冥想训练](/misc/meditation.html)
+- [NSDR](https://www.bilibili.com/video/BV1F4oPYcEi9)
 - [冥想训练 - 外感受](/misc/meditation-alert.html)
+
 - [眼动脱敏再加工 \| EMDR](/misc/EMDR.html)
-- [Wheel of Life - 生活评估](/misc/Wheel_of_Life.html)
+- [眼动脱敏再加工 \| EMDR](https://www.bilibili.com/video/BV1w8sZzLERJ)
+
 - [番茄钟 \| Pomodoro](/misc/Pomodoro.html)
 - [眼睛 - 远近训练](/misc/eyes-near-far-training.html)
