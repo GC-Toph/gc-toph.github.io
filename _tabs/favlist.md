@@ -46,7 +46,9 @@ Interactive graphs and explanations about key [economic](https://www.econgraphs.
 
 
 ## misc
+
 - [Wheel of Life - 生活评估](/misc/Wheel_of_Life.html)
+- [体检前健康风险问卷与初筛评估](/misc/pre_checkup_risk_questionnaire.html)
 
 - [冥想训练](/misc/meditation.html)
 - [NSDR](https://www.bilibili.com/video/BV1F4oPYcEi9)
