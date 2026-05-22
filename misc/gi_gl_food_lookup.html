@@ -1,0 +1,2032 @@
+<!doctype html>
+<html lang="zh-CN">
+
+<head>
+      <meta charset="utf-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
+      <title>常见食物 GI/GL 升糖表</title>
+      <style>
+            :root {
+                  --bg: #f5f7fa;
+                  --surface: #fff;
+                  --text-main: #27384a;
+                  --text-sub: #6b7c8f;
+                  --primary: #2563eb;
+                  --low-bg: #e8f8f5;
+                  --low-border: #10b981;
+                  --low-text: #047857;
+                  --mid-bg: #fff7e6;
+                  --mid-border: #f59e0b;
+                  --mid-text: #b45309;
+                  --high-bg: #fff1f2;
+                  --high-border: #ef4444;
+                  --high-text: #be123c;
+                  --limit-bg: #450a0a;
+                  --limit-text: #fff7ed;
+                  --shadow: 0 8px 30px rgba(15, 23, 42, .07);
+                  --radius: 18px;
+            }
+
+            * {
+                  box-sizing: border-box
+            }
+
+            body {
+                  margin: 0;
+                  background: var(--bg);
+                  color: var(--text-main);
+                  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
+                  line-height: 1.6;
+                  -webkit-font-smoothing: antialiased
+            }
+
+            .container {
+                  max-width: 1260px;
+                  margin: 0 auto;
+                  padding: 38px 18px 28px
+            }
+
+            header {
+                  text-align: center;
+                  margin-bottom: 28px
+            }
+
+            h1 {
+                  font-size: clamp(2rem, 4vw, 3rem);
+                  margin: 0 0 10px;
+                  letter-spacing: -.03em
+            }
+
+            .subtitle {
+                  color: var(--text-sub);
+                  font-size: 1.04rem;
+                  max-width: 900px;
+                  margin: 0 auto
+            }
+
+            .controls {
+                  display: grid;
+                  grid-template-columns: minmax(260px, 1fr) auto auto;
+                  gap: 14px;
+                  align-items: center;
+                  margin: 28px 0 22px;
+                  background: rgba(255, 255, 255, .92);
+                  padding: 18px;
+                  border-radius: var(--radius);
+                  box-shadow: var(--shadow);
+                  position: sticky;
+                  top: 14px;
+                  z-index: 10;
+                  backdrop-filter: blur(10px)
+            }
+
+            .search-box input,
+            .filter-select {
+                  width: 100%;
+                  padding: 12px 14px;
+                  border: 2px solid #e8edf3;
+                  border-radius: 12px;
+                  background: #fff;
+                  color: var(--text-main);
+                  font-size: 15px
+            }
+
+            .search-box input:focus,
+            .filter-select:focus {
+                  outline: none;
+                  border-color: var(--primary)
+            }
+
+            .legend {
+                  display: flex;
+                  gap: 10px;
+                  flex-wrap: wrap;
+                  justify-content: flex-end;
+                  font-size: .84rem;
+                  font-weight: 700
+            }
+
+            .pill {
+                  display: inline-flex;
+                  align-items: center;
+                  gap: 6px;
+                  padding: 6px 9px;
+                  border-radius: 999px;
+                  background: #f8fafc;
+                  border: 1px solid #e5e7eb;
+                  white-space: nowrap
+            }
+
+            .dot {
+                  width: 10px;
+                  height: 10px;
+                  border-radius: 999px
+            }
+
+            .dot.low {
+                  background: var(--low-border)
+            }
+
+            .dot.mid {
+                  background: var(--mid-border)
+            }
+
+            .dot.high {
+                  background: var(--high-border)
+            }
+
+            .dot.limit {
+                  background: #7f1d1d
+            }
+
+            .summary {
+                  display: grid;
+                  grid-template-columns: repeat(4, minmax(0, 1fr));
+                  gap: 14px;
+                  margin: 0 0 22px
+            }
+
+            .summary-card {
+                  background: #fff;
+                  border-radius: 16px;
+                  padding: 16px;
+                  box-shadow: var(--shadow)
+            }
+
+            .summary-card b {
+                  font-size: 1.55rem;
+                  display: block
+            }
+
+            .summary-card span {
+                  color: var(--text-sub);
+                  font-size: .9rem
+            }
+
+            .grid {
+                  display: grid;
+                  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+                  gap: 22px
+            }
+
+            .card {
+                  background: var(--surface);
+                  border-radius: var(--radius);
+                  box-shadow: var(--shadow);
+                  overflow: hidden;
+                  height: fit-content
+            }
+
+            .card-header {
+                  padding: 18px 20px;
+                  border-bottom: 1px solid #eef2f7;
+                  background: linear-gradient(135deg, #fff, #f8fafc);
+                  display: flex;
+                  gap: 12px;
+                  align-items: center
+            }
+
+            .card-icon {
+                  font-size: 25px
+            }
+
+            .card-title {
+                  font-size: 1.18rem;
+                  font-weight: 800;
+                  margin: 0
+            }
+
+            .card-desc {
+                  font-size: .83rem;
+                  color: var(--text-sub);
+                  margin-top: 2px
+            }
+
+            .food-list {
+                  padding: 0;
+                  margin: 0;
+                  list-style: none
+            }
+
+            .food-item {
+                  padding: 15px 18px;
+                  border-bottom: 1px solid #f2f4f7;
+                  border-left: 5px solid transparent;
+                  display: flex;
+                  flex-direction: column;
+                  gap: 10px
+            }
+
+            .food-item:last-child {
+                  border-bottom: 0
+            }
+
+            .food-item:hover {
+                  background: #fafafa
+            }
+
+            .safe {
+                  background: var(--low-bg);
+                  border-left-color: var(--low-border)
+            }
+
+            .moderate {
+                  background: var(--mid-bg);
+                  border-left-color: var(--mid-border)
+            }
+
+            .caution {
+                  background: var(--high-bg);
+                  border-left-color: var(--high-border)
+            }
+
+            .limit {
+                  background: #fee2e2;
+                  border-left-color: #7f1d1d
+            }
+
+            .item-top {
+                  display: flex;
+                  justify-content: space-between;
+                  gap: 12px;
+                  align-items: flex-start
+            }
+
+            .item-name {
+                  font-weight: 800;
+                  font-size: 1rem
+            }
+
+            .item-note {
+                  display: block;
+                  color: var(--text-sub);
+                  font-size: .8rem;
+                  margin-top: 2px;
+                  font-weight: 400
+            }
+
+            .serving {
+                  font-size: .78rem;
+                  color: #64748b;
+                  margin-top: 4px
+            }
+
+            .metrics {
+                  display: flex;
+                  gap: 8px;
+                  flex-wrap: wrap;
+                  align-items: center
+            }
+
+            .badge {
+                  font-size: .78rem;
+                  font-weight: 900;
+                  padding: 4px 8px;
+                  border-radius: 8px;
+                  background: rgba(255, 255, 255, .55);
+                  border: 1px solid rgba(15, 23, 42, .08)
+            }
+
+            .badge.low {
+                  color: var(--low-text)
+            }
+
+            .badge.mid {
+                  color: var(--mid-text)
+            }
+
+            .badge.high {
+                  color: var(--high-text)
+            }
+
+            .safety-badge {
+                  margin-left: auto;
+                  font-size: .78rem;
+                  font-weight: 900;
+                  padding: 5px 9px;
+                  border-radius: 999px
+            }
+
+            .safety-badge.safe {
+                  background: #d1fae5;
+                  color: #047857
+            }
+
+            .safety-badge.moderate {
+                  background: #fef3c7;
+                  color: #92400e
+            }
+
+            .safety-badge.caution {
+                  background: #ffe4e6;
+                  color: #be123c
+            }
+
+            .safety-badge.limit {
+                  background: #7f1d1d;
+                  color: #fff
+            }
+
+            .info-panel {
+                  margin-top: 34px;
+                  background: #fff;
+                  padding: 26px;
+                  border-radius: var(--radius);
+                  box-shadow: var(--shadow);
+                  border-left: 5px solid var(--primary)
+            }
+
+            .info-grid {
+                  display: grid;
+                  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+                  gap: 24px
+            }
+
+            .info-block h3 {
+                  margin: 0 0 10px;
+                  color: var(--primary)
+            }
+
+            .info-block ul {
+                  padding-left: 20px;
+                  margin: 0;
+                  color: var(--text-sub)
+            }
+
+            .info-block li {
+                  margin-bottom: 8px
+            }
+
+            footer {
+                  text-align: center;
+                  margin-top: 30px;
+                  color: var(--text-sub);
+                  font-size: .83rem;
+                  padding-bottom: 18px
+            }
+
+            @media (max-width:900px) {
+                  .controls {
+                        grid-template-columns: 1fr;
+                        position: static
+                  }
+
+                  .legend {
+                        justify-content: flex-start
+                  }
+
+                  .summary {
+                        grid-template-columns: repeat(2, 1fr)
+                  }
+
+                  .grid {
+                        grid-template-columns: 1fr
+                  }
+            }
+      </style>
+</head>
+
+<body>
+      <div class="container">
+            <header>
+                  <h1>常见食物 GI/GL 升糖表</h1>
+                  <p class="subtitle">常见食物 GI（升糖速度）与 GL（按常见份量估算的升糖负荷），并按二者联合给出“安全 / 适量 / 谨慎 / 少吃”评级。<br />带 * 的食物表示公开实测
+                        GI 不充分或品种差异大，采用保守估算。</p>
+            </header>
+
+            <div class="controls">
+                  <div class="search-box"><input type="text" id="searchInput"
+                              placeholder="搜索食物，如：枣、红枣、米饭、燕麦、奶茶、西瓜、麻辣烫..." /></div>
+                  <select id="safetyFilter" class="filter-select" aria-label="按安全评级筛选">
+                        <option value="all">全部安全评级</option>
+                        <option value="safe">安全</option>
+                        <option value="moderate">适量</option>
+                        <option value="caution">谨慎</option>
+                        <option value="limit">少吃/尽量避免</option>
+                  </select>
+                  <div class="legend"><span class="pill"><span class="dot low"></span>GI低≤55 / GL低≤10</span><span
+                              class="pill"><span class="dot mid"></span>GI中56-69 / GL中11-19</span><span
+                              class="pill"><span class="dot high"></span>GI高≥70 / GL高≥20</span></div>
+            </div>
+
+            <section class="summary" id="summary"></section>
+            <main class="grid" id="foodGrid"></main>
+
+            <section class="info-panel">
+                  <div class="info-grid">
+                        <div class="info-block">
+                              <h3>评级规则</h3>
+                              <ul>
+                                    <li><strong>安全：</strong>低GI且低GL，或几乎无可利用碳水。</li>
+                                    <li><strong>适量：</strong>GI或GL有一项中等，常见份量下可控。</li>
+                                    <li><strong>谨慎：</strong>GL高，或高GI叠加中等GL；需要明显控量和搭配。</li>
+                                    <li><strong>少吃：</strong>高GI且高GL，最容易造成餐后血糖峰值。</li>
+                              </ul>
+                        </div>
+                        <div class="info-block">
+                              <h3>怎么用更靠谱</h3>
+                              <ul>
+                                    <li>GL是按“常见一份”估算；你吃两份，GL也近似翻倍。</li>
+                                    <li>混合进餐会改变吸收速度（优先顺序：菜>肉>主食），但不会让碳水消失。</li>
+                                    <li>糖尿病、妊娠糖尿病、胰岛素抵抗人群应结合医生建议和自测血糖/CGM。</li>
+                                    <li>同名食物因品种、成熟度、加工、烹饪软烂程度不同，GI/GL会波动。</li>
+                              </ul>
+                        </div>
+                  </div>
+            </section>
+            <footer>数据参考：悉尼大学 GI 数据库、2021 国际 GI/GL 表综述、Diabetes Canada、Harvard Nutrition Source / Harvard Health
+                  等公开资料；本页仅供健康科普，不替代医疗诊断。</footer>
+      </div>
+
+      <script>
+            const foodData = [
+                  {
+                        "id": "grains",
+                        "title": "🍚 谷物与主食",
+                        "desc": "精制、糊化、打碎越充分，GI/GL通常越高。优先选整粒、冷却、少量搭配蛋白和蔬菜。",
+                        "items": [
+                              {
+                                    "name": "燕麦片（传统压片）",
+                                    "serving": "约40g干重/1碗",
+                                    "giValue": "55",
+                                    "giLevel": "low",
+                                    "glValue": 13,
+                                    "glLevel": "mid",
+                                    "safety": "moderate",
+                                    "note": "中低GI，β-葡聚糖有助延缓吸收"
+                              },
+                              {
+                                    "name": "钢切燕麦",
+                                    "serving": "约40g干重/1碗",
+                                    "giValue": "42",
+                                    "giLevel": "low",
+                                    "glValue": 9,
+                                    "glLevel": "low",
+                                    "safety": "safe",
+                                    "note": "比即食燕麦结构更完整"
+                              },
+                              {
+                                    "name": "即食燕麦片",
+                                    "serving": "约40g干重/1碗",
+                                    "giValue": "66",
+                                    "giLevel": "mid",
+                                    "glValue": 17,
+                                    "glLevel": "mid",
+                                    "safety": "moderate",
+                                    "note": "预熟压薄，升糖更快"
+                              },
+                              {
+                                    "name": "白米饭（热）",
+                                    "serving": "150g熟饭",
+                                    "giValue": "73",
+                                    "giLevel": "high",
+                                    "glValue": 30,
+                                    "glLevel": "high",
+                                    "safety": "limit",
+                                    "note": "粳米、软烂米饭可更高"
+                              },
+                              {
+                                    "name": "冷却米饭/寿司饭",
+                                    "serving": "150g熟饭",
+                                    "giValue": "55-65",
+                                    "giLevel": "mid",
+                                    "glValue": 23,
+                                    "glLevel": "high",
+                                    "safety": "caution",
+                                    "note": "冷却可增加抗性淀粉，但调味糖会抵消"
+                              },
+                              {
+                                    "name": "糙米饭",
+                                    "serving": "150g熟饭",
+                                    "giValue": "50-66",
+                                    "giLevel": "mid",
+                                    "glValue": 20,
+                                    "glLevel": "high",
+                                    "safety": "caution",
+                                    "note": "品种差异较大；比白米更有纤维"
+                              },
+                              {
+                                    "name": "黑米/紫米饭",
+                                    "serving": "150g熟饭",
+                                    "giValue": "45-58",
+                                    "giLevel": "low",
+                                    "glValue": 18,
+                                    "glLevel": "mid",
+                                    "safety": "moderate",
+                                    "note": "常与白米混煮，GL取决于比例"
+                              },
+                              {
+                                    "name": "杂粮饭（含豆类）",
+                                    "serving": "150g熟饭",
+                                    "giValue": "45-60",
+                                    "giLevel": "low",
+                                    "glValue": 16,
+                                    "glLevel": "mid",
+                                    "safety": "moderate",
+                                    "note": "豆类比例越高，GL越低"
+                              },
+                              {
+                                    "name": "藜麦",
+                                    "serving": "150g熟食",
+                                    "giValue": "35-53",
+                                    "giLevel": "low",
+                                    "glValue": 13,
+                                    "glLevel": "mid",
+                                    "safety": "moderate",
+                                    "note": "蛋白和纤维较高"
+                              },
+                              {
+                                    "name": "大麦/青稞饭",
+                                    "serving": "150g熟食",
+                                    "giValue": "25-45",
+                                    "giLevel": "low",
+                                    "glValue": 11,
+                                    "glLevel": "mid",
+                                    "safety": "moderate",
+                                    "note": "β-葡聚糖较多，通常低GI"
+                              },
+                              {
+                                    "name": "荞麦面",
+                                    "serving": "1碗熟面约180g",
+                                    "giValue": "46-59",
+                                    "giLevel": "low",
+                                    "glValue": 18,
+                                    "glLevel": "mid",
+                                    "safety": "moderate",
+                                    "note": "注意部分产品混有小麦粉"
+                              },
+                              {
+                                    "name": "莜麦面/燕麦面",
+                                    "serving": "1碗熟面约180g",
+                                    "giValue": "45-55",
+                                    "giLevel": "low",
+                                    "glValue": 17,
+                                    "glLevel": "mid",
+                                    "safety": "moderate",
+                                    "note": "整粒比例高时更稳"
+                              },
+                              {
+                                    "name": "意大利面（硬质小麦，弹牙）",
+                                    "serving": "180g熟面",
+                                    "giValue": "45-55",
+                                    "giLevel": "low",
+                                    "glValue": 22,
+                                    "glLevel": "high",
+                                    "safety": "caution",
+                                    "note": "煮过软会升高"
+                              },
+                              {
+                                    "name": "普通挂面/汤面",
+                                    "serving": "1碗熟面约200g",
+                                    "giValue": "60-70",
+                                    "giLevel": "mid",
+                                    "glValue": 28,
+                                    "glLevel": "high",
+                                    "safety": "caution",
+                                    "note": "精制面粉，汤面易吃多"
+                              },
+                              {
+                                    "name": "方便面",
+                                    "serving": "1包",
+                                    "giValue": "60-70",
+                                    "giLevel": "mid",
+                                    "glValue": 35,
+                                    "glLevel": "high",
+                                    "safety": "caution",
+                                    "note": "油炸面饼+调料，GL和钠都高"
+                              },
+                              {
+                                    "name": "白馒头",
+                                    "serving": "1个约100g",
+                                    "giValue": "85-88",
+                                    "giLevel": "high",
+                                    "glValue": 42,
+                                    "glLevel": "high",
+                                    "safety": "limit",
+                                    "note": "发酵精白面，升糖快"
+                              },
+                              {
+                                    "name": "花卷",
+                                    "serving": "1个约100g",
+                                    "giValue": "80-88",
+                                    "giLevel": "high",
+                                    "glValue": 40,
+                                    "glLevel": "high",
+                                    "safety": "limit",
+                                    "note": "与白馒头相近，油盐略高"
+                              },
+                              {
+                                    "name": "全麦馒头",
+                                    "serving": "1个约100g",
+                                    "giValue": "60-70",
+                                    "giLevel": "mid",
+                                    "glValue": 32,
+                                    "glLevel": "high",
+                                    "safety": "caution",
+                                    "note": "真正全麦比例越高越好"
+                              },
+                              {
+                                    "name": "白面包/吐司",
+                                    "serving": "2片约60g",
+                                    "giValue": "70-75",
+                                    "giLevel": "high",
+                                    "glValue": 20,
+                                    "glLevel": "high",
+                                    "safety": "limit",
+                                    "note": "精制面粉，GL中高"
+                              },
+                              {
+                                    "name": "全麦面包",
+                                    "serving": "2片约60g",
+                                    "giValue": "50-69",
+                                    "giLevel": "mid",
+                                    "glValue": 16,
+                                    "glLevel": "mid",
+                                    "safety": "moderate",
+                                    "note": "需看配料表第一位是否全麦粉"
+                              },
+                              {
+                                    "name": "法棍面包",
+                                    "serving": "约60g",
+                                    "giValue": "75-95",
+                                    "giLevel": "high",
+                                    "glValue": 25,
+                                    "glLevel": "high",
+                                    "safety": "limit",
+                                    "note": "少油不等于低升糖"
+                              },
+                              {
+                                    "name": "贝果 Bagel",
+                                    "serving": "1个约100g",
+                                    "giValue": "69-72",
+                                    "giLevel": "high",
+                                    "glValue": 36,
+                                    "glLevel": "high",
+                                    "safety": "limit",
+                                    "note": "碳水密度高"
+                              },
+                              {
+                                    "name": "玉米棒（甜玉米）",
+                                    "serving": "1根中等",
+                                    "giValue": "48-55",
+                                    "giLevel": "low",
+                                    "glValue": 14,
+                                    "glLevel": "mid",
+                                    "safety": "moderate",
+                                    "note": "整粒食用比玉米糊更稳"
+                              },
+                              {
+                                    "name": "玉米糊/玉米粥",
+                                    "serving": "1碗",
+                                    "giValue": "65-75",
+                                    "giLevel": "high",
+                                    "glValue": 22,
+                                    "glLevel": "high",
+                                    "safety": "limit",
+                                    "note": "粉碎+糊化提升吸收速度"
+                              },
+                              {
+                                    "name": "小米粥",
+                                    "serving": "1碗",
+                                    "giValue": "70-90",
+                                    "giLevel": "high",
+                                    "glValue": 24,
+                                    "glLevel": "high",
+                                    "safety": "limit",
+                                    "note": "煮得越烂越高"
+                              },
+                              {
+                                    "name": "白米粥",
+                                    "serving": "1碗",
+                                    "giValue": "75-90",
+                                    "giLevel": "high",
+                                    "glValue": 20,
+                                    "glLevel": "high",
+                                    "safety": "limit",
+                                    "note": "水多但糊化充分；容易加量"
+                              },
+                              {
+                                    "name": "皮蛋瘦肉粥",
+                                    "serving": "1碗",
+                                    "giValue": "75-90",
+                                    "giLevel": "high",
+                                    "glValue": 24,
+                                    "glLevel": "high",
+                                    "safety": "limit",
+                                    "note": "蛋白质不能抵消米粥高GI"
+                              },
+                              {
+                                    "name": "糯米饭/年糕",
+                                    "serving": "100g",
+                                    "giValue": "85-95+",
+                                    "giLevel": "high",
+                                    "glValue": 43,
+                                    "glLevel": "high",
+                                    "safety": "limit",
+                                    "note": "支链淀粉高，升糖迅猛"
+                              },
+                              {
+                                    "name": "粽子（糯米）",
+                                    "serving": "1个中等",
+                                    "giValue": "85-95+",
+                                    "giLevel": "high",
+                                    "glValue": 48,
+                                    "glLevel": "high",
+                                    "safety": "limit",
+                                    "note": "GL随个头和馅料大幅变化"
+                              },
+                              {
+                                    "name": "米粉/河粉",
+                                    "serving": "1碗",
+                                    "giValue": "70-85",
+                                    "giLevel": "high",
+                                    "glValue": 34,
+                                    "glLevel": "high",
+                                    "safety": "limit",
+                                    "note": "精制米制品，常见高GI"
+                              },
+                              {
+                                    "name": "凉皮/米皮",
+                                    "serving": "1份",
+                                    "giValue": "70-80",
+                                    "giLevel": "high",
+                                    "glValue": 36,
+                                    "glLevel": "high",
+                                    "safety": "limit",
+                                    "note": "以精制淀粉为主"
+                              },
+                              {
+                                    "name": "粉条/酸辣粉",
+                                    "serving": "1碗",
+                                    "giValue": "65-80",
+                                    "giLevel": "high",
+                                    "glValue": 32,
+                                    "glLevel": "high",
+                                    "safety": "limit",
+                                    "note": "红薯粉/土豆粉差异较大，份量常偏大"
+                              },
+                              {
+                                    "name": "玉米片 Corn flakes",
+                                    "serving": "1碗约30g",
+                                    "giValue": "80-85",
+                                    "giLevel": "high",
+                                    "glValue": 20,
+                                    "glLevel": "high",
+                                    "safety": "limit",
+                                    "note": "高度加工早餐谷物"
+                              },
+                              {
+                                    "name": "格兰诺拉麦片（含糖）",
+                                    "serving": "1份约45g",
+                                    "giValue": "55-70",
+                                    "giLevel": "mid",
+                                    "glValue": 24,
+                                    "glLevel": "high",
+                                    "safety": "caution",
+                                    "note": "油糖添加多，GL偏高"
+                              }
+                        ]
+                  },
+                  {
+                        "id": "tubers",
+                        "title": "🥔 薯类与根茎",
+                        "desc": "同一种薯类，烤、泥、煮、冷却的GI差异很大；替代主食时要扣减米面量。",
+                        "items": [
+                              {
+                                    "name": "煮土豆（带皮）",
+                                    "serving": "150g",
+                                    "giValue": "56-65",
+                                    "giLevel": "mid",
+                                    "glValue": 18,
+                                    "glLevel": "mid",
+                                    "safety": "moderate",
+                                    "note": "带皮整块煮通常比泥更稳"
+                              },
+                              {
+                                    "name": "土豆泥",
+                                    "serving": "150g",
+                                    "giValue": "80-90",
+                                    "giLevel": "high",
+                                    "glValue": 25,
+                                    "glLevel": "high",
+                                    "safety": "limit",
+                                    "note": "结构破坏，消化面积大"
+                              },
+                              {
+                                    "name": "烤土豆",
+                                    "serving": "150g",
+                                    "giValue": "80-95",
+                                    "giLevel": "high",
+                                    "glValue": 28,
+                                    "glLevel": "high",
+                                    "safety": "limit",
+                                    "note": "高温烤制提升可利用糖"
+                              },
+                              {
+                                    "name": "凉土豆沙拉",
+                                    "serving": "150g",
+                                    "giValue": "45-60",
+                                    "giLevel": "low",
+                                    "glValue": 14,
+                                    "glLevel": "mid",
+                                    "safety": "moderate",
+                                    "note": "冷却后抗性淀粉增加；注意沙拉酱"
+                              },
+                              {
+                                    "name": "炸薯条",
+                                    "serving": "1中份",
+                                    "giValue": "70-75",
+                                    "giLevel": "high",
+                                    "glValue": 38,
+                                    "glLevel": "high",
+                                    "safety": "limit",
+                                    "note": "GI未必最高，但热量和总GL高"
+                              },
+                              {
+                                    "name": "薯片",
+                                    "serving": "1小包约40g",
+                                    "giValue": "55-70",
+                                    "giLevel": "mid",
+                                    "glValue": 19,
+                                    "glLevel": "mid",
+                                    "safety": "moderate",
+                                    "note": "油脂高，容易过量"
+                              },
+                              {
+                                    "name": "蒸红薯",
+                                    "serving": "150g",
+                                    "giValue": "60-70",
+                                    "giLevel": "mid",
+                                    "glValue": 22,
+                                    "glLevel": "high",
+                                    "safety": "caution",
+                                    "note": "甜度和品种差异明显"
+                              },
+                              {
+                                    "name": "烤红薯",
+                                    "serving": "150g",
+                                    "giValue": "85-94",
+                                    "giLevel": "high",
+                                    "glValue": 30,
+                                    "glLevel": "high",
+                                    "safety": "limit",
+                                    "note": "更甜更糯通常更高"
+                              },
+                              {
+                                    "name": "紫薯",
+                                    "serving": "150g",
+                                    "giValue": "55-65",
+                                    "giLevel": "mid",
+                                    "glValue": 20,
+                                    "glLevel": "high",
+                                    "safety": "caution",
+                                    "note": "纤维和多酚较多，但仍算主食"
+                              },
+                              {
+                                    "name": "山药",
+                                    "serving": "150g",
+                                    "giValue": "48-55",
+                                    "giLevel": "low",
+                                    "glValue": 14,
+                                    "glLevel": "mid",
+                                    "safety": "moderate",
+                                    "note": "黏液质有助延缓吸收"
+                              },
+                              {
+                                    "name": "芋头",
+                                    "serving": "150g",
+                                    "giValue": "48-54",
+                                    "giLevel": "low",
+                                    "glValue": 13,
+                                    "glLevel": "mid",
+                                    "safety": "moderate",
+                                    "note": "替代部分主食更合适"
+                              },
+                              {
+                                    "name": "莲藕",
+                                    "serving": "150g",
+                                    "giValue": "45-55",
+                                    "giLevel": "low",
+                                    "glValue": 12,
+                                    "glLevel": "mid",
+                                    "safety": "moderate",
+                                    "note": "凉拌更稳，糯藕和甜藕偏高"
+                              },
+                              {
+                                    "name": "南瓜（普通/老南瓜）",
+                                    "serving": "150g",
+                                    "giValue": "65-75",
+                                    "giLevel": "high",
+                                    "glValue": 9,
+                                    "glLevel": "low",
+                                    "safety": "moderate",
+                                    "note": "高GI但可利用碳水较低，GL通常中低"
+                              },
+                              {
+                                    "name": "贝贝南瓜",
+                                    "serving": "150g",
+                                    "giValue": "55-70",
+                                    "giLevel": "mid",
+                                    "glValue": 13,
+                                    "glLevel": "mid",
+                                    "safety": "moderate",
+                                    "note": "口感粉糯，GL随干物质升高"
+                              },
+                              {
+                                    "name": "胡萝卜（煮）",
+                                    "serving": "100g",
+                                    "giValue": "35-50",
+                                    "giLevel": "low",
+                                    "glValue": 4,
+                                    "glLevel": "low",
+                                    "safety": "safe",
+                                    "note": "GI争议较多，GL低"
+                              },
+                              {
+                                    "name": "白萝卜/青萝卜",
+                                    "serving": "150g",
+                                    "giValue": "<20",
+                                    "giLevel": "low",
+                                    "glValue": 2,
+                                    "glLevel": "low",
+                                    "safety": "safe",
+                                    "note": "可利用碳水少，GL很低"
+                              }
+                        ]
+                  },
+                  {
+                        "id": "fruits",
+                        "title": "🍎 新鲜水果与果干",
+                        "desc": "完整水果优于果汁；果干和蜜饯因脱水浓缩，GL常显著升高。",
+                        "items": [
+                              {
+                                    "name": "苹果",
+                                    "serving": "1个中等约150g",
+                                    "giValue": "36-40",
+                                    "giLevel": "low",
+                                    "glValue": 6,
+                                    "glLevel": "low",
+                                    "safety": "safe",
+                                    "note": "带皮更好"
+                              },
+                              {
+                                    "name": "梨",
+                                    "serving": "1个中等约170g",
+                                    "giValue": "30-38",
+                                    "giLevel": "low",
+                                    "glValue": 6,
+                                    "glLevel": "low",
+                                    "safety": "safe",
+                                    "note": "水分高，GL较低"
+                              },
+                              {
+                                    "name": "橙子",
+                                    "serving": "1个中等约130g",
+                                    "giValue": "40-45",
+                                    "giLevel": "low",
+                                    "glValue": 5,
+                                    "glLevel": "low",
+                                    "safety": "safe",
+                                    "note": "完整吃优于橙汁"
+                              },
+                              {
+                                    "name": "柚子/葡萄柚",
+                                    "serving": "半个",
+                                    "giValue": "25-35",
+                                    "giLevel": "low",
+                                    "glValue": 3,
+                                    "glLevel": "low",
+                                    "safety": "safe",
+                                    "note": "酸甜品种差异大"
+                              },
+                              {
+                                    "name": "草莓",
+                                    "serving": "150g",
+                                    "giValue": "25-40",
+                                    "giLevel": "low",
+                                    "glValue": 3,
+                                    "glLevel": "low",
+                                    "safety": "safe",
+                                    "note": "浆果类低GL"
+                              },
+                              {
+                                    "name": "蓝莓",
+                                    "serving": "125g",
+                                    "giValue": "45-53",
+                                    "giLevel": "low",
+                                    "glValue": 6,
+                                    "glLevel": "low",
+                                    "safety": "safe",
+                                    "note": "GI中低，GL低"
+                              },
+                              {
+                                    "name": "樱桃",
+                                    "serving": "100g",
+                                    "giValue": "20-25",
+                                    "giLevel": "low",
+                                    "glValue": 3,
+                                    "glLevel": "low",
+                                    "safety": "safe",
+                                    "note": "低GI低GL"
+                              },
+                              {
+                                    "name": "李子",
+                                    "serving": "2个约120g",
+                                    "giValue": "24-35",
+                                    "giLevel": "low",
+                                    "glValue": 4,
+                                    "glLevel": "low",
+                                    "safety": "safe",
+                                    "note": "低GI低GL"
+                              },
+                              {
+                                    "name": "桃子",
+                                    "serving": "1个中等",
+                                    "giValue": "35-42",
+                                    "giLevel": "low",
+                                    "glValue": 5,
+                                    "glLevel": "low",
+                                    "safety": "safe",
+                                    "note": "罐头糖水版不适用"
+                              },
+                              {
+                                    "name": "杏",
+                                    "serving": "3个约100g",
+                                    "giValue": "30-35",
+                                    "giLevel": "low",
+                                    "glValue": 3,
+                                    "glLevel": "low",
+                                    "safety": "safe",
+                                    "note": "低GL"
+                              },
+                              {
+                                    "name": "葡萄",
+                                    "serving": "100g",
+                                    "giValue": "45-55",
+                                    "giLevel": "low",
+                                    "glValue": 8,
+                                    "glLevel": "low",
+                                    "safety": "safe",
+                                    "note": "容易一串吃多"
+                              },
+                              {
+                                    "name": "猕猴桃",
+                                    "serving": "1个约100g",
+                                    "giValue": "50-55",
+                                    "giLevel": "low",
+                                    "glValue": 6,
+                                    "glLevel": "low",
+                                    "safety": "safe",
+                                    "note": "维C高，GL低"
+                              },
+                              {
+                                    "name": "火龙果",
+                                    "serving": "200g",
+                                    "giValue": "48-55",
+                                    "giLevel": "low",
+                                    "glValue": 10,
+                                    "glLevel": "low",
+                                    "safety": "safe",
+                                    "note": "白心/红心糖量差异较大"
+                              },
+                              {
+                                    "name": "香蕉（熟）",
+                                    "serving": "1根中等",
+                                    "giValue": "55-65",
+                                    "giLevel": "mid",
+                                    "glValue": 14,
+                                    "glLevel": "mid",
+                                    "safety": "moderate",
+                                    "note": "越熟GI越高；青香蕉更低"
+                              },
+                              {
+                                    "name": "芒果",
+                                    "serving": "150g",
+                                    "giValue": "51-60",
+                                    "giLevel": "mid",
+                                    "glValue": 12,
+                                    "glLevel": "mid",
+                                    "safety": "moderate",
+                                    "note": "甜度高，控制份量"
+                              },
+                              {
+                                    "name": "菠萝",
+                                    "serving": "150g",
+                                    "giValue": "55-66",
+                                    "giLevel": "mid",
+                                    "glValue": 10,
+                                    "glLevel": "low",
+                                    "safety": "moderate",
+                                    "note": "成熟度越高越甜"
+                              },
+                              {
+                                    "name": "木瓜",
+                                    "serving": "150g",
+                                    "giValue": "55-60",
+                                    "giLevel": "mid",
+                                    "glValue": 8,
+                                    "glLevel": "low",
+                                    "safety": "moderate",
+                                    "note": "GL通常低到中"
+                              },
+                              {
+                                    "name": "哈密瓜/甜瓜",
+                                    "serving": "150g",
+                                    "giValue": "60-70",
+                                    "giLevel": "mid",
+                                    "glValue": 7,
+                                    "glLevel": "low",
+                                    "safety": "moderate",
+                                    "note": "GI偏高但GL低"
+                              },
+                              {
+                                    "name": "西瓜",
+                                    "serving": "200g",
+                                    "giValue": "72-80",
+                                    "giLevel": "high",
+                                    "glValue": 8,
+                                    "glLevel": "low",
+                                    "safety": "moderate",
+                                    "note": "GI高但水分大，GL低；少量可"
+                              },
+                              {
+                                    "name": "荔枝",
+                                    "serving": "100g",
+                                    "giValue": "65-79",
+                                    "giLevel": "high",
+                                    "glValue": 12,
+                                    "glLevel": "mid",
+                                    "safety": "caution",
+                                    "note": "糖分高，容易过量"
+                              },
+                              {
+                                    "name": "龙眼",
+                                    "serving": "100g",
+                                    "giValue": "60-75",
+                                    "giLevel": "mid",
+                                    "glValue": 13,
+                                    "glLevel": "mid",
+                                    "safety": "moderate",
+                                    "note": "糖分高，少量"
+                              },
+                              {
+                                    "name": "鲜枣/冬枣",
+                                    "serving": "100g",
+                                    "giValue": "60-75*",
+                                    "giLevel": "mid",
+                                    "glValue": 18,
+                                    "glLevel": "mid",
+                                    "safety": "moderate",
+                                    "note": "实测GI资料有限；糖密度高，按中高风险处理"
+                              },
+                              {
+                                    "name": "红枣/干枣",
+                                    "serving": "30g",
+                                    "giValue": "70-100*",
+                                    "giLevel": "high",
+                                    "glValue": 20,
+                                    "glLevel": "high",
+                                    "safety": "limit",
+                                    "note": "脱水浓缩，GL不低；泡水也会溶出糖"
+                              },
+                              {
+                                    "name": "蜜枣/阿胶枣",
+                                    "serving": "30g",
+                                    "giValue": "80-100*",
+                                    "giLevel": "high",
+                                    "glValue": 25,
+                                    "glLevel": "high",
+                                    "safety": "limit",
+                                    "note": "常额外加糖，GL高"
+                              },
+                              {
+                                    "name": "椰枣 Dates",
+                                    "serving": "2-3枚约40g",
+                                    "giValue": "42-62",
+                                    "giLevel": "low",
+                                    "glValue": 18,
+                                    "glLevel": "mid",
+                                    "safety": "moderate",
+                                    "note": "品种差异大；虽GI可中低但GL常偏高"
+                              },
+                              {
+                                    "name": "葡萄干",
+                                    "serving": "30g",
+                                    "giValue": "55-65",
+                                    "giLevel": "mid",
+                                    "glValue": 17,
+                                    "glLevel": "mid",
+                                    "safety": "moderate",
+                                    "note": "脱水浓缩，少量即有较多糖"
+                              },
+                              {
+                                    "name": "无花果干",
+                                    "serving": "40g",
+                                    "giValue": "55-65",
+                                    "giLevel": "mid",
+                                    "glValue": 20,
+                                    "glLevel": "high",
+                                    "safety": "caution",
+                                    "note": "果干GL中高"
+                              },
+                              {
+                                    "name": "果汁（橙汁/苹果汁）",
+                                    "serving": "250ml",
+                                    "giValue": "45-55",
+                                    "giLevel": "low",
+                                    "glValue": 18,
+                                    "glLevel": "mid",
+                                    "safety": "moderate",
+                                    "note": "去掉咀嚼和部分纤维，GL偏高"
+                              },
+                              {
+                                    "name": "水果罐头（糖水）",
+                                    "serving": "150g",
+                                    "giValue": "55-75",
+                                    "giLevel": "mid",
+                                    "glValue": 22,
+                                    "glLevel": "high",
+                                    "safety": "caution",
+                                    "note": "额外糖浆显著提高GL"
+                              }
+                        ]
+                  },
+                  {
+                        "id": "protein_dairy",
+                        "title": "🥚 肉蛋奶、豆类与坚果",
+                        "desc": "低碳水食物GI通常无实际意义；但加糖、勾芡、裹粉会改变评级。",
+                        "items": [
+                              {
+                                    "name": "鸡蛋（水煮/蒸蛋）",
+                                    "serving": "1-2个",
+                                    "giValue": "≈0",
+                                    "giLevel": "low",
+                                    "glValue": 0,
+                                    "glLevel": "low",
+                                    "safety": "safe",
+                                    "note": "几乎无可利用碳水"
+                              },
+                              {
+                                    "name": "鸡胸肉/鱼虾/瘦牛肉",
+                                    "serving": "100g",
+                                    "giValue": "≈0",
+                                    "giLevel": "low",
+                                    "glValue": 0,
+                                    "glLevel": "low",
+                                    "safety": "safe",
+                                    "note": "无淀粉无糖，GI不适用"
+                              },
+                              {
+                                    "name": "豆腐",
+                                    "serving": "150g",
+                                    "giValue": "<15",
+                                    "giLevel": "low",
+                                    "glValue": 1,
+                                    "glLevel": "low",
+                                    "safety": "safe",
+                                    "note": "低碳水，高蛋白"
+                              },
+                              {
+                                    "name": "无糖豆浆",
+                                    "serving": "250ml",
+                                    "giValue": "<20",
+                                    "giLevel": "low",
+                                    "glValue": 2,
+                                    "glLevel": "low",
+                                    "safety": "safe",
+                                    "note": "低GL，注意是否加糖"
+                              },
+                              {
+                                    "name": "纯牛奶",
+                                    "serving": "250ml",
+                                    "giValue": "27-34",
+                                    "giLevel": "low",
+                                    "glValue": 4,
+                                    "glLevel": "low",
+                                    "safety": "safe",
+                                    "note": "乳糖消化较慢"
+                              },
+                              {
+                                    "name": "无糖酸奶/希腊酸奶",
+                                    "serving": "150g",
+                                    "giValue": "12-35",
+                                    "giLevel": "low",
+                                    "glValue": 3,
+                                    "glLevel": "low",
+                                    "safety": "safe",
+                                    "note": "蛋白质较高，GL低"
+                              },
+                              {
+                                    "name": "风味酸奶/果粒酸奶",
+                                    "serving": "150g",
+                                    "giValue": "35-65",
+                                    "giLevel": "low",
+                                    "glValue": 12,
+                                    "glLevel": "mid",
+                                    "safety": "moderate",
+                                    "note": "常含添加糖"
+                              },
+                              {
+                                    "name": "奶酪",
+                                    "serving": "30g",
+                                    "giValue": "≈0",
+                                    "giLevel": "low",
+                                    "glValue": 0,
+                                    "glLevel": "low",
+                                    "safety": "safe",
+                                    "note": "碳水极低，关注脂肪和钠"
+                              },
+                              {
+                                    "name": "花生",
+                                    "serving": "30g",
+                                    "giValue": "<15",
+                                    "giLevel": "low",
+                                    "glValue": 1,
+                                    "glLevel": "low",
+                                    "safety": "safe",
+                                    "note": "低GL，高脂肪高能量"
+                              },
+                              {
+                                    "name": "核桃/杏仁/腰果",
+                                    "serving": "30g",
+                                    "giValue": "<15-25",
+                                    "giLevel": "low",
+                                    "glValue": 2,
+                                    "glLevel": "low",
+                                    "safety": "safe",
+                                    "note": "腰果碳水略高但GL仍低"
+                              },
+                              {
+                                    "name": "鹰嘴豆",
+                                    "serving": "150g熟",
+                                    "giValue": "28-35",
+                                    "giLevel": "low",
+                                    "glValue": 13,
+                                    "glLevel": "mid",
+                                    "safety": "moderate",
+                                    "note": "豆类低GI，但有一定GL"
+                              },
+                              {
+                                    "name": "芸豆/红腰豆",
+                                    "serving": "150g熟",
+                                    "giValue": "24-35",
+                                    "giLevel": "low",
+                                    "glValue": 10,
+                                    "glLevel": "low",
+                                    "safety": "safe",
+                                    "note": "整粒豆类更稳"
+                              },
+                              {
+                                    "name": "绿豆",
+                                    "serving": "150g熟",
+                                    "giValue": "30-40",
+                                    "giLevel": "low",
+                                    "glValue": 11,
+                                    "glLevel": "mid",
+                                    "safety": "moderate",
+                                    "note": "煮烂加糖会升高"
+                              },
+                              {
+                                    "name": "红豆（无糖整粒）",
+                                    "serving": "150g熟",
+                                    "giValue": "30-40",
+                                    "giLevel": "low",
+                                    "glValue": 12,
+                                    "glLevel": "mid",
+                                    "safety": "moderate",
+                                    "note": "整粒低GI"
+                              },
+                              {
+                                    "name": "红豆沙（含糖）",
+                                    "serving": "100g",
+                                    "giValue": "70+",
+                                    "giLevel": "high",
+                                    "glValue": 30,
+                                    "glLevel": "high",
+                                    "safety": "limit",
+                                    "note": "加糖并打碎煮烂，风险高"
+                              },
+                              {
+                                    "name": "毛豆",
+                                    "serving": "150g",
+                                    "giValue": "<20",
+                                    "giLevel": "low",
+                                    "glValue": 4,
+                                    "glLevel": "low",
+                                    "safety": "safe",
+                                    "note": "蛋白和纤维较高"
+                              },
+                              {
+                                    "name": "裹粉炸鸡",
+                                    "serving": "1份",
+                                    "giValue": "55-70",
+                                    "giLevel": "mid",
+                                    "glValue": 16,
+                                    "glLevel": "mid",
+                                    "safety": "moderate",
+                                    "note": "裹粉+酱料带来GL"
+                              },
+                              {
+                                    "name": "午餐肉/火腿肠",
+                                    "serving": "100g",
+                                    "giValue": "<30",
+                                    "giLevel": "low",
+                                    "glValue": 3,
+                                    "glLevel": "low",
+                                    "safety": "safe",
+                                    "note": "碳水通常低，但加工肉不宜多"
+                              },
+                              {
+                                    "name": "糖醋排骨/红烧肉酱汁",
+                                    "serving": "1份",
+                                    "giValue": "40-65",
+                                    "giLevel": "low",
+                                    "glValue": 12,
+                                    "glLevel": "mid",
+                                    "safety": "moderate",
+                                    "note": "肉本身低GI，糖汁提升GL"
+                              }
+                        ]
+                  },
+                  {
+                        "id": "veggies",
+                        "title": "🥦 蔬菜类",
+                        "desc": "非淀粉蔬菜通常低GI低GL；风险多来自勾芡、糖醋、油炸和主食化吃法。",
+                        "items": [
+                              {
+                                    "name": "绿叶菜（菠菜/油菜/生菜）",
+                                    "serving": "200g",
+                                    "giValue": "<15",
+                                    "giLevel": "low",
+                                    "glValue": 1,
+                                    "glLevel": "low",
+                                    "safety": "safe",
+                                    "note": "可利用碳水很少"
+                              },
+                              {
+                                    "name": "西兰花",
+                                    "serving": "200g",
+                                    "giValue": "<15",
+                                    "giLevel": "low",
+                                    "glValue": 2,
+                                    "glLevel": "low",
+                                    "safety": "safe",
+                                    "note": "纤维高，GL低"
+                              },
+                              {
+                                    "name": "黄瓜",
+                                    "serving": "200g",
+                                    "giValue": "<15",
+                                    "giLevel": "low",
+                                    "glValue": 1,
+                                    "glLevel": "low",
+                                    "safety": "safe",
+                                    "note": "几乎不升糖"
+                              },
+                              {
+                                    "name": "西红柿",
+                                    "serving": "200g",
+                                    "giValue": "<15",
+                                    "giLevel": "low",
+                                    "glValue": 2,
+                                    "glLevel": "low",
+                                    "safety": "safe",
+                                    "note": "低GL"
+                              },
+                              {
+                                    "name": "冬瓜/丝瓜/苦瓜",
+                                    "serving": "200g",
+                                    "giValue": "<15",
+                                    "giLevel": "low",
+                                    "glValue": 2,
+                                    "glLevel": "low",
+                                    "safety": "safe",
+                                    "note": "低GL"
+                              },
+                              {
+                                    "name": "茄子",
+                                    "serving": "200g",
+                                    "giValue": "<20",
+                                    "giLevel": "low",
+                                    "glValue": 3,
+                                    "glLevel": "low",
+                                    "safety": "safe",
+                                    "note": "注意吸油，不是升糖问题"
+                              },
+                              {
+                                    "name": "菌菇类",
+                                    "serving": "200g",
+                                    "giValue": "<15",
+                                    "giLevel": "low",
+                                    "glValue": 1,
+                                    "glLevel": "low",
+                                    "safety": "safe",
+                                    "note": "低GL"
+                              },
+                              {
+                                    "name": "洋葱",
+                                    "serving": "100g",
+                                    "giValue": "15-20",
+                                    "giLevel": "low",
+                                    "glValue": 3,
+                                    "glLevel": "low",
+                                    "safety": "safe",
+                                    "note": "用量通常不大"
+                              },
+                              {
+                                    "name": "彩椒",
+                                    "serving": "150g",
+                                    "giValue": "<20",
+                                    "giLevel": "low",
+                                    "glValue": 2,
+                                    "glLevel": "low",
+                                    "safety": "safe",
+                                    "note": "低GL"
+                              },
+                              {
+                                    "name": "秋葵",
+                                    "serving": "150g",
+                                    "giValue": "<20",
+                                    "giLevel": "low",
+                                    "glValue": 2,
+                                    "glLevel": "low",
+                                    "safety": "safe",
+                                    "note": "黏液多糖有助延缓吸收"
+                              },
+                              {
+                                    "name": "豌豆",
+                                    "serving": "100g",
+                                    "giValue": "35-50",
+                                    "giLevel": "low",
+                                    "glValue": 6,
+                                    "glLevel": "low",
+                                    "safety": "safe",
+                                    "note": "比绿叶菜碳水高"
+                              },
+                              {
+                                    "name": "甜玉米粒",
+                                    "serving": "100g",
+                                    "giValue": "48-55",
+                                    "giLevel": "low",
+                                    "glValue": 11,
+                                    "glLevel": "mid",
+                                    "safety": "moderate",
+                                    "note": "归入蔬菜时也要算主食"
+                              },
+                              {
+                                    "name": "勾芡蔬菜",
+                                    "serving": "1份",
+                                    "giValue": "60-80",
+                                    "giLevel": "high",
+                                    "glValue": 15,
+                                    "glLevel": "mid",
+                                    "safety": "caution",
+                                    "note": "芡粉增加快速碳水"
+                              },
+                              {
+                                    "name": "拔丝地瓜/拔丝山药",
+                                    "serving": "1份",
+                                    "giValue": "80-95",
+                                    "giLevel": "high",
+                                    "glValue": 45,
+                                    "glLevel": "high",
+                                    "safety": "limit",
+                                    "note": "糖浆+淀粉，GL高"
+                              }
+                        ]
+                  },
+                  {
+                        "id": "snacks_drinks",
+                        "title": "🍪 零食、饮料与甜味调味",
+                        "desc": "液体糖、膨化淀粉、果干蜜饯是高GL高风险重点。",
+                        "items": [
+                              {
+                                    "name": "无糖茶/黑咖啡/无糖汽水",
+                                    "serving": "250ml",
+                                    "giValue": "0",
+                                    "giLevel": "low",
+                                    "glValue": 0,
+                                    "glLevel": "low",
+                                    "safety": "safe",
+                                    "note": "不含可利用糖"
+                              },
+                              {
+                                    "name": "黑巧克力≥70%",
+                                    "serving": "20g",
+                                    "giValue": "20-25",
+                                    "giLevel": "low",
+                                    "glValue": 3,
+                                    "glLevel": "low",
+                                    "safety": "safe",
+                                    "note": "糖较低但能量高"
+                              },
+                              {
+                                    "name": "牛奶巧克力",
+                                    "serving": "30g",
+                                    "giValue": "40-50",
+                                    "giLevel": "low",
+                                    "glValue": 10,
+                                    "glLevel": "low",
+                                    "safety": "safe",
+                                    "note": "糖脂混合，GL中等"
+                              },
+                              {
+                                    "name": "普通饼干/苏打饼干",
+                                    "serving": "30g",
+                                    "giValue": "65-75",
+                                    "giLevel": "high",
+                                    "glValue": 15,
+                                    "glLevel": "mid",
+                                    "safety": "caution",
+                                    "note": "精制淀粉，容易连吃"
+                              },
+                              {
+                                    "name": "威化饼",
+                                    "serving": "30g",
+                                    "giValue": "70-75",
+                                    "giLevel": "high",
+                                    "glValue": 17,
+                                    "glLevel": "mid",
+                                    "safety": "caution",
+                                    "note": "精制淀粉+糖"
+                              },
+                              {
+                                    "name": "蛋糕/甜甜圈",
+                                    "serving": "1块/1个",
+                                    "giValue": "65-76",
+                                    "giLevel": "high",
+                                    "glValue": 28,
+                                    "glLevel": "high",
+                                    "safety": "limit",
+                                    "note": "GI中高且GL高"
+                              },
+                              {
+                                    "name": "月饼",
+                                    "serving": "1个约100g",
+                                    "giValue": "70-85",
+                                    "giLevel": "high",
+                                    "glValue": 45,
+                                    "glLevel": "high",
+                                    "safety": "limit",
+                                    "note": "糖油面粉密度高"
+                              },
+                              {
+                                    "name": "汤圆",
+                                    "serving": "5-6个",
+                                    "giValue": "80-90",
+                                    "giLevel": "high",
+                                    "glValue": 40,
+                                    "glLevel": "high",
+                                    "safety": "limit",
+                                    "note": "糯米+糖馅，GL高"
+                              },
+                              {
+                                    "name": "冰淇淋",
+                                    "serving": "1球约70g",
+                                    "giValue": "35-60",
+                                    "giLevel": "low",
+                                    "glValue": 10,
+                                    "glLevel": "low",
+                                    "safety": "safe",
+                                    "note": "脂肪降低速度，但含糖"
+                              },
+                              {
+                                    "name": "含糖可乐/汽水",
+                                    "serving": "330ml",
+                                    "giValue": "60-70",
+                                    "giLevel": "mid",
+                                    "glValue": 25,
+                                    "glLevel": "high",
+                                    "safety": "caution",
+                                    "note": "液体糖，GL高"
+                              },
+                              {
+                                    "name": "奶茶（全糖）",
+                                    "serving": "500ml",
+                                    "giValue": "65-80+",
+                                    "giLevel": "high",
+                                    "glValue": 55,
+                                    "glLevel": "high",
+                                    "safety": "limit",
+                                    "note": "糖+珍珠/椰果，GL很高"
+                              },
+                              {
+                                    "name": "珍珠奶茶（半糖）",
+                                    "serving": "500ml",
+                                    "giValue": "60-75",
+                                    "giLevel": "mid",
+                                    "glValue": 38,
+                                    "glLevel": "high",
+                                    "safety": "caution",
+                                    "note": "半糖仍可能GL高"
+                              },
+                              {
+                                    "name": "蜂蜜",
+                                    "serving": "1汤匙约20g",
+                                    "giValue": "55-60",
+                                    "giLevel": "mid",
+                                    "glValue": 10,
+                                    "glLevel": "low",
+                                    "safety": "moderate",
+                                    "note": "主要为糖，少量使用"
+                              },
+                              {
+                                    "name": "白砂糖/蔗糖",
+                                    "serving": "10g",
+                                    "giValue": "65",
+                                    "giLevel": "mid",
+                                    "glValue": 7,
+                                    "glLevel": "low",
+                                    "safety": "moderate",
+                                    "note": "少量也需计入总糖"
+                              },
+                              {
+                                    "name": "葡萄糖粉",
+                                    "serving": "15g",
+                                    "giValue": "100",
+                                    "giLevel": "high",
+                                    "glValue": 15,
+                                    "glLevel": "mid",
+                                    "safety": "caution",
+                                    "note": "直接吸收"
+                              },
+                              {
+                                    "name": "麦芽糊精饮料",
+                                    "serving": "1份",
+                                    "giValue": "95-110",
+                                    "giLevel": "high",
+                                    "glValue": 30,
+                                    "glLevel": "high",
+                                    "safety": "limit",
+                                    "note": "常见于运动补剂/冲调粉"
+                              },
+                              {
+                                    "name": "番茄酱",
+                                    "serving": "2汤匙",
+                                    "giValue": "45-75",
+                                    "giLevel": "mid",
+                                    "glValue": 4,
+                                    "glLevel": "low",
+                                    "safety": "moderate",
+                                    "note": "常含添加糖，用量决定GL"
+                              },
+                              {
+                                    "name": "烧烤酱/甜辣酱",
+                                    "serving": "2汤匙",
+                                    "giValue": "45-75",
+                                    "giLevel": "mid",
+                                    "glValue": 8,
+                                    "glLevel": "low",
+                                    "safety": "moderate",
+                                    "note": "隐藏糖较多"
+                              }
+                        ]
+                  },
+                  {
+                        "id": "meals",
+                        "title": "🍱 外卖与复合餐食",
+                        "desc": "复合餐没有统一GI；这里按常见一份估算GL，核心看主食、粉面、饮料和酱汁。",
+                        "items": [
+                              {
+                                    "name": "麻辣烫（少粉多菜肉蛋）",
+                                    "serving": "1份",
+                                    "giValue": "35-55",
+                                    "giLevel": "low",
+                                    "glValue": 10,
+                                    "glLevel": "low",
+                                    "safety": "safe",
+                                    "note": "不加粉面、方便面、甜酱时更稳"
+                              },
+                              {
+                                    "name": "麻辣烫（含粉面/丸子多）",
+                                    "serving": "1份",
+                                    "giValue": "60-75",
+                                    "giLevel": "mid",
+                                    "glValue": 35,
+                                    "glLevel": "high",
+                                    "safety": "caution",
+                                    "note": "粉面和淀粉丸显著提高GL"
+                              },
+                              {
+                                    "name": "火锅（清汤+肉菜豆腐）",
+                                    "serving": "1餐",
+                                    "giValue": "<30",
+                                    "giLevel": "low",
+                                    "glValue": 8,
+                                    "glLevel": "low",
+                                    "safety": "safe",
+                                    "note": "低碳水组合，蘸料少糖"
+                              },
+                              {
+                                    "name": "火锅（加宽粉/年糕/饮料）",
+                                    "serving": "1餐",
+                                    "giValue": "65-85",
+                                    "giLevel": "high",
+                                    "glValue": 45,
+                                    "glLevel": "high",
+                                    "safety": "limit",
+                                    "note": "主食和含糖饮料决定GL"
+                              },
+                              {
+                                    "name": "饺子",
+                                    "serving": "10个",
+                                    "giValue": "55-65",
+                                    "giLevel": "mid",
+                                    "glValue": 28,
+                                    "glLevel": "high",
+                                    "safety": "caution",
+                                    "note": "皮薄馅大更好"
+                              },
+                              {
+                                    "name": "馄饨",
+                                    "serving": "1碗",
+                                    "giValue": "55-65",
+                                    "giLevel": "mid",
+                                    "glValue": 25,
+                                    "glLevel": "high",
+                                    "safety": "caution",
+                                    "note": "汤不等于低GL，皮也是主食"
+                              },
+                              {
+                                    "name": "包子（肉包）",
+                                    "serving": "2个",
+                                    "giValue": "70-85",
+                                    "giLevel": "high",
+                                    "glValue": 35,
+                                    "glLevel": "high",
+                                    "safety": "limit",
+                                    "note": "面皮为主，GL偏高"
+                              },
+                              {
+                                    "name": "煎饼果子",
+                                    "serving": "1套",
+                                    "giValue": "65-80",
+                                    "giLevel": "high",
+                                    "glValue": 45,
+                                    "glLevel": "high",
+                                    "safety": "limit",
+                                    "note": "面糊+薄脆，GL高"
+                              },
+                              {
+                                    "name": "炒饭",
+                                    "serving": "1份",
+                                    "giValue": "60-75",
+                                    "giLevel": "mid",
+                                    "glValue": 55,
+                                    "glLevel": "high",
+                                    "safety": "caution",
+                                    "note": "油脂可降速度但总GL高"
+                              },
+                              {
+                                    "name": "炒面",
+                                    "serving": "1份",
+                                    "giValue": "60-75",
+                                    "giLevel": "mid",
+                                    "glValue": 50,
+                                    "glLevel": "high",
+                                    "safety": "caution",
+                                    "note": "面量通常很大"
+                              },
+                              {
+                                    "name": "牛肉盖饭",
+                                    "serving": "1份",
+                                    "giValue": "65-85",
+                                    "giLevel": "high",
+                                    "glValue": 55,
+                                    "glLevel": "high",
+                                    "safety": "limit",
+                                    "note": "白米饭为主，酱汁含糖"
+                              },
+                              {
+                                    "name": "咖喱饭",
+                                    "serving": "1份",
+                                    "giValue": "65-85",
+                                    "giLevel": "high",
+                                    "glValue": 60,
+                                    "glLevel": "high",
+                                    "safety": "limit",
+                                    "note": "白饭+淀粉勾芡"
+                              },
+                              {
+                                    "name": "螺蛳粉",
+                                    "serving": "1碗",
+                                    "giValue": "65-80",
+                                    "giLevel": "high",
+                                    "glValue": 55,
+                                    "glLevel": "high",
+                                    "safety": "limit",
+                                    "note": "米粉量大，GL高"
+                              },
+                              {
+                                    "name": "酸辣粉",
+                                    "serving": "1碗",
+                                    "giValue": "65-80",
+                                    "giLevel": "high",
+                                    "glValue": 50,
+                                    "glLevel": "high",
+                                    "safety": "limit",
+                                    "note": "粉条量大，GL高"
+                              },
+                              {
+                                    "name": "汉堡（单个）",
+                                    "serving": "1个",
+                                    "giValue": "60-75",
+                                    "giLevel": "mid",
+                                    "glValue": 25,
+                                    "glLevel": "high",
+                                    "safety": "caution",
+                                    "note": "面包为主，酱料含糖"
+                              },
+                              {
+                                    "name": "汉堡套餐（薯条+可乐）",
+                                    "serving": "1套",
+                                    "giValue": "70-85",
+                                    "giLevel": "high",
+                                    "glValue": 80,
+                                    "glLevel": "high",
+                                    "safety": "limit",
+                                    "note": "精制碳水+液体糖，GL极高"
+                              },
+                              {
+                                    "name": "寿司卷",
+                                    "serving": "6-8块",
+                                    "giValue": "55-70",
+                                    "giLevel": "mid",
+                                    "glValue": 35,
+                                    "glLevel": "high",
+                                    "safety": "caution",
+                                    "note": "米饭多且常加糖醋调味"
+                              },
+                              {
+                                    "name": "沙拉（无主食/少酱）",
+                                    "serving": "1份",
+                                    "giValue": "<30",
+                                    "giLevel": "low",
+                                    "glValue": 5,
+                                    "glLevel": "low",
+                                    "safety": "safe",
+                                    "note": "重点是酱料和是否加面包丁"
+                              },
+                              {
+                                    "name": "轻食碗（含藜麦/糙米）",
+                                    "serving": "1份",
+                                    "giValue": "45-60",
+                                    "giLevel": "low",
+                                    "glValue": 25,
+                                    "glLevel": "high",
+                                    "safety": "caution",
+                                    "note": "主食量决定GL"
+                              }
+                        ]
+                  }
+            ];
+            const labels = { safe: '安全', moderate: '适量', caution: '谨慎', limit: '少吃' };
+            const giLabels = { low: '低GI', mid: '中GI', high: '高GI' };
+            const glLabels = { low: '低GL', mid: '中GL', high: '高GL' };
+
+            function renderSummary(data) {
+                  const flat = data.flatMap(c => c.items);
+                  const counts = { safe: 0, moderate: 0, caution: 0, limit: 0 };
+                  flat.forEach(i => counts[i.safety]++);
+                  document.getElementById('summary').innerHTML = `
+        <div class="summary-card"><b>${flat.length}</b><span>当前显示食物</span></div>
+        <div class="summary-card"><b>${counts.safe}</b><span>安全</span></div>
+        <div class="summary-card"><b>${counts.moderate}</b><span>适量</span></div>
+        <div class="summary-card"><b>${counts.caution + counts.limit}</b><span>谨慎/少吃</span></div>`;
+            }
+
+            function renderFoodGrid(data) {
+                  const grid = document.getElementById('foodGrid');
+                  grid.innerHTML = '';
+                  renderSummary(data);
+                  if (!data.length) { grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:42px;color:#6b7c8f;background:#fff;border-radius:18px;box-shadow:var(--shadow)">未找到相关食物。可尝试更短关键词，如“枣”“米”“粉”“奶茶”。</div>'; return; }
+                  data.forEach(category => {
+                        const card = document.createElement('article'); card.className = 'card';
+                        const headerHtml = `<div class="card-header"><span class="card-icon">${category.title.split(' ')[0]}</span><div><h2 class="card-title">${category.title.substring(2)}</h2><div class="card-desc">${category.desc}</div></div></div>`;
+                        let listHtml = '<ul class="food-list">';
+                        category.items.forEach(item => {
+                              listHtml += `<li class="food-item ${item.safety}"><div class="item-top"><div><span class="item-name">${item.name}</span><span class="item-note">${item.note}</span><div class="serving">常见份量：${item.serving}</div></div></div><div class="metrics"><span class="badge ${item.giLevel}">GI ${item.giValue} · ${giLabels[item.giLevel]}</span><span class="badge ${item.glLevel}">GL ${item.glValue} · ${glLabels[item.glLevel]}</span><span class="safety-badge ${item.safety}">${labels[item.safety]}</span></div></li>`;
+                        });
+                        listHtml += '</ul>'; card.innerHTML = headerHtml + listHtml; grid.appendChild(card);
+                  });
+            }
+
+            function getFilteredData() {
+                  const q = document.getElementById('searchInput').value.toLowerCase().trim();
+                  const sf = document.getElementById('safetyFilter').value;
+                  return foodData.map(category => {
+                        const items = category.items.filter(item => {
+                              const text = `${item.name} ${item.note} ${item.serving} ${item.giValue} ${item.glValue}`.toLowerCase();
+                              const matchQ = !q || text.includes(q);
+                              const matchS = sf === 'all' || item.safety === sf;
+                              return matchQ && matchS;
+                        });
+                        return items.length ? { ...category, items } : null;
+                  }).filter(Boolean);
+            }
+            function applyFilters() { renderFoodGrid(getFilteredData()); }
+            document.addEventListener('DOMContentLoaded', () => { renderFoodGrid(foodData); document.getElementById('searchInput').addEventListener('input', applyFilters); document.getElementById('safetyFilter').addEventListener('change', applyFilters); });
+      </script>
+</body>
+
+</html>
