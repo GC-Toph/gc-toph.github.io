@@ -1,331 +1,974 @@
 <!doctype html>
 <html lang="zh-CN">
+
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>体检前健康风险问卷与初筛评估</title>
+  <title>成人健康体检流程与慢病风险初筛</title>
   <style>
     :root {
-      --bg: #f6f7fb;
+      --bg: #f5f7fb;
       --card: #ffffff;
-      --text: #1f2937;
-      --muted: #6b7280;
-      --line: #e5e7eb;
+      --text: #172033;
+      --muted: #64748b;
+      --line: #e2e8f0;
       --primary: #2563eb;
-      --primary-dark: #1d4ed8;
-      --green: #059669;
-      --orange: #d97706;
-      --red: #dc2626;
-      --blue-light: #eff6ff;
-      --orange-light: #fff7ed;
-      --red-light: #fef2f2;
-      --green-light: #ecfdf5;
+      --primary-700: #1d4ed8;
+      --primary-soft: #eff6ff;
+      --success: #059669;
+      --success-soft: #ecfdf5;
+      --warning: #d97706;
+      --warning-soft: #fff7ed;
+      --danger: #dc2626;
+      --danger-soft: #fef2f2;
+      --purple: #7c3aed;
+      --purple-soft: #f5f3ff;
+      --shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
     }
 
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
     body {
       margin: 0;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", "PingFang SC", sans-serif;
       background: var(--bg);
       color: var(--text);
-      line-height: 1.6;
+      line-height: 1.65;
     }
+
     header {
-      background: linear-gradient(135deg, #1d4ed8, #3b82f6);
       color: #fff;
-      padding: 36px 20px;
+      padding: 38px 20px 32px;
+      background:
+        radial-gradient(circle at 18% 20%, rgba(255, 255, 255, 0.20), transparent 28%),
+        linear-gradient(135deg, #123c91 0%, #2563eb 54%, #06b6d4 100%);
     }
-    .wrap { max-width: 1080px; margin: 0 auto; padding: 0 18px; }
-    h1 { margin: 0 0 10px; font-size: 30px; line-height: 1.25; }
-    .subtitle { margin: 0; opacity: 0.92; max-width: 850px; }
-    main { padding: 24px 0 50px; }
-    .grid { display: grid; grid-template-columns: 1fr; gap: 18px; }
+
+    .wrap {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 0 18px;
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: clamp(26px, 4vw, 38px);
+      line-height: 1.18;
+      letter-spacing: -0.02em;
+    }
+
+    h2 {
+      font-size: 22px;
+      margin: 0 0 14px;
+    }
+
+    h3 {
+      font-size: 17px;
+      margin: 18px 0 10px;
+    }
+
+    h4 {
+      margin: 12px 0 8px;
+    }
+
+    p {
+      margin: 8px 0;
+    }
+
+    .subtitle {
+      margin: 0;
+      opacity: 0.94;
+      max-width: 940px;
+    }
+
+    .source-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: #ffffff;
+      text-decoration: none;
+      font-weight: 800;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.55);
+      padding-bottom: 2px;
+    }
+
+    .source-link::after {
+      content: "↗";
+      font-size: 0.92em;
+      opacity: 0.9;
+    }
+
+    .source-link:hover,
+    .source-link:focus-visible {
+      color: #e0f2fe;
+      border-bottom-color: #e0f2fe;
+      outline: none;
+    }
+
+    .topbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .topbar a {
+      color: #e0f2fe;
+      text-decoration: none;
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      padding: 7px 12px;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 14px;
+      background: rgba(255, 255, 255, 0.10);
+    }
+
+    main {
+      padding: 24px 0 56px;
+    }
+
     .card {
       background: var(--card);
       border: 1px solid var(--line);
-      border-radius: 16px;
-      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
       padding: 22px;
+      margin-bottom: 18px;
     }
-    h2 { font-size: 22px; margin: 0 0 14px; }
-    h3 { font-size: 17px; margin: 18px 0 10px; }
-    .hint { color: var(--muted); font-size: 14px; margin-top: -4px; }
-    .row { display: grid; grid-template-columns: repeat(12, 1fr); gap: 14px; }
-    .field { grid-column: span 6; }
-    .field.full { grid-column: span 12; }
-    label { display: block; font-weight: 600; margin-bottom: 6px; }
-    input[type="number"], input[type="text"], select, textarea {
+
+    .flow-card {
+      overflow: hidden;
+    }
+
+    .flow {
+      display: grid;
+      grid-template-columns: 1fr 48px 1fr 48px 1fr;
+      align-items: center;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .node {
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 16px;
+      padding: 16px;
+      min-height: 110px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .node strong {
+      display: block;
+      font-size: 18px;
+      margin-bottom: 5px;
+    }
+
+    .node span {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .node.primary {
+      border-color: #bfdbfe;
+      background: var(--primary-soft);
+    }
+
+    .node.warning {
+      border-color: #fed7aa;
+      background: var(--warning-soft);
+    }
+
+    .node.success {
+      border-color: #bbf7d0;
+      background: var(--success-soft);
+    }
+
+    .arrow {
+      text-align: center;
+      color: var(--primary);
+      font-size: 30px;
+      font-weight: 900;
+    }
+
+    .branch {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .branch .node {
+      min-height: 94px;
+    }
+
+    .notice,
+    .danger,
+    .successbox {
+      padding: 12px 14px;
+      border-radius: 14px;
+      margin-bottom: 16px;
+    }
+
+    .notice {
+      border: 1px solid #bfdbfe;
+      background: var(--primary-soft);
+      color: #1e3a8a;
+    }
+
+    .danger {
+      border: 1px solid #fecaca;
+      background: var(--danger-soft);
+      color: #991b1b;
+    }
+
+    .successbox {
+      border: 1px solid #bbf7d0;
+      background: var(--success-soft);
+      color: #065f46;
+    }
+
+    .hint,
+    .section-note,
+    .small {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .req,
+    label.required::after {
+      content: " *";
+      color: var(--danger);
+      font-weight: 900;
+    }
+
+    select:invalid,
+    input:invalid {
+      border-color: #fca5a5;
+    }
+
+    .field.invalid-field {
+      border: 2px solid var(--danger);
+      border-radius: 14px;
+      padding: 10px;
+      background: var(--danger-soft);
+    }
+
+    .field.invalid-field input,
+    .field.invalid-field select,
+    .field.invalid-field textarea {
+      border-color: var(--danger);
+      box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.14);
+    }
+
+    .field.invalid-field label {
+      color: #991b1b;
+    }
+
+    .field.invalid-field::after {
+      content: "请填写此必填项";
+      display: block;
+      margin-top: 6px;
+      color: #991b1b;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    input:disabled,
+    select:disabled,
+    textarea:disabled {
+      color: #94a3b8;
+      background: #f1f5f9;
+      border-color: #cbd5e1;
+      cursor: not-allowed;
+    }
+
+    .is-disabled-section {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 14px;
+      margin: 12px 0;
+      opacity: 0.72;
+    }
+
+    .is-disabled-section h2,
+    .is-disabled-section label,
+    .is-disabled-section .hint {
+      color: #94a3b8;
+    }
+
+    .is-disabled-section .check {
+      background: #f1f5f9;
+      color: #94a3b8;
+      border-color: #e2e8f0;
+    }
+
+    select option[disabled] {
+      color: #94a3b8;
+    }
+
+    .section-note {
+      margin: -6px 0 12px;
+    }
+
+    .small {
+      font-size: 13px;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 14px;
+    }
+
+    .field {
+      grid-column: span 6;
+    }
+
+    .field.third {
+      grid-column: span 4;
+    }
+
+    .field.full {
+      grid-column: span 12;
+    }
+
+    label {
+      display: block;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    input[type="number"],
+    input[type="text"],
+    input[type="date"],
+    select,
+    textarea {
       width: 100%;
       padding: 10px 12px;
-      border: 1px solid #d1d5db;
-      border-radius: 10px;
+      border: 1px solid #cbd5e1;
+      border-radius: 11px;
       font-size: 15px;
       background: #fff;
+      color: var(--text);
     }
-    textarea { min-height: 72px; resize: vertical; }
-    .checks { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 14px; }
+
+    textarea {
+      min-height: 72px;
+      resize: vertical;
+    }
+
+    .checks {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px 14px;
+    }
+
+    .checks.three {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
     .check {
       display: flex;
       align-items: flex-start;
       gap: 8px;
-      font-weight: 500;
+      font-weight: 520;
       margin: 0;
+      padding: 8px 10px;
+      border: 1px solid #edf2f7;
+      border-radius: 12px;
+      background: #fbfdff;
     }
-    .check input { margin-top: 5px; }
-    .actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 22px; }
-    .post-actions { display: none; }
+
+    .check input {
+      margin-top: 5px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 22px;
+    }
+
+    .post-actions {
+      display: none;
+    }
+
     button {
       border: 0;
       border-radius: 999px;
       padding: 11px 18px;
       font-size: 15px;
-      font-weight: 700;
+      font-weight: 800;
       cursor: pointer;
     }
-    .primary { background: var(--primary); color: #fff; }
-    .primary:hover { background: var(--primary-dark); }
-    .secondary { background: #e5e7eb; color: #111827; }
-    .result { display: none; }
+
+    .primary-btn {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .primary-btn:hover {
+      background: var(--primary-700);
+    }
+
+    .secondary {
+      background: #e5e7eb;
+      color: #111827;
+    }
+
+    .result {
+      display: none;
+    }
+
     .summary {
       display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-columns: repeat(6, minmax(0, 1fr));
       gap: 12px;
       margin-bottom: 16px;
     }
+
     .metric {
       border: 1px solid var(--line);
-      border-radius: 14px;
+      border-radius: 16px;
       padding: 14px;
       background: #fafafa;
+      min-height: 86px;
     }
-    .metric .k { color: var(--muted); font-size: 13px; }
-    .metric .v { font-size: 22px; font-weight: 800; margin-top: 4px; }
+
+    .metric .k {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .metric .v {
+      font-size: 22px;
+      font-weight: 900;
+      margin-top: 3px;
+    }
+
     .tag {
       display: inline-block;
       padding: 4px 9px;
       border-radius: 999px;
       font-size: 13px;
-      font-weight: 700;
+      font-weight: 800;
       margin: 3px 5px 3px 0;
     }
-    .low { color: var(--green); background: var(--green-light); }
-    .mid { color: var(--orange); background: var(--orange-light); }
-    .high { color: var(--red); background: var(--red-light); }
-    .info { color: var(--primary); background: var(--blue-light); }
+
+    .low {
+      color: var(--success);
+      background: var(--success-soft);
+    }
+
+    .mid {
+      color: var(--warning);
+      background: var(--warning-soft);
+    }
+
+    .high {
+      color: var(--danger);
+      background: var(--danger-soft);
+    }
+
+    .info {
+      color: var(--primary);
+      background: var(--primary-soft);
+    }
+
+    .purple {
+      color: var(--purple);
+      background: var(--purple-soft);
+    }
+
     .risk-block {
       border-left: 4px solid var(--primary);
       background: #f8fafc;
       padding: 12px 14px;
-      border-radius: 12px;
+      border-radius: 13px;
       margin: 10px 0;
     }
-    .risk-block.high-risk { border-left-color: var(--red); background: var(--red-light); }
-    .risk-block.mid-risk { border-left-color: var(--orange); background: var(--orange-light); }
-    ul { margin: 8px 0 0 20px; padding: 0; }
-    .small { color: var(--muted); font-size: 13px; }
-    .notice {
-      border: 1px solid #bfdbfe;
-      background: var(--blue-light);
-      color: #1e3a8a;
-      padding: 12px 14px;
-      border-radius: 12px;
-      margin-bottom: 16px;
+
+    ul {
+      margin: 8px 0 0 20px;
+      padding: 0;
     }
-    .danger {
-      border: 1px solid #fecaca;
-      background: var(--red-light);
-      color: #991b1b;
-      padding: 12px 14px;
-      border-radius: 12px;
-      margin: 12px 0;
+
+    .table-wrap {
+      overflow-x: auto;
+      margin-top: 8px;
     }
-    .table-wrap { overflow-x: auto; margin-top: 8px; }
-    table { width: 100%; border-collapse: collapse; min-width: 760px; }
-    th, td { border: 1px solid var(--line); padding: 10px 12px; vertical-align: top; text-align: left; }
-    th { background: #f9fafb; font-weight: 800; }
-    td .pill {
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 860px;
+    }
+
+    th,
+    td {
+      border: 1px solid var(--line);
+      padding: 10px 12px;
+      vertical-align: top;
+      text-align: left;
+    }
+
+    th {
+      background: #f8fafc;
+      font-weight: 900;
+    }
+
+    tbody tr:nth-child(even) td {
+      background: #fcfcfd;
+    }
+
+    .pill {
       display: inline-block;
       border-radius: 999px;
       padding: 2px 8px;
-      background: #f3f4f6;
-      color: #374151;
+      background: #f1f5f9;
+      color: #475569;
       font-size: 12px;
-      font-weight: 700;
+      font-weight: 800;
+      margin-right: 4px;
       margin-bottom: 4px;
     }
-    .section-note {
+
+    .score-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      margin: 10px 0;
+    }
+
+    .score-card {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 12px;
+      background: #fff;
+    }
+
+    .score-card strong {
+      display: block;
+    }
+
+    details {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 12px 14px;
+      margin: 10px 0;
+      background: #fff;
+    }
+
+    summary {
+      cursor: pointer;
+      font-weight: 900;
+    }
+
+    .footer-note {
+      margin-top: 14px;
       color: var(--muted);
-      font-size: 14px;
-      margin: -4px 0 10px;
+      font-size: 13px;
     }
+
+    @media (max-width: 900px) {
+      .flow {
+        grid-template-columns: 1fr;
+      }
+
+      .arrow {
+        transform: rotate(90deg);
+      }
+
+      .branch {
+        grid-template-columns: 1fr;
+      }
+
+      .summary {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .score-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
     @media (max-width: 760px) {
-      .field { grid-column: span 12; }
-      .checks { grid-template-columns: 1fr; }
-      .summary { grid-template-columns: 1fr 1fr; }
+
+      .field,
+      .field.third {
+        grid-column: span 12;
+      }
+
+      .checks,
+      .checks.three {
+        grid-template-columns: 1fr;
+      }
+
+      .summary {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        /* 移动端保持 2 列 */
+      }
+
+      .card {
+        padding: 16px;
+        border-radius: 14px;
+      }
+
+      .wrap {
+        padding: 0 12px;
+      }
+
+      header {
+        padding: 28px 12px 24px;
+      }
+
+      button {
+        width: 100%;
+      }
+
+      .actions {
+        gap: 10px;
+      }
+
+      table {
+        font-size: 13px;
+      }
+
+      th,
+      td {
+        padding: 8px 9px;
+      }
     }
+
     @media print {
-      header, .actions { display: none !important; }
-      body { background: #fff; }
-      .card { box-shadow: none; break-inside: avoid; }
-      .result { display: block !important; }
-      table { min-width: 0; font-size: 12px; }
+
+      header,
+      .actions,
+      .flow-card {
+        display: none !important;
+      }
+
+      body {
+        background: #fff;
+      }
+
+      main {
+        padding: 0;
+      }
+
+      .card {
+        box-shadow: none;
+        break-inside: avoid;
+        border-color: #ddd;
+      }
+
+      .result {
+        display: block !important;
+      }
+
+      table {
+        min-width: 0;
+        font-size: 12px;
+      }
+
+      .summary,
+      .score-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
     }
   </style>
 </head>
+
 <body>
   <header>
     <div class="wrap">
-      <h1>体检前健康风险问卷与初筛评估</h1>
-      <p class="subtitle">用于体检前收集个人健康信息、识别常见慢病与癌症筛查线索，并生成“基础体检 + 个性化增项”建议。结果仅供体检项目沟通参考，不能替代医生诊断。</p>
+      <h1>成人健康体检流程与慢性病风险初筛</h1>
+      <a class="subtitle source-link"
+        href="https://www.nhc.gov.cn/yzygj/c100068/202511/4feaeb6de63e44cb9fd4ac8f579ca279.shtml" target="_blank"
+        rel="noopener noreferrer">
+        依据2025年版健康体检自测问卷、基本体检项目、慢性病风险筛查项目和常见慢性病风险评估指标整理。
+      </a>
+      <nav class="topbar" aria-label="页面导航">
+        <a href="#flow">流程图</a>
+        <a href="#form">填写问卷</a>
+        <a href="#resultCard">评估结果</a>
+        <a href="#reference">依据说明</a>
+      </nav>
     </div>
   </header>
 
   <main class="wrap">
-    <section class="card">
+    <section class="card flow-card" id="flow">
+      <h2>体检工作流程图</h2>
+      <div class="flow" aria-label="成人健康体检工作流程">
+        <div class="node primary">
+          <strong>1. 健康体检自测问卷</strong>
+          <span>基本信息、既往史/家族史、吸烟饮酒、饮食运动、睡眠心理、女性专项。</span>
+        </div>
+        <div class="arrow">→</div>
+        <div class="node warning">
+          <strong>2. 初步评估健康状况</strong>
+          <span>识别警示症状、已诊断疾病、慢病和肿瘤风险线索。</span>
+        </div>
+        <div class="arrow">→</div>
+        <div class="node success">
+          <strong>3. 分层制定体检方案</strong>
+          <span>基础体检为底座；高风险人群叠加优先推荐和可选项目。</span>
+        </div>
+      </div>
+      <div class="branch">
+        <div class="node success">
+          <strong>无慢性病风险</strong>
+          <span>完成基本体检项目，并根据年龄、性别纳入妇科、乳腺、肺功能、骨密度等基础适配项目。</span>
+        </div>
+        <div class="node warning">
+          <strong>有慢性病风险 / 已诊断慢性病</strong>
+          <span>基本体检项目 + 慢性病风险筛查项目；已有疾病按相应专科随访和复查。</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="card" id="form">
       <div class="notice">
-        填写建议：请尽量如实填写。若出现胸痛、咯血、黑便、便血、明显消瘦、绝经后阴道出血、乳腺肿块等症状，不应等待常规体检，应尽快就医。
+        请尽量如实填写。
       </div>
 
       <form id="riskForm">
-        <h2>一、基本信息</h2>
+        <h2>一、个人基本信息</h2>
         <div class="row">
-          <div class="field">
-            <label for="age">年龄</label>
-            <input id="age" type="number" min="18" max="100" placeholder="例如：42" required />
+          <div class="field third">
+            <label for="name">姓名/编号（选填）</label>
+            <input id="name" type="text" placeholder="可填写体检编号" />
           </div>
-          <div class="field">
+          <div class="field third">
+            <label for="age">年龄</label>
+            <input id="age" type="number" min="18" max="110" placeholder="例如：42" required />
+          </div>
+          <div class="field third">
             <label for="sex">生理性别</label>
             <select id="sex" required>
-              <option value="">请选择</option>
+              <option value="" selected disabled>请选择</option>
               <option value="female">女</option>
               <option value="male">男</option>
             </select>
           </div>
-          <div class="field">
+          <div class="field third">
             <label for="height">身高 cm</label>
-            <input id="height" type="number" min="120" max="220" placeholder="例如：170" />
+            <input id="height" type="number" min="120" max="230" placeholder="例如：170" />
           </div>
-          <div class="field">
+          <div class="field third">
             <label for="weight">体重 kg</label>
-            <input id="weight" type="number" min="30" max="180" step="0.1" placeholder="例如：68" />
+            <input id="weight" type="number" min="30" max="220" step="0.1" placeholder="例如：68" />
           </div>
-          <div class="field">
+          <div class="field third">
             <label for="waist">腰围 cm</label>
-            <input id="waist" type="number" min="40" max="160" placeholder="男性≥90、女性≥85需关注" />
+            <input id="waist" type="number" min="40" max="180" placeholder="男性≥90、女性≥85需关注" />
           </div>
-          <div class="field">
-            <label for="bp">最近血压情况</label>
-            <select id="bp">
+          <div class="field third">
+            <label for="sbp">收缩压 mmHg</label>
+            <input id="sbp" type="number" min="70" max="260" placeholder="例如：128" />
+          </div>
+          <div class="field third">
+            <label for="dbp">舒张压 mmHg</label>
+            <input id="dbp" type="number" min="40" max="160" placeholder="例如：82" />
+          </div>
+          <div class="field third">
+            <label for="bpDx">高血压诊疗情况</label>
+            <select id="bpDx" required>
+              <option value="" selected disabled>请选择</option>
               <option value="unknown">不清楚</option>
-              <option value="normal">通常正常</option>
-              <option value="prehigh">多次在130–139/80–89左右</option>
-              <option value="high">曾被诊断高血压或多次≥140/90</option>
+              <option value="normal">未诊断，平时正常</option>
+              <option value="prehigh">多次130–139/80–89左右</option>
+              <option value="diagnosed">已诊断高血压或正在降压治疗</option>
             </select>
           </div>
         </div>
 
         <h2>二、既往史与家族史</h2>
+        <h3>既往史</h3>
         <p class="hint">勾选已经确诊、长期存在，或医生曾明确提示的问题。</p>
         <div class="checks">
           <label class="check"><input type="checkbox" name="history" value="hypertension">高血压</label>
-          <label class="check"><input type="checkbox" name="history" value="diabetes">糖尿病或糖耐量异常</label>
+          <label class="check"><input type="checkbox" name="history" value="diabetes">糖尿病、糖尿病前期或糖耐量异常</label>
           <label class="check"><input type="checkbox" name="history" value="dyslipidemia">血脂异常</label>
-          <label class="check"><input type="checkbox" name="history" value="fatty_liver">脂肪肝</label>
-          <label class="check"><input type="checkbox" name="history" value="gout">高尿酸或痛风</label>
-          <label class="check"><input type="checkbox" name="history" value="kidney">慢性肾病或蛋白尿</label>
+          <label class="check"><input type="checkbox" name="history" value="fatty_liver">脂肪肝/代谢相关脂肪性肝病</label>
+          <label class="check"><input type="checkbox" name="history" value="gout">高尿酸血症或痛风</label>
+          <label class="check"><input type="checkbox" name="history" value="kidney">慢性肾病、蛋白尿或eGFR下降</label>
           <label class="check"><input type="checkbox" name="history" value="cvd">冠心病、脑卒中、房颤或外周血管病</label>
-          <label class="check"><input type="checkbox" name="history" value="copd">慢阻肺、哮喘或长期慢性咳嗽</label>
-          <label class="check"><input type="checkbox" name="history" value="hepatitis">乙肝/丙肝感染或肝硬化</label>
-          <label class="check"><input type="checkbox" name="history" value="hpylori">幽门螺杆菌感染或慢性萎缩性胃炎</label>
+          <label class="check"><input type="checkbox" name="history" value="copd">慢阻肺、哮喘、慢性支气管炎或肺气肿</label>
+          <label class="check"><input type="checkbox" name="history" value="hepatitis">乙肝/丙肝感染、肝硬化或长期肝功能异常</label>
+          <label class="check"><input type="checkbox" name="history" value="hpylori">幽门螺杆菌感染、慢性萎缩性胃炎或胃溃疡</label>
           <label class="check"><input type="checkbox" name="history" value="polyps">肠息肉、炎症性肠病或既往肠镜异常</label>
+          <label class="check"><input type="checkbox" name="history" value="osteoporosis">骨质疏松、脆性骨折或长期激素用药</label>
+          <label class="check"><input type="checkbox" name="history" value="cognitive">主观记忆下降或认知障碍</label>
           <label class="check"><input type="checkbox" name="history" value="cancer">本人既往恶性肿瘤史</label>
         </div>
 
-        <h3>家族史</h3>
+        <h3>一级亲属家族史</h3>
+        <p class="hint">一级亲属：通常包括父母、子女、兄弟姐妹。</p>
         <div class="checks">
-          <label class="check"><input type="checkbox" name="family" value="early_cvd">一级亲属早发心梗/卒中：男&lt;55岁，女&lt;65岁</label>
-          <label class="check"><input type="checkbox" name="family" value="diabetes">一级亲属糖尿病</label>
-          <label class="check"><input type="checkbox" name="family" value="lung_cancer">一级亲属肺癌</label>
-          <label class="check"><input type="checkbox" name="family" value="colorectal_cancer">一级亲属结直肠癌或腺瘤性息肉</label>
-          <label class="check"><input type="checkbox" name="family" value="gastric_cancer">一级亲属胃癌</label>
-          <label class="check"><input type="checkbox" name="family" value="breast_ovarian">一级亲属乳腺癌/卵巢癌</label>
+          <label class="check"><input type="checkbox" name="family" value="early_cvd">早发心梗/卒中：男&lt;55岁，女&lt;65岁</label>
+          <label class="check"><input type="checkbox" name="family" value="diabetes">糖尿病</label>
+          <label class="check"><input type="checkbox" name="family" value="lung_cancer">肺癌</label>
+          <label class="check"><input type="checkbox" name="family" value="colorectal_cancer">结直肠癌或腺瘤性息肉</label>
+          <label class="check"><input type="checkbox" name="family" value="gastric_cancer">胃癌</label>
+          <label class="check"><input type="checkbox" name="family" value="breast_ovarian">乳腺癌或卵巢癌</label>
+          <label class="check"><input type="checkbox" name="family" value="prostate_cancer">前列腺癌</label>
+          <label class="check"><input type="checkbox" name="family" value="dementia">痴呆或明确认知障碍</label>
         </div>
 
         <h2>三、生活方式与暴露</h2>
         <div class="row">
-          <div class="field">
+          <div class="field third">
             <label for="smoke">吸烟情况</label>
-            <select id="smoke">
+            <select id="smoke" required>
+              <option value="" selected disabled>请选择</option>
               <option value="never">从不吸烟</option>
               <option value="former">已戒烟</option>
               <option value="current">目前吸烟</option>
             </select>
           </div>
-          <div class="field">
-            <label for="packyears">吸烟包年</label>
-            <input id="packyears" type="number" min="0" max="120" step="0.5" placeholder="包年=每天包数×吸烟年数" />
+          <div class="field third">
+            <label for="cigarettes">每日平均支数</label>
+            <input id="cigarettes" type="number" min="0" max="120" placeholder="例如：20" />
           </div>
-          <div class="field">
+          <div class="field third">
+            <label for="smokeYears">吸烟年数</label>
+            <input id="smokeYears" type="number" min="0" max="80" placeholder="例如：25" />
+          </div>
+          <div class="field third">
+            <label for="packyears">吸烟包年（可自动计算）</label>
+            <input id="packyears" type="number" min="0" max="160" step="0.5" placeholder="包年=每日支数÷20×年数" />
+          </div>
+          <div class="field third">
             <label for="secondSmoke">二手烟暴露</label>
-            <select id="secondSmoke">
+            <select id="secondSmoke" required>
+              <option value="" selected disabled>请选择</option>
               <option value="no">无或很少</option>
-              <option value="yes">长期/经常</option>
+              <option value="yes">长期/经常，或共同生活/工作≥20年</option>
             </select>
           </div>
-          <div class="field">
+          <div class="field third">
             <label for="alcohol">饮酒情况</label>
-            <select id="alcohol">
+            <select id="alcohol" required>
+              <option value="" selected disabled>请选择</option>
               <option value="none">不饮酒或偶尔少量</option>
               <option value="moderate">每周饮酒，但不过量</option>
-              <option value="heavy">经常大量饮酒或应酬饮酒</option>
+              <option value="heavy">经常大量饮酒、每次≥6单位或应酬饮酒</option>
             </select>
           </div>
-          <div class="field">
-            <label for="exercise">运动频率</label>
-            <select id="exercise">
-              <option value="good">每周≥150分钟中等强度运动</option>
-              <option value="some">偶尔运动，但不足150分钟/周</option>
-              <option value="low">几乎不运动</option>
+          <div class="field third">
+            <label for="dietHabit">饮食习惯</label>
+            <select id="dietHabit" required>
+              <option value="" selected disabled>请选择</option>
+              <option value="balanced">荤素均衡</option>
+              <option value="meat">荤食为主</option>
+              <option value="vegetarian">素食为主</option>
             </select>
           </div>
-          <div class="field">
-            <label for="diet">饮食特点</label>
-            <select id="diet">
-              <option value="balanced">相对均衡</option>
-              <option value="salty">偏咸/腌制/外卖多</option>
-              <option value="sweetfat">甜食、油炸、夜宵多</option>
-              <option value="lowfiber">蔬果和全谷物少</option>
+          <div class="field third">
+            <label for="dietTaste">饮食口味</label>
+            <select id="dietTaste" required>
+              <option value="" selected disabled>请选择</option>
+              <option value="light">清淡</option>
+              <option value="salty">多盐</option>
+              <option value="oily">多油</option>
+              <option value="sweet">多糖</option>
+              <option value="spicy">辛辣</option>
+              <option value="mixed">多盐/多油/多糖/辛辣中有多项</option>
             </select>
           </div>
-          <div class="field">
-            <label for="sleep">睡眠</label>
-            <select id="sleep">
-              <option value="ok">通常7小时左右，质量尚可</option>
-              <option value="short">长期睡眠不足或倒班</option>
-              <option value="snore">明显打鼾、憋醒或白天嗜睡</option>
+          <div class="field third">
+            <label for="nightSleepHours">每天夜间睡眠时长（小时）</label>
+            <input id="nightSleepHours" type="number" min="0" max="16" step="0.5" placeholder="例如：7" required />
+          </div>
+          <div class="field third">
+            <label for="napMinutes">午睡时长（分钟）</label>
+            <input id="napMinutes" type="number" min="0" max="240" step="5" placeholder="例如：30" />
+          </div>
+          <div class="field third">
+            <label for="sleepQuality">睡眠质量</label>
+            <select id="sleepQuality" required>
+              <option value="" selected disabled>请选择</option>
+              <option value="good">较好</option>
+              <option value="normal">一般</option>
+              <option value="poor">较差</option>
             </select>
           </div>
-          <div class="field">
+          <div class="field third">
+            <label for="vigorousTimes">每周高强度活动次数</label>
+            <input id="vigorousTimes" type="number" min="0" max="21" step="1" placeholder="例如：2" />
+          </div>
+          <div class="field third">
+            <label for="vigorousMinutes">每次高强度活动分钟数</label>
+            <input id="vigorousMinutes" type="number" min="0" max="300" step="5" placeholder="例如：30" />
+          </div>
+          <div class="field third">
+            <label for="moderateTimes">每周中等强度活动次数</label>
+            <input id="moderateTimes" type="number" min="0" max="21" step="1" placeholder="例如：5" />
+          </div>
+          <div class="field third">
+            <label for="moderateMinutes">每次中等强度活动分钟数</label>
+            <input id="moderateMinutes" type="number" min="0" max="300" step="5" placeholder="例如：30" />
+          </div>
+          <div class="field third">
+            <label for="walkTimes">每周步行次数</label>
+            <input id="walkTimes" type="number" min="0" max="21" step="1" placeholder="例如：7" />
+          </div>
+          <div class="field third">
+            <label for="walkMinutes">每次步行分钟数</label>
+            <input id="walkMinutes" type="number" min="0" max="300" step="5" placeholder="例如：30" />
+          </div>
+          <div class="field third">
+            <label for="sedentaryHours">每天久坐/躺卧时长（小时）</label>
+            <input id="sedentaryHours" type="number" min="0" max="24" step="0.5" placeholder="不含睡觉，例如：8" />
+          </div>
+          <div class="field full">
+            <p class="hint">高强度活动：高强度健身、快跑、足球、篮球等需要付出较大体力的活动。中等强度活动：慢跑、骑自行车、打扫卫生等需要付出中等体力的活动。</p>
+          </div>
+          <div class="field third">
             <label for="stress">心理压力</label>
-            <select id="stress">
+            <select id="stress" required>
+              <option value="" selected disabled>请选择</option>
               <option value="low">可承受</option>
               <option value="mid">较大压力，偶有焦虑/失眠</option>
               <option value="high">持续焦虑、抑郁、失眠或影响工作生活</option>
             </select>
           </div>
-          <div class="field full">
+          <div class="field third">
             <label for="occupation">职业/环境暴露</label>
-            <select id="occupation">
+            <select id="occupation" required>
+              <option value="" selected disabled>请选择</option>
               <option value="none">无明显粉尘、石棉、苯、放射线、油烟等暴露</option>
               <option value="dust">粉尘、矿物尘、石棉、焊接烟尘等</option>
               <option value="chemical">苯、染料、农药、重金属、放射线等</option>
               <option value="fume">长期厨房油烟或空气污染暴露</option>
             </select>
           </div>
+          <div class="field third">
+            <label for="highRiskArea">高发地区/特殊暴露</label>
+            <select id="highRiskArea" required>
+              <option value="" selected disabled>请选择</option>
+              <option value="none">无/不清楚</option>
+              <option value="gastric">胃癌高发地区居住史</option>
+              <option value="esophageal">食管癌高发地区居住史</option>
+              <option value="aflatoxin">黄曲霉毒素暴露或长期霉变粮食摄入</option>
+            </select>
+          </div>
         </div>
 
         <h2>四、症状警示</h2>
-        <p class="hint">这些症状更适合直接就医，而不是等待普通体检。</p>
+        <p class="hint">以下症状更适合直接就医，而不是等待普通体检。</p>
         <div class="checks">
           <label class="check"><input type="checkbox" name="alarm" value="chest_pain">胸痛、活动后胸闷或气短明显加重</label>
           <label class="check"><input type="checkbox" name="alarm" value="hemoptysis">咯血、长期咳嗽或不明原因声音嘶哑</label>
@@ -335,58 +978,79 @@
           <label class="check"><input type="checkbox" name="alarm" value="postmenopause_bleeding">绝经后阴道出血或异常阴道出血</label>
           <label class="check"><input type="checkbox" name="alarm" value="neuro">突发肢体无力、言语不清、口角歪斜、短暂黑蒙</label>
           <label class="check"><input type="checkbox" name="alarm" value="severe_pain">持续或进行性加重的腹痛、头痛、骨痛等</label>
+          <label class="check"><input type="checkbox" name="alarm" value="dysphagia">吞咽困难、进行性吞咽梗阻或反酸伴报警症状</label>
+          <label class="check"><input type="checkbox" name="alarm" value="urinary">血尿、明显排尿困难或骨痛伴PSA异常</label>
         </div>
 
         <section id="femaleSection">
           <h2>五、女性专项</h2>
           <div class="row">
-            <div class="field">
+            <div class="field third">
               <label for="sexLife">是否有性生活史</label>
-              <select id="sexLife">
+              <select id="sexLife" required>
+                <option value="" selected disabled>请选择</option>
                 <option value="no">无</option>
                 <option value="yes">有</option>
               </select>
             </div>
-            <div class="field">
+            <div class="field third">
               <label for="hpvVaccine">HPV疫苗接种</label>
-              <select id="hpvVaccine">
+              <select id="hpvVaccine" required>
+                <option value="" selected disabled>请选择</option>
                 <option value="unknown">不清楚/未接种</option>
                 <option value="partial">未完成全程</option>
                 <option value="complete">已完成全程</option>
               </select>
             </div>
-            <div class="field">
+            <div class="field third">
               <label for="cervicalScreen">最近一次宫颈筛查</label>
-              <select id="cervicalScreen">
+              <select id="cervicalScreen" required>
+                <option value="" selected disabled>请选择</option>
                 <option value="never">从未做过或不清楚</option>
                 <option value="lt3">3年内做过且正常</option>
                 <option value="gt3">超过3年未做</option>
                 <option value="abnormal">曾异常，未规范复查</option>
               </select>
             </div>
-            <div class="field">
+            <div class="field third">
               <label for="breastScreen">最近一次乳腺检查</label>
-              <select id="breastScreen">
+              <select id="breastScreen" required>
+                <option value="" selected disabled>请选择</option>
                 <option value="never">从未做过或不清楚</option>
                 <option value="lt1">1年内做过且正常</option>
                 <option value="gt1">超过1年未做</option>
                 <option value="abnormal">曾异常，未规范复查</option>
               </select>
             </div>
-            <div class="field">
+            <div class="field third">
               <label for="menopause">绝经状态</label>
-              <select id="menopause">
+              <select id="menopause" required>
+                <option value="" selected disabled>请选择</option>
                 <option value="no">未绝经</option>
                 <option value="peri">围绝经期</option>
                 <option value="yes">已绝经</option>
               </select>
             </div>
-            <div class="field">
+            <div class="field third">
               <label for="pregnancyPlan">备孕/妊娠/哺乳</label>
-              <select id="pregnancyPlan">
+              <select id="pregnancyPlan" required>
+                <option value="" selected disabled>请选择</option>
                 <option value="no">无</option>
                 <option value="yes">有</option>
               </select>
+            </div>
+            <div class="field full">
+              <label>乳腺/卵巢高风险线索</label>
+              <div class="checks three">
+                <label class="check"><input type="checkbox" name="femaleRisk"
+                    value="early_menarche">月经初潮≤12岁或绝经≥55岁</label>
+                <label class="check"><input type="checkbox" name="femaleRisk" value="brca">本人或一级亲属携带BRCA1/2致病突变</label>
+                <label class="check"><input type="checkbox" name="femaleRisk"
+                    value="breast_biopsy">乳腺不典型增生或乳腺活检/手术史</label>
+                <label class="check"><input type="checkbox" name="femaleRisk" value="hormone">雌孕激素联合治疗≥半年</label>
+                <label class="check"><input type="checkbox" name="femaleRisk" value="no_birth">无活产或初次活产年龄&gt;30岁</label>
+                <label class="check"><input type="checkbox" name="femaleRisk" value="lynch">林奇综合征或卵巢癌相关遗传综合征家族史</label>
+              </div>
             </div>
           </div>
         </section>
@@ -400,8 +1064,9 @@
         </div>
 
         <div class="actions">
-          <button type="submit" class="primary">生成风险评估与体检建议</button>
-          <button type="button" id="printBtn" class="secondary post-actions" onclick="window.print()">打印/另存为 PDF</button>
+          <button type="submit" class="primary-btn">生成风险评估与体检建议</button>
+          <button type="button" id="printBtn" class="secondary post-actions" onclick="window.print()">打印/另存为
+            PDF</button>
           <button type="reset" id="resetBtn" class="secondary post-actions">重置问卷</button>
         </div>
       </form>
@@ -411,15 +1076,16 @@
       <h2>评估结果</h2>
       <div class="summary" id="summary"></div>
       <div id="urgentBox"></div>
+
       <h3>风险标签</h3>
       <div id="tags"></div>
 
-      <h3>建议基础体检项目与频率</h3>
-      <p class="section-note">以下为多数成年人可参考的基础项目；若已有疾病或检查异常，应按医生要求缩短复查间隔。</p>
+      <h3>基础体检项目</h3>
+      <p class="section-note">基础体检为所有成年人通用底座；具体频率需结合年龄、既往结果和医生建议。</p>
       <div id="baseItems"></div>
 
-      <h3>建议个性化增项、频率与科室</h3>
-      <p class="section-note">系统会根据年龄、性别、家族史、生活方式和症状风险生成增项。频率为常用参考，不替代医生医嘱。</p>
+      <h3>个性化增项、频率与科室</h3>
+      <p class="section-note">有慢性病风险或已诊断慢性病时，建议在基础体检上叠加相应专项筛查。</p>
       <div id="extraItems"></div>
 
       <h3>建议与医生重点沟通的问题</h3>
@@ -431,7 +1097,24 @@
       <h3>对应科室速查</h3>
       <div id="departments"></div>
 
-      <p class="small">说明：本工具采用规则评分法，适合体检前分层和沟通，不用于诊断。最终项目应由体检机构或临床医生结合病史、查体和既往检查结果确认。</p>
+      <p class="footer-note">说明：本工具采用规则评分法，适合体检前信息收集、风险分层和项目沟通，不能替代医生诊断。最终体检项目应由体检机构或临床医生结合病史、查体和既往检查结果确认。</p>
+    </section>
+
+    <section class="card" id="reference">
+      <h2>依据说明</h2>
+      <details open>
+        <summary>基础体检项目范围</summary>
+        <p>包括一般检查、内外妇儿/眼耳鼻喉口腔等物理检查、血尿粪常规、肝肾功能、血脂、血糖、尿酸、同型半胱氨酸、甲状腺功能、HPV/宫颈细胞学、十二导联心电图、胸片、腹部和女性相关超声、人体成分、40岁以上肺功能和骨密度等。
+        </p>
+      </details>
+      <details>
+        <summary>慢性病风险筛查项目范围</summary>
+        <p>覆盖心脑血管病、常见恶性肿瘤、慢阻肺、2型糖尿病、骨质疏松、慢性肾病、肥胖和认知功能障碍等方向；系统将“优先推荐项目”和“可选项目”按风险触发输出。</p>
+      </details>
+      <details>
+        <summary>风险指标纳入范围</summary>
+        <p>纳入心血管病、糖尿病、COPD、肺癌、结直肠癌、胃癌、肝癌、乳腺癌、前列腺癌、卵巢癌、食管癌、甲状腺癌和认知功能障碍等常见慢性病风险人群判定线索。</p>
+      </details>
     </section>
   </main>
 
@@ -439,10 +1122,20 @@
     const $ = (id) => document.getElementById(id);
     const vals = (name) => Array.from(document.querySelectorAll(`input[name="${name}"]:checked`)).map(x => x.value);
 
+    // 防范 XSS 的文本转义方法
+    const escapeHtml = (str) => {
+      return (str || "").toString()
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    };
+
     const deptMap = {
       general: "健康管理中心 / 全科医学科 / 体检中心",
       cardio: "心内科；有卒中或短暂性脑缺血发作症状时优先神经内科或急诊",
-      endocrine: "内分泌科；脂肪肝也可咨询消化内科/肝病科",
+      endocrine: "内分泌科 / 营养科；脂肪肝可咨询消化内科或肝病科",
       respiratory: "呼吸与危重症医学科；肺结节可至呼吸科或胸外科",
       gastro: "消化内科；需要胃肠镜时选择内镜中心/消化内镜门诊",
       hepatology: "肝病科 / 感染科 / 消化内科",
@@ -450,7 +1143,9 @@
       breast: "乳腺外科 / 甲乳外科 / 普外科乳腺专病门诊",
       urology: "泌尿外科",
       bone: "骨科 / 骨质疏松门诊 / 老年医学科",
+      renal: "肾内科",
       mental: "心理科 / 精神科 / 睡眠医学门诊",
+      cognitive: "神经内科 / 记忆门诊 / 老年医学科",
       ophthalmology: "眼科",
       dental: "口腔科",
       ent: "耳鼻咽喉科",
@@ -462,6 +1157,51 @@
       const m = heightCm / 100;
       return +(weightKg / (m * m)).toFixed(1);
     }
+
+    function calcPackYears() {
+      const cigarettes = Number($("cigarettes").value || 0);
+      const years = Number($("smokeYears").value || 0);
+      if (cigarettes > 0 && years > 0) {
+        $("packyears").value = ((cigarettes / 20) * years).toFixed(1);
+      }
+    }
+
+    ["cigarettes", "smokeYears"].forEach(id => $(id).addEventListener("change", calcPackYears));
+
+    function refreshRequiredMarks() {
+      document.querySelectorAll('label[for]').forEach(label => label.classList.remove('required'));
+      document.querySelectorAll('input[required], select[required], textarea[required]').forEach(control => {
+        if (control.disabled) return;
+        const label = document.querySelector(`label[for="${control.id}"]`);
+        if (label) label.classList.add('required');
+      });
+    }
+
+    function setFieldDisabled(control, disabled) {
+      control.disabled = disabled;
+      if (disabled) {
+        control.dataset.wasRequired = control.required ? "true" : "false";
+        control.required = false;
+        if (control.type === "checkbox" || control.type === "radio") control.checked = false;
+        else control.value = "";
+      } else if (control.dataset.wasRequired === "true") {
+        control.required = true;
+      }
+    }
+
+    function toggleFemaleSection() {
+      const section = $("femaleSection");
+      // 初始空值时应处于禁用状态。只有明确选择 female 时才解开。
+      const disabled = $("sex").value !== "female";
+      section.classList.toggle("is-disabled-section", disabled);
+      section.setAttribute("aria-disabled", disabled ? "true" : "false");
+      section.querySelectorAll("input, select, textarea").forEach(control => setFieldDisabled(control, disabled));
+      refreshRequiredMarks();
+    }
+
+    $("sex").addEventListener("change", toggleFemaleSection);
+    refreshRequiredMarks();
+    toggleFemaleSection();
 
     function riskLevel(score) {
       if (score >= 7) return { label: "高", cls: "high" };
@@ -480,7 +1220,7 @@
     }
 
     function renderList(items) {
-      if (!items.length) return "<p>暂无特别增项。按基础体检并保持健康生活方式即可。</p>";
+      if (!items.length) return "<p>暂无特别提示。按基础体检并保持健康生活方式即可。</p>";
       return `<ul>${items.map(i => `<li>${i}</li>`).join("")}</ul>`;
     }
 
@@ -492,6 +1232,7 @@
             <thead>
               <tr>
                 <th>项目/方向</th>
+                <th>推荐等级</th>
                 <th>建议频率</th>
                 <th>适用人群或触发条件</th>
                 <th>建议科室</th>
@@ -502,6 +1243,7 @@
               ${items.map(item => `
                 <tr>
                   <td><strong>${item.name}</strong></td>
+                  <td><span class="pill">${item.priority || "基础"}</span></td>
                   <td>${item.frequency}</td>
                   <td>${item.when}</td>
                   <td>${item.department}</td>
@@ -523,63 +1265,86 @@
     }
 
     function baseRecommendations(data) {
-      const band = ageBand(data.age);
       const items = [
         {
-          name: "一般检查：身高、体重、BMI、腰围、血压、脉率",
+          name: "一般检查：身高、体重、BMI、腰围/臀围、血压、脉率",
+          priority: "基础项目",
           frequency: data.age < 30 ? "每1–2年；血压建议每年至少测1次" : "每年；高血压或血压偏高者按医生建议家庭监测",
           when: "所有成年人",
           department: deptMap.general,
-          note: "BMI和腰围用于识别超重、肥胖和中心性肥胖风险。"
+          note: "用于识别超重、肥胖、中心性肥胖和血压异常风险。"
         },
         {
-          name: "血常规、尿常规、粪便常规+隐血",
+          name: "物理检查：内科、外科、眼科、耳鼻咽喉科、口腔科；女性按性生活史做妇科检查",
+          priority: "基础项目",
+          frequency: data.age < 40 ? "每1–2年" : "每年或每1–2年",
+          when: "所有成年人；有症状者及时就诊",
+          department: deptMap.general,
+          note: "体检问诊和查体有助于发现单纯化验难以识别的问题。"
+        },
+        {
+          name: "血常规、尿常规、粪便常规+隐血试验",
+          priority: "基础项目",
           frequency: data.age < 30 ? "每1–2年" : "每年；有贫血、血尿、便血或慢病者按需复查",
           when: "所有成年人",
           department: deptMap.general,
           note: "粪便隐血阳性不等于癌症，但需要进一步确认出血来源。"
         },
         {
-          name: "肝功能、肾功能、血脂、血糖/糖化血红蛋白、尿酸",
+          name: "生化检查：肝功能、肾功能、血脂、空腹血糖、糖化血红蛋白、尿酸、同型半胱氨酸",
+          priority: "基础项目",
           frequency: data.age < 30 ? "每1–2年；超重、有家族史者每年" : "每年；异常者通常3–6个月复查",
           when: "所有成年人，尤其超重、脂肪肝、痛风、高血压、糖尿病家族史者",
           department: deptMap.general + "；异常时内分泌科/肾内科/消化内科",
-          note: "糖化血红蛋白能反映近2–3个月平均血糖，适合与空腹血糖互补。"
+          note: "糖化血红蛋白可反映近2–3个月平均血糖，适合与空腹血糖互补。"
         },
         {
-          name: "心电图",
+          name: "甲状腺功能：促甲状腺激素、游离甲状腺激素",
+          priority: "基础项目",
+          frequency: "每1–2年；甲状腺病史、妊娠/备孕或异常者遵医嘱",
+          when: "所有成年人；备孕/妊娠、甲状腺疾病史或相关症状者",
+          department: deptMap.general + "；异常时内分泌科",
+          note: "甲状腺结节评估还需结合甲状腺及颈部淋巴结超声。"
+        },
+        {
+          name: "十二导联心电图",
+          priority: "基础项目",
           frequency: data.age < 40 ? "每1–2年；有心悸、胸闷者及时做" : "每年",
           when: "成年人基础项目；胸闷、心悸、运动耐量下降、家族早发心血管病者更应关注",
           department: deptMap.general + "；异常时心内科",
-          note: "静息心电图正常不能完全排除冠心病，症状明显者需进一步评估。"
+          note: "静息心电图正常不能完全排除冠心病。"
         },
         {
-          name: "腹部超声：肝、胆、胰、脾、肾等",
-          frequency: data.age < 40 ? "每1–2年；脂肪肝、饮酒、乙肝/丙肝者每年或遵医嘱" : "每年或每1–2年",
-          when: "脂肪肝、胆囊息肉/结石、肝炎病毒感染、长期饮酒或腹部症状者",
-          department: deptMap.general + "；异常时消化内科/肝病科/泌尿外科",
-          note: "超声适合发现结构性异常，但不能替代胃肠镜、肝炎病毒监测或肿瘤专科随访。"
+          name: "放射和超声：胸部正位片或正侧位片、腹部超声；女性子宫附件和乳腺超声",
+          priority: "基础项目",
+          frequency: "每1–2年或按年龄/风险调整；高危肺癌筛查不以胸片替代低剂量CT",
+          when: "所有成年人；肝胆胰脾肾、胸部、女性盆腔和乳腺基础评估",
+          department: deptMap.general + "；异常时按系统转专科",
+          note: "超声适合发现结构性异常，但不能替代胃肠镜、低剂量CT或肝病专科随访。"
         },
         {
-          name: "眼科、口腔、耳鼻喉检查",
-          frequency: "每1–2年；糖尿病、高血压、高度近视、牙周病者每年或遵医嘱",
-          when: "所有成年人；老年人、糖尿病/高血压患者、高度近视者更重要",
-          department: `${deptMap.ophthalmology} / ${deptMap.dental} / ${deptMap.ent}`,
-          note: "口腔和视听功能会影响营养、跌倒风险和生活质量，不应被忽略。"
+          name: "人体成分分析",
+          priority: "基础项目",
+          frequency: "每年或用于体重管理随访",
+          when: "超重、肥胖、肌少风险、运动营养干预人群",
+          department: deptMap.general + " /营养科",
+          note: "关注体脂率、肌肉脂肪分布，辅助制定减重和运动方案。"
         }
       ];
 
       if (data.age >= 40) {
         add(items, {
           name: "肺功能检查",
-          frequency: "40岁以上建议纳入；吸烟、慢性咳嗽、职业粉尘暴露者每年或遵医嘱",
+          priority: "基础适配",
+          frequency: "40岁以上建议纳入；吸烟、慢性咳嗽、职业暴露者每年或遵医嘱",
           when: "40岁以上；吸烟、慢性咳嗽、喘息、粉尘/油烟/化学暴露者",
           department: deptMap.general + "；异常时呼吸与危重症医学科",
-          note: "肺功能用于发现慢阻肺、哮喘等通气功能异常，不能替代肺癌筛查低剂量CT。"
+          note: "用于发现慢阻肺、哮喘等通气功能异常。"
         });
         add(items, {
-          name: "骨密度初筛或DXA骨密度",
-          frequency: "40岁以上可初筛；绝经后女性、≥65岁女性、≥70岁男性建议重点评估",
+          name: "骨密度检测",
+          priority: "基础适配",
+          frequency: "40岁以上可初筛；绝经后女性、≥65岁女性、≥70岁男性重点评估",
           when: "40岁以上、绝经后、低体重、骨折史、长期激素用药、老年人",
           department: deptMap.bone,
           note: "骨质疏松的关键后果是骨折和跌倒，应结合肌力、步态和用药风险。"
@@ -588,47 +1353,47 @@
 
       if (data.sex === "female" && data.sexLife === "yes") {
         add(items, {
-          name: "妇科检查与宫颈癌筛查：HPV和/或TCT",
+          name: "妇科检查、HPV核酸检测和子宫颈细胞学检查",
+          priority: "女性基础",
           frequency: data.age >= 30 ? "通常每3–5年，取决于HPV/TCT组合和既往结果；异常者按妇科流程复查" : "25岁后按医嘱进入筛查；有异常症状及时就诊",
           when: "有性生活史女性；35–64岁尤其应规范筛查",
           department: deptMap.gynecology,
-          note: "接种HPV疫苗后仍需宫颈筛查；筛查异常不等于癌症，但需要规范随访。"
+          note: "接种HPV疫苗后仍需宫颈筛查；筛查异常不等于癌症。"
         });
       }
 
       if (data.sex === "female" && data.age >= 30) {
         add(items, {
           name: "乳腺检查：乳腺体检、乳腺超声，必要时乳腺X线/钼靶",
+          priority: "女性基础",
           frequency: data.age < 40 ? "每1–2年；高危者每年或专科方案" : "每年或每1–2年，按年龄、乳腺密度和风险选择超声/钼靶",
           when: "30岁以上女性；40岁以上、一级亲属乳腺/卵巢癌者更应重视",
           department: deptMap.breast,
-          note: "乳腺超声和钼靶各有优势，不能简单互相替代；有肿块应直接就诊。"
+          note: "乳腺超声和钼靶各有优势，不能简单互相替代。"
         });
       }
 
-      if (data.sex === "male" && data.age >= 50) {
-        add(items, {
-          name: "前列腺评估：症状问诊、直肠指检、PSA按需",
-          frequency: "有排尿症状或家族史者每年评估；低风险人群先与医生讨论利弊",
-          when: "50岁以上男性；尿频、夜尿增多、排尿困难、前列腺癌家族史者",
-          department: deptMap.urology,
-          note: "PSA升高不等于前列腺癌，感染、增生、操作刺激也可能升高。"
-        });
-      }
-
-      return { band, items };
+      return { band: ageBand(data.age), items };
     }
 
     function evaluate(data) {
       const scores = {
         cardio: 0,
+        diabetes: 0,
         metabolic: 0,
-        lung: 0,
+        lungCopd: 0,
+        lungCancer: 0,
         colorectal: 0,
         gastric: 0,
         liver: 0,
         femaleCancer: 0,
+        prostate: 0,
+        esophageal: 0,
+        thyroid: 0,
+        kidney: 0,
+        obesity: 0,
         bone: 0,
+        cognitive: 0,
         mental: 0
       };
       const tags = [];
@@ -638,195 +1403,332 @@
       const depts = [deptMap.general];
       const baseBundle = baseRecommendations(data);
       const base = baseBundle.items;
+      const hasAny = (arr, targets) => targets.some(x => arr.includes(x));
 
-      add(misconceptions, "体检项目不是越贵越好。高价值体检应按年龄、性别、家族史、生活方式、既往结果和症状分层。");
-      add(misconceptions, "无症状人群不建议把PET-CT、全身CT、全身MRI作为常规体检筛查。过度检查可能带来辐射、偶然发现、焦虑和不必要治疗。");
+      add(misconceptions, "体检项目不是越贵越好。高价值体检应按年龄、性别、家族史、生活方式、既往结果和症状分层。 ");
+      add(misconceptions, "无症状人群不建议把PET-CT、全身CT、全身MRI作为常规体检筛查。过度检查可能带来辐射、偶然发现、焦虑和不必要治疗。 ");
       add(misconceptions, "肿瘤标志物“全套”不适合作为普通人群癌症筛查主力，可能假阳性也可能假阴性。癌筛应选择对应癌种的有效方法。 ");
 
-      // BMI and waist
       if (data.bmi !== null) {
-        if (data.bmi >= 28) { scores.metabolic += 3; scores.cardio += 2; tags.push("肥胖"); }
-        else if (data.bmi >= 24) { scores.metabolic += 2; scores.cardio += 1; tags.push("超重"); }
+        if (data.bmi >= 35) { scores.metabolic += 4; scores.cardio += 3; scores.diabetes += 4; scores.obesity += 7; scores.bone += 1; tags.push("重度肥胖"); }
+        else if (data.bmi >= 28) { scores.metabolic += 3; scores.cardio += 2; scores.diabetes += 3; scores.obesity += 5; tags.push("肥胖"); }
+        else if (data.bmi >= 24) { scores.metabolic += 2; scores.cardio += 1; scores.diabetes += 2; scores.obesity += 3; tags.push("超重"); }
+        if (data.bmi < 18.5) { scores.bone += 2; scores.lungCopd += 1; scores.cognitive += data.age >= 65 ? 1 : 0; tags.push("低体重/骨量风险"); }
       }
       if ((data.sex === "male" && data.waist >= 90) || (data.sex === "female" && data.waist >= 85)) {
-        scores.metabolic += 2; scores.cardio += 1; tags.push("中心性肥胖风险");
+        scores.metabolic += 2; scores.cardio += 1; scores.diabetes += 3; scores.obesity += 3; tags.push("中心性肥胖风险");
       }
 
-      // Blood pressure
-      if (data.bp === "high") { scores.cardio += 4; scores.metabolic += 1; tags.push("高血压/血压偏高"); }
-      if (data.bp === "prehigh") { scores.cardio += 2; tags.push("血压临界升高"); }
+      if (data.sbp >= 160 || data.dbp >= 100) { scores.cardio += 5; scores.diabetes += 1; tags.push("血压明显升高"); }
+      else if (data.sbp >= 140 || data.dbp >= 90) { scores.cardio += 4; scores.diabetes += 1; tags.push("血压达到高血压范围"); }
+      else if (data.sbp >= 130 || data.dbp >= 80) { scores.cardio += 2; tags.push("血压临界升高"); }
+      if (data.bpDx === "diagnosed") { scores.cardio += 4; scores.diabetes += 1; scores.kidney += 1; tags.push("已诊断高血压/正在降压治疗"); }
+      if (data.bpDx === "prehigh") { scores.cardio += 2; scores.kidney += 1; }
+      if (data.bpDx === "unknown") { scores.cardio += 1; tags.push("血压情况不清楚，建议规范测量"); }
 
-      // History
       const h = data.history;
-      if (h.includes("hypertension")) scores.cardio += 4;
-      if (h.includes("diabetes")) { scores.cardio += 3; scores.metabolic += 4; }
-      if (h.includes("dyslipidemia")) { scores.cardio += 3; scores.metabolic += 2; }
-      if (h.includes("fatty_liver")) { scores.metabolic += 2; scores.liver += 1; }
-      if (h.includes("gout")) scores.metabolic += 2;
-      if (h.includes("kidney")) { scores.cardio += 3; scores.metabolic += 2; }
-      if (h.includes("cvd")) scores.cardio += 7;
-      if (h.includes("copd")) { scores.lung += 3; scores.cardio += 1; }
-      if (h.includes("hepatitis")) scores.liver += 5;
-      if (h.includes("hpylori")) scores.gastric += 3;
-      if (h.includes("polyps")) scores.colorectal += 5;
-      if (h.includes("cancer")) { scores.cardio += 1; tags.push("既往肿瘤史，需专科随访"); }
+      if (h.includes("hypertension")) { scores.cardio += 4; scores.diabetes += 1; }
+      if (h.includes("diabetes")) { scores.cardio += 4; scores.diabetes += 7; scores.metabolic += 4; scores.kidney += 2; }
+      if (h.includes("dyslipidemia")) { scores.cardio += 3; scores.diabetes += 2; scores.metabolic += 2; }
+      if (h.includes("fatty_liver")) { scores.metabolic += 2; scores.diabetes += 2; scores.liver += 2; }
+      if (h.includes("gout")) { scores.metabolic += 2; scores.kidney += 1; }
+      if (h.includes("kidney")) { scores.cardio += 4; scores.kidney += 7; scores.diabetes += 1; }
+      if (h.includes("cvd")) scores.cardio += 8;
+      if (h.includes("copd")) { scores.lungCopd += 6; scores.lungCancer += 3; scores.cardio += 1; }
+      if (h.includes("hepatitis")) scores.liver += 7;
+      if (h.includes("hpylori")) scores.gastric += 4;
+      if (h.includes("polyps")) scores.colorectal += 6;
+      if (h.includes("osteoporosis")) scores.bone += 7;
+      if (h.includes("cognitive")) scores.cognitive += 5;
+      if (h.includes("cancer")) {
+        scores.lungCancer += 1; scores.colorectal += 1; scores.gastric += 1; scores.liver += 1; scores.femaleCancer += data.sex === "female" ? 2 : 0; scores.prostate += data.sex === "male" ? 2 : 0;
+        tags.push("既往肿瘤史，需专科随访");
+      }
 
-      // Family
       const f = data.family;
       if (f.includes("early_cvd")) scores.cardio += 3;
-      if (f.includes("diabetes")) scores.metabolic += 2;
-      if (f.includes("lung_cancer")) scores.lung += 3;
-      if (f.includes("colorectal_cancer")) scores.colorectal += 4;
-      if (f.includes("gastric_cancer")) scores.gastric += 3;
-      if (f.includes("breast_ovarian")) scores.femaleCancer += 4;
+      if (f.includes("diabetes")) scores.diabetes += 3;
+      if (f.includes("lung_cancer")) scores.lungCancer += 4;
+      if (f.includes("colorectal_cancer")) scores.colorectal += 5;
+      if (f.includes("gastric_cancer")) scores.gastric += 4;
+      if (f.includes("breast_ovarian")) {
+        scores.femaleCancer += data.sex === "female" ? 5 : 2;
+        scores.prostate += data.sex === "male" ? 1 : 0;
+      }
+      if (f.includes("prostate_cancer")) {
+        scores.prostate += data.sex === "male" ? 4 : 1;
+        scores.femaleCancer += data.sex === "female" ? 1 : 0;
+      }
+      if (f.includes("dementia")) scores.cognitive += 3;
 
-      // Lifestyle
-      if (data.smoke === "current") { scores.cardio += 3; scores.lung += 4; tags.push("当前吸烟"); }
-      if (data.smoke === "former") { scores.cardio += 1; scores.lung += 2; }
-      if (data.packyears >= 20) { scores.lung += 5; tags.push("吸烟≥20包年"); }
-      if (data.secondSmoke === "yes") scores.lung += 2;
-      if (data.alcohol === "heavy") { scores.liver += 3; scores.metabolic += 2; scores.cardio += 1; tags.push("饮酒风险"); }
-      if (data.exercise === "low") { scores.cardio += 2; scores.metabolic += 2; }
-      if (data.exercise === "some") { scores.cardio += 1; scores.metabolic += 1; }
-      if (["salty", "sweetfat", "lowfiber"].includes(data.diet)) { scores.cardio += 1; scores.metabolic += 2; }
-      if (data.diet === "lowfiber") scores.colorectal += 1;
-      if (data.sleep === "short") { scores.cardio += 1; scores.mental += 1; }
-      if (data.sleep === "snore") { scores.cardio += 2; scores.metabolic += 2; tags.push("睡眠呼吸暂停风险"); }
-      if (data.stress === "mid") scores.mental += 2;
-      if (data.stress === "high") { scores.mental += 5; tags.push("心理/睡眠需重点评估"); }
-      if (["dust", "chemical", "fume"].includes(data.occupation)) scores.lung += 2;
+      if (data.smoke === "current") { scores.cardio += 3; scores.lungCopd += 4; scores.lungCancer += 5; scores.colorectal += 1; scores.gastric += 1; scores.esophageal += 2; scores.kidney += 1; tags.push("当前吸烟"); }
+      if (data.smoke === "former") { scores.cardio += 1; scores.lungCopd += 2; scores.lungCancer += 3; }
+      if (data.cigarettes >= 20) { scores.lungCancer += 2; scores.lungCopd += 1; scores.cardio += 1; tags.push("每日吸烟≥20支"); }
+      else if (data.cigarettes > 0) { scores.lungCancer += 1; scores.lungCopd += 1; }
+      if (data.smokeYears >= 20) { scores.lungCancer += 2; scores.lungCopd += 1; }
+      if (data.packyears >= 30) { scores.lungCancer += 6; scores.lungCopd += 3; tags.push("吸烟≥30包年"); }
+      else if (data.packyears >= 20) { scores.lungCancer += 5; scores.lungCopd += 2; tags.push("吸烟≥20包年"); }
+      else if (data.packyears >= 10) { scores.lungCancer += 2; scores.lungCopd += 1; }
+      if (data.secondSmoke === "yes") { scores.lungCancer += 3; scores.lungCopd += 1; scores.cardio += 1; tags.push("长期二手烟暴露"); }
+      if (data.alcohol === "moderate") { scores.liver += 1; scores.metabolic += 1; }
+      if (data.alcohol === "heavy") { scores.liver += 4; scores.metabolic += 2; scores.cardio += 1; scores.gastric += 1; scores.esophageal += 2; scores.colorectal += 1; tags.push("饮酒风险"); }
+      const weeklyActiveMinutes = (data.vigorousTimes * data.vigorousMinutes * 2) + (data.moderateTimes * data.moderateMinutes) + (data.walkTimes * data.walkMinutes);
+      if (weeklyActiveMinutes < 150) { scores.cardio += 2; scores.metabolic += 2; scores.diabetes += 2; scores.bone += 1; tags.push("体力活动不足"); }
+      else if (weeklyActiveMinutes < 300) { scores.cardio += 1; scores.metabolic += 1; scores.diabetes += 1; }
+      if (data.sedentaryHours >= 8) { scores.cardio += 1; scores.metabolic += 1; scores.diabetes += 1; tags.push("久坐时间较长"); }
+      if (data.dietHabit === "meat") { scores.cardio += 1; scores.metabolic += 1; scores.colorectal += 1; }
+      if (data.dietHabit === "vegetarian") { scores.metabolic += 1; tags.push("素食为主，建议关注蛋白质、铁、维生素B12等摄入"); }
+      if (["salty", "oily", "sweet", "spicy", "mixed"].includes(data.dietTaste)) { scores.cardio += 1; scores.metabolic += 2; scores.diabetes += 1; }
+      if (["salty", "mixed"].includes(data.dietTaste)) { scores.gastric += 1; scores.cardio += 1; }
+      if (["oily", "mixed"].includes(data.dietTaste)) { scores.metabolic += 1; scores.liver += 1; }
+      if (["sweet", "mixed"].includes(data.dietTaste)) { scores.diabetes += 1; scores.obesity += 1; }
+      if (["spicy", "mixed"].includes(data.dietTaste)) { scores.gastric += 1; }
+      if (data.nightSleepHours > 0 && data.nightSleepHours < 6) { scores.cardio += 1; scores.metabolic += 1; scores.diabetes += 1; scores.mental += 2; tags.push("夜间睡眠不足"); }
+      if (data.nightSleepHours >= 9) { scores.cardio += 1; scores.metabolic += 1; scores.mental += 1; tags.push("夜间睡眠偏长"); }
+      if (data.napMinutes >= 90) { scores.mental += 1; scores.metabolic += 1; tags.push("午睡时间偏长"); }
+      if (data.sleepQuality === "normal") scores.mental += 1;
+      if (data.sleepQuality === "poor") { scores.mental += 2; scores.cardio += 1; tags.push("睡眠质量较差"); }
+      if (data.stress === "mid") { scores.mental += 2; scores.cardio += 1; tags.push("心理压力较大"); }
+      if (data.stress === "high") { scores.mental += 5; scores.cardio += 1; scores.metabolic += 1; tags.push("心理/睡眠需重点评估"); }
+      if (data.occupation === "dust") { scores.lungCopd += 3; scores.lungCancer += 3; tags.push("粉尘/石棉等职业暴露"); }
+      if (data.occupation === "chemical") { scores.lungCopd += 1; scores.lungCancer += 3; scores.liver += 1; scores.kidney += 1; tags.push("化学/放射线等职业暴露"); }
+      if (data.occupation === "fume") { scores.lungCopd += 2; scores.lungCancer += 3; tags.push("油烟/空气污染长期暴露"); }
+      if (data.highRiskArea === "gastric") { scores.gastric += 3; tags.push("胃癌高发地区或相关暴露"); }
+      if (data.highRiskArea === "esophageal") { scores.esophageal += 3; scores.gastric += 1; tags.push("食管癌高发地区居住史"); }
+      if (data.highRiskArea === "aflatoxin") { scores.liver += 3; tags.push("黄曲霉毒素/霉变粮食暴露"); }
 
-      // Age-based risk adjustments
-      if (data.age >= 40) { scores.cardio += 1; scores.colorectal += 1; scores.gastric += 1; scores.bone += 1; }
-      if (data.age >= 50) { scores.cardio += 2; scores.lung += 1; scores.colorectal += 3; scores.bone += 2; }
-      if (data.age >= 65) { scores.cardio += 2; scores.bone += 3; }
+      if (data.age >= 35) scores.diabetes += 2;
+      if (data.age >= 40) { scores.cardio += 1; scores.colorectal += 1; scores.gastric += 1; scores.bone += 1; scores.cognitive += 1; scores.thyroid += 1; }
+      if (data.age >= 45) { scores.gastric += 1; scores.esophageal += 2; }
+      if (data.age >= 50) { scores.cardio += 2; scores.lungCancer += 2; scores.colorectal += 3; scores.bone += 2; scores.cognitive += 2; }
+      if (data.age >= 60 && data.sex === "male") scores.prostate += 5;
+      if (data.age >= 65) { scores.cardio += 2; scores.bone += 3; scores.cognitive += 2; scores.kidney += 1; }
 
-      // Female-specific
+      const fr = data.femaleRisk;
       if (data.sex === "female") {
-        if (data.sexLife === "yes" && ["never", "gt3", "abnormal"].includes(data.cervicalScreen)) scores.femaleCancer += 3;
+        if (data.sexLife === "yes" && ["never", "gt3", "abnormal"].includes(data.cervicalScreen)) { scores.femaleCancer += 3; tags.push("宫颈筛查逾期或既往异常"); }
+        if (data.sexLife === "yes" && data.hpvVaccine === "unknown") scores.femaleCancer += 1;
+        if (data.sexLife === "yes" && data.hpvVaccine === "partial") scores.femaleCancer += 1;
         if (data.age >= 35 && data.sexLife === "yes") scores.femaleCancer += 2;
-        if (data.age >= 40 && ["never", "gt1", "abnormal"].includes(data.breastScreen)) scores.femaleCancer += 2;
-        if (["peri", "yes"].includes(data.menopause)) scores.bone += 2;
-        if (data.pregnancyPlan === "yes") tags.push("备孕/妊娠相关体检需单独设计");
+        if (data.age >= 40 && ["never", "gt1", "abnormal"].includes(data.breastScreen)) { scores.femaleCancer += 2; tags.push("乳腺检查逾期或既往异常"); }
+        if (data.menopause === "peri") { scores.bone += 1; scores.femaleCancer += 1; }
+        if (data.menopause === "yes") { scores.bone += 2; scores.femaleCancer += 1; }
+        if (data.pregnancyPlan === "yes") { scores.thyroid += 2; scores.femaleCancer += 1; tags.push("备孕/妊娠相关体检需单独设计"); }
+        if (fr.includes("early_menarche")) scores.femaleCancer += 1;
+        if (fr.includes("brca")) scores.femaleCancer += 6;
+        if (fr.includes("breast_biopsy")) scores.femaleCancer += 3;
+        if (fr.includes("hormone")) scores.femaleCancer += 2;
+        if (fr.includes("no_birth")) scores.femaleCancer += 1;
+        if (fr.includes("lynch")) { scores.femaleCancer += 5; scores.colorectal += 3; }
       }
 
-      // Core recommendations by risk
       if (scores.cardio >= 3) {
         add(extras, {
-          name: "心血管风险评估",
+          name: "心脑血管疾病风险筛查",
+          priority: scores.cardio >= 7 ? "优先推荐" : "按需推荐",
           frequency: "每年；已有高血压、冠心病、脑卒中、糖尿病或肾病者通常3–6个月随访关键指标",
           when: "血压偏高、血脂异常、糖尿病、吸烟、肥胖、早发心血管病家族史、胸闷心悸者",
           department: deptMap.cardio,
-          note: "包括复测血压、血脂分层、糖化血红蛋白、尿白蛋白/肌酐比；必要时心脏超声、动态血压、动态心电图或运动相关评估。"
+          note: "高血压侧重动态血压、超声心动图、颈动脉超声；冠心病风险可加颈动脉超声、超声心动图、冠脉钙化积分、动态心电图、高敏肌钙蛋白；卒中风险可加头颅CT、颈动脉超声、动态血压、动态心电图、经颅多普勒。"
         });
         addDept(depts, "cardio");
         add(questions, "血压、低密度脂蛋白胆固醇、血糖控制目标分别是多少？是否需要药物或家庭监测？");
         add(misconceptions, "静息心电图正常不代表心脏完全没问题；有胸痛、活动后胸闷、气短或早发家族史时，应按心血管风险进一步评估。 ");
       }
-      if (scores.metabolic >= 3) {
+
+      if (scores.diabetes >= 4 || scores.metabolic >= 4) {
         add(extras, {
-          name: "代谢风险评估",
+          name: "2型糖尿病和代谢风险筛查",
+          priority: "优先推荐",
           frequency: "每年；血糖、血脂、尿酸或肝功能异常者通常3–6个月复查",
-          when: "超重/肥胖、腰围超标、脂肪肝、高尿酸、糖尿病家族史、运动不足或饮食高油高糖者",
+          when: "年龄≥35岁、超重/肥胖、中心性肥胖、糖尿病家族史、血压或血脂异常、脂肪肝、运动不足者",
           department: deptMap.endocrine,
-          note: "包括糖化血红蛋白、血脂、尿酸、肝脏超声、尿白蛋白/肌酐比；必要时营养门诊和运动处方。"
+          note: "优先推荐口服葡萄糖耐量试验；可选眼底照相、尿微量白蛋白/肌酐比、糖化白蛋白、颈动脉/下肢动脉超声、超声心动图等。"
         });
         addDept(depts, "endocrine");
-        add(questions, "是否存在代谢综合征、脂肪肝或糖尿病前期？需要多久复查一次？");
+        add(questions, "是否存在糖尿病前期、代谢综合征或脂肪肝？需要多久复查一次？");
       }
-      if (data.age >= 50 && scores.lung >= 6) {
+
+      if (scores.lungCopd >= 4) {
         add(extras, {
-          name: "肺癌高风险筛查：低剂量螺旋CT",
+          name: "慢性阻塞性肺疾病筛查",
+          priority: "优先推荐",
+          frequency: "40岁以上或有暴露/症状者每年或遵医嘱",
+          when: "吸烟、长期二手烟、慢性咳嗽、喘息、粉尘/油烟/化学暴露、慢阻肺或哮喘史者",
+          department: deptMap.respiratory,
+          note: "优先推荐肺功能检查；可选脉搏氧饱和度监测、心肺运动测试、超声心动图、胸部CT。"
+        });
+        addDept(depts, "respiratory");
+      }
+
+      if (data.age >= 50 && scores.lungCancer >= 6) {
+        add(extras, {
+          name: "肺癌高风险筛查：胸部低剂量CT",
+          priority: "优先推荐",
           frequency: "通常每年1次；具体间隔按结节结果和专科建议调整",
-          when: "50–74岁且吸烟≥20包年、长期二手烟、慢阻肺、职业暴露或一级亲属肺癌史等高风险因素者",
+          when: "年龄≥50岁且吸烟≥20包年、长期二手烟、慢阻肺、职业暴露或一级亲属肺癌史等高风险因素者",
           department: deptMap.respiratory,
           note: "胸片不适合作为高危人群肺癌筛查工具；低剂量CT发现肺结节后需按大小、密度和变化随访。"
         });
         addDept(depts, "respiratory");
         add(questions, "我是否符合肺癌高风险人群标准？低剂量CT多久复查一次？");
-        add(misconceptions, "肺癌筛查高危人群优先选择低剂量螺旋CT，不建议用胸片、PET-CT或肿瘤标志物替代。 ");
-      } else if (scores.lung >= 3) {
-        add(extras, {
-          name: "呼吸系统评估：肺功能和症状评估",
-          frequency: "40岁以上或有暴露/症状者每年或遵医嘱",
-          when: "吸烟、长期二手烟、慢性咳嗽、喘息、粉尘/油烟/化学暴露、慢阻肺或哮喘史者",
-          department: deptMap.respiratory,
-          note: "肺功能用于发现通气功能异常；若有咯血、进行性气短或长期咳嗽，应直接就诊。"
-        });
-        addDept(depts, "respiratory");
+        add(misconceptions, "肺癌筛查高危人群优先选择低剂量CT，不建议用胸片、PET-CT或肿瘤标志物替代。 ");
       }
+
       if (scores.colorectal >= 4 || data.age >= 50) {
         add(extras, {
-          name: "结直肠癌筛查：粪便隐血/粪便DNA或结肠镜",
+          name: "结直肠癌筛查",
+          priority: "优先推荐",
           frequency: "50岁以上或高危者建议规律筛查；结肠镜正常后常见间隔为5–10年，息肉或异常按病理缩短",
           when: "50岁以上；40岁以上且有肠癌家族史、肠息肉、炎症性肠病、便血、黑便或大便习惯改变者",
           department: deptMap.gastro,
-          note: "结肠镜是一线筛查方式之一；粪便检测阳性应进一步做肠镜确认。"
+          note: "优先推荐结肠镜；可选乙状结肠镜、结肠CT、多靶点粪便DNA检测。粪便检测阳性应进一步做肠镜确认。"
         });
         addDept(depts, "gastro");
         add(questions, "我适合做肠镜还是先做粪便检测？若正常，下次筛查间隔多久？");
         add(misconceptions, "没有便血不代表没有肠息肉或早期肠癌；粪便隐血阴性也不能永久排除风险。 ");
       }
+
       if (scores.gastric >= 4) {
         add(extras, {
-          name: "胃癌/胃病风险评估：幽门螺杆菌和胃镜按需",
+          name: "胃癌/胃病风险评估",
+          priority: "优先推荐",
           frequency: "有高危因素者按消化科建议；胃镜间隔取决于萎缩、肠化、息肉、家族史和病理结果",
-          when: "幽门螺杆菌感染、萎缩性胃炎、胃息肉、长期胃部症状、胃癌家族史、来自胃癌高发地区者",
+          when: "年龄≥45岁且有幽门螺杆菌感染、萎缩性胃炎、胃息肉、长期胃部症状、胃癌家族史、高盐腌制饮食或胃癌高发地区居住史者",
           department: deptMap.gastro,
-          note: "幽门螺杆菌阳性需与医生讨论根除治疗；长期胃痛、贫血、黑便、消瘦应直接就诊。"
+          note: "优先推荐胃镜；可选磁控胶囊胃镜、胃超声、幽门螺杆菌检测、血清胃蛋白酶原、血清胃泌素-17。"
         });
         addDept(depts, "gastro");
-        add(misconceptions, "胃部不舒服不能长期只靠胃药压症状；有报警症状或高危因素时，应由消化科判断是否胃镜。 ");
       }
-      if (scores.liver >= 3) {
+
+      if (scores.liver >= 4) {
         add(extras, {
-          name: "肝病风险评估",
+          name: "肝癌/慢性肝病风险评估",
+          priority: "优先推荐",
           frequency: "慢性乙肝/丙肝、肝硬化或明显脂肪肝者通常每6个月或遵专科医嘱",
-          when: "乙肝/丙肝感染、长期大量饮酒、肝硬化、脂肪肝、肝功能反复异常者",
+          when: "乙肝/丙肝感染、长期大量饮酒、肝硬化、脂肪肝、黄曲霉毒素暴露或肝癌家族史者",
           department: deptMap.hepatology,
-          note: "包括肝功能、乙肝/丙肝相关指标、肝脏超声；肝硬化或慢性病毒性肝炎者需专科随访肝癌风险。"
+          note: "肝癌方向优先推荐甲胎蛋白、甲胎蛋白异质体、异常凝血酶原；可选肝脏增强CT/MRI、肝脏瞬时弹性成像等。"
         });
         addDept(depts, "hepatology");
         add(misconceptions, "肝功能正常不等于没有慢性肝病；乙肝/丙肝、肝硬化和脂肪肝风险需要结合病毒学、超声和专科判断。 ");
       }
+
+      if (scores.thyroid >= 3) {
+        add(extras, {
+          name: "甲状腺风险评估",
+          priority: "按需推荐",
+          frequency: "甲状腺功能或超声异常者按内分泌科建议；稳定者通常每6–12个月或每1–2年复查",
+          when: "40岁以上、女性、备孕/妊娠、甲状腺功能异常线索或既往甲状腺检查异常者",
+          department: deptMap.general + "；异常时内分泌科 / 甲状腺外科",
+          note: "基础体检中的甲状腺功能可作为底座；如发现结节或功能异常，应结合甲状腺及颈部淋巴结超声和专科判断。"
+        });
+        addDept(depts, "endocrine");
+      }
+
       if (data.sex === "female" && scores.femaleCancer >= 3) {
         add(extras, {
-          name: "女性肿瘤筛查：宫颈癌和乳腺癌",
-          frequency: "宫颈HPV/TCT通常每3–5年或按异常结果复查；乳腺检查40岁后通常每年或每1–2年",
-          when: "有性生活史女性、35–64岁女性、宫颈筛查逾期/异常者；40岁以上或乳腺/卵巢癌家族史者",
+          name: "女性肿瘤筛查：宫颈癌、乳腺癌、卵巢癌按风险组合",
+          priority: scores.femaleCancer >= 7 ? "优先推荐/高危管理" : "按需推荐",
+          frequency: "宫颈HPV/TCT通常每3–5年或按异常结果复查；乳腺检查40岁后通常每年或每1–2年；高危卵巢癌按妇瘤专科方案",
+          when: "有性生活史女性、宫颈筛查逾期/异常者；40岁以上或乳腺/卵巢癌家族史、BRCA突变等高危者",
           department: `${deptMap.gynecology}；${deptMap.breast}`,
-          note: "HPV疫苗不能替代宫颈筛查；乳腺超声和钼靶按年龄、乳腺密度和风险组合选择。"
+          note: "乳腺癌优先推荐乳腺X线检查；可选乳腺MRI、BRCA基因检测。卵巢癌优先推荐阴道超声、CA125、HE4。"
         });
         addDept(depts, "gynecology");
         addDept(depts, "breast");
-        add(questions, "我的宫颈筛查和乳腺筛查间隔是否合适？是否属于高危人群？");
+        add(questions, "我的宫颈筛查和乳腺筛查间隔是否合适？是否属于遗传高危人群？");
         add(misconceptions, "接种过HPV疫苗仍需要宫颈癌筛查；乳腺没有疼痛也可能需要按年龄和风险筛查。 ");
       }
+
+      if (data.sex === "male" && scores.prostate >= 4) {
+        add(extras, {
+          name: "前列腺癌风险筛查",
+          priority: "优先推荐",
+          frequency: "高风险男性可每年评估；低风险人群先与医生讨论利弊",
+          when: "年龄≥60岁男性；年龄≥45岁且有前列腺癌家族史；携带BRCA2突变且年龄≥40岁",
+          department: deptMap.urology,
+          note: "优先推荐前列腺超声、总PSA、游离PSA及游离/总PSA比值；可选前列腺MRI。PSA升高不等于前列腺癌。"
+        });
+        addDept(depts, "urology");
+      }
+
+      if (scores.esophageal >= 4) {
+        add(extras, {
+          name: "食管癌风险筛查",
+          priority: "优先推荐",
+          frequency: "高危者按消化内镜专科建议",
+          when: "年龄≥45岁且有食管癌高发地区居住史、一级亲属食管癌、热烫/高盐/腌制食品/吸烟/重度饮酒、慢性食管疾病或癌前病变史者",
+          department: deptMap.gastro,
+          note: "优先推荐普通白光内镜；可选色素内镜、窄带成像等特殊内镜技术，必要时胸部增强CT。"
+        });
+        addDept(depts, "gastro");
+      }
+
+      if (scores.kidney >= 4) {
+        add(extras, {
+          name: "慢性肾病风险筛查",
+          priority: "优先推荐",
+          frequency: "高危或异常者每3–12个月按肾内科建议复查",
+          when: "糖尿病、高血压、慢性肾病史、蛋白尿、痛风/高尿酸或肾功能异常者",
+          department: deptMap.renal,
+          note: "优先推荐尿微量白蛋白/肌酐比、血清胱抑素C；可选肾小管功能检测和24小时尿蛋白定量。"
+        });
+        addDept(depts, "renal");
+      }
+
+      if (scores.obesity >= 4) {
+        add(extras, {
+          name: "肥胖相关并发症筛查",
+          priority: "优先推荐",
+          frequency: "减重干预期间可每1–3个月随访；稳定后每6–12个月",
+          when: "BMI≥28、中心性肥胖、打鼾憋醒、血糖血脂异常或月经/内分泌异常者",
+          department: deptMap.endocrine,
+          note: "优先推荐餐后2小时血糖、空腹和餐后2小时胰岛素；可选睡眠呼吸监测、性激素、动态血压、中医体质辨识、OGTT等。"
+        });
+        addDept(depts, "endocrine");
+      }
+
       if (scores.bone >= 3 || data.age >= 65 || (data.sex === "female" && data.menopause === "yes")) {
         add(extras, {
           name: "骨质疏松与跌倒风险评估",
+          priority: "优先推荐",
           frequency: "绝经后女性、≥65岁女性、≥70岁男性或高危者按医嘱；正常者通常每1–2年或更长间隔复查",
           when: "绝经后、老年人、低体重、脆性骨折史、长期激素用药、反复跌倒、维生素D缺乏风险者",
           department: deptMap.bone,
-          note: "包括DXA骨密度、维生素D/钙摄入评估、肌力步态、视力和用药风险评估。"
+          note: "优先推荐双能X线骨密度、定量CT；可选骨代谢指标、25羟维生素D、甲状旁腺素、血钙血磷等。"
         });
         addDept(depts, "bone");
-        add(misconceptions, "骨密度轻度异常不等于立刻需要大量补钙；是否用药要结合骨折风险、年龄、既往骨折和DXA结果。 ");
       }
+
+      if (scores.cognitive >= 4 || data.age >= 50) {
+        add(extras, {
+          name: "认知功能障碍筛查",
+          priority: data.age >= 50 || scores.cognitive >= 7 ? "优先推荐" : "按需推荐",
+          frequency: "50岁以上可定期筛查；有主观记忆下降、家族史或危险因素者提前至40岁或个体化筛查",
+          when: "≥50岁；或伴痴呆危险因素、认知障碍家族史及主观认知下降者",
+          department: deptMap.cognitive,
+          note: "优先推荐简易精神状态检查量表、蒙特利尔认知评估量表、8条目痴呆筛查问卷、神经精神症状筛查、ApoE基因检测；可选头颅MRI、维生素B12、叶酸等。"
+        });
+        addDept(depts, "cognitive");
+      }
+
       if (scores.mental >= 3) {
         add(extras, {
           name: "心理睡眠评估",
+          priority: "按需推荐",
           frequency: "压力大、失眠、焦虑抑郁症状持续超过2周或影响生活时尽快评估；稳定后按医嘱随访",
           when: "持续焦虑、抑郁、失眠、白天功能受影响、长期高压、倒班或疑似睡眠呼吸暂停者",
           department: deptMap.mental,
-          note: "可使用标准量表筛查焦虑、抑郁、失眠；明显打鼾憋醒需评估睡眠呼吸暂停。"
+          note: "可使用GAD-7、PHQ-9等标准量表；明显打鼾憋醒需评估睡眠呼吸暂停。"
         });
         addDept(depts, "mental");
-        add(misconceptions, "长期失眠、焦虑或抑郁不是单靠体检抽血就能解释；需要把心理和睡眠作为正式健康问题处理。 ");
       }
+
       if (data.sex === "female" && data.pregnancyPlan === "yes") {
         add(extras, {
           name: "备孕/妊娠相关评估",
+          priority: "专项设计",
           frequency: "备孕前3–6个月或发现妊娠后尽早评估",
           when: "备孕、妊娠、哺乳期女性",
           department: "妇产科 / 产科 / 生殖医学科",
@@ -835,7 +1737,16 @@
         addDept(depts, "gynecology");
       }
 
-      // Urgent symptoms
+      if (hasAny(data.alarm, ["chest_pain", "neuro"])) scores.cardio += 5;
+      if (hasAny(data.alarm, ["hemoptysis"])) { scores.lungCopd += 3; scores.lungCancer += 4; }
+      if (hasAny(data.alarm, ["blood_stool"])) scores.colorectal += 5;
+      if (hasAny(data.alarm, ["weight_loss"])) { scores.lungCancer += 2; scores.colorectal += 2; scores.gastric += 2; scores.liver += 2; scores.femaleCancer += data.sex === "female" ? 1 : 0; scores.prostate += data.sex === "male" ? 1 : 0; }
+      if (hasAny(data.alarm, ["breast_mass"])) scores.femaleCancer += 5;
+      if (hasAny(data.alarm, ["postmenopause_bleeding"])) scores.femaleCancer += 5;
+      if (hasAny(data.alarm, ["dysphagia"])) { scores.esophageal += 5; scores.gastric += 2; }
+      if (hasAny(data.alarm, ["urinary"])) { scores.kidney += 3; scores.prostate += data.sex === "male" ? 4 : 0; }
+      if (hasAny(data.alarm, ["severe_pain"])) { scores.bone += 2; scores.gastric += 1; scores.liver += 1; }
+
       const urgent = data.alarm.length > 0;
       if (urgent) {
         tags.push("存在警示症状：建议优先就医");
@@ -853,26 +1764,81 @@
       $("resetBtn").style.display = "none";
     }
 
+    function clearInvalidState(control) {
+      const field = control.closest(".field");
+      if (field) field.classList.remove("invalid-field");
+    }
+
+    function markInvalidRequiredFields() {
+      const controls = Array.from(document.querySelectorAll("#riskForm input[required], #riskForm select[required], #riskForm textarea[required]"));
+      let firstInvalid = null;
+
+      document.querySelectorAll(".field.invalid-field").forEach(field => field.classList.remove("invalid-field"));
+
+      controls.forEach(control => {
+        if (control.disabled) return;
+        const invalid = !control.checkValidity() || (control.type === "number" && control.value.trim() === "");
+        if (invalid) {
+          const field = control.closest(".field");
+          if (field) field.classList.add("invalid-field");
+          if (!firstInvalid) firstInvalid = control;
+        }
+      });
+
+      if (firstInvalid) {
+        firstInvalid.focus({ preventScroll: true });
+        firstInvalid.closest(".field")?.scrollIntoView({ behavior: "smooth", block: "center" });
+        return false;
+      }
+      return true;
+    }
+
+    document.querySelectorAll("#riskForm input, #riskForm select, #riskForm textarea").forEach(control => {
+      control.addEventListener("input", () => clearInvalidState(control));
+      control.addEventListener("change", () => clearInvalidState(control));
+      control.addEventListener("invalid", () => {
+        const field = control.closest(".field");
+        if (field) field.classList.add("invalid-field");
+      });
+    });
+
     $("riskForm").addEventListener("submit", (e) => {
       e.preventDefault();
+      if (!markInvalidRequiredFields()) return;
+      calcPackYears();
       const data = {
+        name: $("name").value.trim(),
         age: Number($("age").value),
         sex: $("sex").value,
         height: Number($("height").value),
         weight: Number($("weight").value),
         waist: Number($("waist").value),
-        bp: $("bp").value,
+        sbp: Number($("sbp").value),
+        dbp: Number($("dbp").value),
+        bpDx: $("bpDx").value,
         history: vals("history"),
         family: vals("family"),
         smoke: $("smoke").value,
+        cigarettes: Number($("cigarettes").value || 0),
+        smokeYears: Number($("smokeYears").value || 0),
         packyears: Number($("packyears").value || 0),
         secondSmoke: $("secondSmoke").value,
         alcohol: $("alcohol").value,
-        exercise: $("exercise").value,
-        diet: $("diet").value,
-        sleep: $("sleep").value,
+        dietHabit: $("dietHabit").value,
+        dietTaste: $("dietTaste").value,
+        nightSleepHours: Number($("nightSleepHours").value || 0),
+        napMinutes: Number($("napMinutes").value || 0),
+        sleepQuality: $("sleepQuality").value,
+        vigorousTimes: Number($("vigorousTimes").value || 0),
+        vigorousMinutes: Number($("vigorousMinutes").value || 0),
+        moderateTimes: Number($("moderateTimes").value || 0),
+        moderateMinutes: Number($("moderateMinutes").value || 0),
+        walkTimes: Number($("walkTimes").value || 0),
+        walkMinutes: Number($("walkMinutes").value || 0),
+        sedentaryHours: Number($("sedentaryHours").value || 0),
         stress: $("stress").value,
         occupation: $("occupation").value,
+        highRiskArea: $("highRiskArea").value,
         alarm: vals("alarm"),
         sexLife: $("sexLife").value,
         hpvVaccine: $("hpvVaccine").value,
@@ -880,39 +1846,55 @@
         breastScreen: $("breastScreen").value,
         menopause: $("menopause").value,
         pregnancyPlan: $("pregnancyPlan").value,
+        femaleRisk: vals("femaleRisk"),
         notes: $("notes").value.trim()
       };
       data.bmi = bmi(data.height, data.weight);
 
       const r = evaluate(data);
       const levelRows = [
-        ["心脑血管", r.levels.cardio],
-        ["代谢/脂肪肝/糖尿病", r.levels.metabolic],
-        ["呼吸/肺癌相关", r.levels.lung],
-        ["结直肠癌相关", r.levels.colorectal],
-        ["胃癌/胃病相关", r.levels.gastric],
-        ["肝病相关", r.levels.liver],
-        ["女性肿瘤相关", r.levels.femaleCancer],
-        ["骨质疏松/跌倒", r.levels.bone],
-        ["心理睡眠", r.levels.mental]
+        ["心脑血管", r.levels.cardio, r.scores.cardio],
+        ["糖尿病", r.levels.diabetes, r.scores.diabetes],
+        ["代谢/肥胖", r.levels.metabolic, r.scores.metabolic],
+        ["慢阻肺", r.levels.lungCopd, r.scores.lungCopd],
+        ["肺癌相关", r.levels.lungCancer, r.scores.lungCancer],
+        ["结直肠癌", r.levels.colorectal, r.scores.colorectal],
+        ["胃癌/胃病", r.levels.gastric, r.scores.gastric],
+        ["肝病/肝癌", r.levels.liver, r.scores.liver],
+        ["女性肿瘤", r.levels.femaleCancer, r.scores.femaleCancer],
+        ["前列腺癌", r.levels.prostate, r.scores.prostate],
+        ["食管癌", r.levels.esophageal, r.scores.esophageal],
+        ["甲状腺", r.levels.thyroid, r.scores.thyroid],
+        ["慢性肾病", r.levels.kidney, r.scores.kidney],
+        ["骨质疏松", r.levels.bone, r.scores.bone],
+        ["认知功能", r.levels.cognitive, r.scores.cognitive],
+        ["心理睡眠", r.levels.mental, r.scores.mental]
       ];
 
+      // 转义防 XSS
       $("summary").innerHTML = `
+        <div class="metric"><div class="k">姓名/编号</div><div class="v">${escapeHtml(data.name) || "—"}</div></div>
         <div class="metric"><div class="k">年龄分层</div><div class="v">${r.band}</div></div>
         <div class="metric"><div class="k">BMI</div><div class="v">${data.bmi ?? "—"}</div></div>
         <div class="metric"><div class="k">腰围</div><div class="v">${data.waist || "—"}</div></div>
         <div class="metric"><div class="k">吸烟包年</div><div class="v">${data.packyears || 0}</div></div>
+        <div class="metric"><div class="k">每周活动量</div><div class="v">${(data.vigorousTimes * data.vigorousMinutes * 2) + (data.moderateTimes * data.moderateMinutes) + (data.walkTimes * data.walkMinutes)}分钟</div></div>
       `;
 
-      $("urgentBox").innerHTML = r.urgent
-        ? `<div class="danger"><strong>重要提示：</strong>你勾选了警示症状。建议优先挂相应专科或急诊评估，不要仅依赖普通体检排查。</div>`
+      // 渲染问卷最下面的“补充说明（notes）”
+      const notesHtml = data.notes
+        ? `<div class="risk-block" style="margin-top:0;"><strong>补充说明：</strong>${escapeHtml(data.notes)}</div>`
         : "";
 
-      const tagHtml = [
+      $("urgentBox").innerHTML = (r.urgent
+        ? `<div class="danger"><strong>重要提示：</strong>你勾选了警示症状。建议优先挂相应专科或急诊评估，不要仅依赖普通体检排查。</div>`
+        : `<div class="successbox"><strong>未勾选警示症状：</strong>可按体检流程完成基础体检和风险分层增项。</div>`) + notesHtml;
+
+      $("tags").innerHTML = [
         ...levelRows.map(([name, lvl]) => `<span class="tag ${lvl.cls}">${name}：${lvl.label}风险</span>`),
         ...r.tags.map(t => `<span class="tag info">${t}</span>`)
       ].join("");
-      $("tags").innerHTML = tagHtml;
+
       $("baseItems").innerHTML = renderItemTable(r.base);
       $("extraItems").innerHTML = renderItemTable(r.extras);
       $("doctorQuestions").innerHTML = renderList(r.questions);
@@ -924,9 +1906,15 @@
       $("resultCard").scrollIntoView({ behavior: "smooth", block: "start" });
     });
 
+    // 重置后清理表单残留样式和恢复默认禁用状态
     $("riskForm").addEventListener("reset", () => {
-      setTimeout(resetResultUI, 0);
+      setTimeout(() => {
+        resetResultUI();
+        document.querySelectorAll(".invalid-field").forEach(el => el.classList.remove("invalid-field"));
+        toggleFemaleSection(); // 重新按表单当前值（空值）执行禁用逻辑
+      }, 0);
     });
   </script>
 </body>
+
 </html>
