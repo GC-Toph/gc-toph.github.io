@@ -60,4 +60,5 @@ Interactive graphs and explanations about key [economic](https://www.econgraphs.
 
 - [番茄钟 \| Pomodoro](/misc/Pomodoro.html)
 - [Markdown \| 幻灯片](/misc/slides_md.html)
+- [Markdown \| 简历生成器](/misc/resume_generator.html)
 - [眼睛 - 远近训练](/misc/eyes-near-far-training.html)

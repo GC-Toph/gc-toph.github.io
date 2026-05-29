@@ -1,0 +1,1564 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>简历生成器</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    :root {
+      --primary: #164aac;
+      --primary-dark: #002266;
+      --accent: #60a5fa;
+      --accent-soft: #dbeafe;
+      --text: #111827;
+      --muted: #6b7280;
+      --bg: #eef2ff;
+      --bg-2: #f8fafc;
+      --card: #ffffff;
+      --paper: #ffffff;
+      --border: #e5e7eb;
+      --ring: rgba(37, 99, 235, 0.16);
+      --shadow-sm: 0 8px 22px rgba(15, 23, 42, 0.08);
+      --shadow-lg: 0 30px 80px rgba(15, 23, 42, 0.20);
+      --radius-xl: 22px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family:
+        Inter,
+        "Segoe UI",
+        "PingFang SC",
+        "Microsoft YaHei",
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 12% 0%, color-mix(in srgb, var(--accent) 28%, transparent), transparent 34%),
+        radial-gradient(circle at 88% 12%, color-mix(in srgb, var(--primary) 20%, transparent), transparent 30%),
+        linear-gradient(135deg, var(--bg), var(--bg-2));
+    }
+
+    .theme-blue {
+      --primary: #164aac;
+      --primary-dark: #002266;
+      --accent: #60a5fa;
+      --accent-soft: #dbeafe;
+      --bg: #eef2ff;
+      --bg-2: #f8fafc;
+    }
+
+    .theme-green {
+      --primary: #059669;
+      --primary-dark: #047857;
+      --accent: #34d399;
+      --accent-soft: #d1fae5;
+      --bg: #ecfdf5;
+      --bg-2: #f8fafc;
+      --ring: rgba(5, 150, 105, 0.16);
+    }
+
+    .theme-purple {
+      --primary: #7c3aed;
+      --primary-dark: #5b21b6;
+      --accent: #a78bfa;
+      --accent-soft: #ede9fe;
+      --bg: #f5f3ff;
+      --bg-2: #faf5ff;
+      --ring: rgba(124, 58, 237, 0.16);
+    }
+
+    .theme-dark {
+      --primary: #111827;
+      --primary-dark: #030712;
+      --accent: #64748b;
+      --accent-soft: #e5e7eb;
+      --bg: #e5e7eb;
+      --bg-2: #f8fafc;
+      --ring: rgba(17, 24, 39, 0.15);
+    }
+
+    .theme-minimal {
+      --primary: #18181b;
+      --primary-dark: #09090b;
+      --accent: #a1a1aa;
+      --accent-soft: #f4f4f5;
+      --bg: #fafafa;
+      --bg-2: #f4f4f5;
+      --ring: rgba(24, 24, 27, 0.12);
+    }
+
+    .app-shell {
+      max-width: 1480px;
+      margin: 0 auto;
+      padding: 28px;
+    }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.72);
+      border-radius: 28px;
+      padding: 26px 30px;
+      background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.88), rgba(255, 255, 255, 0.62)),
+        linear-gradient(135deg, color-mix(in srgb, var(--primary) 18%, transparent), transparent);
+      backdrop-filter: blur(18px);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      right: -80px;
+      top: -90px;
+      width: 240px;
+      height: 240px;
+      border-radius: 50%;
+      background: color-mix(in srgb, var(--accent) 38%, transparent);
+      filter: blur(4px);
+    }
+
+    .hero-title {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin: 0;
+      color: #0f172a;
+      font-size: clamp(28px, 3vw, 42px);
+      line-height: 1.1;
+      letter-spacing: -0.04em;
+      font-weight: 850;
+    }
+
+    .hero-icon {
+      display: inline-grid;
+      place-items: center;
+      width: 44px;
+      height: 44px;
+      border-radius: 16px;
+      color: #fff;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      box-shadow: 0 14px 30px var(--ring);
+    }
+
+    .hero-subtitle {
+      position: relative;
+      z-index: 1;
+      max-width: 780px;
+      margin: 12px 0 0;
+      color: #475569;
+      font-size: 15px;
+      line-height: 1.7;
+    }
+
+    .toolbar {
+      margin-top: 18px;
+      background: rgba(255, 255, 255, 0.84);
+      border: 1px solid rgba(226, 232, 240, 0.88);
+      border-radius: 24px;
+      padding: 18px;
+      box-shadow: var(--shadow-sm);
+      backdrop-filter: blur(18px);
+    }
+
+    .field-label {
+      display: block;
+      margin-bottom: 8px;
+      color: #334155;
+      font-size: 13px;
+      font-weight: 750;
+    }
+
+    .form-control {
+      width: 100%;
+      border: 1px solid #dbe3ef;
+      border-radius: 14px;
+      padding: 11px 13px;
+      background: rgba(255, 255, 255, 0.92);
+      color: #0f172a;
+      outline: none;
+      transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+    }
+
+    .form-control:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px var(--ring);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 44px;
+      border-radius: 14px;
+      padding: 10px 15px;
+      font-weight: 760;
+      letter-spacing: -0.01em;
+      transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+      border: 1px solid transparent;
+      white-space: nowrap;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: #fff;
+      box-shadow: 0 14px 30px var(--ring);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.9);
+      border-color: #dbe3ef;
+      color: #334155;
+    }
+
+    .print-hint {
+      margin-top: 14px;
+      color: #64748b;
+      font-size: 12.5px;
+      line-height: 1.6;
+    }
+
+    .print-hint strong {
+      color: var(--primary);
+    }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: minmax(360px, 0.92fr) minmax(640px, 1.08fr);
+      gap: 22px;
+      align-items: start;
+    }
+
+    .panel {
+      overflow: hidden;
+      border: 1px solid rgba(226, 232, 240, 0.86);
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.86);
+      box-shadow: var(--shadow-sm);
+      backdrop-filter: blur(18px);
+    }
+
+    .panel-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 16px 18px;
+      border-bottom: 1px solid #e8eef7;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(248, 250, 252, 0.78));
+    }
+
+    .panel-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 0;
+      color: #0f172a;
+      font-size: 16px;
+      font-weight: 800;
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border: 1px solid #dbe3ef;
+      border-radius: 999px;
+      padding: 5px 10px;
+      background: #fff;
+      color: #64748b;
+      font-size: 12px;
+      font-weight: 650;
+    }
+
+    textarea {
+      display: block;
+      width: 100%;
+      min-height: 840px;
+      resize: vertical;
+      border: 0;
+      border-radius: 0;
+      padding: 20px;
+      background: linear-gradient(90deg, rgba(226, 232, 240, 0.42) 1px, transparent 1px) 0 0 / 36px 36px, #ffffff;
+      color: #111827;
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      font-size: 13px;
+      line-height: 1.8;
+      outline: none;
+    }
+
+    .preview-panel {
+      background: rgba(15, 23, 42, 0.06);
+    }
+
+    .preview-wrap {
+      position: relative;
+      height: 940px;
+      overflow: auto;
+      padding: 34px;
+      background:
+        linear-gradient(45deg, rgba(148, 163, 184, 0.12) 25%, transparent 25%),
+        linear-gradient(-45deg, rgba(148, 163, 184, 0.12) 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, rgba(148, 163, 184, 0.12) 75%),
+        linear-gradient(-45deg, transparent 75%, rgba(148, 163, 184, 0.12) 75%);
+      background-size: 24px 24px;
+      background-position: 0 0, 0 12px, 12px -12px, -12px 0;
+    }
+
+    /* ===== A4 一页紧凑版：参考中文简历模板优化 ===== */
+    .resume-container {
+      position: relative;
+      width: 210mm;
+      height: 297mm;
+      min-height: 297mm;
+      margin: 0 auto;
+      background: #fff;
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+      isolation: isolate;
+    }
+
+    .resume-content {
+      height: 297mm;
+      padding: 9mm 10mm;
+      font-size: 10.8px;
+      line-height: 1.35;
+      color: #111827;
+    }
+
+    .resume-header {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: start;
+      gap: 7mm;
+      padding: 0 0 5mm;
+      margin-bottom: 4mm;
+      border-bottom: 1.5px solid var(--primary);
+    }
+
+    .resume-header::after {
+      content: "";
+      position: absolute;
+      left: 10mm;
+      top: auto;
+      bottom: -1.5px;
+      width: 36mm;
+      height: 2.2px;
+      background: var(--primary-dark);
+    }
+
+    .resume-header .resume-body {
+      width: 100%;
+      min-width: 0;
+    }
+
+    .avatar {
+      order: 2;
+      grid-column: 2;
+      grid-row: 1;
+      width: 25mm;
+      height: 32mm;
+      border: 1px solid #d1d5db;
+      box-shadow: 0 2px 7px rgba(15, 23, 42, 0.18);
+      object-fit: cover;
+      align-self: flex-start;
+      display: none;
+    }
+
+    .avatar.visible {
+      display: block;
+    }
+
+    .resume-body h1 {
+      display: inline-block;
+      min-width: 34mm;
+      margin: 0 0 2.4mm;
+      padding: 2.2mm 3mm;
+      color: #fff;
+      background: linear-gradient(90deg, var(--primary-dark), var(--primary));
+      font-size: 22px;
+      line-height: 1.1;
+      letter-spacing: 0.02em;
+      font-weight: 900;
+    }
+
+    .basic-info-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      column-gap: 3mm;
+      row-gap: 1.4mm;
+      margin-top: 1.6mm;
+    }
+
+    .basic-info-item {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      align-items: baseline;
+      gap: 1.2mm;
+      padding: 0.6mm 1.2mm;
+      border: 1px solid #e5e7eb;
+      background: #f9fafb;
+      line-height: 1.28;
+      overflow: hidden;
+    }
+
+    .basic-info-label {
+      color: #111827;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .basic-info-value {
+      color: #111827;
+      font-weight: 560;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .resume-header p {
+      display: none;
+      /* 使用 grid 显示基础信息 */
+    }
+
+    .resume-header p.legacy-intro {
+      display: block;
+    }
+
+    .resume-section {
+      margin-bottom: 3.2mm;
+    }
+
+    .resume-body h2 {
+      display: flex;
+      align-items: center;
+      gap: 2.2mm;
+      margin: 4.2mm 0 2mm;
+      padding: 0 0 1mm;
+      color: var(--primary-dark);
+      font-size: 14px;
+      line-height: 1.15;
+      font-weight: 900;
+      border-bottom: 1.1px solid var(--primary);
+    }
+
+    .resume-section:first-child h2 {
+      margin-top: 0;
+    }
+
+    .resume-body h2::before {
+      content: "";
+      width: 3.6mm;
+      height: 3.6mm;
+      background: var(--primary);
+    }
+
+    .resume-body h3 {
+      margin: 2.2mm 0 1mm;
+      color: #111827;
+      font-size: 12px;
+      line-height: 1.25;
+      font-weight: 850;
+    }
+
+    .resume-body p {
+      margin: 1.2mm 0;
+      color: #111827;
+    }
+
+    .resume-body ul {
+      margin: 1.1mm 0 1.8mm;
+      padding: 0;
+      list-style: none;
+    }
+
+    .resume-body li {
+      position: relative;
+      margin: 0.65mm 0;
+      padding-left: 3.4mm;
+      color: #111827;
+      line-height: 1.38;
+    }
+
+    .resume-body li::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0.69em;
+      width: 1.4mm;
+      height: 1.4mm;
+      background: var(--primary);
+      transform: translateY(-50%) rotate(45deg);
+    }
+
+    .resume-body strong {
+      color: var(--primary-dark);
+      font-weight: 900;
+    }
+
+    .resume-block {
+      margin: 1.5mm 0 2.1mm;
+    }
+
+    .resume-block>p:first-child,
+    .item-line {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      column-gap: 6mm;
+      align-items: baseline;
+      margin: 0 0 1mm;
+      font-weight: 650;
+    }
+
+    .resume-date {
+      color: #374151;
+      font-weight: 850;
+      white-space: nowrap;
+      text-align: right;
+    }
+
+    .resume-role {
+      margin-left: 5mm;
+      color: #111827;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    @media (max-width: 1280px) {
+      .workspace {
+        grid-template-columns: 1fr;
+      }
+    }
+
+
+    @media print {
+      @page {
+        size: A4 portrait;
+        margin: 0;
+        /* 清除默认打印留白 */
+      }
+
+      * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        color-adjust: exact !important;
+      }
+
+      html,
+      body {
+        background: #ffffff !important;
+        width: 210mm !important;
+        height: 297mm !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow: hidden !important;
+      }
+
+      /* 隐藏与打印无关的 UI 元素 */
+      .no-print {
+        display: none !important;
+      }
+
+      .app-shell.no-print,
+      .panel.no-print,
+      .panel-head.no-print {
+        display: none !important;
+      }
+
+      .app-shell {
+        padding: 0 !important;
+        margin: 0 !important;
+        max-width: none !important;
+      }
+
+      .workspace {
+        display: block !important;
+        gap: 0 !important;
+      }
+
+      .preview-panel {
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+      }
+
+      .preview-wrap {
+        height: auto !important;
+        padding: 0 !important;
+        background: transparent !important;
+        overflow: visible !important;
+      }
+
+      .resume-container {
+        width: 210mm !important;
+        height: 297mm !important;
+        min-height: 297mm !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        box-shadow: none !important;
+        border: none !important;
+        border-radius: 0 !important;
+        transform: none !important;
+        overflow: hidden !important;
+      }
+
+      /* 微调打印时的文字缩放以完美适配一页 */
+      .resume-content {
+        padding: 9mm 10mm !important;
+        font-size: 10.5px !important;
+        line-height: 1.32 !important;
+      }
+
+      .resume-body h1 {
+        font-size: 20px !important;
+      }
+
+      .resume-body h2 {
+        font-size: 13.3px !important;
+        margin-top: 3.4mm !important;
+        margin-bottom: 1.7mm !important;
+      }
+
+      .resume-header {
+        margin-bottom: 3.5mm !important;
+        padding-bottom: 4mm !important;
+      }
+
+      .basic-info-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+      }
+    }
+  </style>
+</head>
+
+<body class="theme-blue">
+  <div class="app-shell no-print">
+    <header class="hero">
+      <h1 class="hero-title">
+        <span class="hero-icon">✦</span>
+        简历生成器
+      </h1>
+    </header>
+
+    <section class="toolbar">
+      <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-4 items-end">
+        <div>
+          <label class="field-label">默认模板</label>
+          <select id="templateSelect" class="form-control">
+            <option value="backend">后端开发：应届生一页模板</option>
+            <option value="fictional">虚构领域：异星生态系统架构师</option>
+            <option value="frontend">互联网：前端工程师</option>
+            <option value="data">数据方向：数据分析师</option>
+            <option value="product">产品方向：产品经理</option>
+            <option value="marketing">市场方向：品牌市场专员</option>
+            <option value="finance">金融方向：财务分析师</option>
+            <option value="design">设计方向：工业设计师</option>
+            <option value="mechanical">工程方向：机械工程师</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="field-label">主题风格</label>
+          <select id="themeSelect" class="form-control">
+            <option value="theme-blue">蓝色商务</option>
+            <option value="theme-green">绿色清新</option>
+            <option value="theme-purple">紫色创意</option>
+            <option value="theme-dark">黑白高级</option>
+            <option value="theme-minimal">极简灰度</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="field-label">照片头像（可选）</label>
+          <input id="avatarInput" type="file" accept="image/*" class="form-control" />
+        </div>
+
+        <div class="flex gap-2">
+          <button id="removeAvatarBtn" class="btn btn-secondary w-full" type="button">移除头像</button>
+          <button id="clearBtn" class="btn btn-secondary w-full" type="button">清空</button>
+        </div>
+
+        <div class="flex gap-2">
+          <button id="loadTemplateBtn" class="btn btn-secondary w-full" type="button">载入模板</button>
+          <button id="exportPdfBtn" class="btn btn-primary w-full" type="button">导出 PDF</button>
+        </div>
+      </div>
+
+      <p class="print-hint">
+        为了确保生成的 PDF 高清且能够自由复制文本，导出功能已切回浏览器系统打印。请在弹出窗口中选择 <strong>“另存为 PDF”</strong>，勾选 <strong>“背景图形”</strong>，并将边距设为
+        <strong>“无”</strong>。
+      </p>
+    </section>
+  </div>
+
+  <div class="app-shell">
+    <main class="workspace">
+      <section class="panel no-print">
+        <div class="panel-head">
+          <h2 class="panel-title">Markdown 输入</h2>
+          <span id="saveStatus" class="status-pill">已自动保存</span>
+        </div>
+
+        <textarea id="markdown" spellcheck="false"></textarea>
+      </section>
+
+      <section class="panel preview-panel">
+        <div class="panel-head no-print">
+          <h2 class="panel-title">简历预览</h2>
+          <span class="status-pill">A4 PDF</span>
+        </div>
+
+        <div class="preview-wrap">
+          <div id="preview" class="resume-container">
+            <div class="resume-content">
+              <div class="resume-header">
+                <img id="avatarPreview" class="avatar" alt="头像" />
+                <div id="resumeIntro" class="resume-body"></div>
+              </div>
+              <div id="resumeRest" class="resume-body"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const STORAGE_KEY = "markdown-resume-generator-v4";
+
+    const templates = {
+      backend: `# 姓名
+
+**电话**：138-0000-0000 | **邮箱**：example@email.com | **微信**：wechat_id  
+**求职意向**：后端开发 | **期望城市**：一线/新一线城市 | **到岗时间**：两周内  
+**学历**：本科/硕士在读 | **政治面貌**：群众/党员 | **GitHub**：github.com/username  
+**个人主页**：blog.example.com | **年龄**：22 | **所在地**：某城市
+
+## 教育背景
+
+**某综合类大学** <span class="resume-role">计算机相关专业（硕士）</span> <span class="resume-date">2025.09 - 2028.06</span>
+
+**某理工类大学** <span class="resume-role">计算机相关专业（本科）</span> <span class="resume-date">2020.09 - 2024.06</span>
+
+**主修课程**：计算机组成原理、计算机网络、操作系统、数据结构与算法、数据库系统、软件工程、Java 程序设计、Web 应用开发  
+**成绩排名**：GPA 3.50+/4.0，专业排名前 40%  
+**语言证书**：大学英语等级考试  
+**荣誉奖项**：校级奖学金、校级优秀学生、学科竞赛奖项  
+**科研/作品**：软件作品/课程项目若干
+
+## 个人优势
+
+- **技术基础扎实**：掌握 Java、Spring Boot、MySQL、数据结构与算法，能够完成后端接口、业务逻辑和数据库设计。
+- **项目落地完整**：具备从需求分析、数据库建模、接口开发、系统部署到文档沉淀的完整项目经验。
+- **学习意愿强**：持续学习后端工程化、分布式系统和业务建模相关技术。
+
+## 项目经历
+
+**资源调度与任务优化系统** <span class="resume-role">全栈开发</span> <span class="resume-date">2024.01 - 2024.06</span>
+
+- **项目描述**：课程/毕业设计项目，面向资源调度场景设计任务分配与路径优化系统，支持任务管理、资源管理、策略配置和多目标优化分配。
+- **技术栈**：Spring Boot、Vue、MyBatis-Plus、MySQL、规则引擎、Maven、Git。
+- **技术实现**：后端负责用户、资源、任务、调度记录等核心模块；建立资源-任务匹配模型，并结合规则配置处理业务约束。
+- **项目亮点**：综合考虑距离、等待时间、资源容量等指标；通过分层架构降低业务耦合，提升后续策略扩展和维护效率。
+
+**在线练习与学习管理系统** <span class="resume-role">后端开发</span> <span class="resume-date">2022.10 - 2023.01</span>
+
+- **项目描述**：面向课程教学的 Web 练习平台，支持教师进行章节、题库、作业、成绩管理，学生可在线答题、查看成绩和解析。
+- **技术栈**：Spring Boot、MyBatis-Plus、MySQL、Tomcat、云服务器。
+- **技术实现**：负责用户权限、章节管理、题库管理、成绩管理等后端模块；通过 MyBatis-Plus 完成数据持久化，提高 CRUD 开发效率。
+- **部署维护**：将系统部署至云服务器，配置 JDK、MySQL、Tomcat 等运行环境，并完成基础联调和问题排查。
+
+## 实习/校园经历
+
+**学生组织/项目小组** <span class="resume-role">技术负责人/成员</span> <span class="resume-date">2021.09 - 2023.06</span>
+
+- 参与课程设计、竞赛项目和团队协作开发，负责需求拆解、后端接口实现、数据库设计和项目文档整理。
+- 在团队中承担沟通协调和进度跟进工作，能够与前端、测试和业务同学进行高效协作。
+
+## 专业技能
+
+- **后端开发**：Java、Spring Boot、MyBatis-Plus、RESTful API、Maven，理解 MVC 分层和常见业务开发流程。
+- **数据库**：MySQL、表结构设计、索引、事务、SQL 编写与基础查询优化。
+- **前端基础**：HTML、CSS、JavaScript、Vue，能够完成基础页面开发、接口联调和数据展示。
+- **算法基础**：数组、链表、栈、队列、树、图、排序、搜索，具备基础算法设计与复杂度分析能力。
+- **工程工具**：IntelliJ IDEA、Git、Linux 基础命令、Tomcat、云服务器，能够完成项目构建、部署和版本管理。
+- **文档协作**：需求说明、接口文档、数据库设计文档、项目总结，熟悉 Markdown/Office 基础写作。
+
+## 自我评价
+
+具备较强的责任心和执行力，能够在项目中主动推进问题定位与解决。关注代码可读性、模块边界和文档沉淀，期望在后端开发岗位中持续提升工程能力和业务理解能力。`,
+
+      fictional: `# 姓名
+
+**电话**：138-0000-0000 | **邮箱**：example@email.com | **地点**：某城市  
+**求职意向**：复杂系统方案设计师 | **作品集**：portfolio.example.com | **可入职时间**：两周内
+
+## 个人优势
+
+具备跨学科系统设计能力，熟悉封闭系统建模、环境参数配置、模块协同和风险预案设计。擅长将复杂约束转化为可执行方案，并通过数据监控持续优化系统稳定性。
+
+## 教育背景
+
+**某虚构大学** - 复杂系统工程  
+2020.09 - 2024.06 | GPA：3.8/4.0
+
+核心课程：系统建模、环境控制工程、资源循环设计、系统动力学、工程伦理
+
+## 实习经历
+
+**某虚构研究中心 - 初级系统设计实习生**  
+2023.07 - 2024.03
+
+- 参与封闭模拟环境的微型循环方案设计，负责多个功能模块的数据联动方案
+- 建立关键环境参数的监控看板，将异常响应时间从 30 分钟缩短至 8 分钟
+- 协助制定 12 类异常预案，包括参数波动、模块故障和流程阻塞等场景
+
+## 项目经历
+
+**封闭式模拟环境系统设计**
+
+- 基于系统动力学方法设计三层循环模型，覆盖输入、循环和反馈机制
+- 通过模拟实验验证系统在 72 小时参数波动下的稳定性，关键参数偏差控制在 6% 以内
+- 输出完整方案文档，包括系统架构图、监测指标、维护流程和风险清单
+
+**模块化功能舱概念方案**
+
+- 设计适配特殊环境的模块化空间布局
+- 对比 4 种方案组合在资源消耗、周期和稳定性上的差异
+- 制作交互式演示原型，用于展示不同参数对结果的影响
+
+## 技能专长
+
+- **建模分析**：系统动力学、参数敏感性分析、风险矩阵
+- **工具软件**：Python、Excel、Tableau、Figma、Notion
+- **工程能力**：需求拆解、方案设计、实验记录、数据看板
+- **综合素质**：跨团队沟通、文档沉淀、快速学习、英文技术阅读
+
+## 自我评价
+
+关注长期系统稳定性，善于在不确定约束下做结构化分析。对新兴技术和复杂系统设计保持高度热情，重视实验验证与工程落地。`,
+
+      frontend: `# 姓名
+
+**电话**：139-0000-0000 | **邮箱**：example@email.com | **地点**：某城市  
+**求职意向**：前端工程师 | **GitHub**：github.com/username | **博客**：blog.example.com
+
+## 个人优势
+
+具备前端开发经验，熟悉 React、Vue、TypeScript 和工程化体系。重视用户体验、性能优化和组件复用，能够独立承担复杂业务模块开发，并推动团队代码规范和效率提升。
+
+## 工作经历
+
+**某科技公司 - 前端工程师**  
+2023.04 - 至今
+
+- 负责企业级管理平台核心模块开发，覆盖权限管理、报表配置、可视化看板等场景
+- 将核心页面首屏加载时间从 3.2s 优化至 1.6s，主要通过路由懒加载、资源压缩和接口并发优化实现
+- 推动组件库建设，沉淀 30+ 通用组件，使同类页面开发周期缩短约 40%
+- 引入 TypeScript 严格模式和 ESLint 规则，降低线上类型相关缺陷
+
+**某互联网公司 - 初级前端工程师**  
+2021.07 - 2023.03
+
+- 参与移动端页面和用户中心开发，支持高并发活动场景
+- 与设计师协作完善响应式布局规范，提升多端页面一致性
+- 接入埋点系统并输出用户行为分析报表，辅助产品优化转化路径
+
+## 项目经历
+
+**低代码表单搭建平台**
+
+- 基于 React + TypeScript 实现拖拽式表单配置、实时预览和 JSON Schema 导出
+- 支持 20+ 表单控件、条件联动和自定义校验规则
+- 将运营配置表单的平均上线时间从 2 天缩短至 0.5 天
+
+## 技能专长
+
+- **语言**：TypeScript、JavaScript、HTML、CSS
+- **框架**：React、Vue3、Next.js、Vite
+- **工程化**：Webpack、pnpm、CI/CD、单元测试
+- **能力重点**：性能优化、组件设计、可维护性、跨端适配`,
+
+      data: `# 姓名
+
+**电话**：137-0000-0000 | **邮箱**：example@email.com | **地点**：某城市  
+**求职意向**：数据分析师 | **作品集**：data.example.com
+
+## 个人优势
+
+具备统计分析、业务拆解和数据可视化能力，熟悉 SQL、Python、Excel 和 BI 工具。能够围绕增长、留存、转化等业务目标建立指标体系，并输出可落地的分析建议。
+
+## 教育背景
+
+**某财经类大学** - 统计学  
+2019.09 - 2023.06
+
+## 工作经历
+
+**某平台型公司 - 数据分析师**  
+2023.07 - 至今
+
+- 搭建用户增长指标体系，覆盖获客、激活、留存、复购和流失预警
+- 使用 SQL 和 Python 分析百万级用户行为数据，定位新用户留存下降的关键环节
+- 建立活动效果评估模型，区分自然增长和活动拉动贡献，辅助预算分配
+- 制作 BI 经营看板，将周报人工整理时间从 4 小时缩短至 30 分钟
+
+## 项目经历
+
+**用户复购率提升分析**
+
+- 通过 RFM 模型对用户分层，识别高潜用户和沉睡用户
+- 设计 A/B 测试方案，对比优惠券、提醒机制和权益触达三类策略
+- 输出运营建议后，目标用户 30 日复购率提升 8.6%
+
+## 技能专长
+
+- **数据工具**：SQL、Python、Excel、Tableau、Power BI
+- **分析方法**：漏斗分析、留存分析、A/B 测试、RFM、回归分析
+- **业务理解**：用户增长、用户分层、活动分析、经营看板
+- **能力重点**：指标体系、问题拆解、可视化表达、结论落地`,
+
+      product: `# 姓名
+
+**电话**：136-0000-0000 | **邮箱**：example@email.com | **地点**：某城市  
+**求职意向**：产品经理 | **作品集**：pm.example.com
+
+## 个人优势
+
+具备从需求洞察、方案设计到上线复盘的完整产品经验。擅长用户研究、竞品分析、PRD 撰写、原型设计和跨团队推进，关注用户价值与业务指标的平衡。
+
+## 工作经历
+
+**某科技公司 - 产品经理**  
+2022.08 - 至今
+
+- 负责企业协作产品的任务管理模块，覆盖需求调研、方案设计、排期推进和效果复盘
+- 基于用户访谈和行为数据重构核心操作页面，使关键操作完成率提升 18%
+- 建立需求优先级评估模型，从用户价值、商业价值、研发成本和风险四个维度排序
+- 协调设计、研发、测试和运营团队，推动多个版本按期上线
+
+## 项目经历
+
+**智能任务推荐功能**
+
+- 分析用户任务创建、延期和完成数据，识别低效协作场景
+- 设计基于项目阶段、历史行为和截止时间的任务推荐逻辑
+- 上线后次日任务完成率提升 11%，功能渗透率达到 36%
+
+## 技能专长
+
+- **产品方法**：用户访谈、需求分析、竞品分析、数据分析、版本规划
+- **工具**：Axure、Figma、墨刀、Jira、SQL、Excel
+- **文档**：BRD、MRD、PRD、流程图、原型图、复盘报告
+- **能力重点**：需求判断、跨团队协作、数据驱动、用户体验`,
+
+      marketing: `# 姓名
+
+**电话**：135-0000-0000 | **邮箱**：example@email.com | **地点**：某城市  
+**求职意向**：品牌市场专员 | **作品集**：brand.example.com
+
+## 个人优势
+
+熟悉品牌传播、内容策划、社媒运营和活动执行。能够根据品牌定位制定内容策略，并通过数据复盘优化传播效率。具备较强的文案、审美和项目推进能力。
+
+## 工作经历
+
+**某消费品牌公司 - 市场运营专员**  
+2022.09 - 至今
+
+- 负责多个内容渠道的选题策划和日常运营
+- 策划多场新品传播活动，累计曝光达到百万级，站外引流转化率提升 20%+
+- 建立内容选题库和投放复盘模板，使内容产出效率提升约 35%
+- 协同设计、达人和媒介团队完成品牌视觉、短视频脚本和内容落地
+
+## 项目经历
+
+**新品整合传播项目**
+
+- 围绕某生活方式主题制定传播主题和内容矩阵
+- 筛选多位内容创作者并分层设计合作形式，包括测评、场景图文和短视频
+- 项目期间品牌搜索指数提升 40%+，新品首月销售额超过目标
+
+## 技能专长
+
+- **市场能力**：品牌定位、内容策划、活动执行、媒介投放、用户洞察
+- **平台经验**：主流内容平台、短视频平台、社交媒体平台
+- **工具**：Figma、剪映、Canva、飞书、Excel
+- **能力重点**：文案表达、审美判断、项目管理、数据复盘`,
+
+      finance: `# 姓名
+
+**电话**：134-0000-0000 | **邮箱**：example@email.com | **地点**：某城市  
+**求职意向**：财务分析师 | **证书**：金融/财务相关证书
+
+## 个人优势
+
+具备财务建模、预算分析、经营分析和数据处理能力。熟悉三大财务报表、预算滚动预测、成本费用分析和管理层报告输出，能够支持业务决策。
+
+## 教育背景
+
+**某财经类大学** - 会计学  
+2018.09 - 2022.06
+
+## 工作经历
+
+**某消费科技公司 - 财务分析专员**  
+2022.07 - 至今
+
+- 参与年度预算和季度滚动预测，覆盖收入、成本、费用和现金流模块
+- 搭建部门费用分析模型，识别异常费用波动并推动责任部门复盘
+- 制作月度经营分析报告，向管理层呈现收入结构、毛利变化和费用效率
+- 使用 Excel Power Query 优化数据清洗流程，将报表更新时间减少 50%
+
+## 项目经历
+
+**新业务线盈利模型测算**
+
+- 建立收入、履约成本、营销费用和人力成本模型
+- 设计乐观、中性、保守三种情景假设，测算盈亏平衡点和回收周期
+- 输出投资建议，为管理层新业务立项提供财务依据
+
+## 技能专长
+
+- **财务能力**：预算管理、经营分析、成本分析、财务建模、现金流分析
+- **工具**：Excel、Power Query、SQL、Power BI、财务系统
+- **知识基础**：三大报表、管理会计、企业估值、内部控制
+- **能力重点**：数据准确性、业务理解、风险意识、报告表达`,
+
+      design: `# 姓名
+
+**电话**：133-0000-0000 | **邮箱**：example@email.com | **地点**：某城市  
+**求职意向**：工业设计师 | **作品集**：design.example.com
+
+## 个人优势
+
+具备产品造型、用户研究、CMF、结构协同和设计落地经验。关注产品使用场景、制造可行性和品牌一致性，能够从概念草图推进到量产配合。
+
+## 教育背景
+
+**某设计类大学** - 工业设计  
+2019.09 - 2023.06
+
+## 项目经历
+
+**小型家用设备设计**
+
+- 基于居家使用场景进行用户访谈和竞品分析，明确“低噪音、易清洁、轻量化”设计目标
+- 完成 20+ 概念草图、3 套方案建模和 1 套高保真渲染
+- 与结构工程师协作优化关键部件、拆卸方式和内部空间布局
+- 输出 CMF 方案、爆炸图、尺寸图和展示海报
+
+**儿童学习用品概念设计**
+
+- 分析儿童学习场景中的安全、操作和舒适性需求
+- 设计防误触结构、柔性调节结构和简化交互按钮
+- 使用 KeyShot 完成材质渲染，并制作产品故事板
+
+## 技能专长
+
+- **设计能力**：用户研究、概念设计、CMF、产品渲染、设计表达
+- **软件工具**：Rhino、KeyShot、SolidWorks、Photoshop、Illustrator、Figma
+- **工程理解**：结构配合、材料工艺、量产约束、人机尺寸
+- **能力重点**：审美判断、场景洞察、可制造性、作品集表达`,
+
+      mechanical: `# 姓名
+
+**电话**：132-0000-0000 | **邮箱**：example@email.com | **地点**：某城市  
+**求职意向**：机械工程师 | **证书**：机械设计相关证书
+
+## 个人优势
+
+具备机械结构设计、三维建模、工程图输出和样机测试经验。熟悉常用机械传动、材料选择、加工工艺和装配约束，能够与电气、采购、生产团队协同推进项目。
+
+## 教育背景
+
+**某理工类大学** - 机械设计制造及其自动化  
+2018.09 - 2022.06
+
+## 工作经历
+
+**某智能装备公司 - 机械工程师**  
+2022.07 - 至今
+
+- 负责自动化设备的结构设计，包括机架、治具、传动机构和防护结构
+- 使用 SolidWorks 完成三维建模、工程图和 BOM 输出
+- 配合供应商解决加工公差、装配干涉和材料替代问题
+- 参与样机调试，使设备节拍从 8s 优化至 6.5s
+
+## 项目经历
+
+**小型自动送料机构设计**
+
+- 设计输送、定位夹具和推料机构
+- 通过结构优化降低卡料概率，并提升维护便利性
+- 输出完整工程图纸、BOM、装配说明和调试记录
+
+## 技能专长
+
+- **机械设计**：结构设计、传动机构、夹具设计、装配设计、工程图
+- **软件工具**：SolidWorks、AutoCAD、Creo、Excel
+- **工艺理解**：钣金、机加工、表面处理、公差配合
+- **能力重点**：工程落地、问题排查、跨部门协作、成本意识`
+    };
+
+    const markdownEl = document.getElementById("markdown");
+    const previewEl = document.getElementById("preview");
+    const resumeIntroEl = document.getElementById("resumeIntro");
+    const resumeRestEl = document.getElementById("resumeRest");
+    const avatarInputEl = document.getElementById("avatarInput");
+    const avatarPreviewEl = document.getElementById("avatarPreview");
+    const themeSelectEl = document.getElementById("themeSelect");
+    const templateSelectEl = document.getElementById("templateSelect");
+    const saveStatusEl = document.getElementById("saveStatus");
+
+    const loadTemplateBtn = document.getElementById("loadTemplateBtn");
+    const clearBtn = document.getElementById("clearBtn");
+    const removeAvatarBtn = document.getElementById("removeAvatarBtn");
+    const exportPdfBtn = document.getElementById("exportPdfBtn");
+
+    const THEME_CLASSES = ["theme-blue", "theme-green", "theme-purple", "theme-dark", "theme-minimal"];
+
+    const PURIFY_CONFIG = {
+      ADD_TAGS: ["span"],
+      ADD_ATTR: ["class", "target", "rel", "title", "href"]
+    };
+
+    if (window.marked) {
+      marked.setOptions({ breaks: true, gfm: true });
+    }
+
+    const state = loadState();
+
+    markdownEl.value = state.markdown || templates.backend;
+    themeSelectEl.value = state.theme || "theme-blue";
+    templateSelectEl.value = state.template || "backend";
+
+    if (state.avatar) {
+      avatarPreviewEl.src = state.avatar;
+      avatarPreviewEl.classList.add("visible");
+    }
+
+    applyTheme(themeSelectEl.value);
+    renderResume();
+
+    markdownEl.addEventListener("input", () => {
+      renderResume();
+      saveState();
+    });
+
+    themeSelectEl.addEventListener("change", () => {
+      applyTheme(themeSelectEl.value);
+      saveState();
+    });
+
+    templateSelectEl.addEventListener("change", saveState);
+
+    loadTemplateBtn.addEventListener("click", () => {
+      const selected = templateSelectEl.value;
+      const hasContent = markdownEl.value.trim().length > 0;
+
+      if (hasContent) {
+        const ok = confirm("载入模板会覆盖当前 Markdown 内容，确认继续？");
+        if (!ok) return;
+      }
+
+      markdownEl.value = templates[selected] || templates.backend || "";
+      renderResume();
+      saveState();
+    });
+
+    clearBtn.addEventListener("click", () => {
+      if (!confirm("确认清空当前 Markdown 内容？")) return;
+      markdownEl.value = "";
+      renderResume();
+      saveState();
+    });
+
+    avatarInputEl.addEventListener("change", handleAvatarUpload);
+
+    removeAvatarBtn.addEventListener("click", () => {
+      avatarInputEl.value = "";
+      avatarPreviewEl.removeAttribute("src");
+      avatarPreviewEl.classList.remove("visible");
+      saveState();
+    });
+
+    // ============================================
+    // 调用原生浏览器打印功能，输出矢量+可选中PDF
+    // ============================================
+    exportPdfBtn.addEventListener("click", () => {
+      const oldText = exportPdfBtn.textContent;
+      exportPdfBtn.disabled = true;
+      exportPdfBtn.textContent = "准备打印...";
+
+      // 临时修改网页标题，让浏览器自动使用此标题作为 PDF 文件名
+      const oldTitle = document.title;
+      document.title = getResumeFileName();
+
+      setTimeout(() => {
+        window.print();
+
+        // 打印对话框关闭后，还原状态
+        document.title = oldTitle;
+        exportPdfBtn.disabled = false;
+        exportPdfBtn.textContent = oldText;
+      }, 300);
+    });
+
+    function parseMarkdown(markdown) {
+      if (window.marked && typeof marked.parse === "function") {
+        return marked.parse(markdown);
+      }
+      return escapeHtml(markdown)
+        .replace(/^# (.*)$/gm, "<h1>$1</h1>")
+        .replace(/^## (.*)$/gm, "<h2>$1</h2>")
+        .replace(/^### (.*)$/gm, "<h3>$1</h3>")
+        .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+        .replace(/\n/g, "<br>");
+    }
+
+    function sanitizeHtml(html) {
+      if (window.DOMPurify && typeof DOMPurify.sanitize === "function") {
+        return DOMPurify.sanitize(html, PURIFY_CONFIG);
+      }
+      return html;
+    }
+
+    function hardenLinks(root) {
+      root.querySelectorAll("a[href]").forEach(link => {
+        const href = (link.getAttribute("href") || "").trim();
+        if (/^javascript:/i.test(href)) {
+          link.removeAttribute("href");
+          return;
+        }
+        link.setAttribute("target", "_blank");
+        link.setAttribute("rel", "noopener noreferrer");
+      });
+    }
+
+    function renderResume() {
+      const markdown = markdownEl.value.trim();
+
+      resumeIntroEl.innerHTML = "";
+      resumeRestEl.innerHTML = "";
+
+      if (!markdown) {
+        resumeIntroEl.innerHTML = '<h1>我的简历</h1><p class="legacy-intro">请在左侧输入 Markdown 内容，或点击“载入模板”。</p>';
+        updateSaveStatus();
+        return;
+      }
+
+      const rawHtml = parseMarkdown(markdown);
+      const safeHtml = sanitizeHtml(rawHtml);
+
+      const temp = document.createElement("div");
+      temp.innerHTML = safeHtml;
+      hardenLinks(temp);
+
+      const firstH1 = temp.querySelector("h1");
+      const introFragment = document.createDocumentFragment();
+      const restHost = document.createElement("div");
+
+      if (firstH1) {
+        introFragment.appendChild(firstH1.cloneNode(true));
+
+        let inBody = false;
+        Array.from(temp.childNodes).forEach(node => {
+          if (node === firstH1) return;
+
+          if (node.nodeType === 1 && node.tagName === "H2") {
+            inBody = true;
+          }
+
+          if (inBody) {
+            restHost.appendChild(node.cloneNode(true));
+          } else {
+            introFragment.appendChild(node.cloneNode(true));
+          }
+        });
+      } else {
+        resumeIntroEl.innerHTML = '<h1>我的简历</h1><p class="legacy-intro">建议使用一级标题填写姓名，例如：# 张三</p>';
+        Array.from(temp.childNodes).forEach(node => restHost.appendChild(node.cloneNode(true)));
+      }
+
+      if (firstH1) {
+        resumeIntroEl.appendChild(introFragment);
+        normalizeBasicInfo();
+      }
+
+      resumeRestEl.appendChild(wrapSections(restHost));
+      polishResumeLayout();
+      updateSaveStatus();
+    }
+
+    function wrapSections(sourceEl) {
+      const fragment = document.createDocumentFragment();
+      let currentSection = null;
+
+      Array.from(sourceEl.childNodes).forEach(node => {
+        if (node.nodeType === 1 && node.tagName === "H2") {
+          currentSection = document.createElement("section");
+          currentSection.className = "resume-section";
+          currentSection.appendChild(node.cloneNode(true));
+          fragment.appendChild(currentSection);
+          return;
+        }
+
+        if (!currentSection) {
+          currentSection = document.createElement("section");
+          currentSection.className = "resume-section";
+          fragment.appendChild(currentSection);
+        }
+
+        currentSection.appendChild(node.cloneNode(true));
+      });
+
+      Array.from(fragment.querySelectorAll(".resume-section")).forEach(section => {
+        const itemCount = section.querySelectorAll("li").length;
+        const textLength = section.textContent.length;
+
+        if (itemCount > 8 || textLength > 750) {
+          section.classList.add("long-section");
+        }
+        enhanceBlocks(section);
+      });
+
+      return fragment;
+    }
+
+    function enhanceBlocks(section) {
+      const children = Array.from(section.childNodes);
+      let block = null;
+
+      children.forEach(node => {
+        if (node.nodeType === 1 && node.tagName === "P" && node.querySelector("strong")) {
+          block = document.createElement("div");
+          block.className = "resume-block";
+          section.insertBefore(block, node);
+          block.appendChild(node);
+          return;
+        }
+
+        if (block && node.nodeType === 1 && ["P", "UL"].includes(node.tagName)) {
+          block.appendChild(node);
+        } else {
+          block = null;
+        }
+      });
+    }
+
+    function polishResumeLayout() {
+      const datePattern = /((?:19|20)\d{2}[.\/-]\d{1,2}\s*(?:-|–|—|~|至)\s*(?:(?:19|20)\d{2}[.\/-]\d{1,2}|至今|Now|Present))/;
+
+      document.querySelectorAll("#resumeRest .resume-block > p:first-child, #resumeRest section > p").forEach(p => {
+        if (p.querySelector(".resume-date")) {
+          p.classList.add("item-line");
+          return;
+        }
+
+        const text = p.textContent || "";
+        const match = text.match(datePattern);
+        if (!match || !p.querySelector("strong")) return;
+
+        const date = match[1];
+        const escapedDate = date.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+        p.innerHTML = p.innerHTML.replace(new RegExp(escapedDate), `<span class="resume-date">${date}</span>`);
+        p.classList.add("item-line");
+      });
+
+      document.querySelectorAll("#resumeRest .resume-block > p:first-child, #resumeRest section > p.item-line").forEach(p => {
+        if (!p.querySelector(".resume-date")) return;
+        const dateEl = p.querySelector(".resume-date");
+        const main = document.createElement("span");
+        main.className = "item-title-main";
+        Array.from(p.childNodes).forEach(node => {
+          if (node !== dateEl) main.appendChild(node.cloneNode(true));
+        });
+        p.innerHTML = "";
+        p.appendChild(main);
+        p.appendChild(dateEl.cloneNode(true));
+      });
+    }
+
+    function normalizeBasicInfo() {
+      const h1 = resumeIntroEl.querySelector("h1");
+      const nodes = Array.from(resumeIntroEl.childNodes).filter(node => node !== h1);
+      const items = collectBasicInfoItems(nodes);
+
+      nodes.forEach(node => node.remove());
+      if (!items.length) return;
+
+      const grid = document.createElement("div");
+      grid.className = "basic-info-grid";
+
+      items.forEach(item => {
+        const parsed = parseBasicInfoItem(item);
+        const box = document.createElement("div");
+        box.className = "basic-info-item";
+
+        const labelEl = document.createElement("span");
+        labelEl.className = "basic-info-label";
+        labelEl.textContent = parsed.label ? parsed.label.replace(/[：:]+$/, "") + "：" : "信息：";
+
+        const valueEl = document.createElement("span");
+        valueEl.className = "basic-info-value";
+        valueEl.innerHTML = parsed.valueHtml || "-";
+
+        box.appendChild(labelEl);
+        box.appendChild(valueEl);
+        grid.appendChild(box);
+      });
+
+      resumeIntroEl.appendChild(grid);
+    }
+
+    function collectBasicInfoItems(nodes) {
+      const items = [];
+
+      nodes.forEach(node => {
+        if (node.nodeType === Node.TEXT_NODE) {
+          splitInfoHtml(escapeHtml(node.textContent)).forEach(item => items.push(item));
+          return;
+        }
+
+        if (node.nodeType !== Node.ELEMENT_NODE) return;
+        const tag = node.tagName;
+        if (["SCRIPT", "STYLE"].includes(tag)) return;
+
+        const html = tag === "P" || tag === "DIV" ? node.innerHTML : node.outerHTML;
+        splitInfoHtml(html).forEach(item => items.push(item));
+      });
+
+      return items.map(item => item.trim()).filter(item => stripHtml(item).trim().length > 0);
+    }
+
+    function splitInfoHtml(html) {
+      return html.replace(/<br\s*\/?\s*>/gi, "|").split(/\s*\|\s*/).map(item => item.trim()).filter(Boolean);
+    }
+
+    function parseBasicInfoItem(itemHtml) {
+      const sanitized = sanitizeHtml(itemHtml).trim();
+      const plain = stripHtml(sanitized).replace(/\s+/g, " ").trim();
+      const colonMatch = plain.match(/[:：]/);
+
+      if (!colonMatch) {
+        return { label: "信息", valueHtml: sanitized };
+      }
+
+      const colonIndex = colonMatch.index;
+      const label = plain.slice(0, colonIndex).replace(/^[-•·]+\s*/, "").trim();
+      let valueHtml = sanitized
+        .replace(/^\s*[-•·]+\s*/, "")
+        .replace(/^\s*<strong>\s*[^<：:]+\s*<\/strong>\s*[:：]\s*/i, "")
+        .replace(/^\s*<b>\s*[^<：:]+\s*<\/b>\s*[:：]\s*/i, "")
+        .replace(/^\s*[^<：:]+\s*[:：]\s*/, "")
+        .trim();
+
+      if (!stripHtml(valueHtml).trim()) {
+        valueHtml = escapeHtml(plain.slice(colonIndex + 1).trim());
+      }
+
+      return { label, valueHtml };
+    }
+
+    function stripHtml(html) {
+      const div = document.createElement("div");
+      div.innerHTML = html;
+      return div.textContent || div.innerText || "";
+    }
+
+    function escapeHtml(text) {
+      return String(text || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+    }
+
+    function handleAvatarUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      if (!file.type.startsWith("image/")) {
+        alert("请上传图片文件。");
+        return;
+      }
+
+      if (file.size > 2 * 1024 * 1024) {
+        alert("图片不能超过 2MB。");
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        avatarPreviewEl.src = reader.result;
+        avatarPreviewEl.classList.add("visible");
+        saveState();
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function applyTheme(theme) {
+      const nextTheme = THEME_CLASSES.includes(theme) ? theme : "theme-blue";
+      document.body.classList.remove(...THEME_CLASSES);
+      document.body.classList.add(nextTheme);
+      themeSelectEl.value = nextTheme;
+    }
+
+    function saveState() {
+      const data = {
+        markdown: markdownEl.value,
+        theme: themeSelectEl.value,
+        template: templateSelectEl.value,
+        avatar: avatarPreviewEl.classList.contains("visible") ? avatarPreviewEl.src : ""
+      };
+
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        updateSaveStatus("已自动保存");
+      } catch (error) {
+        console.warn("保存失败", error);
+        updateSaveStatus("保存失败");
+      }
+    }
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        return raw ? JSON.parse(raw) : {};
+      } catch {
+        return {};
+      }
+    }
+
+    function updateSaveStatus(text = "已自动保存") {
+      saveStatusEl.textContent = text;
+    }
+
+    function getResumeFileName() {
+      const firstLine = markdownEl.value.split("\n").find(line => line.trim().startsWith("# "));
+      const name = firstLine ? firstLine.replace(/^#\s*/, "").trim() : "简历";
+      return `${name}-简历`.replace(/[\\/:*?"<>|]/g, "-").replace(/\s+/g, " ").trim();
+    }
+  </script>
+</body>
+
+</html>
