@@ -1,0 +1,1259 @@
+<!doctype html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>婚前协议草案生成器</title>
+  <style>
+    :root {
+      --bg: #f6f7f9;
+      --panel: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --line: #e5e7eb;
+      --accent: #2563eb;
+      --accent-dark: #1d4ed8;
+      --danger: #b91c1c;
+      --warn-bg: #fff7ed;
+      --warn-border: #fed7aa;
+      --success: #047857;
+      --shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+      --radius: 16px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    header {
+      background: linear-gradient(135deg, #0f172a, #1d4ed8);
+      color: white;
+      padding: 32px 24px;
+    }
+
+    header .wrap {
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 28px;
+      letter-spacing: -0.02em;
+    }
+
+    header p {
+      margin: 0;
+      max-width: 980px;
+      color: rgba(255, 255, 255, 0.86);
+      font-size: 14px;
+    }
+
+    main {
+      max-width: 1280px;
+      margin: 24px auto 56px;
+      padding: 0 20px;
+      display: grid;
+      grid-template-columns: minmax(360px, 520px) 1fr;
+      gap: 20px;
+      align-items: start;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .form-panel {
+      position: sticky;
+      top: 16px;
+      max-height: calc(100vh - 32px);
+      overflow: auto;
+    }
+
+    .card-header {
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .card-header h2 {
+      font-size: 18px;
+      margin: 0;
+    }
+
+    .progress-wrap {
+      min-width: 120px;
+      text-align: right;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .progress {
+      height: 8px;
+      background: #eef2ff;
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 6px;
+    }
+
+    .progress span {
+      display: block;
+      height: 100%;
+      width: 0;
+      background: var(--accent);
+      transition: width 180ms ease;
+    }
+
+    form {
+      padding: 8px 20px 22px;
+    }
+
+    details {
+      border-bottom: 1px solid var(--line);
+      padding: 10px 0;
+    }
+
+    details:last-of-type {
+      border-bottom: 0;
+    }
+
+    summary {
+      cursor: pointer;
+      font-weight: 700;
+      padding: 8px 0;
+      outline: none;
+      display: flex;
+      align-items: center;
+    }
+
+    summary::before {
+      content: '▶';
+      font-size: 10px;
+      margin-right: 8px;
+      color: var(--accent);
+      transition: transform 0.2s ease;
+    }
+
+    details[open] summary::before {
+      transform: rotate(90deg);
+    }
+
+    /* 隐藏默认的小三角 */
+    summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .section-help {
+      color: var(--muted);
+      font-size: 13px;
+      margin: -2px 0 12px 18px;
+    }
+
+    .legal-basis {
+      border: 1px solid #dbeafe;
+      background: #f8fbff;
+      color: #1e3a8a;
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-size: 13px;
+      margin: 10px 0 14px;
+    }
+
+    .field {
+      margin: 14px 0 14px 18px;
+    }
+
+    label {
+      display: block;
+      font-weight: 650;
+      margin-bottom: 6px;
+      font-size: 14px;
+    }
+
+    input[type="text"],
+    input[type="date"],
+    input[type="number"],
+    textarea,
+    select {
+      width: 100%;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      padding: 10px 11px;
+      font: inherit;
+      background: white;
+      color: var(--text);
+      font-size: 14px;
+      margin-top: 4px;
+    }
+
+    textarea {
+      min-height: 82px;
+      resize: vertical;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-left: 18px;
+    }
+
+    .checks {
+      display: grid;
+      gap: 8px;
+      margin-top: 8px;
+      margin-left: 18px;
+    }
+
+    .checkline {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      font-weight: 400;
+      margin: 0;
+      font-size: 14px;
+    }
+
+    .checkline input {
+      margin-top: 3px;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding-top: 16px;
+      position: sticky;
+      bottom: 0;
+      background: linear-gradient(to top, white 85%, rgba(255, 255, 255, 0));
+    }
+
+    button {
+      border: 0;
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-weight: 700;
+      cursor: pointer;
+      font: inherit;
+      font-size: 14px;
+    }
+
+    .primary {
+      background: var(--accent);
+      color: white;
+    }
+
+    .primary:hover {
+      background: var(--accent-dark);
+    }
+
+    .secondary {
+      background: #eef2ff;
+      color: #1e40af;
+    }
+
+    .ghost {
+      background: #f3f4f6;
+      color: var(--text);
+    }
+
+    .danger {
+      background: #fee2e2;
+      color: var(--danger);
+    }
+
+    .preview-panel {
+      min-height: 80vh;
+    }
+
+    .preview-toolbar {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .toolbar-left {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .status {
+      color: var(--success);
+      font-size: 13px;
+      min-height: 20px;
+    }
+
+    .warnings {
+      margin: 18px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .warning {
+      border: 1px solid var(--warn-border);
+      background: var(--warn-bg);
+      border-radius: 12px;
+      padding: 12px 14px;
+      color: #7c2d12;
+      font-size: 13px;
+    }
+
+    .warning strong {
+      color: #9a3412;
+    }
+
+    #draft {
+      padding: 26px 34px 42px;
+      background: white;
+      border-radius: 0 0 var(--radius) var(--radius);
+      font-family: "Songti SC", "SimSun", "Noto Serif CJK SC", serif;
+      color: #111827;
+      font-size: 15px;
+    }
+
+    #draft h2 {
+      text-align: center;
+      font-size: 22px;
+      margin: 6px 0 24px;
+    }
+
+    #draft h3 {
+      margin-top: 24px;
+      font-size: 16px;
+      border-bottom: 1px solid #e5e7eb;
+      padding-bottom: 6px;
+      font-weight: bold;
+      page-break-after: avoid;
+      break-after: avoid;
+    }
+
+    #draft p {
+      margin: 9px 0;
+      text-indent: 2em;
+    }
+
+    #draft p.no-indent {
+      text-indent: 0;
+    }
+
+    #draft ol {
+      padding-left: 2em;
+      margin: 8px 0;
+    }
+
+    #draft li {
+      margin: 6px 0;
+      padding-left: 4px;
+    }
+
+    .placeholder {
+      color: #9ca3af;
+      font-style: italic;
+    }
+
+    .signature-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 28px;
+      margin-top: 40px;
+      padding: 0 2em;
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+
+    .signature-box {
+      min-height: 110px;
+      border-top: 1px solid #111827;
+      padding-top: 10px;
+    }
+
+    .small-note {
+      color: #6b7280;
+      font-size: 12px;
+      margin-top: 16px;
+      text-align: center;
+      text-indent: 0 !important;
+    }
+
+    @media (max-width: 640px) {
+      .grid-2 {
+        grid-template-columns: 1fr;
+        margin-left: 0;
+      }
+
+      .field,
+      .checks,
+      .section-help {
+        margin-left: 0;
+      }
+    }
+
+    @media (max-width: 980px) {
+      main {
+        grid-template-columns: 1fr;
+      }
+
+      .form-panel {
+        position: static;
+        max-height: none;
+      }
+    }
+
+    @media print {
+      body {
+        background: white;
+      }
+
+      header,
+      .form-panel,
+      .preview-toolbar,
+      .warnings {
+        display: none !important;
+      }
+
+      main {
+        display: block;
+        margin: 0;
+        padding: 0;
+        max-width: none;
+      }
+
+      .card {
+        border: 0;
+        box-shadow: none;
+      }
+
+      #draft {
+        padding: 0;
+        font-size: 12pt;
+      }
+
+      .placeholder {
+        color: #000;
+        text-decoration: underline;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="wrap">
+      <h1>婚前协议草案生成器</h1>
+      <p>生成内容仅为起草草案，不替代律师实质审查；涉及房产登记、父母大额出资、公司股权、代持、跨境资产、信托或高净值税务安排的，建议由专业家事律师逐条复核。</p>
+    </div>
+  </header>
+
+  <main>
+    <section class="card form-panel">
+      <div class="card-header">
+        <h2>定制问卷</h2>
+        <div class="progress-wrap">
+          <span id="progressText">0% 完成</span>
+          <div class="progress"><span id="progressBar"></span></div>
+        </div>
+      </div>
+
+      <form id="prenupForm">
+        <div class="legal-basis">
+          <strong>定位：</strong>可重点约定财产归属、收益、债务、父母出资、保险受益、保密与争议解决；<br />但子女抚养、限制离婚自由、剥夺基本权益、用协议直接排除继承人法定权利等条款，存在较高无效或被调整风险。
+        </div>
+
+        <details open>
+          <summary>双方当事人信息</summary>
+          <p class="section-help">用于生成协议首部、签署信息和管辖条款。</p>
+          <div class="grid-2">
+            <div class="field"><label>甲方姓名<input name="partyAName" type="text" placeholder="例如：张三"
+                  data-required></label></div>
+            <div class="field"><label>甲方身份证号<input name="partyAId" type="text" placeholder="十八位身份证号"
+                  data-required></label></div>
+          </div>
+          <div class="grid-2">
+            <div class="field"><label>乙方姓名<input name="partyBName" type="text" placeholder="例如：李四"
+                  data-required></label></div>
+            <div class="field"><label>乙方身份证号<input name="partyBId" type="text" placeholder="十八位身份证号"
+                  data-required></label></div>
+          </div>
+          <div class="grid-2">
+            <div class="field"><label>甲方邮箱/手机号<input name="partyAContact" type="text" placeholder="用于送达和确认沟通记录"></label>
+            </div>
+            <div class="field"><label>乙方邮箱/手机号<input name="partyBContact" type="text" placeholder="用于送达和确认沟通记录"></label>
+            </div>
+          </div>
+          <div class="grid-2">
+            <div class="field"><label>双方国籍/户籍或经常居住地<input name="residencyInfo" type="text"
+                  placeholder="例如：均为中国籍，北京经常居住"></label></div>
+            <div class="field"><label>协议预计签署日期<input name="signingDate" type="date"></label></div>
+          </div>
+          <div class="grid-2">
+            <div class="field"><label>拟登记结婚日期<input name="marriageDate" type="date"></label></div>
+            <div class="field"><label>协议签署城市<input name="city" type="text" placeholder="例如：北京市朝阳区"></label></div>
+          </div>
+          <div class="field"><label>双方通讯地址<textarea name="addresses"
+                placeholder="分别写明甲方、乙方常住地址或法定送达地址（用于法院文书送达）"></textarea></label></div>
+        </details>
+
+        <details open>
+          <summary>核心诉求与生成范围</summary>
+          <div class="checks">
+            <label class="checkline"><input type="checkbox" name="goalSeparateProperty" value="yes" checked>
+              明确婚前财产、婚后个人财产与共同财产边界</label>
+            <label class="checkline"><input type="checkbox" name="goalDebtShield" value="yes" checked>
+              防止一方个人债务、担保、经营风险牵连另一方</label>
+            <label class="checkline"><input type="checkbox" name="goalBusiness" value="yes">
+              保护公司股权、创业项目、知识产权或投资收益</label>
+            <label class="checkline"><input type="checkbox" name="goalParents" value="yes" checked>
+              明确父母出资、赠与、继承、未来遗嘱安排</label>
+            <label class="checkline"><input type="checkbox" name="goalLifestyle" value="yes">
+              添加宠物、保险、保密、居住使用等生活安排</label>
+            <label class="checkline"><input type="checkbox" name="goalDisclosure" value="yes" checked>
+              做完整财产披露，降低“隐瞒重大财产/显失公平”风险</label>
+          </div>
+          <div class="field"><label>其他目标或底线<textarea name="goalOther"
+                placeholder="例如：双方父母出资必须回流各自家庭；不得用夫妻共同财产给第三者转账；创业失败债务不牵连家庭基本资产等。"></textarea></label></div>
+        </details>
+
+        <details open>
+          <summary>财产制度及收益归属</summary>
+          <p class="section-help">不仅要约定本金，更要明确孳息、投资收益和继承财产的归属，这是司法实践中争议最大的部分。</p>
+          <div class="field">
+            <label>婚后财产总体制度
+              <select name="propertyRegime">
+                <option value="separate">婚前财产及婚后各自收入原则上归各自所有（收支各自独立）</option>
+                <option value="mixed">婚前财产各自所有，婚后收入部分共同、部分各自所有</option>
+                <option value="community">婚前财产各自所有，婚后收入原则上共同所有（法定默认）</option>
+                <option value="custom">自定义</option>
+              </select>
+            </label>
+          </div>
+          <div class="field"><label>自定义财产制度补充<textarea name="customRegime"
+                placeholder="当选择“自定义”时填写；也可补充双方对收入、共同账户、个人账户的特殊规则。"></textarea></label></div>
+          <div class="field">
+            <label>婚前财产在婚后产生的收益
+              <select name="investmentIncomeRule">
+                <option value="separate">婚前财产在婚后产生的孳息、自然增值及【投资收益】均归个人所有</option>
+                <option value="legal">孳息和自然增值归个人，但【投资收益】（如炒股盈利、公司分红）归夫妻共同所有</option>
+              </select>
+            </label>
+          </div>
+          <div class="field">
+            <label>婚后继承或受赠财产归属
+              <select name="inheritanceRule">
+                <option value="separate">明确归受继承/受赠方个人所有（防范因长辈未立遗嘱导致财产变为夫妻共同财产）</option>
+                <option value="community">作为夫妻共同财产（遗嘱/赠与合同另有明确约定的除外）</option>
+              </select>
+            </label>
+          </div>
+        </details>
+
+        <details>
+          <summary>婚前资产清单确认</summary>
+          <p class="section-help">尽可能写明唯一识别码：房产不动产权证号、车辆识别代号（车架号）、银行账号尾号、公司统一信用代码等。</p>
+          <div class="field"><label>甲方婚前房产<textarea name="aRealEstate"
+                placeholder="地址、权证号、登记权利人、贷款余额、是否有父母出资"></textarea></label></div>
+          <div class="field"><label>乙方婚前房产<textarea name="bRealEstate"></textarea></label></div>
+          <div class="field"><label>甲方婚前金融资产<textarea name="aFinancial"
+                placeholder="存款、股票、基金、理财、大额保单等（建议写账户尾号及当前估值）"></textarea></label></div>
+          <div class="field"><label>乙方婚前金融资产<textarea name="bFinancial"></textarea></label></div>
+          <div class="field"><label>甲方公司股权/经营权益<textarea name="aEquity"
+                placeholder="公司名称、统一社会信用代码、持股比例、出资来源"></textarea></label></div>
+          <div class="field"><label>乙方公司股权/经营权益<textarea name="bEquity"></textarea></label></div>
+          <div class="field"><label>其他重要婚前财产<textarea name="otherPremarital"
+                placeholder="车辆、贵重首饰、知识产权、债权、收藏品、虚拟货币等"></textarea></label></div>
+        </details>
+
+        <details>
+          <summary>房产特殊规则与父母出资</summary>
+          <div class="field">
+            <label>婚后购房权属规则
+              <select name="postMarriageHouseRule">
+                <option value="title">严格以不动产登记薄为准（登记在谁名下/比例多少，即归谁/按比例）</option>
+                <option value="contribution">穿透登记，按双方及各自父母实际出资比例确定权益份额</option>
+                <option value="community">婚后购房原则上属于夫妻共同财产（法定默认）</option>
+              </select>
+            </label>
+          </div>
+          <div class="field">
+            <label>父母出资定性
+              <select name="parentContributionType">
+                <option value="individual">婚后无论哪方父母出资（购房/购车/大额转账），均视为对自己子女个人的单方赠与</option>
+                <option value="community">婚后父母出资，若无明确书面赠与协议，视为对夫妻双方的共同赠与</option>
+              </select>
+            </label>
+          </div>
+          <div class="field"><label>房贷还款及婚后增值处理<textarea name="mortgageRule"
+                placeholder="例如：婚前个人房产，婚后共同还贷部分及其对应增值，离婚时由产权人按实际共同还贷金额的一半及增值比例补偿另一方。"></textarea></label></div>
+        </details>
+
+        <details>
+          <summary>婚后收入与家庭开支安排</summary>
+          <div class="field">
+            <label>工资、奖金、劳务报酬归属
+              <select name="incomeRule">
+                <option value="separate">各自取得的收入归各自所有（收支各自独立），但需承担共同开支</option>
+                <option value="shared">原则上作为夫妻共同财产</option>
+                <option value="split">约定比例进入家庭共同账户，其余归个人所有</option>
+              </select>
+            </label>
+          </div>
+          <div class="grid-2">
+            <div class="field"><label>共同账户存入比例/金额<input name="jointAccountPct" type="text"
+                  placeholder="例如：每月各存入1万元"></label></div>
+            <div class="field">
+              <label>家庭开支分担方式
+                <select name="expenseRule">
+                  <option value="equal">双方平均分担（各承担一半）</option>
+                  <option value="incomeRatio">按实际收入比例分担</option>
+                  <option value="fixed">使用共同账户资金支付，不足部分协商</option>
+                </select>
+              </label>
+            </div>
+          </div>
+          <div class="field"><label>家庭开支具体包含<textarea name="expenseDetails"
+                placeholder="建议列明：房租/房贷、水电气物业、日常饮食、子女教育医疗、双方父母赡养费等。"></textarea></label></div>
+        </details>
+
+        <details>
+          <summary>债务防火墙与大额支出（共债共签）</summary>
+          <p class="section-help">依《民法典》第一千零六十四条设定债务隔离墙，防止一方赌博或恶意举债牵连另一方。</p>
+          <div class="field"><label>婚前已有债务如实披露<textarea name="premaritalDebt"
+                placeholder="分别列明债权人、金额、用途、还款责任（如无则填“无”）"></textarea></label></div>
+          <div class="field">
+            <label>未经配偶签字的债务认定
+              <select name="personalDebtRule">
+                <option value="strict">未经配偶签字确认或事后追认，且超出家庭日常生活需要的债务，属于个人债务</option>
+                <option value="loose">按法定规则处理</option>
+              </select>
+            </label>
+          </div>
+          <div class="field"><label>大额支出审批阈值<input name="approvalThreshold" type="text"
+                placeholder="例如：单笔超过人民币五万元的借贷、担保、对外投资，需双方书面同意"></label></div>
+        </details>
+
+        <details>
+          <summary>子女、宠物与特殊抚养安排</summary>
+          <p class="section-help">注意：关于未成年子女抚养权的绝对性约定（如“若出轨孩子无条件归另一方”）在法院通常无效，仅作意向参考；但宠物归属约定目前法院大多予以认可。</p>
+          <div class="field"><label>是否计划生育/已有子女情况<textarea name="childrenPlan"
+                placeholder="例如：暂无子女；计划婚后生育；一方已有子女等。"></textarea></label></div>
+          <div class="field"><label>宠物归属与抚养安排<textarea name="petRule"
+                placeholder="例如：婚前宠物狗归甲方个人所有；婚后产生的饲养、医疗费用由双方共同承担。"></textarea></label></div>
+          <div class="field"><label>离婚时子女抚养意向<textarea name="custodyIntent"
+                placeholder="意向性条款：不建议写成绝对放弃抚养权或无需支付抚养费。"></textarea></label></div>
+        </details>
+
+        <details>
+          <summary>忠诚、过错赔偿与底线提示</summary>
+          <p class="section-help">“出轨净身出户”极易被法院认定为显失公平或限制离婚自由而无效。建议采用“法定过错下的损害赔偿（民法典第一千零九十一条）”进行约束。</p>
+          <div class="checks">
+            <label class="checkline"><input type="checkbox" name="includeFidelity" value="yes" checked>
+              写入夫妻忠实、互相尊重原则</label>
+            <label class="checkline"><input type="checkbox" name="includeDV" value="yes" checked>
+              明确家暴、虐待、重婚、同居等法定重大过错方应承担【损害赔偿】责任</label>
+            <label class="checkline"><input type="checkbox" name="avoidPenalty" value="yes" checked>
+              摒弃“净身出户”等剥夺基本生存权的高风险绝对化措辞，改为多分/少分财产意向</label>
+          </div>
+          <div class="field"><label>希望补充的关系原则<textarea name="relationshipPrinciples"
+                placeholder="例如：不得未经同意隐匿、转移夫妻共同财产；尊重对方生育意愿等。"></textarea></label></div>
+        </details>
+
+        <details>
+          <summary>披露、律师咨询与保密机制</summary>
+          <p class="section-help">建议保留“自愿、知情、公平、充分披露”的证据链。</p>
+          <div class="grid-2">
+            <div class="field">
+              <label>甲方是否咨询独立律师
+                <select name="aLawyerConsult">
+                  <option value="acknowledged">未咨询，但确认有权咨询并自愿签署</option>
+                  <option value="yes">已咨询独立律师</option>
+                  <option value="planned">签署前将咨询独立律师</option>
+                </select>
+              </label>
+            </div>
+            <div class="field">
+              <label>乙方是否咨询独立律师
+                <select name="bLawyerConsult">
+                  <option value="acknowledged">未咨询，但确认有权咨询并自愿签署</option>
+                  <option value="yes">已咨询独立律师</option>
+                  <option value="planned">签署前将咨询独立律师</option>
+                </select>
+              </label>
+            </div>
+          </div>
+          <div class="checks">
+            <label class="checkline"><input type="checkbox" name="fullDisclosureAck" value="yes" checked>
+              双方确认已完整披露重大资产、负债、收入、对外担保和经营风险</label>
+            <label class="checkline"><input type="checkbox" name="waiveFurtherDisclosure" value="yes">
+              双方在已有披露基础上，自愿放弃要求对方提供更多材料</label>
+            <label class="checkline"><input type="checkbox" name="includeConfidentiality" value="yes" checked>
+              写入保密条款，限制公开传播财务、家庭和商业信息</label>
+          </div>
+          <div class="field"><label>财务披露附件说明<textarea name="disclosureNotes"
+                placeholder="列明附件：银行流水、房产证复印件、车辆登记证、公司章程、征信报告、贷款合同、保单等。"></textarea></label></div>
+        </details>
+
+        <details>
+          <summary>其他可选条款与争议解决</summary>
+          <p class="section-help">经济补偿、继承、管辖法院及其他特殊约定。</p>
+          <div class="field">
+            <label>离婚经济补偿/经济帮助倾向
+              <select name="supportRule">
+                <option value="legal">不预先固定金额，离婚时依法处理经济补偿、经济帮助及财产分割</option>
+                <option value="waiveLimited">原则上各自自立，但不排除法律规定的家务劳动补偿、生活困难帮助</option>
+                <option value="lumpSum">约定一方在特定条件下支付一次性补偿</option>
+                <option value="childrenConditional">有共同未成年子女或一方明显承担更多家庭照护时，另行协商补偿</option>
+              </select>
+            </label>
+          </div>
+          <div class="field"><label>一次性补偿或触发条件<textarea name="supportDetails"
+                placeholder="例如：一方为照顾子女/老人显著减少工作收入的，离婚时由另一方结合婚龄、贡献、经济能力给予补偿；避免写成绝对剥夺法定权利。"></textarea></label></div>
+          <div class="field">
+            <label>协议自动失效与重谈机制
+              <select name="sunsetRule">
+                <option value="none">不设置自动失效条款，除非双方书面变更或解除</option>
+                <option value="review">婚后定期复盘，但不自动失效</option>
+                <option value="expire">约定达到一定婚龄后部分条款失效或重谈</option>
+              </select>
+            </label>
+          </div>
+          <div class="field"><label>期限/复盘安排<textarea name="sunsetDetails"
+                placeholder="例如：结婚满五年时双方重新评估共同账户比例、房产安排、子女教育资金等。"></textarea></label></div>
+          <div class="field">
+            <label>死亡与继承衔接
+              <select name="deathProvisionRule">
+                <option value="willNeeded">提示另行订立遗嘱/保险受益人安排，本协议仅确认财产性质</option>
+                <option value="separateEstate">约定个人财产死亡后进入个人遗产范围，按遗嘱或法定继承处理</option>
+                <option value="survivorProtection">希望为生存配偶保留居住、保险金或特定财产保障</option>
+              </select>
+            </label>
+          </div>
+          <div class="field"><label>保险与健康保障<textarea name="insuranceRule"
+                placeholder="例如：人寿保险受益人、保费来源、保单现金价值归属、重疾/医疗保险由谁承担等。"></textarea></label></div>
+          <div class="field" style="margin-top: 24px; border-top: 1px dashed #e5e7eb; padding-top: 14px;">
+            <label>争议解决法院
+              <select name="jurisdictionRule">
+                <option value="defendant">由被告住所地有管辖权的人民法院处理</option>
+                <option value="signingCity">由协议签署地或不动产所在地有管辖权的人民法院处理</option>
+              </select>
+            </label>
+          </div>
+          <div class="checks">
+            <label class="checkline"><input type="checkbox" name="notarization" value="yes"> 计划后续办理公证（建议高净值人群办理）</label>
+            <label class="checkline"><input type="checkbox" name="lawyerReview" value="yes" checked>
+              双方确认已充分理解协议法律后果（防范“重大误解”抗辩）</label>
+            <label class="checkline"><input type="checkbox" name="assetAppendix" value="yes" checked>
+              将详细的《财产清单》作为附件附后</label>
+          </div>
+          <div class="field"><label>其他特别约定<textarea name="specialTerms"
+                placeholder="如有代持协议披露、境外资产安排等可填写在此。"></textarea></label></div>
+          <div class="checks">
+            <label class="checkline"><input type="checkbox" name="financialDisclosureComplete" value="yes">
+              我确认双方财产、债务、收入及重大风险披露已基本完整</label>
+          </div>
+        </details>
+
+        <div class="actions">
+          <button type="button" class="primary" onclick="generateDraft(true)">生成/刷新草案</button>
+          <button type="button" class="secondary" onclick="copyDraft()">复制草案</button>
+          <button type="button" class="ghost" onclick="downloadText()">下载草案文本</button>
+          <button type="button" class="danger" onclick="resetForm()">清空数据</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="card preview-panel">
+      <div class="preview-toolbar">
+        <div class="toolbar-left">
+          <button class="primary" type="button" onclick="window.print()">打印 / 另存为 PDF</button>
+          <button class="secondary" type="button" onclick="copyDraft()">复制草案</button>
+        </div>
+        <div class="status" id="status"></div>
+      </div>
+      <div class="warnings" id="warnings"></div>
+      <article id="draft"></article>
+    </section>
+  </main>
+
+  <script>
+    const form = document.getElementById('prenupForm');
+    const draft = document.getElementById('draft');
+    const statusBox = document.getElementById('status');
+    const warningsBox = document.getElementById('warnings');
+    const progressText = document.getElementById('progressText');
+    const progressBar = document.getElementById('progressBar');
+
+    function val(name) {
+      const el = form.elements[name];
+      if (!el) return '';
+      if (el.type === 'checkbox') return el.checked ? 'yes' : '';
+      return String(el.value || '').trim();
+    }
+
+    function checked(name) {
+      const el = form.elements[name];
+      return !!(el && el.checked);
+    }
+
+    function esc(s) {
+      return String(s || '')
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    }
+
+    function textOrPlaceholder(s, placeholder = '【待补充】') {
+      return s ? esc(s).replace(/\n/g, '<br>') : `<span class="placeholder">${placeholder}</span>`;
+    }
+
+    function line(label, value, isNoIndent = false) {
+      return `<p class="${isNoIndent ? 'no-indent' : ''}"><strong>${label}：</strong>${textOrPlaceholder(value)}</p>`;
+    }
+
+    function listItem(label, value) {
+      return `<li><strong>${label}：</strong>${textOrPlaceholder(value, '无或待补充')}</li>`;
+    }
+
+    function todayCN() {
+      const d = new Date();
+      return `${d.getFullYear()}年${String(d.getMonth() + 1).padStart(2, '0')}月${String(d.getDate()).padStart(2, '0')}日`;
+    }
+
+    // 总体财产制度
+    function regimeText() {
+      const regime = val('propertyRegime');
+      const custom = val('customRegime');
+      if (regime === 'custom' && custom) return custom;
+      if (regime === 'separate') return '双方确认，除本协议另有明确约定外，各自婚前财产及婚后以个人名义取得的工资、奖金、劳务报酬、知识产权收益、经营收益等，均归各自个人所有（即分别财产制、收支各自独立）；双方为共同生活设立的共同账户、共同购置资产或另有书面约定的财产除外。';
+      if (regime === 'mixed') return '双方确认，婚前财产原则上归各自所有；婚后收入中依本协议约定划入共同账户或用于共同购置财产的部分属于夫妻共同财产，其余未划入且未用于共同生活的收入归取得方个人所有。';
+      if (regime === 'community') return '双方确认，婚前财产原则上归各自所有；婚后所得（包括但不限于工资、奖金、劳务报酬等）原则上按夫妻共同财产处理，但本协议及后续书面补充协议明确归个人所有的除外。';
+      return '【待补充】';
+    }
+
+    // 投资收益与孳息
+    function investmentIncomeText() {
+      const rule = val('investmentIncomeRule');
+      if (rule === 'separate') return '一方婚前财产在婚后产生的孳息、自然增值，以及由该婚前财产转化或衍生出的【投资收益】（包括但不限于股票及基金交易盈利、理财收益、公司分红及股权增值等），无论另一方是否在婚后对该投资行为提供了辅助或贡献，均明确界定为原所有权人的个人财产，不作为夫妻共同财产分割。';
+      return '一方婚前财产在婚后产生的孳息、自然增值归个人所有；但依据法律规定，婚前财产在婚后产生的【投资收益】（如婚后主动交易产生的股票盈利、公司分红等）应作为夫妻共同财产处理。';
+    }
+
+    // 继承与受赠
+    function inheritanceText() {
+      const rule = val('inheritanceRule');
+      if (rule === 'separate') return '婚姻存续期间，一方因法定继承、遗嘱继承或接受赠与取得的财产，无论遗嘱或赠与合同中是否明确“仅归一方所有”，双方在此通过本协议特别约定：该等继承或受赠所得财产均属于【该方个人财产】，不作为夫妻共同财产。';
+      return '婚姻存续期间，一方继承或受赠的财产，除遗嘱或赠与合同中明确指明归一方个人所有外，依法按照夫妻共同财产处理。';
+    }
+
+    // 房产规则
+    function houseRuleText() {
+      const r = val('postMarriageHouseRule');
+      if (r === 'title') return '婚后购置不动产的权属，严格以不动产登记簿记载及登记比例为准。登记在一方名下的，属于该方个人财产（若存在共同还贷，由产权方给予另一方相应补偿）；登记在双方名下的，按登记份额享有。';
+      if (r === 'contribution') return '婚后购置不动产，无论登记在一方或双方名下，双方同意优先穿透登记表象，按照双方及各自父母实际出资比例（含首付款及还贷本息）确定产权份额。';
+      return '婚后购置不动产原则上作为夫妻共同财产处理，但一方以其个人财产全额购买且有充分资金流向凭证，或双方另有书面约定的除外。';
+    }
+
+    // 父母出资
+    function parentContributionText() {
+      const r = val('parentContributionType');
+      if (r === 'individual') return '双方父母在双方婚后为双方购房、购车、日常生活的出资或大额资金转账，【均视为对各自子女一方的单方赠与】，属于该方个人财产；除非父母在出资时签订了明确的书面协议表示赠与夫妻双方。';
+      return '双方父母在双方婚后为双方购房、购车等的大额出资，若出资父母未出具明确书面声明仅赠与己方子女的，依法推定为对夫妻双方的共同赠与。';
+    }
+
+    // 收入规则
+    function incomeRuleText() {
+      const r = val('incomeRule');
+      const pct = val('jointAccountPct');
+      if (r === 'separate') return '双方婚后各自取得的工资、奖金、劳务报酬等各项收入归取得方个人所有（收支各自独立）。双方按本协议约定共同分担家庭日常开支。';
+      if (r === 'shared') return '双方婚后取得的工资、奖金、劳务报酬等各项收入作为夫妻共同财产处理，由双方共同管理和使用。';
+      if (r === 'split') return `双方婚后各自收入中，${pct ? esc(pct) : '【待补充存入规则】'}按约定周期划入双方指定的共同账户，用于家庭共同生活和共同目标；未划入共同账户的部分，归收入取得方个人所有并自由支配。`;
+      return '【待补充】';
+    }
+
+    // 开支规则
+    function expenseRuleText() {
+      const r = val('expenseRule');
+      const detail = val('expenseDetails');
+      let base = '';
+      if (r === 'equal') base = '家庭日常共同生活开支由双方平均（各承担一半比例）分担。';
+      if (r === 'incomeRatio') base = '家庭日常共同生活开支按照双方实际收入的比例进行分担。';
+      if (r === 'fixed') base = '家庭日常共同生活开支优先使用共同账户内的资金支付，不足部分由双方另行协商补足。';
+      return `${base}${detail ? '<br>具体包含：' + esc(detail).replace(/\n/g, '<br>') : ''}`;
+    }
+
+    // 债务规则
+    function personalDebtText() {
+      const r = val('personalDebtRule');
+      if (r === 'strict') return '未经另一方事后追认或事前共同签字确认，且超出家庭日常生活需要所负的债务（包括但不限于单方用于对外投资、民间借贷、赌博、吸毒等违法或高风险行为的债务），属于举债方个人债务，由其个人财产偿还，绝不牵连配偶。';
+      return '一方名下所负债务是否属于夫妻共同债务，严格按照《中华人民共和国民法典》第一千零六十四条“共债共签”及“用于家庭日常生活”的法定规则进行认定。';
+    }
+
+    function lawyerConsultText() {
+      const map = {
+        acknowledged: '未咨询独立律师，但已知悉可在签署前自行咨询专业律师，并确认在充分理解条款后自愿签署。',
+        yes: '已就本协议内容咨询独立律师或专业法律人士。',
+        planned: '将在正式签署前咨询独立律师或专业法律人士。'
+      };
+      return `甲方：${map[val('aLawyerConsult')] || map.acknowledged} 乙方：${map[val('bLawyerConsult')] || map.acknowledged}`;
+    }
+
+    function supportText() {
+      const r = val('supportRule');
+      const detail = val('supportDetails');
+      if (r === 'waiveLimited') return `双方原则上各自具备独立生活能力；但该约定不排除一方依法主张家务劳动补偿、生活困难帮助、子女抚养费或其他法律明确保护的权益。${detail ? '<br>补充：' + esc(detail).replace(/\n/g, '<br>') : ''}`;
+      if (r === 'lumpSum') return `双方可在特定条件成就时约定一次性补偿，但补偿金额应结合婚龄、家庭贡献、收入差距、过错情况及支付能力确定，避免显失公平。${detail ? '<br>具体约定：' + esc(detail).replace(/\n/g, '<br>') : '具体金额和触发条件：【待补充】'}`;
+      if (r === 'childrenConditional') return `若双方育有共同未成年子女，或一方因照顾子女、老人、协助另一方事业发展而明显承担更多家庭义务、减少个人收入或职业发展机会，离婚时双方同意依法并结合实际贡献协商经济补偿或经济帮助。${detail ? '<br>补充：' + esc(detail).replace(/\n/g, '<br>') : ''}`;
+      return `离婚时，关于家务劳动补偿、生活困难帮助、子女抚养费以及夫妻共同财产分割，依国家现行法律、本协议财产约定及双方实际情况处理。${detail ? '<br>补充：' + esc(detail).replace(/\n/g, '<br>') : ''}`;
+    }
+
+    function sunsetText() {
+      const r = val('sunsetRule');
+      const d = val('sunsetDetails');
+      if (r === 'review') return `本协议不因婚姻存续一定年限而自动失效，但双方同意在约定时间点复盘家庭资产、共同账户、子女教育资金、保险及赡养安排。${d ? '<br>复盘安排：' + esc(d).replace(/\n/g, '<br>') : ''}`;
+      if (r === 'expire') return `双方拟设置部分条款的期限或重谈机制。为避免将来争议，具体失效范围、日期、重谈程序及未达成新协议时的适用规则应以书面明确。${d ? '<br>期限安排：' + esc(d).replace(/\n/g, '<br>') : '具体期限：【待补充】'}`;
+      return '本协议不设置自动失效条款。除双方另行签署书面补充协议、变更协议或解除协议外，本协议持续有效。';
+    }
+
+    function deathProvisionText() {
+      const r = val('deathProvisionRule');
+      if (r === 'separateEstate') return '双方确认，本协议主要用于确认财产性质：一方个人财产在其死亡时原则上进入其个人遗产范围，并依其合法有效遗嘱、遗赠扶养协议或法定继承规则处理。本协议本身不当然替代遗嘱。';
+      if (r === 'survivorProtection') return '双方希望在确认个人财产边界的同时，为生存配偶保留合理生活保障。具体可通过遗嘱、居住权设立、保险受益人指定或赠与合同等文件另行落实。';
+      return '死亡条款在国内应与遗嘱、居住权、保险受益人和继承安排联动处理。本协议仅确认财产归属，不当然剥夺配偶依法可能享有的继承、居住或其他权益；如需改变继承结果，应另行订立合法有效的遗嘱、信托等财富传承规划文件。';
+    }
+
+    function confidentialityText() {
+      if (!checked('includeConfidentiality')) return '';
+      return `<ol>
+          <li>双方因订立、履行、变更或争议解决本协议而知悉的收入、资产、债务、征信、税务、商业资料、家庭隐私及个人信息，仅可用于本协议相关目的。</li>
+          <li>未经对方书面同意，任何一方不得通过社交媒体、媒体采访、公开文章、群聊或其他方式公开披露、贬损性传播或商业化使用上述信息。</li>
+          <li>因司法、仲裁、公证、税务、监管、律师、会计师、评估机构或其他专业服务需要而进行的必要披露，不视为违反保密义务；接收方仍应在合理范围内承担保密责任。</li>
+        </ol>`;
+    }
+
+    function goalsText() {
+      const goals = [];
+      if (checked('goalSeparateProperty')) goals.push('明确婚前与婚后财产边界');
+      if (checked('goalDebtShield')) goals.push('设置债务隔离墙');
+      if (checked('goalBusiness')) goals.push('保护经营性资产、股权、知识产权和投资收益');
+      if (checked('goalParents')) goals.push('明确父母出资、赠与、继承及遗嘱衔接');
+      if (checked('goalLifestyle')) goals.push('安排宠物、保险、保密、居住等生活事项');
+      if (checked('goalDisclosure')) goals.push('通过完整披露增强公平性和可执行性');
+      if (val('goalOther')) goals.push(esc(val('goalOther')).replace(/\n/g, '<br>'));
+      return goals.length ? goals.join('；') : '【待补充】';
+    }
+
+    function buildWarnings() {
+      const warnings = [];
+      if (!checked('avoidPenalty')) warnings.push('未勾选“摒弃高风险惩罚条款”。若协议中出现“出轨即净身出户”、“放弃一切财产”等表述，在司法实践中极易因被认定为“限制离婚自由”或“显失公平”而导致该条款完全无效。');
+      if (val('custodyIntent') || val('childrenPlan')) warnings.push('子女抚养相关条款性质属“人身关系安排”，不能通过婚前协议绝对固化。离婚时法院仍将依据“未成年子女利益最大化”原则重新评估抚养权归属。');
+      if (val('approvalThreshold')) warnings.push('大额债务的内部审批约定主要约束夫妻双方，【不能绝对对抗外部不知情的善意债权人】。建议对外的重大投资或担保务必由双方共同签字确认。');
+      if (checked('notarization')) warnings.push('公证本身并不改变财产性质，但能极大增强协议的证据效力。涉及房产加名或减名的，公证后仍需前往不动产交易中心办理变更登记方能发生物权效力。');
+      if (!checked('fullDisclosureAck')) warnings.push('未勾选完整财务披露。婚前协议最容易被攻击的点之一是隐瞒重大资产、负债或收入，建议签署前补齐附件。');
+      if (val('deathProvisionRule') !== 'willNeeded') warnings.push('死亡与继承安排不能仅靠婚前协议解决。若要改变身后财产分配，请配套遗嘱、保险受益人、居住权或家族信托安排。');
+      if (val('sunsetRule') === 'expire') warnings.push('自动失效条款可能制造新的不确定性。建议写清失效范围、日期、重谈程序以及未达成新协议时适用规则。');
+      if (!checked('financialDisclosureComplete')) warnings.push('财务披露尚未标记完成。正式签署前建议至少完成财产清单、债务清单、父母出资凭证、保单和公司股权资料。');
+      return warnings;
+    }
+
+    const cnNums = ['一', '二', '三', '四', '五', '六', '七', '八', '九', '十', '十一', '十二', '十三', '十四', '十五'];
+
+    function generateDraft(showStatus = false) {
+      const a = val('partyAName') || '甲方';
+      const b = val('partyBName') || '乙方';
+      const marriageDate = val('marriageDate');
+
+      let clauseIndex = 0;
+      function nextTitle(title) {
+        return `<h3>第${cnNums[clauseIndex++]}条 ${title}</h3>`;
+      }
+
+      let clausesHtml = '';
+
+      clausesHtml += nextTitle('协议当事人');
+      clausesHtml += `
+        ${line('甲方（男/女方）', `${a}，身份证号：${val('partyAId') || '【待补充】'}`, true)}
+        ${line('乙方（男/女方）', `${b}，身份证号：${val('partyBId') || '【待补充】'}`, true)}
+        ${line('甲方联系方式', val('partyAContact'), true)}
+        ${line('乙方联系方式', val('partyBContact'), true)}
+        ${line('国籍/户籍或经常居住地', val('residencyInfo'), true)}
+        ${line('经常居住地/送达地址', val('addresses'), true)}
+        <p>鉴于甲乙双方自愿结为夫妻，拟于 ${marriageDate ? esc(marriageDate) : '<span class="placeholder">【待补充日期】</span>'} 前往民政部门办理结婚登记，并拟于 ${val('signingDate') ? esc(val('signingDate')) : '<span class="placeholder">【待补充签署日期】</span>'} 签署本协议。为明确婚前财产的权属、婚后财产的收益归属、债务承担以及家庭生活安排，预防和减少未来的财产纠纷，双方在平等、自愿、不存在任何欺诈与胁迫、并充分知晓本协议法律后果的基础上，达成如下协议：</p>
+        <p><strong>本协议目标：</strong>${goalsText()}</p>
+      `;
+
+      clausesHtml += nextTitle('婚后总体财产制度与收益归属');
+      clausesHtml += `
+        <ol>
+          <li><strong>总体制度：</strong>${textOrPlaceholder(regimeText())}</li>
+          <li><strong>孳息与投资收益：</strong>${investmentIncomeText()}</li>
+          <li><strong>继承与受赠财产：</strong>${inheritanceText()}</li>
+          <li>双方确认，本协议所称“个人财产”包括该财产的实物形态及价值形态（如出售所得价款、被征收征用的补偿款、保险理赔金等替代物），不因财产形态的转化而转变为夫妻共同财产。</li>
+        </ol>
+      `;
+
+      clausesHtml += nextTitle('婚前财产的确认与归属');
+      clausesHtml += `
+        <p>双方确认，以下财产及其后续转化的形态属于个人婚前财产，在任何情况下（无论婚姻存续时间长短）均归原所有人个人所有，不因婚姻关系的缔结而转变为夫妻共同财产：</p>
+        <ol>
+          ${listItem('甲方婚前房产', val('aRealEstate'))}
+          ${listItem('乙方婚前房产', val('bRealEstate'))}
+          ${listItem('甲方金融资产', val('aFinancial'))}
+          ${listItem('乙方金融资产', val('bFinancial'))}
+          ${listItem('甲方公司股权/经营权益', val('aEquity'))}
+          ${listItem('乙方公司股权/经营权益', val('bEquity'))}
+          ${listItem('其他重要婚前财产', val('otherPremarital'))}
+        </ol>
+        <p>未尽列明但有充分银行流水、登记记录或发票证明取得于结婚登记日之前的财产，亦按照婚前个人财产处理。</p>
+      `;
+
+      clausesHtml += nextTitle('房产特殊规则与父母出资定性');
+      clausesHtml += `
+        <ol>
+          <li><strong>婚后购房权属：</strong>${houseRuleText()}</li>
+          <li><strong>父母出资定性：</strong>${parentContributionText()}</li>
+          ${listItem('房贷还款及婚后增值处理', val('mortgageRule'))}
+        </ol>
+      `;
+
+      clausesHtml += nextTitle('婚后收入、账户与家庭日常开支');
+      clausesHtml += `
+        <ol>
+          <li><strong>收入归属：</strong>${incomeRuleText()}</li>
+          <li><strong>开支分担：</strong>${expenseRuleText()}</li>
+          <li>任何一方不得以履行家庭共同开支义务为由，未经同意擅自处分另一方的个人婚前财产。</li>
+        </ol>
+      `;
+
+      clausesHtml += nextTitle('债务隔离墙与大额支出审批（共债共签）');
+      clausesHtml += `
+        <ol>
+          ${listItem('婚前已有债务', val('premaritalDebt'))}
+          <li><strong>共同债务界定：</strong>双方强调，夫妻共同债务应当遵循“共债共签”原则。${personalDebtText()}</li>
+          <li><strong>大额财务约束：</strong>双方约定，${val('approvalThreshold') ? '发生 ' + esc(val('approvalThreshold')) : '发生单笔超过人民币【待补充】元的借款、对外担保、重大投资或对配偶外第三人的大额赠与'}，必须取得另一方的书面同意（含微信、邮件书面确认）。未经同意的单方举债或担保，视为个人行为，由其个人财产承担全部清偿责任。</li>
+        </ol>
+      `;
+
+      clausesHtml += nextTitle('公司股权、合规与知识产权风险隔离');
+      clausesHtml += `
+        <ol>
+          <li>一方婚前持有或婚后以个人财产投资设立的公司股权、合伙企业财产份额等经营性资产，其控制权、表决权及处置权归该方独立行使，另一方予以配合且不得非法干涉。</li>
+          <li>一方因担任公司法定代表人、董事、监事、高级管理人员或实际控制人而产生的职务风险、行政处罚、税务补缴、连带担保责任等，原则上由其实际控制的个人财产依法承担，以此达到家庭资产风险隔离的目的。</li>
+        </ol>
+      `;
+
+      if (val('childrenPlan') || val('custodyIntent') || val('petRule')) {
+        clausesHtml += nextTitle('子女抚养意向与宠物安排');
+        clausesHtml += `
+        <ol>
+          ${val('childrenPlan') || val('custodyIntent') ? `
+          <li><strong>子女安排意向：</strong>${textOrPlaceholder(val('childrenPlan'))}。<br>若双方未来不幸离婚，关于未成年子女的抚养权与抚养费，${val('custodyIntent') ? textOrPlaceholder(val('custodyIntent')) : '将以有利于子女身心健康及未成年子女利益最大化为原则另行协商或依法处理。'}</li>
+          ` : ''}
+          ${val('petRule') ? listItem('宠物归属与饲养', val('petRule')) : ''}
+        </ol>`;
+      }
+
+      if (checked('includeFidelity')) {
+        clausesHtml += nextTitle('忠实、尊重与过错责任');
+        clausesHtml += `
+        <ol>
+          <li>双方承诺在婚姻关系存续期间相互尊重、互相关爱、诚实守信，自觉履行夫妻忠实义务。</li>
+          ${checked('includeDV') ? '<li>如一方存在重婚、与他人同居、实施家庭暴力、虐待或遗弃家庭成员、或有其他严重违反忠实义务的重大过错行为导致离婚的，无过错方有权依据《中华人民共和国民法典》第一千零九十一条主张【损害赔偿】。</li>' : ''}
+          ${checked('avoidPenalty') ? '<li>在进行离婚财产分割时，对无过错方应予以适当照顾（即过错方少分夫妻共同财产），具体比例视过错程度由双方协商或由人民法院酌定。双方不在此预先设定“净身出户”等可能被认定为限制人身自由的绝对性惩罚条款。</li>' : ''}
+          ${val('relationshipPrinciples') ? `<li>${textOrPlaceholder(val('relationshipPrinciples'))}</li>` : ''}
+        </ol>`;
+      }
+
+      clausesHtml += nextTitle('离婚经济补偿、期限、死亡继承与保险衔接');
+      clausesHtml += `
+        <ol>
+          <li><strong>经济补偿与帮助：</strong>${supportText()}</li>
+          <li><strong>协议期限：</strong>${sunsetText()}</li>
+          <li><strong>死亡与继承：</strong>${deathProvisionText()}</li>
+          ${listItem('保险与健康保障安排', val('insuranceRule'))}
+        </ol>
+      `;
+
+      if (checked('includeConfidentiality')) {
+        clausesHtml += nextTitle('保密、信息使用与披露边界');
+        clausesHtml += confidentialityText();
+      }
+
+      clausesHtml += nextTitle('财产转移防范与信息披露');
+      clausesHtml += `
+        <ol>
+          <li>双方负有如实披露名下重大资产和债务的义务。${checked('fullDisclosureAck') ? '双方确认，截至签署日已向对方披露其知悉范围内的重大资产、负债、收入、对外担保和经营风险。' : '双方应在正式签署前补充完整披露材料。'}</li>
+          <li><strong>独立法律意见：</strong>${lawyerConsultText()}</li>
+          <li>${checked('waiveFurtherDisclosure') ? '双方确认在已取得充分披露资料基础上，自愿放弃要求对方进一步提供非必要财务材料。该放弃不适用于对方故意隐瞒、转移或虚构重大财产及债务的情形。' : '双方均保留在正式签署前要求对方补充合理财务材料的权利。'}</li>
+          ${listItem('披露附件说明', val('disclosureNotes'))}
+          <li>婚姻存续期间，如一方存在隐藏、转移、变卖、毁损、挥霍夫妻共同财产，或者伪造夫妻共同债务企图侵占另一方财产的，在离婚分割夫妻共同财产时，对该方可以少分或者不分财产。</li>
+        </ol>
+      `;
+
+      clausesHtml += nextTitle('争议解决、协议生效与附件');
+      clausesHtml += `
+        <ol>
+          <li><strong>管辖约定：</strong>因本协议的效力、解释及履行发生任何争议，双方应友好协商解决；协商不成的，${val('jurisdictionRule') === 'defendant' ? '依法向被告住所地有管辖权的人民法院提起诉讼。' : '依法向协议签署地或不动产所在地有管辖权的人民法院提起诉讼。'}</li>
+          <li><strong>生效条件：</strong>涉及婚前财产确权的部分，自双方签字、捺印之日起立即生效；涉及婚姻存续期间的财产制度及债务安排，自双方办理结婚登记之日起生效。本协议一经生效，对双方均具有严格的法律约束力。</li>
+          <li>${checked('lawyerReview') ? '<strong>法律审查确认：</strong>双方确认在签署本协议前，均已审慎阅读全部条款，完全理解其法律含义及法律后果，并确认本协议不存在任何显失公平或重大误解之情形。' : '双方建议在签署本协议前就相关条款的法律后果咨询专业人士。'}</li>
+          <li>${checked('assetAppendix') ? '附件《婚前及重要财产清单》与本协议正文具有同等法律效力。' : '双方可另行制作财产清单或签订补充书面协议，补充协议与本协议不一致的，以签署在后的书面协议为准。'}</li>
+          <li><strong>披露完成状态：</strong>${checked('financialDisclosureComplete') ? '双方确认财务披露已基本完成，可进入律师复核及正式签署阶段。' : '双方确认本草案仍处于信息收集阶段，正式签署前应完成全部财产、债务、收入、保险和经营风险披露。'}</li>
+          ${val('specialTerms') ? `<li><strong>其他特别约定：</strong>${textOrPlaceholder(val('specialTerms'))}</li>` : ''}
+        </ol>
+      `;
+
+      const html = `
+        <h2>婚前财产及婚姻相关事项协议书</h2>
+
+        ${clausesHtml}
+
+        <div class="signature-grid">
+          <div class="signature-box">
+            <p class="no-indent">甲方（男/女方）签字并捺印：</p>
+            <p class="no-indent">签署日期：______年____月____日</p>
+          </div>
+          <div class="signature-box">
+            <p class="no-indent">乙方（男/女方）签字并捺印：</p>
+            <p class="no-indent">签署日期：______年____月____日</p>
+          </div>
+        </div>
+        <p class="small-note">签署地点：${val('city') ? esc(val('city')) : '____________________'}</p>
+      `;
+
+      draft.innerHTML = html;
+      const warnings = buildWarnings();
+      warningsBox.innerHTML = warnings.map(w => `<div class="warning"><strong>风险提示：</strong>${esc(w)}</div>`).join('');
+      updateProgress();
+      if (showStatus) flash('草案已刷新');
+      saveToLocal();
+    }
+
+    function updateProgress() {
+      const required = Array.from(form.querySelectorAll('[data-required]'));
+      const filledReq = required.filter(el => String(el.value || '').trim()).length;
+
+      const optional = Array.from(form.querySelectorAll('input[type="text"]:not([data-required]), input[type="date"], input[type="number"], textarea, select'));
+      const filledOptional = optional.filter(el => String(el.value || '').trim()).length;
+
+      const totalScore = required.length + Math.floor(optional.length / 1.5);
+      let currentScore = filledReq + Math.floor(filledOptional / 1.5);
+
+      let pct = Math.min(100, Math.round((currentScore / totalScore) * 100));
+      if (isNaN(pct)) pct = 0;
+
+      progressText.textContent = `${pct}% 完成`;
+      progressBar.style.width = pct + '%';
+    }
+
+    function plainDraftText() {
+      return draft.innerText.replace(/\n{3,}/g, '\n\n').trim();
+    }
+
+    async function copyDraft() {
+      generateDraft(false);
+      const text = plainDraftText();
+
+      if (navigator.clipboard && window.isSecureContext) {
+        try {
+          await navigator.clipboard.writeText(text);
+          flash('草案文本已复制到剪贴板');
+          return;
+        } catch (e) { }
+      }
+
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      textarea.style.position = 'fixed';
+      textarea.style.left = '-9999px';
+      document.body.appendChild(textarea);
+      textarea.select();
+
+      try {
+        document.execCommand('copy');
+        flash('草案文本已复制到剪贴板');
+      } catch (err) {
+        flash('复制失败，请尝试手动全选复制');
+      } finally {
+        document.body.removeChild(textarea);
+      }
+    }
+
+    function downloadText() {
+      generateDraft(false);
+      const blob = new Blob([plainDraftText()], { type: 'text/plain;charset=utf-8' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = '婚前协议草案.txt';
+      a.click();
+      URL.revokeObjectURL(a.href);
+      flash('TXT 文档已下载');
+    }
+
+    function resetForm() {
+      if (!confirm('确定清空所有已填写内容？')) return;
+      localStorage.removeItem('prenupFormDataV3');
+      form.reset();
+      form.elements.avoidPenalty.checked = true;
+      form.elements.includeDV.checked = true;
+      form.elements.includeFidelity.checked = true;
+      form.elements.lawyerReview.checked = true;
+      form.elements.assetAppendix.checked = true;
+      generateDraft(true);
+    }
+
+    function flash(msg) {
+      statusBox.textContent = msg;
+      clearTimeout(window.__flashTimer);
+      window.__flashTimer = setTimeout(() => statusBox.textContent = '', 2200);
+    }
+
+    function saveToLocal() {
+      const data = {};
+      Array.from(form.elements).forEach(el => {
+        if (!el.name) return;
+        data[el.name] = el.type === 'checkbox' ? el.checked : el.value;
+      });
+      localStorage.setItem('prenupFormDataV3', JSON.stringify(data));
+    }
+
+    function loadFromLocal() {
+      try {
+        const raw = localStorage.getItem('prenupFormDataV3');
+        if (!raw) return;
+        const data = JSON.parse(raw);
+        Object.entries(data).forEach(([k, v]) => {
+          const el = form.elements[k];
+          if (!el) return;
+          if (el.type === 'checkbox') el.checked = !!v;
+          else el.value = v;
+        });
+      } catch (e) { }
+    }
+
+    form.addEventListener('input', () => generateDraft(false));
+    form.addEventListener('change', () => generateDraft(false));
+    loadFromLocal();
+    generateDraft(false);
+  </script>
+</body>
+
+</html>

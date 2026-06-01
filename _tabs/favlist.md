@@ -50,6 +50,7 @@ Interactive graphs and explanations about key [economic](https://www.econgraphs.
 - [Wheel of Life - 生活评估](/misc/Wheel_of_Life.html)
 - [体检前健康风险问卷与初筛评估](/misc/pre_checkup_risk_questionnaire.html)
 - [常见食物 GI GL 表](/misc/gi_gl_food_lookup.html)
+- [婚前协议生成器](/misc/prenup_generator.html)
 
 - [冥想训练](/misc/meditation.html)
 - [NSDR](https://www.bilibili.com/video/BV1F4oPYcEi9)

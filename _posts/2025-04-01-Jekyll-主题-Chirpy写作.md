@@ -50,9 +50,9 @@ bundle
 
 使用:
 
-构建 `jekyll build` 或 `jekyll b`
+构建 `bundle exec jekyll build` 或 `jekyll build` 或 `jekyll b`
 
-本地部署 `jekyll serve` 或 `jekyll s`
+本地部署 `bundle exec jekyll serve` 或 `jekyll serve` 或 `jekyll s`
 
 ## 写作
 
