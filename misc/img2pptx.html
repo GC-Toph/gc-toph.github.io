@@ -1,0 +1,605 @@
+<!doctype html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Image -> PPTX</title>
+  <script src="https://cdn.jsdelivr.net/npm/json5@2.2.3/dist/index.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/pptxgenjs@4.0.1/dist/pptxgen.bundle.js"></script>
+  <style>
+    :root {
+      --bg: #f6f7f9;
+      --panel: #fff;
+      --text: #15171a;
+      --muted: #68707d;
+      --line: #d8dde6;
+      --accent: #2f6fed;
+      --danger: #c93c37;
+      --ok: #217346;
+      --warn: #946200;
+      --code: #f3f5f8
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text)
+    }
+
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #cbd0d9;
+      border-radius: 4px
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #a1a9b5
+    }
+
+    header {
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--line);
+      background: var(--panel)
+    }
+
+    header h1 {
+      margin: 0 0 6px;
+      font-size: 20px;
+      line-height: 1.25
+    }
+
+    header p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.45
+    }
+
+    main {
+      display: grid;
+      grid-template-columns: 460px 1fr 460px;
+      gap: 0;
+      padding: 0
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, .04);
+      display: flex;
+      flex-direction: column;
+      min-height: 0
+    }
+
+    .panel h2 {
+      margin: 0;
+      padding: 13px 14px;
+      font-size: 14px;
+      border-bottom: 1px solid var(--line);
+      background: #fbfcfd;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0
+    }
+
+    .panel-body {
+      padding: 14px;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 0
+    }
+
+    label {
+      display: block;
+      font-weight: 650;
+      font-size: 12px;
+      margin: 0 0 6px
+    }
+
+    .hint {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+      margin: 6px 0 12px
+    }
+
+    .pill {
+      display: inline-block;
+      padding: 2px 7px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 600;
+      white-space: nowrap
+    }
+
+    .stat {
+      font-size: 11px;
+      color: #667085;
+      margin-left: 8px
+    }
+
+    textarea {
+      width: 100%;
+      flex-grow: 1;
+      resize: vertical;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 12px;
+      font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+      font-size: 12px;
+      line-height: 1.5;
+      outline: none;
+      background: #fff;
+      min-height: 360px
+    }
+
+    #promptText {
+      min-height: 360px;
+      background: #fcfdff
+    }
+
+    textarea:focus,
+    select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(47, 111, 237, .12)
+    }
+
+    select {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 8px 10px;
+      background: #fbfcfd
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-top: 6px;
+      flex-shrink: 0
+    }
+
+    button {
+      appearance: none;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #fff;
+      color: var(--text);
+      padding: 6px 8px;
+      font-weight: 650;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all .15s
+    }
+
+    button.primary {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent)
+    }
+
+    button:hover:not(:disabled) {
+      filter: brightness(.95)
+    }
+
+    button:disabled {
+      opacity: .6;
+      cursor: not-allowed
+    }
+
+    #status {
+      margin-top: 10px;
+      font-size: 12px;
+      line-height: 1.45;
+      color: var(--muted);
+      white-space: pre-wrap;
+      word-break: break-word
+    }
+
+    #status.error {
+      color: var(--danger)
+    }
+
+    #status.ok {
+      color: var(--ok)
+    }
+
+    #status.warn {
+      color: var(--warn)
+    }
+
+    .preview-wrap {
+      padding: 18px;
+      overflow: auto;
+      height: calc(100vh - 112px)
+    }
+
+    #preview {
+      position: relative;
+      width: min(100%, 1066px);
+      aspect-ratio: 16/9;
+      background: #fff;
+      border: 1px solid #ccd2dc;
+      margin: 0 auto;
+      box-shadow: 0 12px 30px rgba(15, 23, 42, .12);
+      overflow: hidden;
+      container-type: inline-size
+    }
+
+    .el {
+      position: absolute;
+      overflow: hidden;
+      white-space: pre-wrap;
+      word-break: normal
+    }
+
+    .placeholder {
+      display: grid;
+      place-items: center;
+      border: 1px dashed #a8b0bc;
+      background: repeating-linear-gradient(45deg, #f4f6f8, #f4f6f8 8px, #eef1f5 8px, #eef1f5 16px);
+      color: #667085;
+      text-align: center;
+      padding: 8px
+    }
+
+    .table {
+      border-collapse: collapse;
+      width: 100%;
+      height: 100%;
+      table-layout: fixed
+    }
+
+    .table td {
+      border: 1px solid #cfd6e0;
+      padding: 4px 6px;
+      vertical-align: middle;
+      overflow: hidden;
+      text-overflow: ellipsis
+    }
+
+    .usage {
+      overflow: auto
+    }
+
+    .usage ol {
+      padding-left: 18px;
+      margin: 8px 0 14px
+    }
+
+    .usage li {
+      margin: 6px 0;
+      font-size: 13px;
+      line-height: 1.45
+    }
+
+    .usage code {
+      background: var(--code);
+      padding: 2px 4px;
+      border-radius: 4px;
+      font-size: 12px
+    }
+
+    .mini {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin: 8px 0 2px
+    }
+
+    .mini div {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 8px;
+      background: #fbfcfd;
+      font-size: 12px;
+      color: var(--muted)
+    }
+
+    @media(max-width:1360px) {
+      main {
+        grid-template-columns: 460px 1fr
+      }
+
+      .usage-panel {
+        grid-column: 1/-1
+      }
+
+      #promptText {
+        min-height: 260px
+      }
+
+      .preview-wrap {
+        height: auto
+      }
+    }
+
+    @media(max-width:940px) {
+      main {
+        grid-template-columns: 1fr
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>Image -> PPTX</h1>
+  </header>
+  <main>
+    <section class="panel">
+      <h2>输入 <span class="pill">image-layout-pptx-v2</span></h2>
+      <div class="panel-body">
+        <label for="jsonInput">Layout JSON <span id="schemaStats" class="stat"></span></label><textarea id="jsonInput"
+          spellcheck="false"></textarea>
+        <div class="actions"><button id="loadSample">填入示例</button><button id="formatJson">格式化</button><button
+            id="validateBtn">校验 / 预览</button><button id="downloadJson">下载 JSON</button><button id="makePptx"
+            class="primary">生成 PPTX</button></div>
+        <div id="status">等待输入。</div>
+      </div>
+    </section>
+    <section class="panel">
+      <h2>HTML 预览</h2>
+      <div class="preview-wrap"><label for="slideSelect">预览页面</label><select id="slideSelect"></select>
+        <p class="hint">预览用于快速校对版式；最终 PPTX 会使用 PptxGenJS 的原生属性生成。</p>
+        <div id="preview"></div>
+      </div>
+    </section>
+    <section class="panel usage-panel">
+      <h2>LLM Prompt / 用法</h2>
+      <div class="panel-body usage">
+        <textarea id="promptText" readonly spellcheck="false"></textarea>
+        <div class="actions"><button id="copyPrompt">复制 Prompt</button></div>
+        <div class="mini">
+        </div>
+        <ol>
+          <li>附上要还原的图片或设计需求发给 LLM。</li>
+          <li>要求返回符合 <code>image-layout-pptx-v2</code> 的纯 JSON。</li>
+          <li>粘贴到左侧点击「校验 / 预览」，再「生成 PPTX」。</li>
+        </ol>
+      </div>
+    </section>
+  </main>
+  <script>
+    const $ = id => document.getElementById(id); let currentLayout = null, currentSlideIndex = 0;
+
+    const llmPrompt = `You are an image-to-editable-PowerPoint layout generation engine.
+
+Return ONE valid JSON object only. No Markdown. No code fences. No explanations.
+
+Goal: recreate the provided image/design as an editable PowerPoint deck with maximum visual fidelity.
+Use native PowerPoint/PptxGenJS objects wherever possible.
+
+Priority order:
+1. Editable text boxes with exact typography, margins, alignment, line spacing, character spacing, and rich text runs.
+2. Native shapes and lines for cards, panels, dividers, arrows, badges, geometric diagrams, backgrounds.
+3. Native tables for grids, comparison tables, schedules, metric tables.
+4. Native charts for simple bar/line/pie/doughnut charts when values can be inferred.
+5. Inline SVG only for complex icons/illustrations that cannot be represented with native shapes.
+6. Placeholder only when the visual cannot be reconstructed reliably.
+
+Coordinate system:
+- x, y, w, h are normalized from 0 to 1 relative to slide width/height.
+- Elements are rendered in array order. Later elements appear above earlier elements.
+- Use many small elements when needed for fidelity. Do not merge important text into SVG.
+- Use 6-character hex colors only, for example '#FFFFFF'. No rgba(), rgb(), CSS names, or 3-digit hex.
+- transparency is 0-100, where 0 is opaque and 100 is fully transparent.
+- opacity is 0-1 and may be used at element level.
+
+Schema:
+{
+  "schema": "image-layout-pptx-v2",
+  "deck": {
+    "title": "Generated deck",
+    "subject": "Image recreation",
+    "author": "AI",
+    "company": "",
+    "lang": "zh-CN",
+    "slideSize": { "width": 13.333, "height": 7.5 },
+    "theme": {
+      "headFontFace": "Aptos Display",
+      "bodyFontFace": "Aptos",
+      "lang": "zh-CN",
+      "colors": { "text": "#111111", "background": "#FFFFFF", "accent1": "#2F6FED" }
+    }
+  },
+  "slides": [
+    {
+      "id": "slide_001",
+      "section": "Main",
+      "background": { "type": "solid", "color": "#FFFFFF" },
+      "notes": ["Optional speaker note"],
+      "elements": []
+    }
+  ]
+}
+
+Common element fields:
+{
+  "id": "unique_name",
+  "type": "text | shape | line | svg | placeholder | table | chart | image",
+  "x": 0.1, "y": 0.1, "w": 0.3, "h": 0.1,
+  "rotation": 0,
+  "opacity": 1,
+  "flipH": false,
+  "flipV": false,
+  "alt": "short accessibility description",
+  "hyperlink": { "url": "https://example.com", "tooltip": "Open" }
+}
+
+Text element:
+{
+  "id": "title_1", "type": "text", "role": "title",
+  "x": 0.07, "y": 0.08, "w": 0.72, "h": 0.12,
+  "text": "Text content",
+  "richText": [
+    { "text": "Bold ", "options": { "bold": true } },
+    { "text": "accent", "options": { "color": "#2F6FED", "italic": true } }
+  ],
+  "style": {
+    "fontFace": "Aptos", "fontSize": 30, "bold": true, "italic": false,
+    "color": "#111111", "highlight": "#FFF2CC", "transparency": 0,
+    "align": "left", "valign": "top", "margin": [0,0,0,0],
+    "lineSpacingMultiple": 0.95, "lineSpacing": 22, "charSpacing": -1,
+    "fit": "shrink", "wrap": true,
+    "breakLine": false,
+    "bullet": false,
+    "underline": false,
+    "strike": false,
+    "subscript": false,
+    "superscript": false,
+    "fill": { "color": "#FFFFFF", "transparency": 100 },
+    "line": { "color": "#FFFFFF", "width": 0, "transparency": 100 },
+    "shadow": { "type": "outer", "color": "#000000", "opacity": 0.16, "blur": 2, "angle": 45, "distance": 1 },
+    "glow": { "color": "#2F6FED", "opacity": 0.35, "size": 1 }
+  }
+}
+Use richText for mixed formatting. For bullet lists, use richText array items with options.bullet and options.breakLine. Do not use Unicode bullet characters unless the original image visibly contains them as literal text.
+
+Shape element:
+{
+  "id": "card_1", "type": "shape", "shape": "rect | roundRect | ellipse | triangle | arc | chevron | pentagon | hexagon | diamond | parallelogram | trapezoid | cloud | star5",
+  "x": 0.07, "y": 0.25, "w": 0.36, "h": 0.35,
+  "style": {
+    "fill": { "color": "#F4F7FB", "transparency": 0 },
+    "line": { "color": "#D8DEE9", "width": 1, "transparency": 50, "dash": "solid" },
+    "radius": 0.025,
+    "shadow": { "type": "outer", "color": "#000000", "opacity": 0.10, "blur": 3, "angle": 45, "distance": 1 }
+  }
+}
+
+Line element:
+{
+  "id": "line_1", "type": "line",
+  "x": 0.07, "y": 0.22, "w": 0.86, "h": 0,
+  "style": { "line": { "color": "#D8DEE9", "width": 1, "dash": "solid", "beginArrowType": "none", "endArrowType": "none" } }
+}
+
+Table element:
+{
+  "id": "table_1", "type": "table",
+  "x": 0.08, "y": 0.35, "w": 0.84, "h": 0.35,
+  "colW": [0.28, 0.28, 0.28],
+  "rowH": [0.08, 0.09, 0.09],
+  "rows": [
+    [ { "text": "Metric", "options": { "bold": true, "fill": { "color": "#EEF4FF" } } }, { "text": "Q1" } ],
+    [ "Revenue", "$10M" ]
+  ],
+  "style": { "fontFace": "Aptos", "fontSize": 10, "color": "#111111", "align": "center", "valign": "mid", "margin": 0.04, "border": { "color": "#CFD6E0", "width": 1 } }
+}
+
+Chart element:
+{
+  "id": "chart_1", "type": "chart", "chartType": "bar | col | line | pie | doughnut",
+  "x": 0.52, "y": 0.22, "w": 0.36, "h": 0.38,
+  "data": [ { "name": "Series 1", "labels": ["A", "B", "C"], "values": [10, 20, 15] } ],
+  "style": { "showLegend": false, "showValue": false, "showCategoryName": false, "catAxisLabelFontFace": "Aptos", "catAxisLabelFontSize": 8, "valAxisLabelFontSize": 8, "showCatName": true, "showValAxis": true, "showCatAxis": true, "colors": ["#2F6FED", "#7AA2FF"] }
+}
+Only use chart when the underlying values can be reasonably inferred. Otherwise use native shapes/SVG.
+
+SVG element:
+{
+  "id": "svg_1", "type": "svg",
+  "x": 0.55, "y": 0.22, "w": 0.34, "h": 0.36,
+  "svg": "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 240'><rect width='400' height='240' rx='24' fill='#EEF4FF'/></svg>",
+  "alt": "simplified visual"
+}
+SVG rules: use single quotes for all SVG attributes inside the JSON string, include xmlns and viewBox, no external image/script/href/event handlers.
+
+Placeholder element:
+{ "id":"photo_1", "type":"placeholder", "x":0.55, "y":0.22, "w":0.34, "h":0.36, "label":"Photo manually added here" }
+
+Fidelity checklist before final JSON:
+- Extract every visible heading, label, number, axis label, caption, footnote as editable text.
+- Match hierarchy with fontSize, bold, weight, color, lineHeight/lineSpacingMultiple.
+- Recreate cards, dividers, chips, shadows, rounded corners, transparency, and arrows with native shapes/lines.
+- Preserve alignment: use margin: 0 for tightly aligned labels.
+- Split mixed-color/mixed-weight text into richText runs.
+- Use table/chart objects when the image contains a real table/chart.
+- Keep all coordinates within 0..1.
+`;
+
+    const sampleLayout = {
+      schema: "image-layout-pptx-v2", deck: { title: "layout", subject: "Image recreation", author: "AI", company: "", lang: "zh-CN", slideSize: { width: 13.333, height: 7.5 }, theme: { headFontFace: "Aptos Display", bodyFontFace: "Aptos", lang: "zh-CN", colors: { text: "#111111", background: "#FFFFFF", accent1: "#2F6FED" } } }, slides: [{
+        id: "slide_001", section: "Main", background: { type: "solid", color: "#FFFFFF" }, notes: ["Generated with enhanced PptxGenJS mapping."], elements: [
+          { id: "bg_band", type: "shape", shape: "rect", x: 0, y: 0, w: 1, h: 0.22, style: { fill: { color: "#EEF4FF", transparency: 0 }, line: { color: "#EEF4FF", width: 0, transparency: 100 } } },
+          { id: "title", type: "text", role: "title", x: 0.06, y: 0.07, w: 0.72, h: 0.08, text: "image → layout JSON → editable PPTX", style: { fontFace: "Aptos Display", fontSize: 28, bold: true, color: "#101828", align: "left", valign: "top", margin: [0, 0, 0, 0], fit: "shrink", charSpacing: -1 } },
+          { id: "subtitle", type: "text", role: "subtitle", x: 0.06, y: 0.155, w: 0.63, h: 0.055, richText: [{ text: "v2 uses ", options: { color: "#475467" } }, { text: "richText / shadows / charts / tables", options: { bold: true, color: "#2F6FED" } }, { text: " for better fidelity.", options: { color: "#475467" } }], style: { fontFace: "Aptos", fontSize: 12, color: "#475467", margin: [0, 0, 0, 0], fit: "shrink" } },
+          { id: "card_1", type: "shape", shape: "roundRect", x: 0.06, y: 0.29, w: 0.37, h: 0.43, style: { fill: { color: "#F8FAFC", transparency: 0 }, line: { color: "#D8DEE9", width: 1, transparency: 0 }, radius: 0.025, shadow: { type: "outer", color: "#000000", opacity: 0.10, blur: 2, angle: 45, distance: 1 } } },
+          { id: "metric", type: "text", x: 0.09, y: 0.33, w: 0.28, h: 0.07, richText: [{ text: "保真度 ", options: { color: "#344054" } }, { text: "+42%", options: { bold: true, color: "#217346" } }], style: { fontSize: 18, bold: false, margin: [0, 0, 0, 0], fit: "shrink" } },
+          { id: "bullets", type: "text", x: 0.095, y: 0.43, w: 0.29, h: 0.20, richText: [{ text: "Native text runs", options: { bullet: { type: "bullet" }, breakLine: true } }, { text: "Shape shadows and dashed lines", options: { bullet: { type: "bullet" }, breakLine: true } }, { text: "Editable charts and tables", options: { bullet: { type: "bullet" } } }], style: { fontSize: 12, color: "#344054", margin: [0.02, 0, 0, 0.06], fit: "shrink", lineSpacingMultiple: 1.05 } },
+          { id: "chart_1", type: "chart", chartType: "col", x: 0.52, y: 0.30, w: 0.36, h: 0.36, data: [{ name: "Fidelity", labels: ["Text", "Shape", "Chart", "Table"], values: [72, 84, 78, 88] }], style: { showLegend: false, showValue: false, showCatName: true, showValAxis: true, showCatAxis: true, catAxisLabelFontFace: "Aptos", catAxisLabelFontSize: 8, valAxisLabelFontSize: 8, colors: ["#2F6FED"] } },
+          { id: "arrow", type: "line", x: 0.445, y: 0.505, w: 0.055, h: 0, style: { line: { color: "#98A2B3", width: 2, dash: "solid", endArrowType: "triangle" } } },
+          { id: "foot", type: "text", x: 0.06, y: 0.86, w: 0.78, h: 0.05, text: "Tip: use margin: 0 and fit: shrink for pixel-like alignment.", style: { fontSize: 10, color: "#667085", margin: [0, 0, 0, 0] } }
+        ]
+      }]
+    };
+
+    $("jsonInput").value = JSON.stringify(sampleLayout, null, 2); $("promptText").value = llmPrompt;
+    $("loadSample").onclick = async () => { $("jsonInput").value = JSON.stringify(sampleLayout, null, 2); await validateAndPreview() }; $("formatJson").onclick = formatJson; $("validateBtn").onclick = validateAndPreview; $("downloadJson").onclick = downloadJson; $("copyPrompt").onclick = copyPrompt; $("makePptx").onclick = () => { const b = $("makePptx"); b.disabled = true; b.textContent = "处理中..."; setTimeout(() => generatePptx().finally(() => { b.disabled = false; b.textContent = "生成 PPTX" }), 50) }; $("slideSelect").onchange = async e => { currentSlideIndex = Number(e.target.value || 0); if (currentLayout) await renderPreview(currentLayout, currentSlideIndex) };
+
+    function fixLlmJsonErrors(rawText) { let text = rawText.trim(); text = text.replace(/^```(?:json)?/im, '').replace(/```$/m, '').trim(); text = text.replace(/"svg"\s*:\s*"([\s\S]*?<\/svg>)"/gi, (m, svg) => { let s = svg.replace(/\\"/g, '"').replace(/"/g, "'").replace(/\r?\n/g, ' '); return `"svg": "${s}"` }); return text }
+    function parseAndValidate(warnings = []) { let layout; const safe = fixLlmJsonErrors($("jsonInput").value); try { layout = typeof JSON5 !== "undefined" ? JSON5.parse(safe) : JSON.parse(safe) } catch (e) { throw new Error("JSON 解析失败：" + e.message) } if (!layout || !["image-layout-pptx", "image-layout-pptx-v2"].includes(layout.schema)) throw new Error("schema 必须是 image-layout-pptx-v2"); if (layout.schema === "image-layout-pptx") warnings.push("检测到旧 schema，已兼容读取；建议改为 image-layout-pptx-v2 以使用更多 PptxGenJS 属性。"); if (!layout.deck) layout.deck = {}; if (!layout.deck.slideSize) layout.deck.slideSize = { width: 13.333, height: 7.5 }; if (!Array.isArray(layout.slides) || !layout.slides.length) throw new Error("slides 必须是非空数组"); layout.slides.forEach((s, si) => { if (!Array.isArray(s.elements)) throw new Error(`slides[${si}].elements 必须是数组`); s.elements.forEach((el, i) => validateElement(el, si, i, warnings)) }); return normalizeLayout(layout) }
+    function validateElement(el, si, i, warnings) { const path = `slides[${si}].elements[${i}]`, allowed = ["text", "shape", "line", "image", "svg", "placeholder", "table", "chart"]; if (!el || !allowed.includes(el.type)) throw new Error(`${path}.type 不合法。允许：${allowed.join(", ")}`);["x", "y", "w", "h"].forEach(k => { if (typeof el[k] !== "number" || Number.isNaN(el[k])) throw new Error(`${path}.${k} 必须是数字`) }); if (el.type === "svg") { if (typeof el.svg !== "string" || !el.svg.trim().startsWith("<svg")) throw new Error(`${path}.svg 必须是 <svg> 字符串`); if (/<script|onload=|onclick=|href=["']https?:/i.test(el.svg)) throw new Error(`${path}.svg 不允许外部脚本或资源`) } if (el.type === "chart" && !Array.isArray(el.data)) throw new Error(`${path}.data 必须是图表数据数组`); if (el.type === "text" && el.richText && typeof el.text === "string") warnings.push(`${path} 同时存在 text 与 richText，将优先使用 richText。`) }
+    function normalizeLayout(layout) { const c = JSON.parse(JSON.stringify(layout)); c.schema = "image-layout-pptx-v2"; c.deck.slideSize.width = Number(c.deck.slideSize.width || 13.333); c.deck.slideSize.height = Number(c.deck.slideSize.height || 7.5); c.deck.theme = c.deck.theme || { bodyFontFace: "Aptos", colors: { text: "#111111" } }; for (const s of c.slides) { s.background = s.background || { type: "solid", color: "#FFFFFF" }; s.elements = s.elements.map((el, idx) => ({ ...el, id: el.id || `${el.type}_${idx + 1}`, opacity: el.opacity == null ? 1 : clamp(el.opacity, 0, 1), rotation: el.rotation || 0, x: clamp(el.x, 0, 1), y: clamp(el.y, 0, 1), w: clamp(el.w, 0.001, 1), h: el.type === "line" ? clamp(el.h, 0, 1) : clamp(el.h, 0.001, 1) })) } return c }
+    function ptToCqw(pt, sw) { return (pt / (sw * 72) * 100) + "cqw" } function pct(n) { return n * 100 + "%" } function clamp(n, a, b) { return Math.max(a, Math.min(b, n)) }
+    async function renderPreview(layout, slideIndex) { const p = $("preview"); p.innerHTML = ""; const s = layout.slides[slideIndex] || layout.slides[0], sw = layout.deck.slideSize.width; p.style.background = s.background?.type === "solid" ? (s.background.color || "#FFFFFF") : "#FFFFFF"; for (const el of s.elements) { const node = await createPreviewElement(el, layout, sw); node.classList.add("el"); node.style.left = pct(el.x); node.style.top = pct(el.y); node.style.width = pct(el.w); node.style.height = pct(el.h); node.style.opacity = el.opacity; node.style.transform = el.rotation ? `rotate(${el.rotation}deg)` : ""; p.appendChild(node) } updateStats(layout) }
+    async function createPreviewElement(el, layout, sw) {
+      if (el.type === "text") { const d = document.createElement("div"), st = el.style || {}; d.style.fontFamily = st.fontFace || layout.deck.theme?.bodyFontFace || layout.deck.theme?.fontFace || "Aptos, sans-serif"; d.style.fontSize = ptToCqw(st.fontSize || 16, sw); d.style.fontWeight = st.bold ? "700" : "400"; d.style.fontStyle = st.italic ? "italic" : "normal"; d.style.color = cssColor(st.color || layout.deck.theme?.colors?.text || "#111111"); d.style.textAlign = st.align || "left"; d.style.lineHeight = st.lineHeight || st.lineSpacingMultiple || "1.15"; d.style.display = "flex"; d.style.alignItems = (st.valign === "mid" || st.valign === "middle") ? "center" : st.valign === "bottom" ? "flex-end" : "flex-start"; d.style.justifyContent = st.align === "center" ? "center" : st.align === "right" ? "flex-end" : "flex-start"; d.style.padding = marginCss(st.margin, sw); if (st.fill?.color && Number(st.fill.transparency || 0) < 100) d.style.background = cssColor(st.fill.color); if (st.line?.width) d.style.border = `${st.line.width}px solid ${cssColor(st.line.color || "#111111")}`; if (st.shadow) d.style.boxShadow = previewShadow(st.shadow); if (Array.isArray(el.richText)) { d.innerHTML = el.richText.map(r => `<span style="${richPreviewStyle(r.options || {}, st, sw)}">${escapeHtml(r.text || "")}</span>`).join("") } else d.textContent = el.text || ""; return d }
+      if (el.type === "shape") { const d = document.createElement("div"), st = el.style || {}; d.style.background = cssColor(fillColor(st.fill) || "transparent"); const ln = lineObj(st.line); d.style.border = ln.width ? `${ln.width}px ${ln.dash && ln.dash !== "solid" ? "dashed" : "solid"} ${cssColor(ln.color || "#000000")}` : "none"; d.style.borderRadius = el.shape === "roundRect" ? pct(st.radius || 0.02) : el.shape === "ellipse" ? "50%" : "0"; if (el.shape === "triangle") d.style.clipPath = "polygon(50% 0%,0% 100%,100% 100%)"; if (st.shadow) d.style.boxShadow = previewShadow(st.shadow); return d }
+      if (el.type === "line") { const d = document.createElement("div"), ln = lineObj(el.style?.line || el.style || {}); d.style.borderTop = `${ln.width == null ? 1 : ln.width}px ${ln.dash && ln.dash !== "solid" ? "dashed" : "solid"} ${cssColor(ln.color || "#111111")}`; d.style.height = "0"; return d }
+      if (el.type === "svg") { const img = document.createElement("img"); let s = el.svg; if (!s.includes("xmlns=")) s = s.replace("<svg", "<svg xmlns='http://www.w3.org/2000/svg'"); img.src = svgToDataUrl(s); img.style.width = "100%"; img.style.height = "100%"; img.style.objectFit = "contain"; return img }
+      if (el.type === "placeholder") { const d = document.createElement("div"); d.className = "placeholder"; d.textContent = el.label || "Placeholder"; d.style.fontSize = ptToCqw(12, sw); return d }
+      if (el.type === "table") { const t = document.createElement("table"); t.className = "table"; const st = el.style || {}; t.style.fontFamily = st.fontFace || layout.deck.theme?.bodyFontFace || "Aptos"; t.style.color = cssColor(st.color || "#111111"); t.style.fontSize = ptToCqw(st.fontSize || 10, sw); (el.rows || []).forEach(row => { const tr = document.createElement("tr"); row.forEach(cell => { const td = document.createElement("td"); const co = typeof cell === "string" ? {} : (cell.options || {}); td.textContent = typeof cell === "string" ? cell : (cell.text || ""); if (co.bold) td.style.fontWeight = "700"; if (co.color) td.style.color = cssColor(co.color); if (co.fill?.color) td.style.background = cssColor(co.fill.color); td.style.textAlign = co.align || st.align || "left"; tr.appendChild(td) }); t.appendChild(tr) }); return t }
+      if (el.type === "chart") { const d = document.createElement("div"); d.style.display = "grid"; d.style.placeItems = "end stretch"; d.style.gap = "4px"; d.style.gridAutoFlow = "column"; d.style.alignItems = "end"; d.style.padding = "8px"; const vals = (el.data?.[0]?.values || []), max = Math.max(...vals, 1); vals.forEach(v => { const b = document.createElement("div"); b.style.height = (v / max * 88) + "%"; b.style.background = cssColor(el.style?.colors?.[0] || "#2F6FED"); b.style.borderRadius = "3px 3px 0 0"; d.appendChild(b) }); return d }
+      return document.createElement("div")
+    }
+    function richPreviewStyle(o, st, sw) { let s = ""; if (o.bold) s += "font-weight:700;"; if (o.italic) s += "font-style:italic;"; if (o.color) s += `color:${cssColor(o.color)};`; if (o.fontSize) s += `font-size:${ptToCqw(o.fontSize, sw)};`; return s }
+    function escapeHtml(s) { return String(s).replace(/[&<>"]/g, m => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;" }[m])) }
+    function previewShadow(sh) { const op = sh.opacity == null ? 0.16 : sh.opacity; return `0 ${sh.distance || 2}px ${sh.blur || 6}px rgba(0,0,0,${op})` } function marginCss(m, sw) { if (Array.isArray(m)) return m.map(x => ptToCqw(Number(x) * 72, sw)).join(" "); if (typeof m === "number") return ptToCqw(m * 72, sw); return "0" }
+
+    async function generatePptx() { try { const warnings = [], layout = parseAndValidate(warnings), Ctor = window.pptxgenjs || window.pptxgen || window.PptxGenJS; if (!Ctor) throw new Error("未能加载 PptxGenJS。请检查网络。"); const pptx = new Ctor(), sw = layout.deck.slideSize.width, sh = layout.deck.slideSize.height; pptx.defineLayout({ name: "CUST", width: sw, height: sh }); pptx.layout = "CUST"; applyDeckMeta(pptx, layout); let lastSection = null; for (const sd of layout.slides) { if (sd.section && sd.section !== lastSection && pptx.addSection) { pptx.addSection({ title: sd.section }); lastSection = sd.section } const slide = pptx.addSlide(); if (sd.background?.type === "solid") slide.background = { color: cleanColor(sd.background.color) }; if (Array.isArray(sd.notes) && slide.addNotes) slide.addNotes(sd.notes); for (const el of sd.elements) { const box = { x: el.x * sw, y: el.y * sh, w: el.w * sw, h: el.h * sh }, base = { ...box, rotate: el.rotation || 0, flipH: !!el.flipH, flipV: !!el.flipV, hyperlink: hyperlinkOpt(el.hyperlink) }; if (el.type === "shape") addShape(slide, pptx, el, base, sw, sh); else if (el.type === "line") addLine(slide, pptx, el, box); else if (el.type === "text") addText(slide, layout, el, base); else if (el.type === "svg") await addSvg(slide, el, base); else if (el.type === "placeholder") addPlaceholder(slide, pptx, el, base); else if (el.type === "table") addTable(slide, layout, el, base, sw, sh); else if (el.type === "chart") addChart(slide, pptx, el, base); else if (el.type === "image") addImage(slide, el, base) } } await pptx.writeFile({ fileName: "generated-layout-fidelity.pptx" }); setStatus("已成功生成 enhanced PPTX 文件！" + (warnings.length ? "\n\nWarnings:\n- " + warnings.join("\n- ") : ""), warnings.length ? "warn" : "ok") } catch (e) { setStatus("生成失败: " + (e.message || String(e)), "error") } }
+    function applyDeckMeta(pptx, l) { pptx.author = l.deck.author || "AI"; pptx.company = l.deck.company || ""; pptx.subject = l.deck.subject || "Image recreation"; pptx.title = l.deck.title || "Generated deck"; pptx.lang = l.deck.lang || l.deck.theme?.lang || "zh-CN"; const th = l.deck.theme || {}; pptx.theme = { headFontFace: th.headFontFace || th.fontFace || "Aptos Display", bodyFontFace: th.bodyFontFace || th.fontFace || "Aptos", lang: th.lang || l.deck.lang || "zh-CN" } }
+    function addShape(slide, pptx, el, base, sw, sh) { const st = el.style || {}; slide.addShape(mapShape(pptx, el.shape), { ...base, fill: fillOpt(st.fill ?? st.fillColor, el.opacity), line: lineOpt(st.line), radius: st.radius ? st.radius * Math.min(sw, sh) : undefined, shadow: shadowOpt(st.shadow), transparency: opacityToTransparency(el.opacity), shapeName: el.id }) }
+    function addLine(slide, pptx, el, box) { slide.addShape(pptx.ShapeType.line, { x: box.x, y: box.y, w: box.w, h: box.h || 0, rotate: el.rotation || 0, line: lineOpt(el.style?.line || el.style), shapeName: el.id }) }
+    function addText(slide, layout, el, base) { const st = el.style || {}, font = st.fontFace || layout.deck.theme?.bodyFontFace || layout.deck.theme?.fontFace || "Aptos"; const opts = { ...base, fontFace: font, fontSize: st.fontSize || 16, bold: !!st.bold, italic: !!st.italic, color: cleanColor(st.color || layout.deck.theme?.colors?.text || "#111111"), highlight: st.highlight ? cleanColor(st.highlight) : undefined, transparency: num(st.transparency), align: st.align || "left", valign: mapValign(st.valign), margin: marginOpt(st.margin), fit: st.fit || "shrink", wrap: st.wrap !== false, breakLine: !!st.breakLine, lineSpacing: st.lineSpacing, lineSpacingMultiple: st.lineSpacingMultiple, charSpacing: st.charSpacing, paraSpaceAfter: st.paraSpaceAfter, underline: st.underline, strike: st.strike, subscript: st.subscript, superscript: st.superscript, bullet: bulletOpt(st.bullet), fill: fillOpt(st.fill), line: lineOpt(st.line), shadow: shadowOpt(st.shadow), glow: glowOpt(st.glow), shapeName: el.id, hyperlink: hyperlinkOpt(el.hyperlink) }; if (Array.isArray(el.richText)) { slide.addText(el.richText.map(r => ({ text: r.text || "", options: cleanTextRunOptions(r.options || {}, st, font) })), opts) } else slide.addText(el.text || "", opts) }
+    function cleanTextRunOptions(o, st, font) { return { fontFace: o.fontFace || font, fontSize: o.fontSize, bold: o.bold, italic: o.italic, color: o.color ? cleanColor(o.color) : undefined, highlight: o.highlight ? cleanColor(o.highlight) : undefined, breakLine: o.breakLine, softBreakBefore: o.softBreakBefore, options: o.options, bullet: bulletOpt(o.bullet), underline: o.underline, strike: o.strike, subscript: o.subscript, superscript: o.superscript, charSpacing: o.charSpacing, lineSpacingMultiple: o.lineSpacingMultiple } }
+    async function addSvg(slide, el, base) { let svg = el.svg; if (!svg.includes("xmlns=")) svg = svg.replace("<svg", "<svg xmlns='http://www.w3.org/2000/svg'"); if (!svg.includes("width=")) svg = svg.replace("<svg", "<svg width='100%'"); if (!svg.includes("height=")) svg = svg.replace("<svg", "<svg height='100%'"); const data = await svgToPngDataUrl(svg, Math.max(20, Math.round(base.w * 192)), Math.max(20, Math.round(base.h * 192))); slide.addImage({ data, ...base, transparency: opacityToTransparency(el.opacity), altText: el.alt || el.id }) }
+    function addPlaceholder(slide, pptx, el, base) { slide.addShape(pptx.ShapeType.roundRect, { ...base, fill: { color: "F4F6F8", transparency: opacityToTransparency(el.opacity) }, line: { color: "B8C0CC", width: 1, dash: "dash" }, radius: .08, shapeName: el.id }); slide.addText(el.label || "Placeholder", { ...base, fontSize: 11, color: "667085", align: "center", valign: "mid", margin: .04, fit: "shrink" }) }
+    function addTable(slide, layout, el, base, sw, sh) { const st = el.style || {}; const rows = (el.rows || []).map(r => r.map(c => typeof c === "string" ? { text: c, options: {} } : { text: c.text || "", options: tableCellOptions(c.options || {}, st, layout) })); slide.addTable(rows, { ...base, fontFace: st.fontFace || layout.deck.theme?.bodyFontFace || "Aptos", fontSize: st.fontSize || 10, color: cleanColor(st.color || "#111111"), align: st.align || "left", valign: mapValign(st.valign) || "mid", margin: st.margin == null ? 0.04 : st.margin, border: { type: "solid", color: cleanColor(st.border?.color || "#CFD6E0"), pt: st.border?.width || 1 }, colW: Array.isArray(el.colW) ? el.colW.map(v => v * sw) : undefined, rowH: Array.isArray(el.rowH) ? el.rowH.map(v => v * sh) : undefined, shapeName: el.id }) }
+    function tableCellOptions(o, st, layout) { return { bold: o.bold, italic: o.italic, color: o.color ? cleanColor(o.color) : undefined, fontSize: o.fontSize, align: o.align || st.align, valign: mapValign(o.valign || st.valign), fill: o.fill?.color ? { color: cleanColor(o.fill.color), transparency: num(o.fill.transparency) } : undefined, margin: o.margin ?? st.margin, border: o.border ? { type: "solid", color: cleanColor(o.border.color || "#CFD6E0"), pt: o.border.width || 1 } : undefined } }
+    function addChart(slide, pptx, el, base) { const t = mapChartType(pptx, el.chartType); const st = el.style || {}; slide.addChart(t, el.data, { ...base, showLegend: !!st.showLegend, showValue: !!st.showValue, showCategoryName: !!st.showCategoryName, showCatName: st.showCatName !== false, showValAxis: st.showValAxis !== false, showCatAxis: st.showCatAxis !== false, catAxisLabelFontFace: st.catAxisLabelFontFace, catAxisLabelFontSize: st.catAxisLabelFontSize, valAxisLabelFontSize: st.valAxisLabelFontSize, showTitle: !!st.title, title: st.title, showTitleOverlay: false, ser: st.colors ? { dataLabelPosition: "bestFit" } : undefined, chartColors: Array.isArray(st.colors) ? st.colors.map(cleanColor) : undefined, shapeName: el.id }) }
+    function addImage(slide, el, base) { if (el.data) slide.addImage({ data: el.data, ...base, transparency: opacityToTransparency(el.opacity), altText: el.alt || el.id }); else if (el.path) slide.addImage({ path: el.path, ...base, transparency: opacityToTransparency(el.opacity), altText: el.alt || el.id }) }
+
+    function cleanColor(c) { if (!c || c === "transparent") return "FFFFFF"; let s = String(c).trim().toUpperCase(); if (s.startsWith("RGB")) return "888888"; let h = s.replace(/[^0-9A-F]/g, ""); if (h.length === 3) return h.split("").map(x => x + x).join(""); return h.slice(0, 6).padStart(6, "0") } function cssColor(c) { return c && c.startsWith("#") ? c : "#" + cleanColor(c) } function num(v) { return v == null ? undefined : Number(v) } function opacityToTransparency(op) { return op == null ? 0 : Math.round((1 - op) * 100) } function fillColor(f) { return typeof f === "string" ? f : f?.color } function fillOpt(f, op) { const color = fillColor(f); if (!color || color === "transparent") return { color: "FFFFFF", transparency: 100 }; return { color: cleanColor(color), transparency: f && typeof f === "object" && f.transparency != null ? f.transparency : opacityToTransparency(op) } } function lineObj(l) { return typeof l === "object" && l ? l : {} } function lineOpt(l) { l = lineObj(l); if (!l || l.width === 0) return { color: "FFFFFF", transparency: 100, width: 0 }; return { color: cleanColor(l.color || "#111111"), width: l.width ?? 1, transparency: num(l.transparency), dash: l.dash === "dash" || l.dash === "dashDot" || l.dash === "lgDash" ? l.dash : undefined, beginArrowType: l.beginArrowType && l.beginArrowType !== "none" ? l.beginArrowType : undefined, endArrowType: l.endArrowType && l.endArrowType !== "none" ? l.endArrowType : undefined } }
+    function shadowOpt(sh) { if (!sh) return undefined; return { type: sh.type || "outer", color: cleanColor(sh.color || "#000000"), opacity: sh.opacity ?? 0.16, blur: sh.blur ?? 2, angle: sh.angle ?? 45, distance: sh.distance ?? 1 } } function glowOpt(g) { if (!g) return undefined; return { color: cleanColor(g.color || "#2F6FED"), opacity: g.opacity ?? 0.35, size: g.size ?? 1 } } function marginOpt(m) { if (m == null) return 0; if (Array.isArray(m)) return m; return m } function hyperlinkOpt(h) { if (!h) return undefined; return h.url ? { url: h.url, tooltip: h.tooltip } : h.slide ? { slide: h.slide, tooltip: h.tooltip } : undefined } function bulletOpt(b) { if (!b) return undefined; if (b === true) return { type: "bullet" }; return b } function mapValign(v) { return v === "middle" ? "mid" : (v || undefined) }
+    function mapShape(pptx, s) { const S = pptx.ShapeType; const m = { ellipse: S.ellipse, triangle: S.triangle, roundRect: S.roundRect, arc: S.arc, chevron: S.chevron, pentagon: S.pentagon, hexagon: S.hexagon, diamond: S.diamond, parallelogram: S.parallelogram, trapezoid: S.trapezoid, cloud: S.cloud, star5: S.star5 }; return m[s] || S.rect } function mapChartType(pptx, t) { const C = pptx.ChartType || {}; return ({ bar: C.bar, col: C.bar, line: C.line, pie: C.pie, doughnut: C.doughnut }[t] || C.bar) } function svgToDataUrl(svg) { return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg) } function svgToPngDataUrl(svg, w, h) { return new Promise((res, rej) => { const img = new Image(); img.onload = () => { try { const c = document.createElement("canvas"); c.width = w; c.height = h; const ctx = c.getContext("2d"); ctx.drawImage(img, 0, 0, w, h); res(c.toDataURL("image/png")) } catch (e) { rej(e) } }; img.onerror = () => rej(new Error("SVG 渲染失败")); img.src = svgToDataUrl(svg) }) }
+    function formatJson() { try { const parsed = typeof JSON5 !== "undefined" ? JSON5.parse(fixLlmJsonErrors($("jsonInput").value)) : JSON.parse(fixLlmJsonErrors($("jsonInput").value)); $("jsonInput").value = JSON.stringify(parsed, null, 2); setStatus("JSON 已自动修复并格式化。", "ok") } catch (e) { setStatus("格式化失败：" + e.message, "error") } } function downloadJson() { try { const l = parseAndValidate([]), blob = new Blob([JSON.stringify(l, null, 2)], { type: "application/json" }), a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "layout-v2.json"; a.click() } catch (e) { setStatus(e.message, "error") } } async function copyPrompt() { try { await navigator.clipboard.writeText($("promptText").value); setStatus("Prompt 已复制。", "ok") } catch (e) { setStatus("无法复制，请手动选中复制。", "warn") } }
+    function syncSlideSelect(layout) { const sel = $("slideSelect"), old = currentSlideIndex; sel.innerHTML = layout.slides.map((s, i) => `<option value="${i}">${i + 1}. ${s.id || "slide"}</option>`).join(""); currentSlideIndex = Math.min(old, layout.slides.length - 1); sel.value = String(currentSlideIndex) } function updateStats(layout) { const els = layout.slides.flatMap(s => s.elements || []), count = {}; els.forEach(e => count[e.type] = (count[e.type] || 0) + 1); $("schemaStats").textContent = Object.entries(count).map(([k, v]) => `${k}:${v}`).join(" · ") } async function validateAndPreview() { try { const warnings = [], layout = parseAndValidate(warnings); currentLayout = layout; syncSlideSelect(layout); await renderPreview(layout, currentSlideIndex); const msg = `JSON 有效。slides: ${layout.slides.length}，当前预览第 ${currentSlideIndex + 1} 页。`; setStatus(warnings.length ? msg + "\n\nWarnings:\n- " + warnings.join("\n- ") : msg, warnings.length ? "warn" : "ok") } catch (e) { setStatus(e.message || String(e), "error") } }
+    function setStatus(msg, type) { const el = $("status"); el.textContent = msg; el.className = type || "" }
+    validateAndPreview();
+  </script>
+</body>
+
+</html>
