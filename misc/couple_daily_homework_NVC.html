@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>情侣每日作业｜NVC反馈</title>
+  <style>
+    :root {
+      --bg1: #fff2fb;
+      --bg2: #eef3ff;
+      --card: rgba(255, 255, 255, 0.86);
+      --card-solid: #ffffff;
+      --text: #201629;
+      --muted: #5f5368;
+      --line: rgba(58, 35, 80, 0.24);
+      --accent: #d000b8;
+      --accent2: #4d5dff;
+      --good: #5a2cff;
+      --bad: #c026d3;
+      --warn: #b56b00;
+      --shadow: 0 18px 55px rgba(81, 47, 107, 0.14);
+      --radius: 22px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      background:
+        radial-gradient(circle at 12% 12%, rgba(208, 0, 184, 0.22), transparent 28%),
+        radial-gradient(circle at 85% 0%, rgba(77, 93, 255, 0.20), transparent 32%),
+        linear-gradient(135deg, var(--bg1), var(--bg2));
+      line-height: 1.5;
+    }
+
+    .shell {
+      width: min(1180px, calc(100vw - 32px));
+      margin: 0 auto;
+      padding: 32px 0 60px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.4fr 0.6fr;
+      gap: 18px;
+      align-items: stretch;
+      margin-bottom: 20px;
+    }
+
+    .hero-main,
+    .score-card,
+    .panel,
+    .entry {
+      border: 1px solid var(--line);
+      background: var(--card);
+      backdrop-filter: blur(16px);
+      box-shadow: var(--shadow);
+      border-radius: var(--radius);
+    }
+
+    .hero-main {
+      padding: 28px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-main::after {
+      content: "♡";
+      position: absolute;
+      right: 28px;
+      top: 10px;
+      font-size: 84px;
+      color: rgba(208, 0, 184, 0.15);
+      transform: rotate(-12deg);
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: clamp(30px, 4vw, 52px);
+      letter-spacing: -0.05em;
+      line-height: 1.05;
+    }
+
+    .subtitle {
+      margin: 0;
+      color: var(--muted);
+      font-size: 16px;
+      max-width: 720px;
+    }
+
+    .flow {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 9px;
+      margin-top: 22px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(208, 0, 184, 0.12);
+      border: 1px solid rgba(208, 0, 184, 0.28);
+      font-size: 13px;
+      color: #4d234b;
+    }
+
+    .score-card {
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 14px;
+    }
+
+    .date-row {
+      display: grid;
+      gap: 8px;
+    }
+
+    label {
+      font-size: 13px;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    input[type="date"],
+    input[type="text"],
+    textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 11px 12px;
+      background: rgba(255, 255, 255, 0.72);
+      color: var(--text);
+      font: inherit;
+      outline: none;
+      transition: border-color .16s, box-shadow .16s, background .16s;
+    }
+
+    textarea {
+      min-height: 88px;
+      resize: vertical;
+    }
+
+    input:focus,
+    textarea:focus {
+      border-color: rgba(77, 93, 255, 0.66);
+      box-shadow: 0 0 0 4px rgba(77, 93, 255, 0.16);
+      background: #fff;
+    }
+
+    .score-number {
+      font-size: 56px;
+      font-weight: 900;
+      letter-spacing: -0.05em;
+      line-height: 1;
+    }
+
+    .score-number.positive {
+      color: var(--good);
+    }
+
+    .score-number.nonpositive {
+      color: var(--bad);
+    }
+
+    .score-text {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .status {
+      padding: 10px 12px;
+      border-radius: 14px;
+      font-weight: 800;
+      font-size: 14px;
+      border: 1px solid;
+    }
+
+    .status.ok {
+      color: var(--good);
+      background: rgba(22, 129, 91, 0.10);
+      border-color: rgba(22, 129, 91, 0.20);
+    }
+
+    .status.no {
+      color: var(--bad);
+      background: rgba(185, 51, 70, 0.10);
+      border-color: rgba(185, 51, 70, 0.20);
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 16px 0 22px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 14px;
+      padding: 11px 15px;
+      cursor: pointer;
+      font: inherit;
+      font-weight: 850;
+      transition: transform .12s, box-shadow .12s, opacity .12s;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    .primary {
+      color: white;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      box-shadow: 0 10px 24px rgba(142, 104, 255, 0.20);
+    }
+
+    .secondary {
+      color: #4d3a5c;
+      background: rgba(255, 255, 255, 0.72);
+      border: 1px solid var(--line);
+    }
+
+    .danger {
+      color: #fff;
+      background: linear-gradient(135deg, #d44e64, #9d3347);
+    }
+
+    button:disabled {
+      cursor: not-allowed;
+      opacity: .52;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .panel {
+      padding: 20px;
+      margin-bottom: 18px;
+    }
+
+    .panel h2 {
+      margin: 0 0 6px;
+      font-size: 20px;
+      letter-spacing: -0.02em;
+    }
+
+    .panel p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .entries {
+      display: grid;
+      gap: 18px;
+    }
+
+    .entry {
+      padding: 20px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .entry::before {
+      content: attr(data-index);
+      position: absolute;
+      right: 20px;
+      top: 14px;
+      font-size: 46px;
+      font-weight: 900;
+      color: rgba(142, 104, 255, 0.10);
+      line-height: 1;
+    }
+
+    .entry-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .entry-title {
+      margin: 0;
+      font-size: 18px;
+      letter-spacing: -0.02em;
+    }
+
+    .entry-score {
+      min-width: 74px;
+      text-align: center;
+      border-radius: 999px;
+      padding: 8px 10px;
+      background: rgba(255, 255, 255, 0.64);
+      border: 1px solid var(--line);
+      color: var(--muted);
+      font-weight: 900;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .wide {
+      grid-column: 1 / -1;
+    }
+
+    .field {
+      display: grid;
+      gap: 8px;
+    }
+
+    .print-empty-hidden {
+      display: none !important;
+    }
+
+    body:not(.printing) .print-empty-hidden {
+      display: grid !important;
+    }
+
+    .tag-section {
+      display: grid;
+      gap: 10px;
+    }
+
+    .tag-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .tag-hint {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .tag {
+      user-select: none;
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.64);
+      color: #49394f;
+      font-size: 13px;
+      cursor: pointer;
+      transition: .12s;
+    }
+
+    .tag input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .tag .score {
+      color: var(--muted);
+      font-weight: 900;
+      font-size: 12px;
+    }
+
+    .tag.pos.selected {
+      background: rgba(90, 44, 255, 0.14);
+      border-color: rgba(90, 44, 255, 0.52);
+      color: #3214ad;
+      box-shadow: 0 0 0 3px rgba(90, 44, 255, 0.12);
+    }
+
+    .tag.pos.selected::before {
+      content: "＋";
+      font-weight: 950;
+    }
+
+    .tag.neg.selected {
+      background: rgba(192, 38, 211, 0.13);
+      border-color: rgba(192, 38, 211, 0.56);
+      color: #8a129b;
+      box-shadow: 0 0 0 3px rgba(192, 38, 211, 0.12);
+    }
+
+    .tag.neg.selected::before {
+      content: "－";
+      font-weight: 950;
+    }
+
+    .tag.neu.selected {
+      background: rgba(181, 107, 0, 0.12);
+      border-color: rgba(181, 107, 0, 0.42);
+      color: #7a4700;
+      box-shadow: 0 0 0 3px rgba(181, 107, 0, 0.10);
+    }
+
+    .tag.neu.selected::before {
+      content: "•";
+      font-weight: 950;
+    }
+
+    .custom-row {
+      display: grid;
+      grid-template-columns: 1fr 130px;
+      gap: 8px;
+    }
+
+    .custom-preview {
+      display: none;
+      width: fit-content;
+      padding: 8px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(58, 35, 80, 0.24);
+      background: rgba(255, 255, 255, 0.75);
+      font-size: 13px;
+      font-weight: 850;
+    }
+
+    .custom-preview.has-content {
+      display: inline-flex;
+    }
+
+    select {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 10px 12px;
+      background: rgba(255, 255, 255, 0.72);
+      font: inherit;
+      color: var(--text);
+      outline: none;
+    }
+
+    .autosave {
+      color: var(--muted);
+      font-size: 13px;
+      margin-left: auto;
+      align-self: center;
+    }
+
+    .footer-note {
+      color: var(--muted);
+      font-size: 12px;
+      margin: 18px 0 0;
+      text-align: center;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 22px;
+      transform: translateX(-50%) translateY(20px);
+      opacity: 0;
+      pointer-events: none;
+      background: #31263e;
+      color: #fff;
+      padding: 12px 16px;
+      border-radius: 999px;
+      box-shadow: var(--shadow);
+      font-weight: 800;
+      transition: .18s;
+      z-index: 30;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    @media (max-width: 820px) {
+      .hero {
+        grid-template-columns: 1fr;
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .custom-row {
+        grid-template-columns: 1fr;
+      }
+
+      .shell {
+        width: min(100vw - 20px, 1180px);
+        padding-top: 12px;
+      }
+
+      .hero-main,
+      .score-card,
+      .panel,
+      .entry {
+        border-radius: 18px;
+      }
+    }
+
+    @media print {
+      body {
+        background: #fff !important;
+      }
+
+      .shell {
+        width: 100%;
+        padding: 0;
+      }
+
+      .toolbar,
+      .footer-note,
+      .toast,
+      .custom-row,
+      .tag-hint {
+        display: none !important;
+      }
+
+      .hero,
+      .entries {
+        display: block;
+      }
+
+      .hero-main,
+      .score-card,
+      .panel,
+      .entry {
+        box-shadow: none;
+        border: 1px solid #ddd;
+        background: #fff;
+        break-inside: avoid;
+        margin-bottom: 12px;
+      }
+
+      .entry {
+        padding: 14px;
+      }
+
+      textarea,
+      input,
+      select {
+        border-color: #ddd;
+        background: #fff;
+      }
+
+      .tag:not(.selected) {
+        display: none;
+      }
+
+      .tag.selected {
+        border-color: #bbb !important;
+        box-shadow: none !important;
+        background: #fff !important;
+        color: #111 !important;
+      }
+
+      h1 {
+        font-size: 30px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <section class="hero">
+      <div class="hero-main">
+        <h1>情侣每日作业</h1>
+        <div class="flow" aria-label="填写流程">
+          <span class="pill">① 事实：只描述发生了什么</span>
+          <span class="pill">② 感受：选标签或补充</span>
+          <span class="pill">③ 需求：我真正想要什么</span>
+          <span class="pill">④ 方案：下次怎么做</span>
+        </div>
+        <h2>核心: 诚实反馈文字和分数</h2>
+      </div>
+
+      <aside class="score-card">
+        <div class="date-row">
+          <label for="day">日期</label>
+          <input id="day" type="date" />
+        </div>
+        <div>
+          <div id="totalScore" class="score-number positive">+0</div>
+          <p class="score-text">今日总分，范围建议理解为 -15 到 +15；单个情绪标签为 -3 到 +3。</p>
+        </div>
+        <div id="status" class="status no">! 今日总分必须为正，才能导出 PDF。</div>
+      </aside>
+    </section>
+
+    <div class="toolbar">
+      <button class="primary" id="exportPdf">导出 PDF</button>
+      <button class="secondary" id="fillExample">填入示例</button>
+      <button class="danger" id="clearAll">一键清空</button>
+      <span class="autosave" id="saveState">已开启本地自动缓存</span>
+    </div>
+
+
+    <section id="entries" class="entries" aria-label="每日五条记录"></section>
+
+    <p class="footer-note">数据只保存在当前浏览器的 localStorage，不会上传到任何服务器。导出 PDF 使用浏览器打印功能，选择“保存为 PDF”即可。</p>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    const STORAGE_KEY = "coupleDailyHomework.v1";
+
+    const positiveTags = [
+      ["感动", 3], ["感激", 3], ["被爱", 3], ["安心", 2], ["满足", 2],
+      ["开心", 2], ["亲密", 2], ["被理解", 2], ["期待", 2], ["踏实", 2],
+      ["温暖", 2], ["欣赏", 2], ["骄傲", 2], ["放松", 1], ["好奇", 1],
+      ["平静", 1], ["被尊重", 2], ["被支持", 2], ["有希望", 2], ["甜蜜", 3],
+      ["珍惜", 2], ["释然", 1], ["信任", 2], ["心软", 1], ["愿意靠近", 2]
+    ];
+
+    const negativeTags = [
+      ["愤怒", -3], ["委屈", -3], ["伤心", -3], ["难过", -2], ["失望", -2],
+      ["焦虑", -2], ["害怕", -2], ["孤单", -2], ["不被重视", -3], ["被忽略", -2],
+      ["挫败", -2], ["嫉妒", -2], ["羞耻", -2], ["烦躁", -1], ["疲惫", -1],
+      ["压力大", -1], ["困惑", -1], ["不安", -2], ["冷淡", -2], ["无力", -2],
+      ["防御", -1], ["紧张", -1], ["失落", -2], ["心疼", -1], ["受伤", -3]
+    ];
+
+    const neutralTags = [
+      ["需要空间", 0], ["需要拥抱", 0], ["需要解释", 0], ["需要确认", 0],
+      ["想被倾听", 0], ["想要陪伴", 0], ["需要边界", 0], ["需要计划", 0]
+    ];
+
+    const entriesEl = document.getElementById("entries");
+    const totalScoreEl = document.getElementById("totalScore");
+    const statusEl = document.getElementById("status");
+    const saveStateEl = document.getElementById("saveState");
+    const dayEl = document.getElementById("day");
+    const toastEl = document.getElementById("toast");
+
+    function todayISO() {
+      const d = new Date();
+      const offset = d.getTimezoneOffset();
+      const local = new Date(d.getTime() - offset * 60000);
+      return local.toISOString().slice(0, 10);
+    }
+
+    function signed(n) {
+      return n > 0 ? `+${n}` : `${n}`;
+    }
+
+    function showToast(message) {
+      toastEl.textContent = message;
+      toastEl.classList.add("show");
+      clearTimeout(showToast.timer);
+      showToast.timer = setTimeout(() => toastEl.classList.remove("show"), 1800);
+    }
+
+    function makeTag(label, score, groupName, index, type) {
+      const safe = `${groupName}-${index}-${label}`.replace(/\s+/g, "-");
+      return `
+        <label class="tag ${type}" data-score="${score}">
+          <input type="checkbox" name="${groupName}" value="${label}" data-score="${score}" id="${safe}">
+          <span>${label}</span>
+          <span class="score">${signed(score)}</span>
+        </label>
+      `;
+    }
+
+    function renderEntries() {
+      const positiveHtml = (i) => positiveTags.map(([label, score]) => makeTag(label, score, `feelings-${i}`, i, "pos")).join("");
+      const negativeHtml = (i) => negativeTags.map(([label, score]) => makeTag(label, score, `feelings-${i}`, i, "neg")).join("");
+      const neutralHtml = (i) => neutralTags.map(([label, score]) => makeTag(label, score, `feelings-${i}`, i, "neu")).join("");
+
+      entriesEl.innerHTML = Array.from({ length: 5 }, (_, idx) => {
+        const i = idx + 1;
+        return `
+          <article class="entry" data-index="${i}">
+            <div class="entry-head">
+              <h3 class="entry-title">第 ${i} 条</h3>
+              <div class="entry-score" id="entryScore-${i}">0 分</div>
+            </div>
+
+            <div class="grid">
+              <div class="field wide print-check" data-print-group="fact">
+                <label for="fact-${i}">事实</label>
+                <textarea id="fact-${i}" data-field="fact" placeholder="只写可观察事实，例如：今晚我说想聊天时，你还在处理工作消息。"></textarea>
+              </div>
+
+              <div class="field wide tag-section print-check" data-print-group="feelings">
+                <div class="tag-header">
+                  <label>感受标签</label>
+                  <span class="tag-hint">可多选，分数自动相加；每个标签 -3 到 +3。</span>
+                </div>
+                <div class="tags">${positiveHtml(i)}</div>
+                <div class="tags">${negativeHtml(i)}</div>
+                <div class="tags">${neutralHtml(i)}</div>
+                <div class="custom-row">
+                  <input id="customFeeling-${i}" type="text" placeholder="自定义感受，例如：有点心疼、被接住了……">
+                  <select id="customScore-${i}" aria-label="自定义感受分数">
+                    <option value="0">0 分</option>
+                    <option value="1">+1 分</option>
+                    <option value="2">+2 分</option>
+                    <option value="3">+3 分</option>
+                    <option value="-1">-1 分</option>
+                    <option value="-2">-2 分</option>
+                    <option value="-3">-3 分</option>
+                  </select>
+                </div>
+                <div id="customPreview-${i}" class="custom-preview"></div>
+              </div>
+
+              <div class="field wide print-check" data-print-group="need">
+                <label for="need-${i}">需求</label>
+                <textarea id="need-${i}" data-field="need" placeholder="我真正需要的是……例如：我需要在重要时刻被优先回应。"></textarea>
+              </div>
+
+              <div class="field wide print-check" data-print-group="solution">
+                <label for="solution-${i}">方案 / 制度</label>
+                <textarea id="solution-${i}" data-field="solution" placeholder="必须具体，例如：没有 DDL 等紧急事情时，每周日 15:00-18:00 一起出去玩；吵架后 30 分钟冷静，再用 10 分钟复盘。"></textarea>
+              </div>
+            </div>
+          </article>
+        `;
+      }).join("");
+    }
+
+    function readState() {
+      const entries = [];
+      for (let i = 1; i <= 5; i++) {
+        const checked = [...document.querySelectorAll(`input[name="feelings-${i}"]:checked`)].map(el => ({
+          label: el.value,
+          score: Number(el.dataset.score)
+        }));
+
+        entries.push({
+          fact: document.getElementById(`fact-${i}`).value,
+          need: document.getElementById(`need-${i}`).value,
+          solution: document.getElementById(`solution-${i}`).value,
+          feelings: checked,
+          customFeeling: document.getElementById(`customFeeling-${i}`).value,
+          customScore: Number(document.getElementById(`customScore-${i}`).value)
+        });
+      }
+      return { day: dayEl.value || todayISO(), entries };
+    }
+
+    function entryScore(entry) {
+      const preset = entry.feelings.reduce((sum, f) => sum + Number(f.score || 0), 0);
+      const custom = entry.customFeeling.trim() ? Number(entry.customScore || 0) : 0;
+      return Math.max(-15, Math.min(15, preset + custom));
+    }
+
+    function totalScore() {
+      return readState().entries.reduce((sum, entry) => sum + entryScore(entry), 0);
+    }
+
+    function updateScores() {
+      const state = readState();
+      let total = 0;
+      state.entries.forEach((entry, idx) => {
+        const score = entryScore(entry);
+        total += score;
+        const i = idx + 1;
+        const el = document.getElementById(`entryScore-${i}`);
+        el.textContent = `${signed(score)} 分`;
+        el.style.color = score > 0 ? "var(--good)" : score < 0 ? "var(--bad)" : "var(--muted)";
+
+        const customPreview = document.getElementById(`customPreview-${i}`);
+        const customText = entry.customFeeling.trim();
+        if (customText) {
+          customPreview.textContent = `${customText} ${signed(Number(entry.customScore || 0))}`;
+          customPreview.classList.add("has-content");
+        } else {
+          customPreview.textContent = "";
+          customPreview.classList.remove("has-content");
+        }
+      });
+
+      totalScoreEl.textContent = signed(total);
+      totalScoreEl.classList.toggle("positive", total > 0);
+      totalScoreEl.classList.toggle("nonpositive", total <= 0);
+
+      const ok = total > 0;
+      statusEl.className = `status ${ok ? "ok" : "no"}`;
+      statusEl.textContent = ok
+        ? "✓ 已达成：今日总分为正，可以导出 PDF。"
+        : "! 今日总分必须为正，才能导出 PDF。请补充感谢、理解、修复或建设性方案。";
+
+      document.getElementById("exportPdf").disabled = !ok;
+      return total;
+    }
+
+    function saveState(silent = true) {
+      const state = readState();
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      updateScores();
+      saveStateEl.textContent = `已自动保存：${new Date().toLocaleTimeString("zh-CN", { hour: "2-digit", minute: "2-digit", second: "2-digit" })}`;
+      if (!silent) showToast("已保存到本地缓存");
+    }
+
+    function loadState() {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      let state = null;
+      if (raw) {
+        try { state = JSON.parse(raw); } catch (e) { state = null; }
+      }
+
+      dayEl.value = state?.day || todayISO();
+
+      if (state?.entries?.length) {
+        state.entries.slice(0, 5).forEach((entry, idx) => {
+          const i = idx + 1;
+          document.getElementById(`fact-${i}`).value = entry.fact || "";
+          document.getElementById(`need-${i}`).value = entry.need || "";
+          document.getElementById(`solution-${i}`).value = entry.solution || "";
+          document.getElementById(`customFeeling-${i}`).value = entry.customFeeling || "";
+          document.getElementById(`customScore-${i}`).value = String(entry.customScore ?? 0);
+
+          (entry.feelings || []).forEach(f => {
+            const target = [...document.querySelectorAll(`input[name="feelings-${i}"]`)].find(el => el.value === f.label);
+            if (target) {
+              target.checked = true;
+              target.closest(".tag").classList.add("selected");
+            }
+          });
+        });
+      }
+      updateScores();
+    }
+
+    function bindEvents() {
+      document.body.addEventListener("input", (e) => {
+        if (e.target.matches("textarea, input, select")) {
+          saveState(true);
+        }
+      });
+
+      document.body.addEventListener("change", (e) => {
+        if (e.target.matches('input[type="checkbox"]')) {
+          e.target.closest(".tag").classList.toggle("selected", e.target.checked);
+          saveState(true);
+        }
+      });
+
+
+      document.getElementById("clearAll").addEventListener("click", () => {
+        const ok = confirm("确定要清空今日所有内容和本地缓存吗？此操作无法撤销。");
+        if (!ok) return;
+        localStorage.removeItem(STORAGE_KEY);
+        document.querySelectorAll("textarea, input[type='text']").forEach(el => el.value = "");
+        document.querySelectorAll("select").forEach(el => el.value = "0");
+        document.querySelectorAll("input[type='checkbox']").forEach(el => {
+          el.checked = false;
+          el.closest(".tag").classList.remove("selected");
+        });
+        dayEl.value = todayISO();
+        updateScores();
+        showToast("已清空");
+      });
+
+      function markEmptyForPrint() {
+        document.body.classList.add("printing");
+        for (let i = 1; i <= 5; i++) {
+          const groups = {
+            fact: Boolean(document.getElementById(`fact-${i}`).value.trim()),
+            need: Boolean(document.getElementById(`need-${i}`).value.trim()),
+            solution: Boolean(document.getElementById(`solution-${i}`).value.trim()),
+            feelings: Boolean(
+              document.querySelectorAll(`input[name="feelings-${i}"]:checked`).length ||
+              document.getElementById(`customFeeling-${i}`).value.trim()
+            )
+          };
+
+          Object.entries(groups).forEach(([group, hasContent]) => {
+            const block = document.querySelector(`.entry[data-index="${i}"] [data-print-group="${group}"]`);
+            if (block) block.classList.toggle("print-empty-hidden", !hasContent);
+          });
+
+          const article = document.querySelector(`.entry[data-index="${i}"]`);
+          const hasAnyContent = Object.values(groups).some(Boolean);
+          if (article) article.classList.toggle("print-empty-hidden", !hasAnyContent);
+        }
+      }
+
+      function restoreAfterPrint() {
+        document.body.classList.remove("printing");
+        document.querySelectorAll(".print-empty-hidden").forEach(el => el.classList.remove("print-empty-hidden"));
+      }
+
+      window.addEventListener("afterprint", restoreAfterPrint);
+      window.matchMedia && window.matchMedia("print").addEventListener?.("change", e => {
+        if (!e.matches) restoreAfterPrint();
+      });
+
+      document.getElementById("exportPdf").addEventListener("click", () => {
+        const total = updateScores();
+        if (total <= 0) {
+          showToast("今日总分必须为正，才能导出 PDF");
+          return;
+        }
+        saveState(true);
+        markEmptyForPrint();
+        setTimeout(() => window.print(), 60);
+      });
+
+      document.getElementById("fillExample").addEventListener("click", () => {
+        const examples = [
+          {
+            fact: "今天晚饭后我说想散步，你放下手机陪我走了 30 分钟。",
+            need: "我需要稳定的陪伴，也需要知道我提出的小愿望会被认真对待。",
+            solution: "没有 DDL 或紧急事情时，每周日 15:00-18:00 固定一起出门约会；临时取消要提前说明并补一个新时间。",
+            feelings: ["感动", "安心", "被重视"],
+            customFeeling: "被接住了",
+            customScore: 2
+          },
+          {
+            fact: "昨晚我表达感受时，我们中途都提高了音量。",
+            need: "我需要吵架时仍然被尊重，也需要我们有一个暂停机制。",
+            solution: "当任何一方说“暂停 20 分钟”，双方先停止争论；20 分钟后用‘事实-感受-需求-方案’继续说。",
+            feelings: ["难过", "愿意靠近", "有希望"],
+            customFeeling: "",
+            customScore: 0
+          },
+          {
+            fact: "你今天主动问我会议顺不顺利，还记得我昨天提到会紧张。",
+            need: "我需要被记住，也希望重要小事能被彼此放在心上。",
+            solution: "每天睡前互相问一个具体问题：今天最累的时刻是什么？今天最想感谢对方什么？",
+            feelings: ["感激", "温暖", "被理解"],
+            customFeeling: "",
+            customScore: 0
+          },
+          {
+            fact: "我午休时发消息，你过了五个小时回复，没有提前说明。",
+            need: "我需要基本回应感，尤其是在我明确表达想你的时候。",
+            solution: "工作忙不能聊天时，先回一句‘我在忙，几点后找你’，不用长聊，但提前给一个明确时间。",
+            feelings: ["失落", "需要确认", "信任"],
+            customFeeling: "",
+            customScore: 0
+          },
+          {
+            fact: "晚上我们一起整理了下周安排，把约会、运动和各自工作时间都写了下来。",
+            need: "我需要关系里有计划感，也需要看见我们是在一起建设生活。",
+            solution: "每周日晚上 20:30 做 15 分钟周计划：各自 DDL、约会时间、家务分工、需要支持的事情。",
+            feelings: ["踏实", "期待", "珍惜"],
+            customFeeling: "",
+            customScore: 0
+          }
+        ];
+
+        document.querySelectorAll("textarea, input[type='text']").forEach(el => el.value = "");
+        document.querySelectorAll("select").forEach(el => el.value = "0");
+        document.querySelectorAll("input[type='checkbox']").forEach(el => {
+          el.checked = false;
+          el.closest(".tag").classList.remove("selected");
+        });
+
+        examples.forEach((ex, idx) => {
+          const i = idx + 1;
+          document.getElementById(`fact-${i}`).value = ex.fact;
+          document.getElementById(`need-${i}`).value = ex.need;
+          document.getElementById(`solution-${i}`).value = ex.solution;
+          document.getElementById(`customFeeling-${i}`).value = ex.customFeeling;
+          document.getElementById(`customScore-${i}`).value = String(ex.customScore);
+
+          ex.feelings.forEach(label => {
+            const target = [...document.querySelectorAll(`input[name="feelings-${i}"]`)].find(el => el.value === label);
+            if (target) {
+              target.checked = true;
+              target.closest(".tag").classList.add("selected");
+            }
+          });
+        });
+        saveState(true);
+        showToast("已填入示例，可继续修改");
+      });
+    }
+
+    renderEntries();
+    bindEvents();
+    loadState();
+  </script>
+</body>
+</html>
