@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>阻尼、带宽与相位滞后：频域可视化</title>
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --card: #ffffff;
+      --text: #111827;
+      --muted: #6b7280;
+      --border: #e5e7eb;
+      --blue: #2563eb;
+      --green: #16a34a;
+      --orange: #f97316;
+      --red: #dc2626;
+      --purple: #7c3aed;
+      --shadow: 0 10px 28px rgba(15, 23, 42, 0.08);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.65;
+    }
+
+    header {
+      padding: 28px 32px;
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 65%, #312e81 100%);
+      color: white;
+    }
+
+    header h1 {
+      margin: 0 0 10px;
+      font-size: clamp(22px, 3vw, 34px);
+      letter-spacing: -0.02em;
+    }
+
+    header p {
+      margin: 0;
+      max-width: 1100px;
+      color: #d1d5db;
+      font-size: 15px;
+    }
+
+    main {
+      display: grid;
+      grid-template-columns: 360px minmax(0, 1fr);
+      gap: 22px;
+      max-width: 1780px;
+      margin: 0 auto;
+      padding: 22px;
+    }
+
+    @media (max-width: 1100px) {
+      main { grid-template-columns: 1fr; }
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+    }
+
+    .panel { padding: 20px; }
+
+    h2, h3 { margin-top: 0; }
+    h2 { font-size: 19px; }
+    h3 { font-size: 16px; margin-bottom: 8px; }
+
+    .control {
+      padding: 14px 0 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .control:last-of-type { border-bottom: none; }
+
+    label {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      font-weight: 700;
+      font-size: 14px;
+      margin-bottom: 8px;
+    }
+
+    .value {
+      color: var(--blue);
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--blue);
+    }
+
+    .hint {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 4px;
+    }
+
+    .metric-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin: 16px 0;
+    }
+
+    .metric {
+      padding: 10px;
+      border-radius: 12px;
+      background: #f8fafc;
+      border: 1px solid var(--border);
+    }
+
+    .metric .name {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .metric .num {
+      font-size: 17px;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .explain {
+      padding: 14px;
+      border-left: 4px solid var(--blue);
+      border-radius: 12px;
+      background: #eff6ff;
+      font-size: 14px;
+    }
+
+    .formula {
+      margin-top: 14px;
+      padding: 14px;
+      border-radius: 12px;
+      background: #f9fafb;
+      border: 1px solid var(--border);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 12.5px;
+      overflow-x: auto;
+      line-height: 1.9;
+    }
+
+    .charts {
+      display: grid;
+      gap: 22px;
+    }
+
+    .chart-card { padding: 12px 12px 8px; }
+
+    canvas {
+      width: 100%;
+      height: 330px;
+      display: block;
+      border-radius: 14px;
+      cursor: crosshair;
+    }
+
+    .caption {
+      color: var(--muted);
+      font-size: 13px;
+      padding: 0 8px 10px;
+    }
+
+    .tooltip {
+      position: fixed;
+      display: none;
+      z-index: 20;
+      max-width: 270px;
+      padding: 9px 11px;
+      border-radius: 10px;
+      background: rgba(17, 24, 39, 0.92);
+      color: white;
+      font-size: 12px;
+      pointer-events: none;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.24);
+      backdrop-filter: blur(6px);
+    }
+
+    details {
+      margin-top: 14px;
+      border-top: 1px solid var(--border);
+      padding-top: 12px;
+    }
+
+    summary {
+      cursor: pointer;
+      font-weight: 800;
+      color: #1f2937;
+    }
+
+    .derivation {
+      font-size: 14px;
+      color: #374151;
+    }
+
+    code {
+      background: #eef2ff;
+      padding: 1px 5px;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>阻尼、带宽与相位滞后：频域可视化</h1>
+    <p>
+      模型：标准二阶闭环 T(s)=ωn²/(s²+2ζωn s+ωn²)，再叠加纯延迟 e^{-sTd}。
+      拖动参数，观察幅频曲线、相频曲线和极点图如何同步变化。
+    </p>
+  </header>
+
+  <main>
+    <aside class="card panel">
+      <h2>参数</h2>
+
+      <div class="control">
+        <label for="zeta">阻尼比 ζ <span class="value" id="zetaValue"></span></label>
+        <input id="zeta" type="range" min="0.05" max="2.00" step="0.01" value="0.70" />
+        <div class="hint">ζ 小：共振峰高、容易震荡。ζ 大：更稳但更慢。</div>
+      </div>
+
+      <div class="control">
+        <label for="wn">自然频率 ωn <span class="value" id="wnValue"></span></label>
+        <input id="wn" type="range" min="0.5" max="25" step="0.1" value="5.0" />
+        <div class="hint">ωn 越大，曲线整体向右移，系统愿意跟随更快变化。</div>
+      </div>
+
+      <div class="control">
+        <label for="delay">纯延迟 Td <span class="value" id="delayValue"></span></label>
+        <input id="delay" type="range" min="0" max="0.50" step="0.005" value="0.050" />
+        <div class="hint">延迟不改变幅值，但会额外增加相位滞后：-ωTd。</div>
+      </div>
+
+      <div class="metric-grid" id="metrics"></div>
+      <div class="explain" id="explain"></div>
+
+      <div class="formula">
+        |T(jω)| = ωn² / √[(ωn²-ω²)² + (2ζωnω)²]<br>
+        ∠T(jω) = -atan2(2ζωnω, ωn²-ω²)<br>
+        延迟相位 = -ωTd rad = -ωTd·180/π deg<br>
+        带宽：|T(jωbw)| = 1/√2，即 -3 dB
+      </div>
+
+      <details open>
+        <summary>怎么看这三张图？</summary>
+        <div class="derivation">
+          <p><strong>幅频图</strong>看“系统会不会放大某些频率”。鼓包越高，共振越强，阻尼越不足。</p>
+          <p><strong>带宽线</strong>看 -3 dB 交点。交点越靠右，系统能跟随越快的目标变化。</p>
+          <p><strong>相频图</strong>看“输出比输入晚多少”。延迟只会把相位曲线向下拉，频率越高拉得越严重。</p>
+          <p><strong>极点图</strong>看根的位置。极点越靠左衰减越快，越靠近虚轴越容易震荡。</p>
+        </div>
+      </details>
+    </aside>
+
+    <section class="charts">
+      <div class="card chart-card">
+        <canvas id="magCanvas"></canvas>
+        <div class="caption">幅频曲线：阻尼不足时会出现共振峰；-3 dB 交点定义闭环带宽。</div>
+      </div>
+      <div class="card chart-card">
+        <canvas id="phaseCanvas"></canvas>
+        <div class="caption">相频曲线：橙色曲线包含纯延迟。注意延迟让高频相位快速下坠。</div>
+      </div>
+      <div class="card chart-card">
+        <canvas id="poleCanvas"></canvas>
+        <div class="caption">极点图：欠阻尼时是一对共轭复根；临界/过阻尼时变为实根。</div>
+      </div>
+    </section>
+  </main>
+
+  <div class="tooltip" id="tooltip"></div>
+
+<script>
+(() => {
+  "use strict";
+
+  const COLORS = {
+    blue: "#2563eb",
+    green: "#16a34a",
+    orange: "#f97316",
+    red: "#dc2626",
+    purple: "#7c3aed",
+    grid: "#e5e7eb",
+    axis: "#6b7280",
+    text: "#111827",
+    muted: "#6b7280"
+  };
+
+  const els = {
+    zeta: document.getElementById("zeta"),
+    wn: document.getElementById("wn"),
+    delay: document.getElementById("delay"),
+    zetaValue: document.getElementById("zetaValue"),
+    wnValue: document.getElementById("wnValue"),
+    delayValue: document.getElementById("delayValue"),
+    metrics: document.getElementById("metrics"),
+    explain: document.getElementById("explain"),
+    tooltip: document.getElementById("tooltip"),
+    magCanvas: document.getElementById("magCanvas"),
+    phaseCanvas: document.getElementById("phaseCanvas"),
+    poleCanvas: document.getElementById("poleCanvas")
+  };
+
+  const state = {
+    freqs: [],
+    noDelay: [],
+    withDelay: [],
+    bw: null,
+    resonantPeak: null,
+    phaseAtWn: null,
+    delayLagAtWn: null,
+    domains: {}
+  };
+
+  function logspace(a, b, n) {
+    return Array.from({ length: n }, (_, i) => 10 ** (a + (b - a) * i / (n - 1)));
+  }
+
+  function responseAt(w, zeta, wn, delay) {
+    const re = wn * wn - w * w;
+    const im = 2 * zeta * wn * w;
+    const den = Math.hypot(re, im);
+    const mag = (wn * wn) / den;
+    const db = 20 * Math.log10(mag);
+    const phaseNoDelay = -Math.atan2(im, re);
+    const phase = phaseNoDelay - w * delay;
+    return {
+      w,
+      mag,
+      db,
+      phaseRad: phase,
+      phaseDeg: radToDeg(phase),
+      phaseNoDelayDeg: radToDeg(phaseNoDelay)
+    };
+  }
+
+  function radToDeg(x) { return x * 180 / Math.PI; }
+
+  function findCrossing(freqs, data, targetDb) {
+    for (let i = 1; i < freqs.length; i++) {
+      const y0 = data[i - 1].db;
+      const y1 = data[i].db;
+      if ((y0 - targetDb) * (y1 - targetDb) <= 0 && y0 >= targetDb && y1 <= targetDb) {
+        const x0 = Math.log10(freqs[i - 1]);
+        const x1 = Math.log10(freqs[i]);
+        const t = (targetDb - y0) / (y1 - y0);
+        return 10 ** (x0 + t * (x1 - x0));
+      }
+    }
+    return null;
+  }
+
+  function findPeak(freqs, data) {
+    let best = { w: freqs[0], db: data[0].db, mag: data[0].mag };
+    for (let i = 1; i < data.length; i++) {
+      if (data[i].db > best.db) best = { w: freqs[i], db: data[i].db, mag: data[i].mag };
+    }
+    return best;
+  }
+
+  function analyticBandwidth(zeta, wn) {
+    const inner = 4 * zeta ** 4 - 4 * zeta ** 2 + 2;
+    const term = 1 - 2 * zeta ** 2 + Math.sqrt(inner);
+    return term > 0 ? wn * Math.sqrt(term) : null;
+  }
+
+  function resonantPeakFormula(zeta) {
+    if (zeta >= 1 / Math.sqrt(2)) return null;
+    const mr = 1 / (2 * zeta * Math.sqrt(1 - zeta * zeta));
+    return { mag: mr, db: 20 * Math.log10(mr) };
+  }
+
+  function setCanvasSize(canvas) {
+    const dpr = window.devicePixelRatio || 1;
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = Math.round(rect.width * dpr);
+    canvas.height = Math.round(rect.height * dpr);
+    const ctx = canvas.getContext("2d");
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    return { ctx, w: rect.width, h: rect.height };
+  }
+
+  function chartBox(w, h) {
+    return { L: 74, R: 24, T: 42, B: 54, W: w - 98, H: h - 96 };
+  }
+
+  function clear(ctx, w, h) {
+    ctx.clearRect(0, 0, w, h);
+    ctx.fillStyle = "white";
+    ctx.fillRect(0, 0, w, h);
+  }
+
+  function drawTitle(ctx, title, box) {
+    ctx.fillStyle = COLORS.text;
+    ctx.font = "700 15px system-ui, sans-serif";
+    ctx.fillText(title, box.L, 24);
+  }
+
+  function drawFrame(ctx, box) {
+    ctx.strokeStyle = COLORS.grid;
+    ctx.lineWidth = 1;
+    ctx.strokeRect(box.L, box.T, box.W, box.H);
+  }
+
+  function drawXAxisLabel(ctx, text, w, h) {
+    ctx.fillStyle = COLORS.muted;
+    ctx.font = "12px system-ui, sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText(text, w / 2, h - 13);
+    ctx.textAlign = "left";
+  }
+
+  function drawYAxisLabel(ctx, text, h) {
+    ctx.save();
+    ctx.translate(18, h / 2);
+    ctx.rotate(-Math.PI / 2);
+    ctx.fillStyle = COLORS.muted;
+    ctx.font = "12px system-ui, sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText(text, 0, 0);
+    ctx.restore();
+  }
+
+  function createMaps(box, xMinLog, xMaxLog, yMin, yMax) {
+    return {
+      x: value => box.L + (Math.log10(value) - xMinLog) / (xMaxLog - xMinLog) * box.W,
+      y: value => box.T + (yMax - value) / (yMax - yMin) * box.H
+    };
+  }
+
+  function drawGridLogX(ctx, box, maps, freqs, yTicks, ySuffix) {
+    const xTicks = [0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 50, 100];
+    ctx.font = "12px system-ui, sans-serif";
+    ctx.lineWidth = 1;
+
+    for (const y of yTicks) {
+      const py = maps.y(y);
+      ctx.strokeStyle = COLORS.grid;
+      ctx.beginPath();
+      ctx.moveTo(box.L, py);
+      ctx.lineTo(box.L + box.W, py);
+      ctx.stroke();
+      ctx.fillStyle = COLORS.muted;
+      ctx.textAlign = "right";
+      ctx.fillText(`${y}${ySuffix}`, box.L - 8, py + 4);
+    }
+
+    const minF = freqs[0];
+    const maxF = freqs[freqs.length - 1];
+    for (const x of xTicks) {
+      if (x < minF || x > maxF) continue;
+      const px = maps.x(x);
+      ctx.strokeStyle = COLORS.grid;
+      ctx.beginPath();
+      ctx.moveTo(px, box.T);
+      ctx.lineTo(px, box.T + box.H);
+      ctx.stroke();
+      ctx.fillStyle = COLORS.muted;
+      ctx.textAlign = "center";
+      ctx.fillText(String(x), px, box.T + box.H + 22);
+    }
+    ctx.textAlign = "left";
+  }
+
+  function drawCurve(ctx, freqs, data, maps, key, color, width = 2.5) {
+    ctx.strokeStyle = color;
+    ctx.lineWidth = width;
+    ctx.lineJoin = "round";
+    ctx.beginPath();
+    data.forEach((p, i) => {
+      const x = maps.x(freqs[i]);
+      const y = maps.y(p[key]);
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    });
+    ctx.stroke();
+  }
+
+  function drawMagnitude() {
+    const { ctx, w, h } = setCanvasSize(els.magCanvas);
+    const box = chartBox(w, h);
+    clear(ctx, w, h);
+    drawTitle(ctx, "幅频曲线：阻尼影响共振峰，带宽是 -3 dB 交点", box);
+    drawFrame(ctx, box);
+    drawXAxisLabel(ctx, "频率 ω，rad/s，对数坐标", w, h);
+    drawYAxisLabel(ctx, "幅值，dB", h);
+
+    const xMin = Math.log10(state.freqs[0]);
+    const xMax = Math.log10(state.freqs[state.freqs.length - 1]);
+    const maps = createMaps(box, xMin, xMax, -50, 25);
+    state.domains.mag = { box, xMin, xMax, yMin: -50, yMax: 25 };
+    drawGridLogX(ctx, box, maps, state.freqs, [-40, -30, -20, -10, -3, 0, 10, 20], " dB");
+
+    // 0 dB and -3 dB reference lines.
+    for (const [db, color, label] of [[0, COLORS.axis, "0 dB"], [-3, COLORS.red, "-3 dB"]]) {
+      ctx.strokeStyle = color;
+      ctx.setLineDash(db === -3 ? [7, 5] : [3, 5]);
+      ctx.lineWidth = db === -3 ? 1.8 : 1.1;
+      ctx.beginPath();
+      ctx.moveTo(box.L, maps.y(db));
+      ctx.lineTo(box.L + box.W, maps.y(db));
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = color;
+      ctx.font = "700 12px system-ui, sans-serif";
+      ctx.fillText(label, box.L + 10, maps.y(db) - 7);
+    }
+
+    drawCurve(ctx, state.freqs, state.noDelay, maps, "db", COLORS.blue, 3);
+
+    if (state.resonantPeak && state.resonantPeak.db > 0.15) {
+      const x = maps.x(state.resonantPeak.w);
+      const y = maps.y(state.resonantPeak.db);
+      marker(ctx, x, y, COLORS.purple);
+      label(ctx, `共振峰 ${state.resonantPeak.db.toFixed(1)} dB`, x + 10, y - 10, COLORS.purple);
+    }
+
+    if (state.bw) {
+      const x = maps.x(state.bw);
+      const y = maps.y(-3);
+      ctx.strokeStyle = COLORS.red;
+      ctx.setLineDash([6, 5]);
+      ctx.lineWidth = 1.8;
+      ctx.beginPath();
+      ctx.moveTo(x, box.T);
+      ctx.lineTo(x, box.T + box.H);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      marker(ctx, x, y, COLORS.red);
+      label(ctx, `ωbw ≈ ${state.bw.toFixed(2)} rad/s`, x + 10, box.T + 24, COLORS.red);
+    }
+  }
+
+  function drawPhase() {
+    const { ctx, w, h } = setCanvasSize(els.phaseCanvas);
+    const box = chartBox(w, h);
+    clear(ctx, w, h);
+    drawTitle(ctx, "相频曲线：延迟只增加相位滞后，不改变幅值", box);
+    drawFrame(ctx, box);
+    drawXAxisLabel(ctx, "频率 ω，rad/s，对数坐标", w, h);
+    drawYAxisLabel(ctx, "相位，deg", h);
+
+    const xMin = Math.log10(state.freqs[0]);
+    const xMax = Math.log10(state.freqs[state.freqs.length - 1]);
+    const maps = createMaps(box, xMin, xMax, -420, 20);
+    state.domains.phase = { box, xMin, xMax, yMin: -420, yMax: 20 };
+    drawGridLogX(ctx, box, maps, state.freqs, [-360, -270, -180, -90, 0], "°");
+
+    drawCurve(ctx, state.freqs, state.noDelay, maps, "phaseDeg", COLORS.green, 3);
+    drawCurve(ctx, state.freqs, state.withDelay, maps, "phaseDeg", COLORS.orange, 3);
+
+    legend(ctx, box.L + 12, box.T + 18, COLORS.green, "无延迟");
+    legend(ctx, box.L + 12, box.T + 42, COLORS.orange, "有延迟：额外 -ωTd");
+
+    const wn = Number(els.wn.value);
+    const x = maps.x(wn);
+    const p0 = responseAt(wn, Number(els.zeta.value), wn, 0).phaseDeg;
+    const p1 = responseAt(wn, Number(els.zeta.value), wn, Number(els.delay.value)).phaseDeg;
+    ctx.strokeStyle = COLORS.axis;
+    ctx.setLineDash([4, 5]);
+    ctx.beginPath();
+    ctx.moveTo(x, box.T);
+    ctx.lineTo(x, box.T + box.H);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    marker(ctx, x, maps.y(p0), COLORS.green);
+    marker(ctx, x, maps.y(p1), COLORS.orange);
+    label(ctx, `ω=ωn 时额外滞后 ${Math.abs(p1 - p0).toFixed(1)}°`, x + 10, maps.y(p1) + 18, COLORS.orange);
+  }
+
+  function drawPoles() {
+    const { ctx, w, h } = setCanvasSize(els.poleCanvas);
+    const box = chartBox(w, h);
+    clear(ctx, w, h);
+    drawTitle(ctx, "极点图：ζ 决定角度，ωn 决定离原点距离", box);
+    drawFrame(ctx, box);
+    drawXAxisLabel(ctx, "实轴 Re(s)", w, h);
+    drawYAxisLabel(ctx, "虚轴 Im(s)", h);
+
+    const zeta = Number(els.zeta.value);
+    const wn = Number(els.wn.value);
+    const range = Math.max(8, 1.45 * wn);
+    const xMin = -range;
+    const xMax = 0.32 * range;
+    const yMin = -range;
+    const yMax = range;
+    const xMap = x => box.L + (x - xMin) / (xMax - xMin) * box.W;
+    const yMap = y => box.T + (yMax - y) / (yMax - yMin) * box.H;
+
+    // Grid.
+    ctx.font = "12px system-ui, sans-serif";
+    for (let x = Math.ceil(xMin); x <= xMax; x += 2) {
+      const px = xMap(x);
+      ctx.strokeStyle = COLORS.grid;
+      ctx.beginPath();
+      ctx.moveTo(px, box.T);
+      ctx.lineTo(px, box.T + box.H);
+      ctx.stroke();
+    }
+    for (let y = Math.ceil(yMin); y <= yMax; y += 2) {
+      const py = yMap(y);
+      ctx.strokeStyle = COLORS.grid;
+      ctx.beginPath();
+      ctx.moveTo(box.L, py);
+      ctx.lineTo(box.L + box.W, py);
+      ctx.stroke();
+    }
+
+    // Axes.
+    ctx.strokeStyle = COLORS.axis;
+    ctx.lineWidth = 1.7;
+    ctx.beginPath(); ctx.moveTo(xMap(0), box.T); ctx.lineTo(xMap(0), box.T + box.H); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(box.L, yMap(0)); ctx.lineTo(box.L + box.W, yMap(0)); ctx.stroke();
+
+    // Natural frequency circle.
+    ctx.strokeStyle = "#93c5fd";
+    ctx.setLineDash([6, 6]);
+    ctx.lineWidth = 1.8;
+    ctx.beginPath();
+    ctx.arc(xMap(0), yMap(0), Math.abs(xMap(wn) - xMap(0)), 0, 2 * Math.PI);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    label(ctx, "|s|=ωn", xMap(-0.7 * wn), yMap(0.72 * wn), COLORS.blue);
+
+    const poles = computePoles(zeta, wn);
+    poles.forEach(p => {
+      ctx.strokeStyle = COLORS.blue;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(xMap(0), yMap(0));
+      ctx.lineTo(xMap(p.re), yMap(p.im));
+      ctx.stroke();
+      drawX(ctx, xMap(p.re), yMap(p.im), COLORS.red);
+    });
+
+    if (zeta < 1) {
+      const theta = radToDeg(Math.acos(zeta));
+      label(ctx, `θ=arccos(ζ)≈${theta.toFixed(1)}°`, box.L + 12, box.T + 24, COLORS.blue);
+      label(ctx, `实部=-ζωn=${(-zeta * wn).toFixed(2)}`, box.L + 12, box.T + 46, COLORS.red);
+    } else {
+      label(ctx, "ζ≥1：极点落在实轴上，不再振荡", box.L + 12, box.T + 24, COLORS.blue);
+    }
+
+    label(ctx, "左半平面：稳定", box.L + 12, box.T + box.H - 16, COLORS.green);
+    label(ctx, "越靠近虚轴，越容易振荡", xMap(0) + 10, box.T + 24, COLORS.orange);
+  }
+
+  function computePoles(zeta, wn) {
+    if (zeta < 1) {
+      const re = -zeta * wn;
+      const im = wn * Math.sqrt(1 - zeta * zeta);
+      return [{ re, im }, { re, im: -im }];
+    }
+    if (Math.abs(zeta - 1) < 1e-9) return [{ re: -wn, im: 0 }, { re: -wn, im: 0 }];
+    const q = Math.sqrt(zeta * zeta - 1);
+    return [
+      { re: -wn * (zeta - q), im: 0 },
+      { re: -wn * (zeta + q), im: 0 }
+    ];
+  }
+
+  function marker(ctx, x, y, color) {
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.arc(x, y, 5, 0, 2 * Math.PI);
+    ctx.fill();
+    ctx.strokeStyle = "white";
+    ctx.lineWidth = 2;
+    ctx.stroke();
+  }
+
+  function drawX(ctx, x, y, color) {
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 3;
+    ctx.lineCap = "round";
+    ctx.beginPath(); ctx.moveTo(x - 7, y - 7); ctx.lineTo(x + 7, y + 7); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x - 7, y + 7); ctx.lineTo(x + 7, y - 7); ctx.stroke();
+  }
+
+  function label(ctx, text, x, y, color) {
+    ctx.fillStyle = color;
+    ctx.font = "700 12px system-ui, sans-serif";
+    ctx.fillText(text, x, y);
+  }
+
+  function legend(ctx, x, y, color, text) {
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.moveTo(x, y - 4);
+    ctx.lineTo(x + 26, y - 4);
+    ctx.stroke();
+    ctx.fillStyle = COLORS.text;
+    ctx.font = "13px system-ui, sans-serif";
+    ctx.fillText(text, x + 34, y);
+  }
+
+  function updateText(zeta, wn, delay) {
+    els.zetaValue.textContent = zeta.toFixed(2);
+    els.wnValue.textContent = `${wn.toFixed(1)} rad/s`;
+    els.delayValue.textContent = `${delay.toFixed(3)} s`;
+
+    const bwAnalytic = analyticBandwidth(zeta, wn);
+    const peakFormula = resonantPeakFormula(zeta);
+    const delayLag = radToDeg(wn * delay);
+    const ts2 = zeta > 0 ? 4 / (zeta * wn) : Infinity;
+
+    els.metrics.innerHTML = `
+      <div class="metric"><div class="name">-3 dB 带宽</div><div class="num">${state.bw ? state.bw.toFixed(2) : "—"}</div></div>
+      <div class="metric"><div class="name">解析带宽</div><div class="num">${bwAnalytic ? bwAnalytic.toFixed(2) : "—"}</div></div>
+      <div class="metric"><div class="name">共振峰</div><div class="num">${peakFormula ? peakFormula.db.toFixed(1) + " dB" : "无明显峰"}</div></div>
+      <div class="metric"><div class="name">ωn 处延迟相位</div><div class="num">-${delayLag.toFixed(1)}°</div></div>
+    `;
+
+    let damping;
+    if (zeta < 0.2) damping = "阻尼极小：共振峰很高，系统对某些频率会明显放大，时域中通常表现为大幅振荡。";
+    else if (zeta < 0.6) damping = "欠阻尼：会超调和振荡，但极点在左半平面，所以震荡会逐渐衰减。";
+    else if (zeta < 0.9) damping = "阻尼适中：这是工程里常用的折中区间，速度和稳定性都比较好。";
+    else if (zeta <= 1.05) damping = "接近临界阻尼：基本不振荡；但从频域看，共振峰会被压平，响应不如小阻尼那么激进。";
+    else damping = "过阻尼：极点变成两个负实根，不再振荡，但慢极点会拖慢响应。";
+
+    els.explain.innerHTML = `
+      <strong>当前状态：</strong>${damping}<br>
+      <strong>带宽直觉：</strong>${state.bw ? `系统大致愿意跟随 ${state.bw.toFixed(2)} rad/s 以下的变化` : "当前扫描范围内没有找到 -3 dB 点"}。<br>
+      <strong>延迟直觉：</strong>Td=${delay.toFixed(3)}s 时，在 ω=ωn=${wn.toFixed(1)} rad/s 处额外滞后 ${delayLag.toFixed(1)}°。频率再高，滞后按 ωTd 线性增加。<br>
+      <strong>时域参考：</strong>2% 调节时间近似 Ts≈4/(ζωn)=${Number.isFinite(ts2) ? ts2.toFixed(2) + "s" : "—"}。
+    `;
+  }
+
+  function update() {
+    const zeta = Number(els.zeta.value);
+    const wn = Number(els.wn.value);
+    const delay = Number(els.delay.value);
+
+    state.freqs = logspace(-1, 2, 1200);
+    state.noDelay = state.freqs.map(w => responseAt(w, zeta, wn, 0));
+    state.withDelay = state.freqs.map(w => responseAt(w, zeta, wn, delay));
+    state.bw = findCrossing(state.freqs, state.noDelay, -3);
+    state.resonantPeak = findPeak(state.freqs, state.noDelay);
+
+    updateText(zeta, wn, delay);
+    drawMagnitude();
+    drawPhase();
+    drawPoles();
+  }
+
+  function tooltipFor(canvas, type) {
+    canvas.addEventListener("mousemove", ev => {
+      if (!state.freqs.length) return;
+      const rect = canvas.getBoundingClientRect();
+      const domain = state.domains[type];
+      if (!domain) return;
+      const xCss = ev.clientX - rect.left;
+      const { box, xMin, xMax } = domain;
+      if (xCss < box.L || xCss > box.L + box.W) {
+        els.tooltip.style.display = "none";
+        return;
+      }
+      const logW = xMin + (xCss - box.L) / box.W * (xMax - xMin);
+      const w = 10 ** logW;
+      let idx = 0;
+      let best = Infinity;
+      for (let i = 0; i < state.freqs.length; i++) {
+        const d = Math.abs(Math.log10(state.freqs[i]) - logW);
+        if (d < best) { best = d; idx = i; }
+      }
+
+      const p0 = state.noDelay[idx];
+      const p1 = state.withDelay[idx];
+      els.tooltip.style.display = "block";
+      els.tooltip.style.left = `${ev.clientX + 14}px`;
+      els.tooltip.style.top = `${ev.clientY + 14}px`;
+      if (type === "mag") {
+        els.tooltip.innerHTML = `<b>ω=${w.toFixed(2)} rad/s</b><br>幅值=${p0.db.toFixed(2)} dB<br>|T|=${p0.mag.toFixed(3)}`;
+      } else {
+        els.tooltip.innerHTML = `<b>ω=${w.toFixed(2)} rad/s</b><br>无延迟相位=${p0.phaseDeg.toFixed(1)}°<br>有延迟相位=${p1.phaseDeg.toFixed(1)}°<br>额外滞后=${(p1.phaseDeg - p0.phaseDeg).toFixed(1)}°`;
+      }
+    });
+    canvas.addEventListener("mouseleave", () => { els.tooltip.style.display = "none"; });
+  }
+
+  [els.zeta, els.wn, els.delay].forEach(input => input.addEventListener("input", update));
+  window.addEventListener("resize", update);
+  tooltipFor(els.magCanvas, "mag");
+  tooltipFor(els.phaseCanvas, "phase");
+  update();
+})();
+</script>
+</body>
+</html>
