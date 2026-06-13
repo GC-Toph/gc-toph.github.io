@@ -1,0 +1,641 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CPT 训练助手</title>
+  <style>
+    :root {
+      --bg: #f4f6f8;
+      --panel: #ffffff;
+      --text: #1d2129;
+      --muted: #86909c;
+      --line: #e5e6eb;
+      --brand: #165dff;
+      --brand-hover: #0e42d2;
+      --brand-light: #e8f3ff;
+      --ok: #00b42a;
+      --warn: #ff7d00;
+      --danger: #f53f3f;
+      --radius: 12px;
+      --shadow: 0 4px 10px rgba(0,0,0,0.04);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+    header {
+      position: sticky; top: 0; z-index: 20;
+      background: rgba(255,255,255,0.95); backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--line);
+    }
+    .topbar {
+      max-width: 1200px; margin: 0 auto; padding: 12px 20px;
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    }
+    .brand h1 { font-size: 18px; font-weight: 600; }
+    .brand p { color: var(--muted); font-size: 12px; margin-top: 2px; }
+    .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    
+    button, .file-label {
+      border: 1px solid var(--line); background: #fff; color: var(--text);
+      border-radius: 8px; padding: 6px 12px; font-size: 14px;
+      cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center;
+    }
+    button:hover, .file-label:hover { border-color: var(--brand); color: var(--brand); }
+    button.primary { background: var(--brand); color: #fff; border-color: var(--brand); }
+    button.primary:hover { background: var(--brand-hover); color: #fff; }
+    button.danger { color: var(--danger); border-color: #fcaaaa; }
+    button.danger:hover { background: #fff2f2; }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+    input[type="file"] { display: none; }
+    
+    .layout {
+      max-width: 1200px; margin: 20px auto; padding: 0 20px;
+      display: grid; grid-template-columns: 220px 1fr; gap: 24px;
+    }
+    nav { align-self: start; position: sticky; top: 80px; }
+    .navbtn {
+      width: 100%; text-align: left; border: none; background: transparent;
+      padding: 10px 12px; margin-bottom: 4px; border-radius: 8px; color: #4e5969; font-size: 15px;
+    }
+    .navbtn:hover { background: #f2f3f5; color: var(--text); }
+    .navbtn.active { background: var(--brand-light); color: var(--brand); font-weight: 600; }
+    
+    main { min-width: 0; }
+    section.view { display: none; animation: fadeIn 0.3s ease; }
+    section.view.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+    
+    .card {
+      background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
+      box-shadow: var(--shadow); padding: 24px; margin-bottom: 20px;
+    }
+    .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+    h2 { font-size: 20px; font-weight: 600; }
+    h3 { font-size: 16px; font-weight: 600; margin-bottom: 12px; }
+    .help { color: var(--muted); font-size: 13px; margin-top: 4px; }
+    
+    .grid { display: grid; gap: 16px; }
+    .grid.two { grid-template-columns: repeat(2, 1fr); }
+    .grid.three { grid-template-columns: repeat(3, 1fr); }
+    .grid.four { grid-template-columns: repeat(4, 1fr); }
+    
+    label { font-size: 13px; font-weight: 500; color: #4e5969; display: block; margin-bottom: 6px; }
+    input, textarea, select {
+      width: 100%; border: 1px solid var(--line); border-radius: 8px;
+      padding: 10px; font-size: 14px; background: #fff; color: var(--text); transition: 0.2s;
+    }
+    input:focus, textarea:focus, select:focus { outline: none; border-color: var(--brand); box-shadow: 0 0 0 2px var(--brand-light); }
+    textarea { min-height: 80px; resize: vertical; }
+    
+    .pill {
+      display: inline-flex; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 500;
+    }
+    .pill.ok { background: #e8ffea; color: var(--ok); }
+    .pill.warn { background: #fff7e8; color: var(--warn); }
+    .pill.danger { background: #ffece8; color: var(--danger); }
+    
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th, td { border-bottom: 1px solid var(--line); padding: 12px 10px; text-align: left; vertical-align: middle; }
+    th { color: var(--muted); font-weight: 500; background: #f7f8fa; }
+    .table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; }
+    .empty-state { text-align: center; padding: 30px; color: var(--muted); font-size: 14px; }
+    
+    .metric { background: #f7f8fa; border-radius: 8px; padding: 16px; text-align: center; }
+    .metric span { display: block; font-size: 12px; color: var(--muted); }
+    .metric strong { display: block; font-size: 28px; color: var(--brand); margin: 4px 0; }
+    
+    /* PCL-5 Card UI */
+    .pcl-wizard { display: flex; flex-direction: column; align-items: center; max-width: 600px; margin: 0 auto; }
+    .pcl-progress-bar { width: 100%; height: 6px; background: var(--line); border-radius: 3px; margin-bottom: 24px; overflow: hidden; }
+    .pcl-progress-fill { height: 100%; background: var(--brand); width: 0%; transition: 0.3s; }
+    .pcl-question { font-size: 18px; font-weight: 500; text-align: center; margin-bottom: 24px; min-height: 54px; }
+    .pcl-options { display: grid; grid-template-columns: 1fr; gap: 12px; width: 100%; }
+    .pcl-option {
+      border: 1px solid var(--line); background: #fff; padding: 14px; border-radius: 8px;
+      text-align: center; cursor: pointer; transition: 0.2s; font-size: 15px; font-weight: 500;
+    }
+    .pcl-option:hover { border-color: var(--brand); background: var(--brand-light); }
+    .pcl-option.selected { background: var(--brand); color: #fff; border-color: var(--brand); }
+    .pcl-nav { display: flex; justify-content: space-between; width: 100%; margin-top: 24px; }
+    
+    /* Toast */
+    #toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
+    .toast { background: #1d2129; color: #fff; padding: 10px 20px; border-radius: 8px; font-size: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); animation: toastIn 0.3s, toastOut 0.3s 2.7s forwards; }
+    @keyframes toastIn { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    @keyframes toastOut { from { opacity: 1; } to { opacity: 0; } }
+
+    @media (max-width: 800px) {
+      .layout { grid-template-columns: 1fr; padding: 16px; gap: 16px; }
+      nav { display: flex; overflow-x: auto; position: static; white-space: nowrap; padding-bottom: 8px; }
+      .navbtn { width: auto; margin: 0 8px 0 0; }
+      .grid.two, .grid.three, .grid.four { grid-template-columns: 1fr; }
+      .topbar { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+  <div id="toast-container"></div>
+
+  <header>
+    <div class="topbar">
+      <div class="brand">
+        <h1>CPT 训练助手</h1>
+        <p>纯本地离线运行 · 数据安全隐私</p>
+      </div>
+      <div class="actions">
+        <button id="exportBtn">导出备份</button>
+        <label class="file-label" for="importFile">导入恢复</label>
+        <input id="importFile" type="file" accept=".json" />
+        <button class="danger" id="resetBtn">清空数据</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="layout">
+    <nav id="nav"></nav>
+    <main>
+      <!-- 总览 -->
+      <section class="view active" data-view="dashboard">
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h2>总览</h2>
+              <p class="help">根据 CPT 流程：确定创伤事件 -> 评估 PCL-5 -> 记录影响陈述 -> 每日 ABC 与替代想法练习。</p>
+            </div>
+          </div>
+          <div class="grid four">
+            <div class="metric"><span>最新 PCL-5 评分</span><strong id="mLatestScore">-</strong><div id="mScoreHint">暂无</div></div>
+            <div class="metric"><span>PCL-5 记录次</span><strong id="mPclCount">0</strong><div>建议每周测 1 次</div></div>
+            <div class="metric"><span>卡点(Stuck Points)</span><strong id="mStuckCount">0</strong><div>待探索</div></div>
+            <div class="metric"><span>ABC 练习</span><strong id="mAbcCount">0</strong><div>建议每日 1 次</div></div>
+          </div>
+        </div>
+        <div class="card">
+          <h3>PCL-5 评分趋势</h3>
+          <canvas id="scoreChart" width="800" height="240" style="width:100%; background:#fcfcfd; border-radius:8px; border:1px solid var(--line);"></canvas>
+          <p class="help" style="margin-top:10px;">注：31分以上提示症状显著，低于20分常视为症状明显好转。本工具仅供自我记录，不替代临床诊断。</p>
+        </div>
+      </section>
+
+      <!-- 安全计划 -->
+      <section class="view" data-view="safety">
+        <div class="card">
+          <h2>安全计划</h2>
+          <p class="help" style="color:var(--danger)">如遇紧急危机或强烈的自伤意图，请立即停止练习并拨打当地急救电话或联系专业医生。</p>
+        </div>
+        <div class="card grid two">
+          <div><label>当前安全感 (0-10)</label><input type="number" min="0" max="10" data-bind="safety.currentSafety"></div>
+          <div><label>紧急联系人</label><input data-bind="safety.emergencyContact" placeholder="姓名 / 电话"></div>
+          <div><label>让我稳定下来的方法 (Grounding)</label><textarea data-bind="safety.grounding" placeholder="如：深呼吸、冷水洗脸、54321感官法..."></textarea></div>
+          <div><label>本地危机支持资源</label><textarea data-bind="safety.crisisResources" placeholder="心理危机干预热线、附近医院急诊地址..."></textarea></div>
+        </div>
+      </section>
+
+      <!-- Index Event -->
+      <section class="view" data-view="indexEvent">
+        <div class="card">
+          <h2>目标创伤事件 (Index Event)</h2>
+          <p class="help">选择当前最困扰你的创伤事件作为练习焦点。只需写简称，无需详细回忆细节。</p>
+        </div>
+        <div class="card grid two">
+          <div><label>事件简称</label><input data-bind="indexEvent.label" placeholder="如：那次车祸 / 某段关系中的事件"></div>
+          <div><label>大约发生时间</label><input data-bind="indexEvent.when" placeholder="如：3年前 / 2019年"></div>
+          <div><label>最强烈的核心情绪</label><input data-bind="indexEvent.strongestEmotion" placeholder="如：极度羞耻 / 内疚 / 恐惧 / 愤怒"></div>
+          <div><label>当前困扰程度 (0-10)</label><input type="number" min="0" max="10" data-bind="indexEvent.distress"></div>
+        </div>
+      </section>
+
+      <!-- PCL-5 -->
+      <section class="view" data-view="pcl">
+        <div class="card">
+          <div class="card-header">
+            <div><h2>PCL-5 创伤后应激障碍检查单</h2><p class="help">请根据过去一个月（或一周）内，该创伤事件对你的困扰程度进行评分。</p></div>
+            <button class="primary" id="startPclBtn">开始/重新测试</button>
+          </div>
+          
+          <!-- 卡片式测试面板 -->
+          <div id="pclTestPanel" style="display:none; background: #fafbfc; padding: 30px 20px; border-radius: 12px; border: 1px solid var(--line);">
+            <div class="pcl-wizard">
+              <div class="pcl-progress-bar"><div class="pcl-progress-fill" id="pclProgress"></div></div>
+              <div style="font-size:13px; color:var(--muted); margin-bottom:8px;" id="pclCounter">题目 1 / 20</div>
+              <div class="pcl-question" id="pclQuestionText">...</div>
+              <div class="pcl-options">
+                <div class="pcl-option" data-val="0">0 - 完全没有</div>
+                <div class="pcl-option" data-val="1">1 - 有一点</div>
+                <div class="pcl-option" data-val="2">2 - 中等程度</div>
+                <div class="pcl-option" data-val="3">3 - 相当多</div>
+                <div class="pcl-option" data-val="4">4 - 极多</div>
+              </div>
+              <div class="pcl-nav">
+                <button id="pclPrevBtn">上一题</button>
+                <button class="primary" id="pclSaveBtn" style="display:none;">完成并保存评分</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="card">
+          <h3>历史测评记录</h3>
+          <div class="table-wrap"><table id="pclTable"></table></div>
+        </div>
+      </section>
+
+      <!-- Impact Statement -->
+      <section class="view" data-view="impact">
+        <div class="card">
+          <h2>影响陈述 (Impact Statement)</h2>
+          <p class="help">描述你对“为什么会发生这件事”的理解，以及它如何改变了你对**自己、他人和世界**的看法。</p>
+        </div>
+        <div class="card grid two">
+          <div><label>我认为发生的原因是...</label><textarea data-bind="impact.cause"></textarea></div>
+          <div><label>我认为谁该负责？为什么？</label><textarea data-bind="impact.blame"></textarea></div>
+          <div><label>这件事让我如何看待自己？</label><textarea data-bind="impact.self"></textarea></div>
+          <div><label>这件事让我如何看待他人/世界？</label><textarea data-bind="impact.world"></textarea></div>
+        </div>
+      </section>
+
+      <!-- Stuck Points -->
+      <section class="view" data-view="stuck">
+        <div class="card">
+          <div class="card-header">
+            <div><h2>卡点记录 (Stuck Point Log)</h2><p class="help">卡点是你告诉自己的、阻碍恢复的极端想法（例如“全都是我的错”、“没有任何人可以信任”）。</p></div>
+            <button class="primary" id="addStuckBtn">添加卡点</button>
+          </div>
+          <div class="grid three">
+            <div style="grid-column: 1 / span 2;"><label>具体想法 (完整陈述句)</label><input id="spText" placeholder="如：如果我当初不那么做，一切就不会发生。"></div>
+            <div><label>主题类别</label><select id="spTheme"><option>创伤原因/自责</option><option>安全</option><option>信任</option><option>权力/控制</option><option>自尊</option><option>亲密</option><option>其他</option></select></div>
+            <div><label>相信程度 (0-100%)</label><input id="spBelief" type="number" min="0" max="100"></div>
+            <div><label>伴随情绪</label><input id="spEmotion" placeholder="如：极度内疚"></div>
+            <div><label>当前状态</label><select id="spStatus"><option>待处理</option><option>探索中</option><option>已形成替代想法</option></select></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="table-wrap"><table id="stuckTable"></table></div>
+        </div>
+      </section>
+
+      <!-- ABC -->
+      <section class="view" data-view="abc">
+        <div class="card">
+          <div class="card-header">
+            <div><h2>ABC 情绪日记</h2><p class="help">A=触发事件(仅事实)，B=我的想法(卡点)，C=我的情绪感觉。</p></div>
+            <button class="primary" id="saveAbcBtn">保存 ABC</button>
+          </div>
+          <div class="grid three">
+            <div><label>A：发生了什么客观事实？</label><textarea id="abcA" placeholder="剥离解释，只写发生的事。如：朋友没回微信。"></textarea></div>
+            <div><label>B：我告诉了自己什么想法？</label><textarea id="abcB" placeholder="如：他一定觉得我很烦，没人喜欢我。"></textarea></div>
+            <div><label>C：产生了什么情绪？</label><textarea id="abcC" placeholder="如：羞耻、焦虑。"></textarea></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="table-wrap"><table id="abcTable"></table></div>
+        </div>
+      </section>
+
+      <!-- Explore -->
+      <section class="view" data-view="explore">
+        <div class="card">
+          <div class="card-header">
+            <div><h2>探索问题</h2><p class="help">针对某个卡点，通过提问来检验它的真实性和合理性。</p></div>
+            <button class="primary" id="saveEqBtn">保存探索</button>
+          </div>
+          <div class="grid" style="margin-bottom: 20px;">
+            <div><label>选择要探索的卡点</label><select id="eqStuck"></select></div>
+          </div>
+          <div class="grid two" id="eqQuestions"></div>
+        </div>
+        <div class="card">
+          <div class="table-wrap"><table id="eqTable"></table></div>
+        </div>
+      </section>
+
+      <!-- Alternative Thoughts -->
+      <section class="view" data-view="alternative">
+        <div class="card">
+          <div class="card-header">
+            <div><h2>替代想法 (Alternative Thoughts)</h2><p class="help">基于事实和探索，生成一个更平衡、客观的新想法来替代旧卡点。</p></div>
+            <button class="primary" id="saveAtBtn">保存替代想法</button>
+          </div>
+          <div class="grid two">
+            <div><label>1. 针对哪个卡点 (旧想法)？</label><select id="atStuck"></select></div>
+            <div><label>2. 曾经对它的相信程度 (0-100%)</label><input type="number" id="atOldBelief" disabled></div>
+            <div style="grid-column: 1 / -1;"><label>3. 综合事实与探索，更平衡的替代想法是：</label><textarea id="atF" placeholder="如：虽然这件事很糟糕，但并不是我一个人的错，我也尽力了..."></textarea></div>
+            <div><label>4. 对新想法的相信程度 (0-100%)</label><input type="number" min="0" max="100" id="atNewBelief"></div>
+            <div><label>5. 重新评估对旧想法的相信程度 (0-100%)</label><input type="number" min="0" max="100" id="atReBelief"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="table-wrap"><table id="atTable"></table></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+<script>
+(function(){
+  // --- 基础状态与工具 ---
+  const KEY = 'cpt_app_data_v2';
+  const today = () => new Date().toISOString().slice(0,10);
+  const uid = () => Math.random().toString(36).slice(2, 9);
+  
+  const defaultState = {
+    safety: {}, indexEvent: {}, impact: {},
+    pcl: [], stuckPoints: [], abc: [], exploring: [], alternatives: []
+  };
+  let state = { ...defaultState, ...JSON.parse(localStorage.getItem(KEY) || '{}') };
+
+  const views = [
+    {id:'dashboard', icon:'📊', name:'总览面板'},
+    {id:'safety', icon:'🛡️', name:'安全计划'},
+    {id:'indexEvent', icon:'🎯', name:'创伤事件'},
+    {id:'pcl', icon:'📝', name:'PCL-5 测评'},
+    {id:'impact', icon:'✍️', name:'影响陈述'},
+    {id:'stuck', icon:'🛑', name:'卡点日志'},
+    {id:'abc', icon:'🔄', name:'ABC 练习'},
+    {id:'explore', icon:'🔍', name:'探索提问'},
+    {id:'alternative', icon:'⚖️', name:'替代想法'}
+  ];
+
+  // PCL-5 标准医学问题描述
+  const pclQuestions = [
+    '突然想起创伤事件，出现反复的、令人困扰的、不想要的记忆？',
+    '出现反复的、令人困扰的梦境（与创伤事件有关）？',
+    '突然感觉或表现得好像创伤事件正在再次发生（如闪回）？',
+    '当某些事物让你想起创伤事件时，感到非常强烈的心理痛苦或难受？',
+    '当某些事物让你想起创伤事件时，产生强烈的身体反应（如心跳加速、呼吸困难、出汗）？',
+    '努力回避关于创伤事件的记忆、想法或感受？',
+    '努力回避会让你想起创伤事件的外部提醒（如人、地点、谈话、物品或情境）？',
+    '难以想起来创伤事件的某个重要部分？',
+    '对自己、他人或世界抱有强烈的消极信念或预期（例如“我很糟糕”、“没人可以信任”）？',
+    '因为创伤事件的发生或其后果，强烈地责备自己或他人？',
+    '持续产生强烈的消极情绪（如恐惧、惊恐、愤怒、内疚或羞耻）？',
+    '对过去喜欢的重要活动失去兴趣，或大幅减少参与？',
+    '感觉与他人疏远，或难以与他人亲近？',
+    '难以体验积极的情绪（例如无法感受到快乐或爱意）？',
+    '变得易怒，甚至爆发愤怒，或表现出攻击性行为？',
+    '冒太多风险，或做出可能伤害自己的鲁莽行为？',
+    '变得过度警觉，总是提心吊胆、保持戒备？',
+    '容易受惊吓，反应过度？',
+    '难以集中注意力？',
+    '难以入睡，或容易醒来（睡眠质量差）？'
+  ];
+
+  const eqPrompts = [
+    '有什么事实证据支持这个想法？', '有什么事实证据反对这个想法？', 
+    '这个想法是否包含了极端词（如“永远”、“必须”、“全部”）？', 
+    '我是不是把情绪感受当成了事实证据？'
+  ];
+
+  function save() { localStorage.setItem(KEY, JSON.stringify(state)); }
+  function val(id) { return document.getElementById(id).value.trim(); }
+  function escape(s) { return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  function truncate(s, n=40) { s=String(s||''); return s.length>n ? s.slice(0,n)+'...' : s; }
+
+  // --- 全局 Toast 提示 ---
+  function toast(msg, type='ok') {
+    const box = document.getElementById('toast-container');
+    const el = document.createElement('div');
+    el.className = 'toast';
+    el.style.background = type === 'danger' ? 'var(--danger)' : (type === 'warn' ? 'var(--warn)' : '#1d2129');
+    el.textContent = msg;
+    box.appendChild(el);
+    setTimeout(() => el.remove(), 3000);
+  }
+
+  // --- 导航与绑定 ---
+  function initApp() {
+    const nav = document.getElementById('nav');
+    nav.innerHTML = views.map(v => `<button class="navbtn ${v.id==='dashboard'?'active':''}" data-go="${v.id}">${v.icon} ${v.name}</button>`).join('');
+    
+    nav.addEventListener('click', e => {
+      const btn = e.target.closest('[data-go]'); if(!btn) return;
+      document.querySelectorAll('.navbtn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      document.querySelectorAll('section.view').forEach(v => v.classList.remove('active'));
+      document.querySelector(`section[data-view="${btn.dataset.go}"]`).classList.add('active');
+      if (btn.dataset.go === 'dashboard') renderDashboard();
+    });
+
+    document.querySelectorAll('[data-bind]').forEach(el => {
+      const keys = el.dataset.bind.split('.');
+      el.value = state[keys[0]][keys[1]] || '';
+      el.addEventListener('input', () => { state[keys[0]][keys[1]] = el.value; save(); });
+    });
+
+    document.getElementById('eqQuestions').innerHTML = eqPrompts.map((q,i) => `<div><label>${i+1}. ${q}</label><textarea id="eq_${i}"></textarea></div>`).join('');
+  }
+
+  // --- PCL-5 卡片交互逻辑 ---
+  let pclAnswers = [];
+  let pclCurrentIndex = 0;
+
+  document.getElementById('startPclBtn').addEventListener('click', () => {
+    pclAnswers = new Array(20).fill(null);
+    pclCurrentIndex = 0;
+    document.getElementById('pclTestPanel').style.display = 'block';
+    renderPclQuestion();
+  });
+
+  function renderPclQuestion() {
+    if (pclCurrentIndex >= 20) {
+      document.getElementById('pclQuestionText').textContent = "测试完成，请点击下方按钮保存。";
+      document.querySelector('.pcl-options').style.display = 'none';
+      document.getElementById('pclSaveBtn').style.display = 'block';
+      document.getElementById('pclPrevBtn').style.display = 'block';
+      document.getElementById('pclProgress').style.width = '100%';
+      document.getElementById('pclCounter').textContent = '已完成';
+      return;
+    }
+    document.querySelector('.pcl-options').style.display = 'grid';
+    document.getElementById('pclSaveBtn').style.display = 'none';
+    document.getElementById('pclPrevBtn').style.display = pclCurrentIndex === 0 ? 'none' : 'block';
+    document.getElementById('pclQuestionText').textContent = pclQuestions[pclCurrentIndex];
+    document.getElementById('pclCounter').textContent = `题目 ${pclCurrentIndex + 1} / 20`;
+    document.getElementById('pclProgress').style.width = `${(pclCurrentIndex / 20) * 100}%`;
+    
+    document.querySelectorAll('.pcl-option').forEach(el => {
+      el.classList.remove('selected');
+      if (pclAnswers[pclCurrentIndex] === Number(el.dataset.val)) el.classList.add('selected');
+    });
+  }
+
+  document.querySelectorAll('.pcl-option').forEach(btn => {
+    btn.addEventListener('click', () => {
+      pclAnswers[pclCurrentIndex] = Number(btn.dataset.val);
+      btn.classList.add('selected');
+      setTimeout(() => { pclCurrentIndex++; renderPclQuestion(); }, 250); // 延迟250ms自动跳下一题
+    });
+  });
+
+  document.getElementById('pclPrevBtn').addEventListener('click', () => {
+    if (pclCurrentIndex > 0) { pclCurrentIndex--; renderPclQuestion(); }
+  });
+
+  document.getElementById('pclSaveBtn').addEventListener('click', () => {
+    const total = pclAnswers.reduce((a,b)=>a+b,0);
+    state.pcl.push({ id: uid(), date: today(), scores: pclAnswers, total });
+    save(); renderTables(); renderDashboard();
+    document.getElementById('pclTestPanel').style.display = 'none';
+    toast('PCL-5 评分保存成功！');
+  });
+
+  // --- 表格渲染器 ---
+  function emptyRow(cols) { return `<tr><td colspan="${cols}" class="empty-state">暂无记录</td></tr>`; }
+  function delBtn(col, id) { return `<button onclick="appDelete('${col}','${id}')">删除</button>`; }
+
+  function renderTables() {
+    // PCL-5
+    const pclHTML = state.pcl.length === 0 ? emptyRow(4) : state.pcl.map(r => `<tr><td>${r.date}</td><td><strong>${r.total}</strong></td><td>${r.total>=31?'<span class="pill danger">症状显著</span>':(r.total<20?'<span class="pill ok">低于20</span>':'<span class="pill warn">中等</span>')}</td><td>${delBtn('pcl', r.id)}</td></tr>`).join('');
+    document.getElementById('pclTable').innerHTML = `<tr><th>日期</th><th>总分</th><th>提示</th><th>操作</th></tr>${pclHTML}`;
+
+    // Stuck Points
+    const spHTML = state.stuckPoints.length === 0 ? emptyRow(5) : state.stuckPoints.map(r => `<tr><td>${escape(truncate(r.text))}</td><td>${escape(r.theme)}</td><td>${r.belief}%</td><td><span class="pill warn">${escape(r.status)}</span></td><td>${delBtn('stuckPoints', r.id)}</td></tr>`).join('');
+    document.getElementById('stuckTable').innerHTML = `<tr><th>卡点想法</th><th>主题</th><th>相信度</th><th>状态</th><th>操作</th></tr>${spHTML}`;
+
+    // ABC
+    const abcHTML = state.abc.length === 0 ? emptyRow(5) : state.abc.map(r => `<tr><td>${r.date}</td><td>${escape(truncate(r.A, 20))}</td><td>${escape(truncate(r.B, 20))}</td><td>${escape(r.C)}</td><td>${delBtn('abc', r.id)}</td></tr>`).join('');
+    document.getElementById('abcTable').innerHTML = `<tr><th>日期</th><th>A(事件)</th><th>B(想法)</th><th>C(情绪)</th><th>操作</th></tr>${abcHTML}`;
+
+    // Explore
+    const eqHTML = state.exploring.length === 0 ? emptyRow(3) : state.exploring.map(r => `<tr><td>${r.date}</td><td>${escape(truncate(r.stuckText, 30))}</td><td>${delBtn('exploring', r.id)}</td></tr>`).join('');
+    document.getElementById('eqTable').innerHTML = `<tr><th>日期</th><th>探索的卡点</th><th>操作</th></tr>${eqHTML}`;
+
+    // Alternative
+    const atHTML = state.alternatives.length === 0 ? emptyRow(4) : state.alternatives.map(r => `<tr><td>${r.date}</td><td>${escape(truncate(r.stuckText, 20))}</td><td>${escape(truncate(r.F, 30))}</td><td>${delBtn('alternatives', r.id)}</td></tr>`).join('');
+    document.getElementById('atTable').innerHTML = `<tr><th>日期</th><th>原卡点</th><th>新替代想法</th><th>操作</th></tr>${atHTML}`;
+
+    // 刷新下拉菜单
+    const opts = `<option value="">-- 请选择卡点 --</option>` + state.stuckPoints.map(sp => `<option value="${sp.id}">${escape(truncate(sp.text, 50))}</option>`).join('');
+    ['eqStuck', 'atStuck'].forEach(id => { const el=document.getElementById(id); const v=el.value; el.innerHTML=opts; el.value=v; });
+  }
+
+  // --- 模块业务逻辑 ---
+  document.getElementById('addStuckBtn').addEventListener('click', () => {
+    if(!val('spText')) return toast('请填写卡点想法', 'warn');
+    state.stuckPoints.push({ id: uid(), text: val('spText'), theme: val('spTheme'), belief: val('spBelief')||0, status: val('spStatus') });
+    ['spText','spBelief','spEmotion'].forEach(id => document.getElementById(id).value = '');
+    save(); renderTables(); renderDashboard(); toast('卡点已添加');
+  });
+
+  document.getElementById('saveAbcBtn').addEventListener('click', () => {
+    if(!val('abcA') || !val('abcB')) return toast('请至少填写 A 和 B', 'warn');
+    state.abc.push({ id: uid(), date: today(), A: val('abcA'), B: val('abcB'), C: val('abcC') });
+    ['abcA','abcB','abcC'].forEach(id => document.getElementById(id).value = '');
+    save(); renderTables(); renderDashboard(); toast('ABC 保存成功');
+  });
+
+  document.getElementById('saveEqBtn').addEventListener('click', () => {
+    const sid = val('eqStuck'); if(!sid) return toast('请选择要探索的卡点', 'warn');
+    const stuck = state.stuckPoints.find(x=>x.id===sid);
+    state.exploring.push({ id: uid(), date: today(), stuckId: sid, stuckText: stuck.text });
+    eqPrompts.forEach((_,i) => document.getElementById('eq_'+i).value = '');
+    save(); renderTables(); toast('探索记录已保存');
+  });
+
+  document.getElementById('atStuck').addEventListener('change', e => {
+    const sp = state.stuckPoints.find(x=>x.id === e.target.value);
+    document.getElementById('atOldBelief').value = sp ? sp.belief : '';
+  });
+
+  document.getElementById('saveAtBtn').addEventListener('click', () => {
+    const sid = val('atStuck'); if(!sid) return toast('请选择卡点', 'warn');
+    const stuck = state.stuckPoints.find(x=>x.id===sid);
+    state.alternatives.push({ id: uid(), date: today(), stuckId: sid, stuckText: stuck.text, F: val('atF') });
+    ['atF','atNewBelief','atReBelief'].forEach(id => document.getElementById(id).value = '');
+    save(); renderTables(); toast('替代想法已保存');
+  });
+
+  window.appDelete = function(collection, id) {
+    if(!confirm('确定要删除这条记录吗？')) return;
+    state[collection] = state[collection].filter(x => x.id !== id);
+    save(); renderTables(); renderDashboard(); toast('已删除');
+  };
+
+  // --- 仪表盘与图表 ---
+  function renderDashboard() {
+    const latest = state.pcl[state.pcl.length - 1];
+    document.getElementById('mLatestScore').textContent = latest ? latest.total : '-';
+    document.getElementById('mPclCount').textContent = state.pcl.length;
+    document.getElementById('mStuckCount').textContent = state.stuckPoints.length;
+    document.getElementById('mAbcCount').textContent = state.abc.length;
+
+    const canvas = document.getElementById('scoreChart');
+    const ctx = canvas.getContext('2d');
+    const w = canvas.width, h = canvas.height;
+    ctx.clearRect(0,0,w,h);
+    
+    if(state.pcl.length === 0) {
+      ctx.fillStyle = '#86909c'; ctx.font = '14px sans-serif'; ctx.textAlign = 'center';
+      ctx.fillText('暂无评测数据，请先完成一次 PCL-5 测试。', w/2, h/2);
+      return;
+    }
+
+    // 绘制参考线
+    const pad = 40, maxScore = 80;
+    function getY(val) { return h - pad - (val/maxScore)*(h - pad*2); }
+    ctx.lineWidth = 1; ctx.textAlign = 'left';
+    [20, 31, 50].forEach(val => {
+      ctx.strokeStyle = val===31 ? '#f53f3f' : '#e5e6eb';
+      ctx.beginPath(); ctx.moveTo(pad, getY(val)); ctx.lineTo(w-pad, getY(val)); ctx.stroke();
+      ctx.fillStyle = val===31 ? '#f53f3f' : '#86909c'; ctx.fillText(val + '分', 5, getY(val)+4);
+    });
+
+    // 绘制折线
+    const step = state.pcl.length > 1 ? (w - pad*2) / (state.pcl.length - 1) : 0;
+    ctx.strokeStyle = '#165dff'; ctx.lineWidth = 3; ctx.beginPath();
+    state.pcl.forEach((d, i) => {
+      const x = pad + i * step, y = getY(d.total);
+      if(i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    });
+    ctx.stroke();
+
+    // 绘制数据点
+    state.pcl.forEach((d, i) => {
+      const x = pad + i * step, y = getY(d.total);
+      ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(x, y, 5, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+      ctx.fillStyle = '#1d2129'; ctx.textAlign = 'center'; ctx.fillText(d.total, x, y - 12);
+    });
+  }
+
+  // --- 导入导出与清空 ---
+  document.getElementById('exportBtn').addEventListener('click', () => {
+    save();
+    const blob = new Blob([JSON.stringify(state, null, 2)], {type:'application/json'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = `CPT_Backup_${today()}.json`; a.click();
+    toast('数据已导出');
+  });
+
+  document.getElementById('importFile').addEventListener('change', e => {
+    const file = e.target.files[0]; if(!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const imported = JSON.parse(reader.result);
+        if(!confirm('导入将覆盖当前全部数据，确定继续？')) return;
+        state = { ...defaultState, ...imported }; save(); location.reload();
+      } catch(err) { toast('文件格式错误', 'danger'); }
+    };
+    reader.readAsText(file);
+  });
+
+  document.getElementById('resetBtn').addEventListener('click', () => {
+    if(confirm('警告：此操作将永久清空浏览器中的所有数据且不可恢复！建议先导出备份。是否继续？')) {
+      localStorage.removeItem(KEY); location.reload();
+    }
+  });
+
+  // 启动
+  initApp();
+  renderTables();
+  renderDashboard();
+
+})();
+</script>
+</body>
+</html>

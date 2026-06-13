@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PCL-5 创伤后应激障碍检查清单</title>
+    <style>
+        body {
+            font-family: "Helvetica Neue", Helvetica, Arial, "Microsoft YaHei", sans-serif;
+            background-color: #f7f9fa;
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 40px auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            font-size: 1.6em;
+            margin-bottom: 20px;
+        }
+        .instructions {
+            background-color: #f0f4f8;
+            border-left: 4px solid #3498db;
+            padding: 12px 15px;
+            margin-bottom: 25px;
+            font-size: 0.9em;
+            color: #555;
+        }
+        /* 进度条样式 */
+        .progress-container {
+            width: 100%;
+            background-color: #e8ecef;
+            border-radius: 4px;
+            height: 8px;
+            margin-bottom: 25px;
+            overflow: hidden;
+        }
+        .progress-bar {
+            height: 100%;
+            background-color: #3498db;
+            width: 5%;
+            transition: width 0.3s ease;
+        }
+        .progress-text {
+            text-align: right;
+            font-size: 0.85em;
+            color: #7f8c8d;
+            margin-top: -20px;
+            margin-bottom: 20px;
+        }
+        /* 卡片样式 */
+        .question-card {
+            display: none; /* 默认隐藏，通过JS控制显示 */
+            animation: fadeIn 0.4s ease;
+        }
+        .question-card.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .question-text {
+            font-size: 1.1em;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #2c3e50;
+            min-height: 60px;
+        }
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 30px;
+        }
+        .option-label {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            border: 1px solid #dcdfe6;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.95em;
+        }
+        .option-label:hover {
+            background-color: #f5f7fa;
+            border-color: #c0c4cc;
+        }
+        .option-label input {
+            margin-right: 12px;
+            transform: scale(1.1);
+        }
+        /* 选中状态样式 */
+        .option-label.selected {
+            background-color: #ebf5ff;
+            border-color: #409eff;
+            color: #409eff;
+        }
+        /* 导航按钮 */
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+        }
+        .btn {
+            padding: 10px 20px;
+            font-size: 0.95em;
+            border-radius: 4px;
+            cursor: pointer;
+            border: 1px solid #dcdfe6;
+            background-color: #fff;
+            color: #606266;
+            transition: all 0.2s;
+            flex: 1;
+            text-align: center;
+        }
+        .btn:hover {
+            background-color: #f5f7fa;
+        }
+        .btn-primary {
+            background-color: #3498db;
+            color: #fff;
+            border: none;
+        }
+        .btn-primary:hover {
+            background-color: #2980b9;
+        }
+        .btn:disabled {
+            background-color: #f5f7fa;
+            color: #c0c4cc;
+            cursor: not-allowed;
+            border-color: #e4e7ed;
+        }
+        /* 结果区域 */
+        #result-box {
+            display: none;
+            padding: 25px;
+            background-color: #e8f8f5;
+            border: 1px solid #a3e4d7;
+            border-radius: 8px;
+            animation: fadeIn 0.5s ease;
+        }
+        .result-title {
+            font-weight: bold;
+            color: #16a085;
+            margin-bottom: 12px;
+            font-size: 1.2em;
+            text-align: center;
+        }
+        .disclaimer {
+            font-size: 0.85em;
+            color: #7f8c8d;
+            margin-top: 20px;
+            border-top: 1px dashed #bdc3c7;
+            padding-top: 15px;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>PCL-5 创伤后应激障碍检查清单</h1>
+    
+    <!-- 顶栏指导语 -->
+    <div class="instructions" id="instructions-header">
+        <strong>提示：</strong>在过去的一个月里，这些问题在多大程度上困扰了您？请根据实际情况选择。
+    </div>
+
+    <!-- 进度条 -->
+    <div id="progress-wrapper">
+        <div class="progress-container">
+            <div class="progress-bar" id="progress-bar"></div>
+        </div>
+        <div class="progress-text" id="progress-text">第 1 / 20 题</div>
+    </div>
+
+    <!-- 问题卡片容器 -->
+    <form id="pcl5-form">
+        <div id="cards-container"></div>
+        
+        <!-- 导航按钮 -->
+        <div class="nav-buttons" id="nav-container">
+            <button type="button" class="btn" id="prev-btn" onclick="prevQuestion()" disabled>上一题</button>
+            <button type="button" class="btn btn-primary" id="next-btn" onclick="nextQuestion()">下一题</button>
+        </div>
+    </form>
+
+    <!-- 结果展示 -->
+    <div id="result-box">
+        <div class="result-title">评估结果</div>
+        <p style="text-align: center;">您的总得分是：<strong id="total-score" style="font-size: 1.6em; color: #e74c3c;">0</strong> 分（满分 80 分）。</p>
+        <p id="score-interpretation" style="margin-bottom: 20px;"></p>
+        <button type="button" class="btn" onclick="resetQuiz()">重新测评</button>
+        <div class="disclaimer">
+            * 注：PCL-5 筛查分界值通常在 31 至 33 分之间。本量表结果仅作为筛查和自我了解参考，不能代替专业的临床心理诊断。如您感到持续困扰，建议咨询专业的精神科医生或心理咨询师。
+        </div>
+    </div>
+</div>
+
+<script>
+    const questions = [
+        "反复出现与那次创伤事件有关的、不愉快的、非自主的记忆。",
+        "反复出现关于那次创伤事件的、不愉快的梦（梦魇）。",
+        "突然感觉或觉得那次创伤事件好像正在重新发生（好像回到了过去，重新经历它）。",
+        "当某些事物让你想起那次创伤事件时，感到极度痛苦。",
+        "当某些事物让你想起那次创伤事件时，身体产生强烈的生理反应（例如心跳加快、呼吸困难、出汗）。",
+        "尽量避免去想、去感受与那次创伤事件有关的记忆、想法或感受。",
+        "尽量避免接触会让你想起那次创伤事件的外部事物（例如人、地方、对话、活动、物体或处境）。",
+        "无法记住那次创伤事件的重要部分（并非由于脑外伤、酒精或药物所致）。",
+        "对自己、他人或世界产生了持久且过分的消极信念（例如：“我很糟糕”、“没人可以信任”、“这个世界绝对是危险的”）。",
+        "因为创伤事件而错误地责怪自己或他人。",
+        "持续存在消极的情绪状态（例如恐惧、愤怒、内疚或羞耻）。",
+        "对参加你以前喜欢的活动失去兴趣。",
+        "感到与他人疏远或隔阂。",
+        "难以感受到积极的情绪（例如无法感到快乐、满足，或对爱你的人无法产生爱的感觉）。",
+        "表现出易怒的行为或愤怒爆发（通常在很少或没有挑衅的情况下，表现为对人或物言语或身体上的攻击）。",
+        "行为不计后果或采取自我毁灭式的举动（例如危险驾驶、过度饮酒）。",
+        "处于过度警觉状态，随时保持戒备（例如总是关注周围潜在的危险）。",
+        "容易受惊或感到惊吓。",
+        "难以集中注意力。",
+        "睡眠困难（例如难以入睡或易醒、睡眠质量差）。"
+    ];
+
+    const options = [
+        { text: "完全没有", value: 0 },
+        { text: "有一点", value: 1 },
+        { text: "中等程度", value: 2 },
+        { text: "相当严重", value: 3 },
+        { text: "极度严重", value: 4 }
+    ];
+
+    let currentStep = 0;
+    const totalQuestions = questions.length;
+
+    // 动态渲染问题卡片
+    const container = document.getElementById('cards-container');
+    questions.forEach((q, index) => {
+        const qNum = index + 1;
+        const card = document.createElement('div');
+        card.className = `question-card ${index === 0 ? 'active' : ''}`;
+        card.id = `card-${index}`;
+        
+        let html = `<div class="question-text">${qNum}. ${q}</div>`;
+        html += `<div class="options-list">`;
+        
+        options.forEach(opt => {
+            html += `
+                <label class="option-label" onclick="selectOption(this, ${index})">
+                    <input type="radio" name="q${qNum}" value="${opt.value}">
+                    ${opt.text}
+                </label>
+            `;
+        });
+        
+        html += `</div>`;
+        card.innerHTML = html;
+        container.appendChild(card);
+    });
+
+    // 选中选项的处理
+    function selectOption(labelElement, stepIndex) {
+        // 清除同组其他选项的选中高亮样式
+        const siblings = labelElement.parentNode.querySelectorAll('.option-label');
+        siblings.forEach(el => el.classList.remove('selected'));
+        
+        // 高亮当前选中项
+        labelElement.classList.add('selected');
+
+        // 自动勾选内部的 input
+        const radio = labelElement.querySelector('input');
+        radio.checked = true;
+
+        // 自动跳转到下一题（延迟一小会儿提供良好视觉反馈，但最后一题不自动提交）
+        if (stepIndex < totalQuestions - 1) {
+            setTimeout(() => {
+                if (currentStep === stepIndex) { // 防止用户快速点击造成多步跳转
+                    nextQuestion();
+                }
+            }, 250);
+        }
+    }
+
+    // 更新界面状态（进度条、按钮状态等）
+    function updateUI() {
+        // 更新卡片可见性
+        for (let i = 0; i < totalQuestions; i++) {
+            const card = document.getElementById(`card-${i}`);
+            if (i === currentStep) {
+                card.classList.add('active');
+            } else {
+                card.classList.remove('active');
+            }
+        }
+
+        // 更新进度条
+        const progressPercent = ((currentStep + 1) / totalQuestions) * 100;
+        document.getElementById('progress-bar').style.width = `${progressPercent}%`;
+        document.getElementById('progress-text').innerText = `第 ${currentStep + 1} / ${totalQuestions} 题`;
+
+        // 更新按钮状态
+        document.getElementById('prev-btn').disabled = (currentStep === 0);
+
+        const nextBtn = document.getElementById('next-btn');
+        if (currentStep === totalQuestions - 1) {
+            nextBtn.innerText = "完成并提交";
+            nextBtn.className = "btn btn-primary";
+        } else {
+            nextBtn.innerText = "下一题";
+            nextBtn.className = "btn btn-primary";
+        }
+    }
+
+    // 下一题
+    function nextQuestion() {
+        // 检查当前题是否已答
+        const qNum = currentStep + 1;
+        const answered = document.querySelector(`input[name="q${qNum}"]:checked`);
+        if (!answered) {
+            alert("请先选择一个选项再进行下一题。");
+            return;
+        }
+
+        if (currentStep < totalQuestions - 1) {
+            currentStep++;
+            updateUI();
+        } else {
+            calculateScore();
+        }
+    }
+
+    // 上一题
+    function prevQuestion() {
+        if (currentStep > 0) {
+            currentStep--;
+            updateUI();
+        }
+    }
+
+    // 计算最后得分
+    function calculateScore() {
+        let total = 0;
+        for (let i = 1; i <= totalQuestions; i++) {
+            const selected = document.querySelector(`input[name="q${i}"]:checked`);
+            if (selected) {
+                total += parseInt(selected.value);
+            }
+        }
+
+        // 隐藏题目和导航，显示结果
+        document.getElementById('pcl5-form').style.display = 'none';
+        document.getElementById('progress-wrapper').style.display = 'none';
+        document.getElementById('instructions-header').style.display = 'none';
+
+        document.getElementById('total-score').innerText = total;
+
+        let interpretation = "";
+        if (total >= 33) {
+            interpretation = "您的得分提示可能存在较为明显的创伤后应激障碍（PTSD）相关症状，建议寻找资质完备的心理咨询师或精神科医生进行进一步评估。";
+        } else {
+            interpretation = "您的得分在常规临床筛查分界线以下，提示目前相关创伤应激症状可能不明显。如仍有不适，请保持对自身情绪的关注。";
+        }
+        document.getElementById('score-interpretation').innerText = interpretation;
+
+        document.getElementById('result-box').style.display = 'block';
+    }
+
+    // 重新测评
+    function resetQuiz() {
+        currentStep = 0;
+        document.getElementById('pcl5-form').reset();
+        
+        // 清除所有选中样式
+        const selectedLabels = document.querySelectorAll('.option-label.selected');
+        selectedLabels.forEach(el => el.classList.remove('selected'));
+
+        // 恢复显示界面
+        document.getElementById('pcl5-form').style.display = 'block';
+        document.getElementById('progress-wrapper').style.display = 'block';
+        document.getElementById('instructions-header').style.display = 'block';
+        document.getElementById('result-box').style.display = 'none';
+
+        updateUI();
+    }
+
+    // 初始化界面
+    updateUI();
+</script>
+
+</body>
+</html>
