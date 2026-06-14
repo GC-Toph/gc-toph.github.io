@@ -38,12 +38,14 @@
     }
     .brand h1 { font-size: 18px; font-weight: 600; }
     .brand p { color: var(--muted); font-size: 12px; margin-top: 2px; }
-    .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
     
     button, .file-label {
       border: 1px solid var(--line); background: #fff; color: var(--text);
-      border-radius: 8px; padding: 6px 12px; font-size: 14px;
-      cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center;
+      border-radius: 8px; padding: 6px 12px; font-size: 14px; line-height: 20px;
+      height: 34px; cursor: pointer; transition: 0.2s;
+      display: inline-flex; align-items: center; justify-content: center; white-space: nowrap;
+      font-family: inherit;
     }
     button:hover, .file-label:hover { border-color: var(--brand); color: var(--brand); }
     button.primary { background: var(--brand); color: #fff; border-color: var(--brand); }
@@ -100,7 +102,8 @@
     .pill.danger { background: #ffece8; color: var(--danger); }
     
     table { width: 100%; border-collapse: collapse; font-size: 14px; }
-    th, td { border-bottom: 1px solid var(--line); padding: 12px 10px; text-align: left; vertical-align: middle; }
+    th, td { border-bottom: 1px solid var(--line); padding: 12px 10px; text-align: left; vertical-align: top; }
+    td { white-space: pre-wrap; overflow-wrap: anywhere; word-break: break-word; }
     th { color: var(--muted); font-weight: 500; background: #f7f8fa; }
     .table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; }
     .empty-state { text-align: center; padding: 30px; color: var(--muted); font-size: 14px; }
@@ -494,23 +497,23 @@
     document.getElementById('pclTable').innerHTML = `<tr><th>日期</th><th>总分</th><th>提示</th><th>操作</th></tr>${pclHTML}`;
 
     // Stuck Points
-    const spHTML = state.stuckPoints.length === 0 ? emptyRow(5) : state.stuckPoints.map(r => `<tr><td>${escape(truncate(r.text))}</td><td>${escape(r.theme)}</td><td>${r.belief}%</td><td><span class="pill warn">${escape(r.status)}</span></td><td>${delBtn('stuckPoints', r.id)}</td></tr>`).join('');
+    const spHTML = state.stuckPoints.length === 0 ? emptyRow(5) : state.stuckPoints.map(r => `<tr><td>${escape(r.text)}</td><td>${escape(r.theme)}</td><td>${r.belief}%</td><td><span class="pill warn">${escape(r.status)}</span></td><td>${delBtn('stuckPoints', r.id)}</td></tr>`).join('');
     document.getElementById('stuckTable').innerHTML = `<tr><th>卡点想法</th><th>主题</th><th>相信度</th><th>状态</th><th>操作</th></tr>${spHTML}`;
 
     // ABC
-    const abcHTML = state.abc.length === 0 ? emptyRow(5) : state.abc.map(r => `<tr><td>${r.date}</td><td>${escape(truncate(r.A, 20))}</td><td>${escape(truncate(r.B, 20))}</td><td>${escape(r.C)}</td><td>${delBtn('abc', r.id)}</td></tr>`).join('');
+    const abcHTML = state.abc.length === 0 ? emptyRow(5) : state.abc.map(r => `<tr><td>${r.date}</td><td>${escape(r.A)}</td><td>${escape(r.B)}</td><td>${escape(r.C)}</td><td>${delBtn('abc', r.id)}</td></tr>`).join('');
     document.getElementById('abcTable').innerHTML = `<tr><th>日期</th><th>A(事件)</th><th>B(想法)</th><th>C(情绪)</th><th>操作</th></tr>${abcHTML}`;
 
     // Explore
-    const eqHTML = state.exploring.length === 0 ? emptyRow(3) : state.exploring.map(r => `<tr><td>${r.date}</td><td>${escape(truncate(r.stuckText, 30))}</td><td>${delBtn('exploring', r.id)}</td></tr>`).join('');
+    const eqHTML = state.exploring.length === 0 ? emptyRow(3) : state.exploring.map(r => `<tr><td>${r.date}</td><td>${escape(r.stuckText)}</td><td>${delBtn('exploring', r.id)}</td></tr>`).join('');
     document.getElementById('eqTable').innerHTML = `<tr><th>日期</th><th>探索的卡点</th><th>操作</th></tr>${eqHTML}`;
 
     // Alternative
-    const atHTML = state.alternatives.length === 0 ? emptyRow(4) : state.alternatives.map(r => `<tr><td>${r.date}</td><td>${escape(truncate(r.stuckText, 20))}</td><td>${escape(truncate(r.F, 30))}</td><td>${delBtn('alternatives', r.id)}</td></tr>`).join('');
+    const atHTML = state.alternatives.length === 0 ? emptyRow(4) : state.alternatives.map(r => `<tr><td>${r.date}</td><td>${escape(r.stuckText)}</td><td>${escape(r.F)}</td><td>${delBtn('alternatives', r.id)}</td></tr>`).join('');
     document.getElementById('atTable').innerHTML = `<tr><th>日期</th><th>原卡点</th><th>新替代想法</th><th>操作</th></tr>${atHTML}`;
 
     // 刷新下拉菜单
-    const opts = `<option value="">-- 请选择卡点 --</option>` + state.stuckPoints.map(sp => `<option value="${sp.id}">${escape(truncate(sp.text, 50))}</option>`).join('');
+    const opts = `<option value="">-- 请选择卡点 --</option>` + state.stuckPoints.map(sp => `<option value="${sp.id}">${escape(sp.text)}</option>`).join('');
     ['eqStuck', 'atStuck'].forEach(id => { const el=document.getElementById(id); const v=el.value; el.innerHTML=opts; el.value=v; });
   }
 
