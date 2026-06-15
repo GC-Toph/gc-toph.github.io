@@ -100,6 +100,10 @@
     .pill.ok { background: #e8ffea; color: var(--ok); }
     .pill.warn { background: #fff7e8; color: var(--warn); }
     .pill.danger { background: #ffece8; color: var(--danger); }
+    details.record-detail { margin-top: 6px; }
+    details.record-detail summary { color: var(--brand); cursor: pointer; font-size: 13px; }
+    .detail-box { margin-top: 8px; padding: 10px; border-radius: 8px; background: #f7f8fa; color: #4e5969; font-size: 13px; }
+    .detail-box strong { color: var(--text); }
     
     table { width: 100%; border-collapse: collapse; font-size: 14px; }
     th, td { border-bottom: 1px solid var(--line); padding: 12px 10px; text-align: left; vertical-align: top; }
@@ -274,7 +278,7 @@
             <div><label>主题类别</label><select id="spTheme"><option>创伤原因/自责</option><option>安全</option><option>信任</option><option>权力/控制</option><option>自尊</option><option>亲密</option><option>其他</option></select></div>
             <div><label>相信程度 (0-100%)</label><input id="spBelief" type="number" min="0" max="100"></div>
             <div><label>伴随情绪</label><input id="spEmotion" placeholder="如：极度内疚"></div>
-            <div><label>当前状态</label><select id="spStatus"><option>待处理</option><option>探索中</option><option>已形成替代想法</option></select></div>
+            <div><label>初始状态</label><select id="spStatus"><option>待处理</option></select><p class="help">状态会随“探索”和“替代想法”自动流转。</p></div>
           </div>
         </div>
         <div class="card">
@@ -326,7 +330,8 @@
           </div>
           <div class="grid two">
             <div><label>1. 针对哪个卡点 (旧想法)？</label><select id="atStuck"></select></div>
-            <div><label>2. 曾经对它的相信程度 (0-100%)</label><input type="number" id="atOldBelief" disabled></div>
+            <div><label>2. 当前对旧想法的相信程度 (0-100%)</label><input type="number" id="atOldBelief" disabled></div>
+            <div style="grid-column: 1 / -1;" id="atExplorePreview" class="detail-box">选择卡点后，这里会显示最近一次探索记录，帮助你写替代想法。</div>
             <div style="grid-column: 1 / -1;"><label>3. 综合事实与探索，更平衡的替代想法是：</label><textarea id="atF" placeholder="如：虽然这件事很糟糕，但并不是我一个人的错，我也尽力了..."></textarea></div>
             <div><label>4. 对新想法的相信程度 (0-100%)</label><input type="number" min="0" max="100" id="atNewBelief"></div>
             <div><label>5. 重新评估对旧想法的相信程度 (0-100%)</label><input type="number" min="0" max="100" id="atReBelief"></div>
@@ -394,10 +399,46 @@
     '我是不是把情绪感受当成了事实证据？'
   ];
 
+  ['pcl','stuckPoints','abc','exploring','alternatives'].forEach(k => { if (!Array.isArray(state[k])) state[k] = []; });
+
   function save() { localStorage.setItem(KEY, JSON.stringify(state)); }
   function val(id) { return document.getElementById(id).value.trim(); }
+  function numVal(id, fallback=0) {
+    const raw = document.getElementById(id).value;
+    if (raw === '') return fallback;
+    return clampPercent(raw);
+  }
+  function clampPercent(v) {
+    const n = Number(v);
+    if (!Number.isFinite(n)) return 0;
+    return Math.max(0, Math.min(100, Math.round(n)));
+  }
   function escape(s) { return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
   function truncate(s, n=40) { s=String(s||''); return s.length>n ? s.slice(0,n)+'...' : s; }
+  function statusClass(status) {
+    if (status === '已形成替代想法') return 'ok';
+    if (status === '探索中') return 'warn';
+    return 'danger';
+  }
+  function latestByStuck(collection, stuckId) {
+    return state[collection].filter(x => x.stuckId === stuckId).slice(-1)[0];
+  }
+  function syncStuckStatus(stuckId) {
+    const sp = state.stuckPoints.find(x => x.id === stuckId);
+    if (!sp) return;
+    if (state.alternatives.some(x => x.stuckId === stuckId)) sp.status = '已形成替代想法';
+    else if (state.exploring.some(x => x.stuckId === stuckId)) sp.status = '探索中';
+    else sp.status = '待处理';
+  }
+  function syncAllStuckStatus() { state.stuckPoints.forEach(sp => syncStuckStatus(sp.id)); }
+  function renderExplorePreview(stuckId) {
+    const box = document.getElementById('atExplorePreview');
+    if (!box) return;
+    if (!stuckId) { box.textContent = '选择卡点后，这里会显示最近一次探索记录，帮助你写替代想法。'; return; }
+    const ex = latestByStuck('exploring', stuckId);
+    if (!ex || !ex.answers) { box.textContent = '这个卡点还没有保存过探索记录。建议先完成“探索提问”，再写替代想法。'; return; }
+    box.innerHTML = '<strong>最近一次探索：</strong>' + eqPrompts.map((q,i) => `<div style="margin-top:6px;"><strong>${i+1}. ${escape(q)}</strong><br>${escape(ex.answers[i] || '未填写')}</div>`).join('');
+  }
 
   // --- 全局 Toast 提示 ---
   function toast(msg, type='ok') {
@@ -497,30 +538,39 @@
     document.getElementById('pclTable').innerHTML = `<tr><th>日期</th><th>总分</th><th>提示</th><th>操作</th></tr>${pclHTML}`;
 
     // Stuck Points
-    const spHTML = state.stuckPoints.length === 0 ? emptyRow(5) : state.stuckPoints.map(r => `<tr><td>${escape(r.text)}</td><td>${escape(r.theme)}</td><td>${r.belief}%</td><td><span class="pill warn">${escape(r.status)}</span></td><td>${delBtn('stuckPoints', r.id)}</td></tr>`).join('');
-    document.getElementById('stuckTable').innerHTML = `<tr><th>卡点想法</th><th>主题</th><th>相信度</th><th>状态</th><th>操作</th></tr>${spHTML}`;
+    syncAllStuckStatus();
+    const spHTML = state.stuckPoints.length === 0 ? emptyRow(6) : state.stuckPoints.map(r => {
+      const exCount = state.exploring.filter(x => x.stuckId === r.id).length;
+      const atCount = state.alternatives.filter(x => x.stuckId === r.id).length;
+      return `<tr><td>${escape(r.text)}</td><td>${escape(r.theme)}</td><td>${clampPercent(r.belief)}%</td><td>${escape(r.emotion || '')}</td><td><span class="pill ${statusClass(r.status)}">${escape(r.status)}</span><div class="help">探索 ${exCount} · 替代 ${atCount}</div></td><td>${delBtn('stuckPoints', r.id)}</td></tr>`;
+    }).join('');
+    document.getElementById('stuckTable').innerHTML = `<tr><th>卡点想法</th><th>主题</th><th>相信度</th><th>情绪</th><th>状态</th><th>操作</th></tr>${spHTML}`;
 
     // ABC
     const abcHTML = state.abc.length === 0 ? emptyRow(5) : state.abc.map(r => `<tr><td>${r.date}</td><td>${escape(r.A)}</td><td>${escape(r.B)}</td><td>${escape(r.C)}</td><td>${delBtn('abc', r.id)}</td></tr>`).join('');
     document.getElementById('abcTable').innerHTML = `<tr><th>日期</th><th>A(事件)</th><th>B(想法)</th><th>C(情绪)</th><th>操作</th></tr>${abcHTML}`;
 
     // Explore
-    const eqHTML = state.exploring.length === 0 ? emptyRow(3) : state.exploring.map(r => `<tr><td>${r.date}</td><td>${escape(r.stuckText)}</td><td>${delBtn('exploring', r.id)}</td></tr>`).join('');
-    document.getElementById('eqTable').innerHTML = `<tr><th>日期</th><th>探索的卡点</th><th>操作</th></tr>${eqHTML}`;
+    const eqHTML = state.exploring.length === 0 ? emptyRow(4) : state.exploring.map(r => {
+      const details = r.answers ? `<details class="record-detail"><summary>查看探索回答</summary><div class="detail-box">${eqPrompts.map((q,i)=>`<div><strong>${i+1}. ${escape(q)}</strong><br>${escape(r.answers[i] || '未填写')}</div>`).join('<hr style="border:none;border-top:1px solid var(--line);margin:8px 0;">')}</div></details>` : '';
+      return `<tr><td>${r.date}</td><td>${escape(r.stuckText)}${details}</td><td>${escape(r.nextStep || '用于生成替代想法')}</td><td>${delBtn('exploring', r.id)}</td></tr>`;
+    }).join('');
+    document.getElementById('eqTable').innerHTML = `<tr><th>日期</th><th>探索的卡点与回答</th><th>下一步</th><th>操作</th></tr>${eqHTML}`;
 
     // Alternative
-    const atHTML = state.alternatives.length === 0 ? emptyRow(4) : state.alternatives.map(r => `<tr><td>${r.date}</td><td>${escape(r.stuckText)}</td><td>${escape(r.F)}</td><td>${delBtn('alternatives', r.id)}</td></tr>`).join('');
-    document.getElementById('atTable').innerHTML = `<tr><th>日期</th><th>原卡点</th><th>新替代想法</th><th>操作</th></tr>${atHTML}`;
+    const atHTML = state.alternatives.length === 0 ? emptyRow(6) : state.alternatives.map(r => `<tr><td>${r.date}</td><td>${escape(r.stuckText)}</td><td>${escape(r.F)}</td><td>${clampPercent(r.oldBelief)}%</td><td>${clampPercent(r.newBelief)}% / ${clampPercent(r.reBelief)}%</td><td>${delBtn('alternatives', r.id)}</td></tr>`).join('');
+    document.getElementById('atTable').innerHTML = `<tr><th>日期</th><th>原卡点</th><th>新替代想法</th><th>保存前旧想法相信度</th><th>新想法 / 重新评估旧想法</th><th>操作</th></tr>${atHTML}`;
 
     // 刷新下拉菜单
     const opts = `<option value="">-- 请选择卡点 --</option>` + state.stuckPoints.map(sp => `<option value="${sp.id}">${escape(sp.text)}</option>`).join('');
     ['eqStuck', 'atStuck'].forEach(id => { const el=document.getElementById(id); const v=el.value; el.innerHTML=opts; el.value=v; });
+    renderExplorePreview(document.getElementById('atStuck').value);
   }
 
   // --- 模块业务逻辑 ---
   document.getElementById('addStuckBtn').addEventListener('click', () => {
     if(!val('spText')) return toast('请填写卡点想法', 'warn');
-    state.stuckPoints.push({ id: uid(), text: val('spText'), theme: val('spTheme'), belief: val('spBelief')||0, status: val('spStatus') });
+    state.stuckPoints.push({ id: uid(), text: val('spText'), theme: val('spTheme'), belief: numVal('spBelief', 0), emotion: val('spEmotion'), status: '待处理' });
     ['spText','spBelief','spEmotion'].forEach(id => document.getElementById(id).value = '');
     save(); renderTables(); renderDashboard(); toast('卡点已添加');
   });
@@ -535,27 +585,49 @@
   document.getElementById('saveEqBtn').addEventListener('click', () => {
     const sid = val('eqStuck'); if(!sid) return toast('请选择要探索的卡点', 'warn');
     const stuck = state.stuckPoints.find(x=>x.id===sid);
-    state.exploring.push({ id: uid(), date: today(), stuckId: sid, stuckText: stuck.text });
+    if(!stuck) return toast('找不到这个卡点，请刷新后重试', 'danger');
+    const answers = eqPrompts.map((_,i) => val('eq_'+i));
+    if (answers.every(a => !a)) return toast('请至少填写一个探索回答', 'warn');
+    state.exploring.push({ id: uid(), date: today(), stuckId: sid, stuckText: stuck.text, answers, nextStep: '进入替代想法' });
+    if (stuck.status !== '已形成替代想法') stuck.status = '探索中';
     eqPrompts.forEach((_,i) => document.getElementById('eq_'+i).value = '');
-    save(); renderTables(); toast('探索记录已保存');
+    save(); renderTables(); renderDashboard(); renderExplorePreview(sid); toast('探索记录已保存，卡点状态已更新为“探索中”');
   });
 
   document.getElementById('atStuck').addEventListener('change', e => {
     const sp = state.stuckPoints.find(x=>x.id === e.target.value);
-    document.getElementById('atOldBelief').value = sp ? sp.belief : '';
+    document.getElementById('atOldBelief').value = sp ? clampPercent(sp.belief) : '';
+    renderExplorePreview(e.target.value);
   });
 
   document.getElementById('saveAtBtn').addEventListener('click', () => {
     const sid = val('atStuck'); if(!sid) return toast('请选择卡点', 'warn');
     const stuck = state.stuckPoints.find(x=>x.id===sid);
-    state.alternatives.push({ id: uid(), date: today(), stuckId: sid, stuckText: stuck.text, F: val('atF') });
+    if(!stuck) return toast('找不到这个卡点，请刷新后重试', 'danger');
+    if(!val('atF')) return toast('请填写替代想法', 'warn');
+    const oldBelief = clampPercent(stuck.belief);
+    const newBelief = numVal('atNewBelief', 0);
+    const reBelief = numVal('atReBelief', oldBelief);
+    state.alternatives.push({ id: uid(), date: today(), stuckId: sid, stuckText: stuck.text, F: val('atF'), oldBelief, newBelief, reBelief });
+    stuck.belief = reBelief;
+    stuck.status = '已形成替代想法';
     ['atF','atNewBelief','atReBelief'].forEach(id => document.getElementById(id).value = '');
-    save(); renderTables(); toast('替代想法已保存');
+    document.getElementById('atOldBelief').value = reBelief;
+    save(); renderTables(); renderDashboard(); toast('替代想法已保存，卡点相信度与状态已同步更新');
   });
 
   window.appDelete = function(collection, id) {
     if(!confirm('确定要删除这条记录吗？')) return;
+    let affectedStuckId = null;
+    const record = state[collection].find(x => x.id === id);
+    if (record && record.stuckId) affectedStuckId = record.stuckId;
+    if (collection === 'stuckPoints') {
+      affectedStuckId = id;
+      state.exploring = state.exploring.filter(x => x.stuckId !== id);
+      state.alternatives = state.alternatives.filter(x => x.stuckId !== id);
+    }
     state[collection] = state[collection].filter(x => x.id !== id);
+    if (affectedStuckId) syncStuckStatus(affectedStuckId);
     save(); renderTables(); renderDashboard(); toast('已删除');
   };
 
@@ -634,6 +706,8 @@
   });
 
   // 启动
+  syncAllStuckStatus();
+  save();
   initApp();
   renderTables();
   renderDashboard();

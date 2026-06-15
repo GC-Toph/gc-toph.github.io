@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>平滑追踪训练</title>
+    <style>
+        :root {
+            --panel-bg: rgba(22, 22, 22, 0.86);
+            --panel-border: rgba(255,255,255,0.08);
+            --text: #f3f3f3;
+            --muted: #bbbbbb;
+            --primary: #2f80ff;
+            --danger: #d93d4b;
+            --dot: #ff1f1f;
+        }
+
+        * { box-sizing: border-box; }
+
+        html, body {
+            margin: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: #ffffff;
+            color: var(--text);
+            font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+            touch-action: manipulation;
+        }
+
+        body {
+            position: relative;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        #scene {
+            position: fixed;
+            inset: 0;
+            overflow: hidden;
+            background: #fff;
+        }
+
+        #pattern {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            display: block;
+            background: #fff;
+        }
+
+        #vignette {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            background:
+                radial-gradient(circle at center, rgba(255,255,255,0) 35%, rgba(0,0,0,0.06) 100%),
+                linear-gradient(to bottom, rgba(255,255,255,0.02), rgba(0,0,0,0.04));
+        }
+
+        #target {
+            position: absolute;
+            width: 28px;
+            height: 28px;
+            left: 0;
+            top: 0;
+            border-radius: 50%;
+            background: radial-gradient(circle at 35% 35%, #ff8a8a 0%, #ff3b3b 35%, #ff1212 65%, #bb0000 100%);
+            box-shadow: 0 0 18px rgba(255, 0, 0, 0.45);
+            transform: translate3d(0, 0, 0);
+            will-change: transform;
+            display: none;
+            z-index: 5;
+        }
+
+        #target::after {
+            content: "";
+            position: absolute;
+            inset: -6px;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 60, 60, 0.18);
+        }
+
+        .instructions {
+            position: absolute;
+            top: 18px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: min(92vw, 720px);
+            text-align: center;
+            font-size: 15px;
+            line-height: 1.6;
+            color: rgba(255,255,255,0.88);
+            background: rgba(0,0,0,0.38);
+            padding: 10px 14px;
+            border-radius: 14px;
+            z-index: 20;
+            backdrop-filter: blur(4px);
+            text-shadow: 0 1px 2px rgba(0,0,0,0.4);
+            pointer-events: none;
+        }
+
+        #status-bar {
+            position: absolute;
+            top: 18px;
+            right: 18px;
+            z-index: 22;
+            background: rgba(0,0,0,0.45);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 999px;
+            padding: 8px 14px;
+            color: #fff;
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
+            display: none;
+            backdrop-filter: blur(4px);
+        }
+
+        #toggle-panel-btn {
+            position: absolute;
+            right: 18px;
+            bottom: 18px;
+            z-index: 25;
+            width: 48px;
+            height: 48px;
+            border: none;
+            border-radius: 50%;
+            display: none;
+            cursor: pointer;
+            background: rgba(0,0,0,0.6);
+            color: white;
+            font-size: 22px;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.28);
+        }
+
+        #control-panel {
+            position: absolute;
+            left: 50%;
+            bottom: 26px;
+            transform: translateX(-50%);
+            z-index: 24;
+            width: min(92vw, 540px);
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 18px;
+            padding: 16px 18px;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.3);
+            backdrop-filter: blur(8px);
+            transition: transform 0.25s ease, opacity 0.25s ease;
+        }
+
+        #control-panel.hidden {
+            transform: translate(-50%, 120%);
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .panel-title {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .panel-title h2 {
+            margin: 0;
+            font-size: 18px;
+            color: #fff;
+        }
+
+        .panel-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px 16px;
+        }
+
+        .setting {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            min-width: 0;
+        }
+
+        .setting label {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            align-items: center;
+            font-size: 14px;
+            color: var(--text);
+        }
+
+        .setting small {
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        input[type="range"], select {
+            width: 100%;
+            accent-color: var(--primary);
+        }
+
+        select {
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.08);
+            color: #fff;
+            padding: 8px 10px;
+        }
+
+        .btn-row {
+            margin-top: 14px;
+            display: flex;
+            gap: 10px;
+        }
+
+        button.action {
+            flex: 1;
+            border: none;
+            border-radius: 10px;
+            padding: 12px 14px;
+            font-size: 16px;
+            font-weight: 700;
+            color: #fff;
+            background: var(--primary);
+            cursor: pointer;
+        }
+
+        button.action.stop { background: var(--danger); }
+        button.action.secondary { background: rgba(255,255,255,0.12); }
+        button:disabled { opacity: 0.55; cursor: not-allowed; }
+
+        .footer-note {
+            margin-top: 10px;
+            color: var(--muted);
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        @media (max-width: 640px) {
+            .panel-grid {
+                grid-template-columns: 1fr;
+            }
+            .instructions {
+                font-size: 13px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="scene">
+        <canvas id="pattern"></canvas>
+        <div id="vignette"></div>
+        <div class="instructions">
+            ⚠️ 保持头部尽量静止，仅用眼球追踪红点。<br>
+            建议每周至少三次, 每次5分钟。
+        </div>
+        <div id="status-bar">剩余时间：<span id="timer">03:00</span></div>
+        <div id="target" aria-label="训练目标"></div>
+    </div>
+
+    <button id="toggle-panel-btn" aria-label="展开设置">⚙️</button>
+
+    <div id="control-panel">
+        <div class="panel-title">
+            <h2>🎯 平滑追踪训练</h2>
+            <button id="fullscreen-btn" class="action secondary" style="flex:0 0 auto; padding:8px 12px; font-size:14px;">全屏</button>
+        </div>
+
+        <div class="panel-grid">
+            <div class="setting">
+                <label><span>速度</span><strong id="speed-value">1.2</strong></label>
+                <input type="range" id="speed-slider" min="0.4" max="2.4" step="0.1" value="1.2">
+            </div>
+
+            <div class="setting">
+                <label><span>轨迹尺寸</span><strong id="size-value">85%</strong></label>
+                <input type="range" id="size-slider" min="0.45" max="1.0" step="0.01" value="0.85">
+                <small>控制红点活动范围。</small>
+            </div>
+
+            <div class="setting">
+                <label><span>红点大小</span><strong id="target-size-value">28 px</strong></label>
+                <input type="range" id="target-size-slider" min="16" max="46" step="1" value="28">
+                <small>适合不同距离与屏幕尺寸。</small>
+            </div>
+
+            <div class="setting">
+                <label><span>训练时长</span><strong id="duration-value">5 分钟</strong></label>
+                <input type="range" id="duration-slider" min="2" max="15" step="1" value="5">
+            </div>
+
+            <div class="setting">
+                <label for="path-select"><span>轨迹类型</span></label>
+                <select id="path-select">
+                    <option value="wave">横向波浪</option>
+                    <option value="ellipse">椭圆环绕</option>
+                    <option value="infinity" selected>∞ 字轨迹</option>
+                    <option value="lissajous">自由摆动</option>
+                </select>
+            </div>
+
+            <div class="setting">
+                <label for="stripe-density"><span>条纹密度</span><strong id="stripe-density-value">26</strong></label>
+                <input type="range" id="stripe-density" min="14" max="40" step="1" value="26">
+            </div>
+        </div>
+
+        <div class="btn-row">
+            <button id="start-btn" class="action">开始训练</button>
+            <button id="stop-btn" class="action stop" disabled>停止</button>
+        </div>
+
+        <div class="footer-note">
+            建议先从较慢速度开始，单眼训练时遮住优势眼；若出现明显头晕或不适，请立即停止。
+        </div>
+    </div>
+
+    <script>
+        const patternCanvas = document.getElementById('pattern');
+        const patternCtx = patternCanvas.getContext('2d');
+        const target = document.getElementById('target');
+        const controlPanel = document.getElementById('control-panel');
+        const togglePanelBtn = document.getElementById('toggle-panel-btn');
+        const statusBar = document.getElementById('status-bar');
+        const timerEl = document.getElementById('timer');
+
+        const startBtn = document.getElementById('start-btn');
+        const stopBtn = document.getElementById('stop-btn');
+        const fullscreenBtn = document.getElementById('fullscreen-btn');
+
+        const speedSlider = document.getElementById('speed-slider');
+        const sizeSlider = document.getElementById('size-slider');
+        const targetSizeSlider = document.getElementById('target-size-slider');
+        const durationSlider = document.getElementById('duration-slider');
+        const pathSelect = document.getElementById('path-select');
+        const stripeDensitySlider = document.getElementById('stripe-density');
+
+        const speedValue = document.getElementById('speed-value');
+        const sizeValue = document.getElementById('size-value');
+        const targetSizeValue = document.getElementById('target-size-value');
+        const durationValue = document.getElementById('duration-value');
+        const stripeDensityValue = document.getElementById('stripe-density-value');
+
+        let isRunning = false;
+        let animationId = null;
+        let lastTs = 0;
+        let phase = 0;
+        let timeLeft = 180;
+        let timerInterval = null;
+        let wakeLock = null;
+
+        function clamp(value, min, max) {
+            return Math.max(min, Math.min(max, value));
+        }
+
+        function updateReadouts() {
+            speedValue.textContent = Number(speedSlider.value).toFixed(1);
+            sizeValue.textContent = `${Math.round(parseFloat(sizeSlider.value) * 100)}%`;
+            targetSizeValue.textContent = `${targetSizeSlider.value} px`;
+            durationValue.textContent = `${durationSlider.value} 分钟`;
+            stripeDensityValue.textContent = stripeDensitySlider.value;
+            updateTargetSize();
+        }
+
+        function updateTargetSize() {
+            const size = parseInt(targetSizeSlider.value, 10);
+            target.style.width = `${size}px`;
+            target.style.height = `${size}px`;
+        }
+
+        function toggleControlPanel(forceShow = false) {
+            if (forceShow) {
+                controlPanel.classList.remove('hidden');
+                togglePanelBtn.style.display = 'none';
+            } else {
+                controlPanel.classList.toggle('hidden');
+                togglePanelBtn.style.display = controlPanel.classList.contains('hidden') ? 'block' : 'none';
+            }
+        }
+
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timeLeft / 60).toString().padStart(2, '0');
+            const seconds = (timeLeft % 60).toString().padStart(2, '0');
+            timerEl.textContent = `${minutes}:${seconds}`;
+        }
+
+        async function requestWakeLock() {
+            try {
+                if ('wakeLock' in navigator) {
+                    wakeLock = await navigator.wakeLock.request('screen');
+                }
+            } catch (err) {
+                console.log('Wake lock 请求失败:', err);
+            }
+        }
+
+        function releaseWakeLock() {
+            if (wakeLock) {
+                wakeLock.release().catch(() => {});
+                wakeLock = null;
+            }
+        }
+
+        function drawPerspectiveStripes() {
+            const w = window.innerWidth;
+            const h = window.innerHeight;
+            const dpr = window.devicePixelRatio || 1;
+
+            patternCanvas.width = Math.round(w * dpr);
+            patternCanvas.height = Math.round(h * dpr);
+            patternCanvas.style.width = `${w}px`;
+            patternCanvas.style.height = `${h}px`;
+            patternCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+            patternCtx.clearRect(0, 0, w, h);
+            patternCtx.fillStyle = '#ffffff';
+            patternCtx.fillRect(0, 0, w, h);
+
+            const centerX = w / 2;
+            const halfW = w / 2;
+            const count = parseInt(stripeDensitySlider.value, 10);
+            const power = 2.35;
+
+            const boundaries = [];
+            for (let i = 0; i <= count; i++) {
+                const t = i / count;
+                boundaries.push(Math.pow(t, power) * halfW);
+            }
+
+            patternCtx.fillStyle = '#000000';
+            for (let i = 0; i < count; i++) {
+                if (i % 2 !== 0) continue;
+
+                const inner = boundaries[i];
+                const outer = boundaries[i + 1];
+                const width = outer - inner;
+
+                patternCtx.fillRect(centerX + inner, 0, width, h);
+                patternCtx.fillRect(centerX - outer, 0, width, h);
+            }
+
+            const glow = patternCtx.createLinearGradient(centerX - 10, 0, centerX + 10, 0);
+            glow.addColorStop(0, 'rgba(255,255,255,0)');
+            glow.addColorStop(0.45, 'rgba(255,255,255,0.25)');
+            glow.addColorStop(0.5, 'rgba(255,255,255,0.75)');
+            glow.addColorStop(0.55, 'rgba(255,255,255,0.25)');
+            glow.addColorStop(1, 'rgba(255,255,255,0)');
+            patternCtx.fillStyle = glow;
+            patternCtx.fillRect(centerX - 14, 0, 28, h);
+        }
+
+        function getTargetPosition(progress) {
+            const w = window.innerWidth;
+            const h = window.innerHeight;
+            const cx = w / 2;
+            const cy = h / 2;
+            const sizeMod = parseFloat(sizeSlider.value);
+            const ampX = w * 0.34 * sizeMod;
+            const ampY = h * 0.18 * sizeMod;
+            const mode = pathSelect.value;
+
+            const p = progress;
+            let x = cx;
+            let y = cy;
+            let s = 1;
+
+            if (mode === 'wave') {
+                x = cx + ampX * Math.sin(p);
+                y = cy + ampY * 0.55 * Math.sin(p * 2 + Math.PI / 6);
+                s = 1 + 0.08 * Math.sin(p * 3);
+            } else if (mode === 'ellipse') {
+                x = cx + ampX * Math.cos(p);
+                y = cy + ampY * Math.sin(p);
+                s = 1 + 0.06 * Math.sin(p * 2);
+            } else if (mode === 'infinity') {
+                x = cx + ampX * Math.sin(p);
+                y = cy + ampY * Math.sin(p) * Math.cos(p);
+                s = 1 + 0.08 * Math.sin(p * 4);
+            } else if (mode === 'lissajous') {
+                x = cx + ampX * Math.sin(p * 1.05 + 0.35);
+                y = cy + ampY * Math.sin(p * 2.1);
+                s = 1 + 0.09 * Math.sin(p * 2.6);
+            }
+
+            return { x, y, scale: s };
+        }
+
+        function animate(ts) {
+            if (!isRunning) return;
+
+            if (!lastTs) lastTs = ts;
+            let dt = (ts - lastTs) / 1000;
+            lastTs = ts;
+            dt = clamp(dt, 0, 0.04);
+
+            const speed = parseFloat(speedSlider.value);
+            const angularSpeed = 1.15 * speed;
+            phase += dt * angularSpeed;
+
+            const { x, y, scale } = getTargetPosition(phase);
+            const size = parseInt(targetSizeSlider.value, 10);
+            target.style.transform = `translate3d(${(x - size / 2).toFixed(2)}px, ${(y - size / 2).toFixed(2)}px, 0) scale(${scale.toFixed(3)})`;
+
+            animationId = requestAnimationFrame(animate);
+        }
+
+        function startTraining() {
+            if (isRunning) return;
+
+            isRunning = true;
+            lastTs = 0;
+            phase = -Math.PI / 2;
+            timeLeft = parseInt(durationSlider.value, 10) * 60;
+            updateTimerDisplay();
+            requestWakeLock();
+
+            target.style.display = 'block';
+            startBtn.disabled = true;
+            stopBtn.disabled = false;
+            statusBar.style.display = 'block';
+            if (!controlPanel.classList.contains('hidden')) toggleControlPanel(false);
+
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                timeLeft -= 1;
+                updateTimerDisplay();
+                if (timeLeft <= 0) {
+                    stopTraining(true);
+                }
+            }, 1000);
+
+            animationId = requestAnimationFrame(animate);
+        }
+
+        function stopTraining(completed = false) {
+            isRunning = false;
+            cancelAnimationFrame(animationId);
+            clearInterval(timerInterval);
+            releaseWakeLock();
+
+            target.style.display = 'none';
+            startBtn.disabled = false;
+            stopBtn.disabled = true;
+            statusBar.style.display = 'none';
+            toggleControlPanel(true);
+
+            if (completed) {
+                setTimeout(() => {
+                    alert('🎉 本轮训练完成！\n请放松眼睛，眺望远处休息 1–2 分钟。');
+                }, 120);
+            }
+        }
+
+        function handleResize() {
+            drawPerspectiveStripes();
+        }
+
+        fullscreenBtn.addEventListener('click', async () => {
+            try {
+                if (!document.fullscreenElement) {
+                    await document.documentElement.requestFullscreen();
+                } else if (document.exitFullscreen) {
+                    await document.exitFullscreen();
+                }
+            } catch (err) {
+                console.log('全屏切换失败:', err);
+            }
+        });
+
+        startBtn.addEventListener('click', startTraining);
+        stopBtn.addEventListener('click', () => stopTraining(false));
+        togglePanelBtn.addEventListener('click', () => toggleControlPanel(true));
+
+        [speedSlider, sizeSlider, targetSizeSlider, durationSlider, stripeDensitySlider].forEach(el => {
+            el.addEventListener('input', () => {
+                updateReadouts();
+                if (el === stripeDensitySlider) drawPerspectiveStripes();
+            });
+        });
+
+        pathSelect.addEventListener('change', () => {
+            // 轨迹切换时无需特殊处理，下一帧自动生效
+        });
+
+        window.addEventListener('resize', handleResize);
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') {
+                lastTs = 0;
+                if (isRunning) requestWakeLock();
+            }
+        });
+
+        updateReadouts();
+        updateTimerDisplay();
+        drawPerspectiveStripes();
+    </script>
+</body>
+</html>

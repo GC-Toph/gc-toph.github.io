@@ -2,230 +2,569 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>弱视 远近聚焦训练</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>弱视 远近聚焦与辨识训练</title>
     <style>
+        :root {
+            --primary: #007BFF;
+            --success: #28a745;
+            --danger: #dc3545;
+            --bg: #f8f9fa;
+        }
+
+        * { box-sizing: border-box; }
+
         body {
             margin: 0;
             padding: 0;
             overflow: hidden;
-            background-color: #ffffff;
+            background-color: var(--bg);
+            background-image:
+                radial-gradient(circle, transparent 20%, rgba(0,0,0,0.03) 21%, transparent 22%),
+                radial-gradient(circle, transparent 40%, rgba(0,0,0,0.03) 41%, transparent 42%),
+                radial-gradient(circle, transparent 60%, rgba(0,0,0,0.03) 61%, transparent 62%),
+                radial-gradient(circle, transparent 80%, rgba(0,0,0,0.03) 81%, transparent 82%);
+            background-size: 100vmax 100vmax;
+            background-position: center;
             font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
+            touch-action: none;
         }
 
         #control-panel {
             position: absolute;
             top: 20px;
-            z-index: 10;
-            text-align: center;
-            background: rgba(240, 240, 240, 0.95);
-            padding: 15px 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+            width: 90%;
+            max-width: 420px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            backdrop-filter: blur(5px);
+            transition: transform 0.3s ease, opacity 0.3s ease;
         }
 
+        #control-panel.hidden {
+            transform: translate(-50%, -150%);
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        #toggle-panel-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 99;
+            background: rgba(255, 255, 255, 0.8);
+            border: none;
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            display: none;
+        }
+
+        .header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        h2 { margin: 0; font-size: 20px; color: #333; }
+
         #timer {
-            font-size: 32px;
+            font-size: 36px;
             font-weight: bold;
-            color: #333;
+            color: var(--primary);
+            text-align: center;
             margin: 10px 0;
             font-variant-numeric: tabular-nums;
         }
 
-        button {
-            padding: 10px 25px;
+        .settings-group {
+            background: rgba(0,0,0,0.03);
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+
+        .settings-group label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .slider-row {
+            display: grid;
+            grid-template-columns: 1fr 70px;
+            gap: 8px;
+            align-items: center;
+            margin: 6px 0 12px;
+        }
+
+        .slider-row input[type=range] { width: 100%; }
+
+        .slider-row input[type=number] {
+            width: 64px;
+            padding: 4px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 13px;
+            text-align: center;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        button.primary-btn {
+            flex: 1;
+            padding: 12px;
             font-size: 18px;
+            font-weight: bold;
             cursor: pointer;
-            background-color: #007BFF;
+            background-color: var(--primary);
             color: white;
             border: none;
-            border-radius: 5px;
-            transition: background 0.3s;
+            border-radius: 8px;
+            transition: transform 0.1s, background 0.3s;
         }
 
-        button:hover {
-            background-color: #0056b3;
-        }
-
-        button:disabled {
-            background-color: #cccccc;
-            cursor: not-allowed;
-        }
+        button.primary-btn:active { transform: scale(0.95); }
+        button.primary-btn.danger { background-color: var(--danger); }
+        button:disabled { background-color: #ccc !important; cursor: not-allowed; transform: none; }
 
         .instructions {
-            font-size: 14px;
-            color: #d9534f;
+            font-size: 12px;
+            color: #888;
             margin-top: 10px;
-            font-weight: bold;
+            text-align: center;
+            line-height: 1.5;
         }
 
-        .status-text {
-            font-size: 14px;
-            color: #555;
-            margin-top: 5px;
+        #status-bar {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 90;
+            background: rgba(255,255,255,0.8);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            color: #333;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: none;
         }
 
         #canvas {
-            position: relative;
-            width: 100vw;
-            height: 100vh;
+            position: absolute;
+            inset: 0;
             display: flex;
             align-items: center;
             justify-content: center;
+            overflow: hidden;
         }
 
-        #symbol {
-            font-family: Arial, sans-serif;
-            font-weight: bold;
-            color: #000000;
-            font-size: 40px; 
-            line-height: 1;
+        /*
+          关键点：视标本体按最大尺寸绘制，然后只做 0-1 倍缩放。
+        */
+        #symbol-motion {
+            width: min(72vmin, 720px);
+            height: min(72vmin, 720px);
+            color: #000;
+            transform-origin: 50% 50%;
             opacity: 0;
-            transform: scale(0.05);
-            /* 设定变换基准点为中心，保证缩放不偏移 */
-            transform-origin: center center;
+            contain: layout paint style;
         }
+
+        #symbol-feedback {
+            width: 100%;
+            height: 100%;
+            transform-origin: 50% 50%;
+        }
+
+        #optotype {
+            display: block;
+            width: 100%;
+            height: 100%;
+            fill: currentColor;
+            shape-rendering: geometricPrecision;
+        }
+
+        #d-pad {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 110;
+            display: none;
+            grid-template-columns: 60px 60px 60px;
+            grid-template-rows: 60px 60px 60px;
+            gap: 10px;
+        }
+
+        #d-pad button {
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid var(--primary);
+            border-radius: 15px;
+            font-size: 28px;
+            color: var(--primary);
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            transition: transform 0.1s, background 0.1s, color 0.1s;
+        }
+
+        #d-pad button:active { background: var(--primary); color: white; transform: scale(0.9); }
+        .pad-up { grid-column: 2; grid-row: 1; }
+        .pad-left { grid-column: 1; grid-row: 2; }
+        .pad-right { grid-column: 3; grid-row: 2; }
+        .pad-down { grid-column: 2; grid-row: 3; }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .error-shake { color: var(--danger) !important; animation: shake 0.3s ease-in-out; }
+        .success-flash { color: var(--success) !important; filter: drop-shadow(0 0 16px rgba(40,167,69,0.7)); }
     </style>
 </head>
 <body>
+    <div id="status-bar">得分: <span id="score">0</span></div>
+    <button id="toggle-panel-btn">⚙️</button>
 
     <div id="control-panel">
-        <h2>弱视 远近聚焦训练</h2>
+        <div class="header-row">
+            <h2>👀 远近聚焦与辨识训练</h2>
+            <button id="fullscreen-btn" style="background:none;border:none;font-size:20px;cursor:pointer;">⛶</button>
+        </div>
+
         <div id="timer">10:00</div>
-        <button id="startBtn">开始训练</button>
-        <button id="stopBtn" disabled>停止</button>
-        <div class="status-text" id="statusText">等待开始...</div>
-        <div class="instructions">⚠️ 请佩戴屈光矫正眼镜，保持头部固定，遮住主导眼，用弱视眼追踪视标</div>
+
+        <div class="settings-group">
+            <label>
+                <span>开启互动答题 (防走神)</span>
+                <input type="checkbox" id="quiz-mode" checked>
+            </label>
+
+            <label>
+                <span>暂停时机 (视标大小)</span>
+                <span><span id="pause-threshold-label">8</span>%</span>
+            </label>
+            <div class="slider-row">
+                <input type="range" id="pause-threshold" min="0.02" max="0.95" step="0.01" value="0.08">
+                <input type="number" id="pause-threshold-number" min="2" max="95" step="1" value="8" inputmode="numeric">
+            </div>
+
+            <label>
+                <span>单次缩放时长</span>
+                <select id="cycle-time">
+                    <option value="5000">5秒 (较快)</option>
+                    <option value="10000" selected>10秒 (标准)</option>
+                    <option value="15000">15秒 (缓慢)</option>
+                </select>
+            </label>
+        </div>
+
+        <div class="btn-group">
+            <button id="startBtn" class="primary-btn">开始训练</button>
+            <button id="stopBtn" class="primary-btn danger" disabled>停止</button>
+        </div>
+
+        <div class="instructions">
+            ⚠️ 戴好眼镜，遮住主导眼。
+        </div>
     </div>
 
     <div id="canvas">
-        <div id="symbol">E</div>
+        <div id="symbol-motion" aria-label="E视标">
+            <div id="symbol-feedback">
+                <!-- SVG 矢量 E：默认开口向右，旋转后用于答题方向 -->
+                <svg id="optotype" viewBox="0 0 100 100" role="img" aria-hidden="true">
+                    <rect x="10" y="10" width="80" height="18"></rect>
+                    <rect x="10" y="41" width="62" height="18"></rect>
+                    <rect x="10" y="72" width="80" height="18"></rect>
+                    <rect x="10" y="10" width="18" height="80"></rect>
+                </svg>
+            </div>
+        </div>
+    </div>
+
+    <div id="d-pad">
+        <button class="pad-up" onclick="checkAnswer('up')">↑</button>
+        <button class="pad-left" onclick="checkAnswer('left')">←</button>
+        <button class="pad-right" onclick="checkAnswer('right')">→</button>
+        <button class="pad-down" onclick="checkAnswer('down')">↓</button>
     </div>
 
     <script>
-        const TOTAL_TIME = 600; // 总时长：10分钟 (600秒)
-        const HALF_CYCLE_TIME = 10000; // 单向时长：10秒 (10000毫秒)
-        
+        // --- 核心配置与状态 ---
+        const TOTAL_TIME = 600;
+        const MIN_ZOOM = 0.02;
+        const MAX_ZOOM = 1.0;
+
         let timeLeft = TOTAL_TIME;
-        let timerInterval;
-        let currentTimeout;
+        let timerInterval = null;
         let isRunning = false;
+        let score = 0;
+        let wakeLock = null;
+
+        let animationFrameId = null;
+        let phase = 'idle'; // idle, approaching, paused_for_answer, receding
+        let progress = 0; // 当前阶段 0.0 到 1.0
+        let lastTime = 0;
+        let hasPausedThisCycle = false;
+        let currentAngle = 0; // 0=右, 90=下, 180=左, 270=上
 
         const timerDisplay = document.getElementById('timer');
         const startBtn = document.getElementById('startBtn');
         const stopBtn = document.getElementById('stopBtn');
-        const symbol = document.getElementById('symbol');
-        const statusText = document.getElementById('statusText');
+        const symbolMotion = document.getElementById('symbol-motion');
+        const symbolFeedback = document.getElementById('symbol-feedback');
+        const dPad = document.getElementById('d-pad');
+        const controlPanel = document.getElementById('control-panel');
+        const togglePanelBtn = document.getElementById('toggle-panel-btn');
+        const statusBar = document.getElementById('status-bar');
+        const scoreDisplay = document.getElementById('score');
 
-        // 上、右、下、左
-        const directions = [0, 90, 180, 270];
+        const quizModeCheckbox = document.getElementById('quiz-mode');
+        const pauseThresholdInput = document.getElementById('pause-threshold');
+        const pauseThresholdNumber = document.getElementById('pause-threshold-number');
+        const pauseThresholdLabel = document.getElementById('pause-threshold-label');
+        const cycleTimeSelect = document.getElementById('cycle-time');
+
+        const angles = { right: 0, down: 90, left: 180, up: 270 };
+        const angleKeys = Object.keys(angles);
+
+        // smootherStep：两端速度为 0，避免小视标刚出现或大视标到顶时突兀。
+        function smootherStep(t) {
+            t = Math.min(1, Math.max(0, t));
+            return t * t * t * (t * (t * 6 - 15) + 10);
+        }
+
+        // 用对数插值控制尺寸，视觉上比线性 scale 更均匀。
+        function zoomFromProgress(t) {
+            const eased = smootherStep(t);
+            return MIN_ZOOM * Math.pow(MAX_ZOOM / MIN_ZOOM, eased);
+        }
+
+        function syncPauseThreshold(source) {
+            let value = source === pauseThresholdNumber
+                ? Number(pauseThresholdNumber.value) / 100
+                : Number(pauseThresholdInput.value);
+
+            if (!Number.isFinite(value)) value = 0.3;
+            value = Math.min(0.95, Math.max(MIN_ZOOM, value));
+
+            pauseThresholdInput.value = value.toFixed(2);
+            pauseThresholdNumber.value = Math.round(value * 100);
+            pauseThresholdLabel.textContent = Math.round(value * 100);
+        }
+
+        pauseThresholdInput.addEventListener('input', () => syncPauseThreshold(pauseThresholdInput));
+        pauseThresholdNumber.addEventListener('input', () => syncPauseThreshold(pauseThresholdNumber));
+        syncPauseThreshold(pauseThresholdInput);
 
         function updateTimerDisplay() {
-            const minutes = Math.floor(timeLeft / 60);
-            const seconds = timeLeft % 60;
-            timerDisplay.textContent = 
-                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            const m = Math.floor(timeLeft / 60).toString().padStart(2, '0');
+            const s = (timeLeft % 60).toString().padStart(2, '0');
+            timerDisplay.textContent = `${m}:${s}`;
         }
 
-        // 第 1 阶段：由远及近 (出现并放大)
-        function approach() {
+        function toggleControlPanel(forceShow = false) {
+            if (forceShow) {
+                controlPanel.classList.remove('hidden');
+                togglePanelBtn.style.display = 'none';
+            } else {
+                controlPanel.classList.toggle('hidden');
+                togglePanelBtn.style.display = controlPanel.classList.contains('hidden') ? 'block' : 'none';
+            }
+        }
+        togglePanelBtn.addEventListener('click', () => toggleControlPanel());
+
+        async function requestWakeLock() {
+            try {
+                if ('wakeLock' in navigator) {
+                    wakeLock = await navigator.wakeLock.request('screen');
+                }
+            } catch (err) {
+                console.log('防息屏失败:', err);
+            }
+        }
+
+        function releaseWakeLock() {
+            if (wakeLock !== null) {
+                wakeLock.release().then(() => { wakeLock = null; });
+            }
+        }
+
+        function applySymbolTransform(zoom) {
+            // 只在 0-1 范围内缩放最大尺寸的 SVG，避免大视标被放大成模糊贴图。
+            symbolMotion.style.transform = `scale(${zoom}) rotate(${currentAngle}deg)`;
+            symbolMotion.style.opacity = '1';
+        }
+
+        function startNewCycle() {
+            const randomDir = angleKeys[Math.floor(Math.random() * angleKeys.length)];
+            currentAngle = angles[randomDir];
+            hasPausedThisCycle = false;
+            phase = 'approaching';
+            progress = 0;
+            lastTime = performance.now();
+            symbolFeedback.style.color = '#000';
+
+            if (animationFrameId !== null) cancelAnimationFrame(animationFrameId);
+            animationFrameId = requestAnimationFrame(animationLoop);
+        }
+
+        function animationLoop(currentTime) {
             if (!isRunning) return;
 
-            // 随机抽取新方向
-            const randomAngle = directions[Math.floor(Math.random() * directions.length)];
-            
-            // 瞬间重置到最远端（极小、极淡）
-            symbol.style.transition = 'none';
-            symbol.style.transform = `scale(0.05) rotate(${randomAngle}deg)`;
-            symbol.style.opacity = '0.5';
+            const rawDelta = currentTime - lastTime;
+            const deltaTime = Math.min(rawDelta, 80); // 切后台/卡顿后不突然跳很远
+            lastTime = currentTime;
 
-            // 强制重绘，使重置立即生效
-            void symbol.offsetWidth;
+            const duration = Number(cycleTimeSelect.value) || 10000;
 
-            statusText.textContent = "状态：视标正在靠近 🟢";
+            if (phase !== 'paused_for_answer') {
+                progress += deltaTime / duration;
+            }
 
-            // 开启【由远及近】动画：
-            // 使用 ease-in (先慢后快)，完美模拟物体匀速靠近时，视觉面积先变化慢、最后猛增的物理现象
-            symbol.style.transition = `transform ${HALF_CYCLE_TIME}ms ease-in, opacity ${HALF_CYCLE_TIME}ms ease-in`;
-            symbol.style.transform = `scale(12) rotate(${randomAngle}deg)`;
-            symbol.style.opacity = '1';
+            const clampedProgress = Math.min(Math.max(progress, 0), 1);
+            let zoom;
 
-            // 10秒后，无缝切换到远离阶段
-            currentTimeout = setTimeout(() => recede(randomAngle), HALF_CYCLE_TIME);
+            if (phase === 'approaching' || phase === 'paused_for_answer') {
+                zoom = zoomFromProgress(clampedProgress);
+                applySymbolTransform(zoom);
+
+                const quizMode = quizModeCheckbox.checked;
+                const pauseThreshold = Number(pauseThresholdInput.value) || 0.3;
+
+                if (quizMode && !hasPausedThisCycle && phase === 'approaching' && zoom >= pauseThreshold) {
+                    hasPausedThisCycle = true;
+                    phase = 'paused_for_answer';
+                    dPad.style.display = 'grid';
+                } else if (phase === 'approaching' && clampedProgress >= 1) {
+                    phase = 'receding';
+                    progress = 0;
+                }
+            } else if (phase === 'receding') {
+                zoom = zoomFromProgress(1 - clampedProgress);
+                applySymbolTransform(zoom);
+
+                if (clampedProgress >= 1) {
+                    startNewCycle();
+                    return;
+                }
+            }
+
+            animationFrameId = requestAnimationFrame(animationLoop);
         }
 
-        // 第 2 阶段：由近及远 (缩小并消失)
-        function recede(angle) {
-            if (!isRunning) return;
+        window.checkAnswer = function(direction) {
+            if (phase !== 'paused_for_answer') return;
 
-            statusText.textContent = "状态：视标正在远离 🔵";
+            const correctAngle = angles[direction];
+            if (currentAngle === correctAngle) {
+                score += 10;
+                scoreDisplay.textContent = score;
 
-            // 开启【由近及远】动画：
-            // 使用 ease-out (先快后慢)，模拟物体刚离开眼前时缩小得快，越远缩小得越慢的现象
-            // 注意保留同一个 angle，防止 E 字在倒退时发生旋转
-            symbol.style.transition = `transform ${HALF_CYCLE_TIME}ms ease-out, opacity ${HALF_CYCLE_TIME}ms ease-out`;
-            symbol.style.transform = `scale(0.05) rotate(${angle}deg)`;
-            symbol.style.opacity = '0.5';
+                symbolFeedback.classList.add('success-flash');
+                setTimeout(() => symbolFeedback.classList.remove('success-flash'), 300);
 
-            // 10秒后，开始下一轮全新的出现
-            currentTimeout = setTimeout(approach, HALF_CYCLE_TIME);
-        }
+                dPad.style.display = 'none';
+                phase = 'approaching';
+                lastTime = performance.now();
+            } else {
+                symbolFeedback.classList.add('error-shake');
+                setTimeout(() => symbolFeedback.classList.remove('error-shake'), 300);
+            }
+        };
 
-        // 开始训练
         function startTraining() {
             if (isRunning) return;
             isRunning = true;
+            score = 0;
+            scoreDisplay.textContent = score;
             timeLeft = TOTAL_TIME;
             updateTimerDisplay();
+            requestWakeLock();
 
             startBtn.disabled = true;
             stopBtn.disabled = false;
+            statusBar.style.display = quizModeCheckbox.checked ? 'block' : 'none';
+            toggleControlPanel(false);
 
+            clearInterval(timerInterval);
             timerInterval = setInterval(() => {
                 timeLeft--;
                 updateTimerDisplay();
-
-                if (timeLeft <= 0) {
-                    endTraining(true);
-                }
+                if (timeLeft <= 0) endTraining(true);
             }, 1000);
 
-            // 启动循环
-            approach();
+            startNewCycle();
         }
 
-        // 停止/结束训练
         function endTraining(completed = false) {
             isRunning = false;
             clearInterval(timerInterval);
-            clearTimeout(currentTimeout);
+            timerInterval = null;
+            if (animationFrameId !== null) cancelAnimationFrame(animationFrameId);
+            animationFrameId = null;
+            releaseWakeLock();
 
             startBtn.disabled = false;
             stopBtn.disabled = true;
-            statusText.textContent = completed ? "训练完成！" : "训练已停止";
+            dPad.style.display = 'none';
+            hasPausedThisCycle = false;
+            statusBar.style.display = 'none';
+            phase = 'idle';
+            progress = 0;
 
-            // 平滑隐藏视标
-            symbol.style.transition = 'opacity 0.5s';
-            symbol.style.opacity = '0.5';
+            toggleControlPanel(true);
+            symbolMotion.style.transform = `scale(${MIN_ZOOM}) rotate(0deg)`;
+            symbolMotion.style.opacity = '0';
 
             if (completed) {
                 setTimeout(() => {
-                    alert("🎉 每日10分钟训练完成！请取下眼罩，眺望远处休息一下。");
+                    alert(`🎉 恭喜完成训练！\n本次得分: ${score}\n请取下眼罩，眺望远处休息一下。`);
                     timeLeft = TOTAL_TIME;
                     updateTimerDisplay();
-                }, 500);
+                }, 100);
             }
         }
+
+        document.getElementById('fullscreen-btn').addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => console.log(err));
+            } else if (document.exitFullscreen) {
+                document.exitFullscreen();
+            }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (phase === 'paused_for_answer') {
+                if (e.key === 'ArrowUp') checkAnswer('up');
+                if (e.key === 'ArrowDown') checkAnswer('down');
+                if (e.key === 'ArrowLeft') checkAnswer('left');
+                if (e.key === 'ArrowRight') checkAnswer('right');
+            }
+        });
 
         startBtn.addEventListener('click', startTraining);
         stopBtn.addEventListener('click', () => endTraining(false));
 
         updateTimerDisplay();
+        symbolMotion.style.transform = `scale(${MIN_ZOOM}) rotate(0deg)`;
     </script>
 </body>
 </html>
