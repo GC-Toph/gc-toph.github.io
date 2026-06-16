@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>焦虑-对抗型依恋｜触发急救卡</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --paper: #fbf7ef;
+    --card: #fffdf8;
+    --ink: #1f2626;
+    --text: #38403f;
+    --muted: #6d7470;
+    --soft: #efe8db;
+    --line: rgba(52, 59, 58, 0.18);
+    --teal: #245b59;
+    --teal-soft: #dceceb;
+    --clay: #a45f4c;
+    --clay-soft: #f3ded6;
+    --ochre: #9a6a22;
+    --ochre-soft: #f4e7c8;
+    --sage: #52735a;
+    --sage-soft: #e3efe4;
+    --shadow: rgba(39, 34, 26, 0.16);
+  }
+
+  html, body {
+    width: 100%;
+    min-height: 100%;
+    background: #e7e2d8;
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body { padding: 8mm 0 14mm; }
+
+  .sheet {
+    width: 297mm;
+    height: 210mm;
+    margin: 0 auto;
+    background:
+      radial-gradient(circle at 9% 9%, rgba(36,91,89,.11), transparent 26%),
+      radial-gradient(circle at 94% 86%, rgba(164,95,76,.12), transparent 30%),
+      linear-gradient(135deg, #fbf7ef 0%, #fffdf8 48%, #f6efe2 100%);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 18px 44px var(--shadow);
+  }
+
+  .sheet::before,
+  .sheet::after {
+    content: "";
+    position: absolute;
+    z-index: 20;
+    pointer-events: none;
+    border-color: rgba(77, 70, 57, 0.42);
+  }
+
+  .sheet::before {
+    top: 50%; left: 6mm; right: 6mm;
+    border-top: 1.2px dashed;
+  }
+
+  .sheet::after {
+    left: 50%; top: 6mm; bottom: 6mm;
+    border-left: 1.2px dashed;
+  }
+
+  .card { padding: 6.2mm; min-width: 0; min-height: 0; display: flex; }
+
+  .inner {
+    width: 100%; height: 100%;
+    background: rgba(255,253,248,.93);
+    border: 1px solid rgba(51, 59, 58, .16);
+    border-radius: 18px;
+    padding: 5.9mm 6.4mm 5.4mm;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .inner::before {
+    content: "";
+    position: absolute;
+    width: 52mm; height: 52mm;
+    border-radius: 50%;
+    right: -24mm; top: -27mm;
+    opacity: .46;
+  }
+
+  .inner::after {
+    content: "";
+    position: absolute;
+    width: 13mm; height: 13mm;
+    border-radius: 50%;
+    right: 10mm; bottom: 9mm;
+    opacity: .18;
+  }
+
+  .card:nth-child(1) .inner::before, .card:nth-child(1) .inner::after { background: var(--teal-soft); }
+  .card:nth-child(2) .inner::before, .card:nth-child(2) .inner::after { background: var(--clay-soft); }
+  .card:nth-child(3) .inner::before, .card:nth-child(3) .inner::after { background: var(--ochre-soft); }
+  .card:nth-child(4) .inner::before, .card:nth-child(4) .inner::after { background: var(--sage-soft); }
+
+  .content { position: relative; z-index: 2; height: 100%; display: flex; flex-direction: column; min-height: 0; }
+
+  .header {
+    display: grid;
+    grid-template-columns: 31px 1fr auto;
+    align-items: center;
+    gap: 8px;
+    padding-bottom: 5px;
+    margin-bottom: 5px;
+    border-bottom: 2px solid var(--ink);
+    flex-shrink: 0;
+  }
+
+  .num {
+    width: 29px; height: 29px;
+    border-radius: 10px;
+    display: grid; place-items: center;
+    color: white;
+    background: var(--ink);
+    font-size: 13px; font-weight: 850;
+  }
+
+  h1, h2 { line-height: 1.14; letter-spacing: .2px; }
+  h1 { font-size: 15.9px; font-weight: 900; }
+  h2 { font-size: 14.7px; font-weight: 900; }
+  .sub { margin-top: 1px; color: var(--muted); font-size: 10px; font-weight: 550; }
+
+  .tag {
+    border-radius: 999px;
+    border: 1px solid rgba(31,38,38,.15);
+    background: rgba(255,255,255,.55);
+    padding: 3px 8px;
+    color: var(--muted);
+    font-size: 10px;
+    font-weight: 850;
+    white-space: nowrap;
+  }
+
+  .body { flex: 1; min-height: 0; color: var(--text); font-size: 10.15px; line-height: 1.29; }
+
+  .lead {
+    padding: 5px 7px;
+    border-radius: 11px;
+    background: rgba(239,232,219,.74);
+    border: 1px solid var(--line);
+    font-size: 10.45px;
+    line-height: 1.34;
+    font-weight: 650;
+    color: #3b3a34;
+    margin-bottom: 4px;
+  }
+
+  .lead strong { font-weight: 900; color: var(--ink); }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; }
+
+  .mini {
+    border: 1px solid var(--line);
+    background: rgba(255,255,255,.58);
+    border-radius: 11px;
+    padding: 4px 6px;
+    min-height: 0;
+  }
+
+  .mini b, .row b, .principle b { color: var(--ink); font-weight: 900; }
+  .mini .k {
+    display: inline-block;
+    margin-bottom: 2px;
+    font-size: 10.2px;
+    font-weight: 900;
+    letter-spacing: .3px;
+    color: var(--muted);
+  }
+
+  .axis {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 5px;
+    margin: 4px 0;
+  }
+
+  .axis-box {
+    border-radius: 11px;
+    padding: 6px;
+    border: 1px solid var(--line);
+    background: rgba(255,255,255,.62);
+    text-align: center;
+  }
+
+  .axis-box .big { display: block; font-weight: 900; font-size: 13px; color: var(--ink); margin-bottom: 1px; }
+  .axis-mid { font-size: 16px; color: var(--muted); font-weight: 900; }
+
+  .section-title {
+    margin: 4px 0 3px;
+    display: flex; align-items: center; gap: 6px;
+    color: var(--muted);
+    font-size: 10.4px;
+    font-weight: 900;
+    letter-spacing: .5px;
+  }
+  .section-title::before { content: ""; width: 16px; height: 2px; border-radius: 99px; background: currentColor; opacity: .5; }
+
+  .steps { display: grid; gap: 3.5px; }
+  .step {
+    display: grid;
+    grid-template-columns: 30px 1fr;
+    gap: 7px;
+    align-items: start;
+  }
+
+  .badge {
+    height: 20px;
+    border-radius: 7px;
+    display: grid; place-items: center;
+    color: #fff;
+    background: var(--clay);
+    font-size: 9.8px;
+    font-weight: 900;
+  }
+
+  .step p { padding-top: 1px; }
+
+  .callout {
+    margin-top: 4px;
+    padding: 4px 7px;
+    border-radius: 12px;
+    border: 1px solid var(--line);
+    font-size: 10.2px;
+    line-height: 1.3;
+    font-weight: 650;
+  }
+
+  .teal { background: rgba(220,236,235,.86); color: #244d4d; }
+  .clay { background: rgba(243,222,214,.87); color: #6a3c31; }
+  .ochre { background: rgba(244,231,200,.90); color: #65461e; }
+  .sage { background: rgba(227,239,228,.90); color: #344f3b; }
+
+  .danger-list { display: grid; gap: 4px; margin-top: 4px; }
+  .row {
+    display: grid;
+    grid-template-columns: 72px 1fr;
+    gap: 6px;
+    align-items: start;
+    padding: 4px 6px;
+    border-radius: 10px;
+    background: rgba(255,255,255,.58);
+    border: 1px solid var(--line);
+  }
+
+  .row .left { font-weight: 900; color: var(--ochre); }
+  .replace .left { color: var(--sage); }
+
+  .vs {
+    display: grid;
+    grid-template-columns: 1fr 12px 1fr;
+    gap: 5px;
+    align-items: stretch;
+    margin-bottom: 5px;
+  }
+
+  .vs .label {
+    font-size: 9.8px;
+    font-weight: 900;
+    color: var(--muted);
+    margin-bottom: 2px;
+  }
+  .vs .arrow { display: grid; place-items: center; color: var(--muted); font-weight: 900; }
+
+  .script {
+    padding: 5px 7px;
+    border-radius: 12px;
+    background: rgba(227,239,228,.93);
+    border-left: 4px solid rgba(82,115,90,.65);
+    color: #2e4634;
+    font-size: 10.7px;
+    line-height: 1.42;
+    margin-top: 5px;
+  }
+
+  .principles { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin-top: 4px; }
+  .principle {
+    border-radius: 10px;
+    padding: 4px 5px;
+    background: rgba(255,255,255,.6);
+    border: 1px solid var(--line);
+  }
+  .principle .n {
+    display: inline-grid; place-items: center;
+    width: 15px; height: 15px; margin-right: 4px;
+    border-radius: 50%; background: var(--sage); color: white;
+    font-size: 9px; font-weight: 900;
+  }
+
+  .footer {
+    position: absolute;
+    left: 0; right: 0; bottom: 3.4mm;
+    z-index: 30;
+    text-align: center;
+    font-size: 8.8px;
+    color: rgba(83, 78, 68, .68);
+    letter-spacing: .25px;
+  }
+
+  .print-note {
+    width: 297mm; margin: 10px auto 0;
+    text-align: center;
+    color: #706d66;
+    font-size: 13px;
+    line-height: 1.7;
+  }
+  .print-note code { background: white; border: 1px solid #ddd5ca; padding: 2px 5px; border-radius: 5px; }
+
+  @page { size: A4 landscape; margin: 0; }
+  @media print {
+    html, body { width: 297mm; height: 210mm; background: white; padding: 0; }
+    .sheet { margin: 0; box-shadow: none; width: 297mm; height: 210mm; }
+    .print-note { display: none; }
+    .inner, .lead, .mini, .callout, .script, .axis-box, .row, .principle { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+</style>
+</head>
+<body>
+<main class="sheet">
+  <section class="card">
+    <div class="inner">
+      <div class="content">
+        <header class="header">
+          <div class="num">1</div>
+          <div>
+            <h1>焦虑型依恋｜关系触发急救卡</h1>
+            <div class="sub">当晚回、沉默、冲突、距离变化让你突然失控时使用</div>
+          </div>
+          <div class="tag">先识别系统</div>
+        </header>
+        <div class="body">
+          <div class="lead"><strong>核心判断：</strong>我此刻可能不是“太敏感”，而是依恋系统在扫描伴侣是否可得、是否回应、关系是否安全。</div>
+          <div class="axis">
+            <div class="axis-box"><span class="big">关系线索</span>晚回 / 语气淡 / 计划变 / 冲突未修复</div>
+            <div class="axis-mid">→</div>
+            <div class="axis-box"><span class="big">系统激活</span>警觉升高 / 想靠近 / 难以停想</div>
+          </div>
+          <div class="section-title">把三件事拆开</div>
+          <div class="grid-3">
+            <div class="mini"><span class="k">事实</span><br>可被录像记录的事：他说了什么、做了什么、什么时候发生。</div>
+            <div class="mini"><span class="k">解释</span><br>我脑内补出的含义：不爱我、要离开、我不够好。</div>
+            <div class="mini"><span class="k">需要</span><br>真正想要的是：确认、靠近、尊重、稳定回应。</div>
+          </div>
+          <div class="section-title">30秒自检</div>
+          <div class="grid-2">
+            <div class="mini"><b>身体：</b>胸口紧、胃沉、心跳快、手冷、想盯手机。</div>
+            <div class="mini"><b>冲动：</b>追问、撤退、冷处理、翻旧账、提分手试探。</div>
+          </div>
+          <div class="callout teal"><b>安全句：</b>“我的感受是真的；但最坏解释只是一个假设。先多等一点信息，再行动。”</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="inner">
+      <div class="content">
+        <header class="header">
+          <div class="num">2</div>
+          <div>
+            <h2>激活策略：脑内如何把你推向靠近</h2>
+            <div class="sub">识别“想马上确认”的力量，不直接服从它</div>
+          </div>
+          <div class="tag">降激活</div>
+        </header>
+        <div class="body">
+          <div class="lead"><strong>激活策略</strong>是推动你重新获得亲近和安全感的想法 / 感受。它的目标可以理解，但执行方式需要调整。</div>
+          <div class="danger-list">
+            <div class="row"><div class="left">反复想</div><div>难以专注，脑中循环对方的语气、表情、已读未回、过去细节。</div></div>
+            <div class="row"><div class="left">理想化</div><div>只记得对方好的部分，把“失去他/她”想成唯一灾难。</div></div>
+            <div class="row"><div class="left">低估自己</div><div>觉得自己不够有吸引力、不够稳定、不值得被坚定选择。</div></div>
+            <div class="row"><div class="left">唯一机会</div><div>相信“很难再遇到合适的人”，于是把不满足的关系合理化。</div></div>
+          </div>
+          <div class="section-title">被激活时的执行流程</div>
+          <div class="steps">
+            <div class="step"><div class="badge">停</div><p>暂停即时反应：不发长消息、不下关系结论、不做惩罚性动作。</p></div>
+            <div class="step"><div class="badge">标</div><p>写一句：我被触发的是 <b>____</b>；我担心的是 <b>____</b>；我需要的是 <b>____</b>。</p></div>
+            <div class="step"><div class="badge">查</div><p>至少列出2个中性解释：忙、累、误会、表达差异、需要时间整理。</p></div>
+            <div class="step"><div class="badge">说</div><p>等身体下降后，用“我感到 / 我需要 / 我希望”提出一个具体请求。</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="inner">
+      <div class="content">
+        <header class="header">
+          <div class="num">3</div>
+          <div>
+            <h2>抗议行为：把“求安全”换成“可回应”</h2>
+            <div class="sub">抗议行为会争取注意，但常常破坏真正的亲近</div>
+          </div>
+          <div class="tag">替代动作</div>
+        </header>
+        <div class="body">
+          <div class="vs">
+            <div class="mini"><div class="label">旧动作</div>反复联系、冷处理、计分、敌意、威胁离开、制造嫉妒。</div>
+            <div class="arrow">→</div>
+            <div class="mini replace"><div class="label">新动作</div>清楚表达不安，提出可执行请求，并保留对方回应空间。</div>
+          </div>
+          <div class="danger-list">
+            <div class="row replace"><div class="left">想连发</div><div>改成一条清楚消息：“我有点不安。你方便时告诉我今晚大概几点联系？”</div></div>
+            <div class="row replace"><div class="left">想冷掉</div><div>改成请求暂停：“我需要20分钟冷静，不是要消失，之后回来谈。”</div></div>
+            <div class="row replace"><div class="left">想计分</div><div>改成说需求：“我不想用谁先低头衡量在乎，我想把问题讲清楚。”</div></div>
+            <div class="row replace"><div class="left">想攻击</div><div>改成说脆弱：“我刚才生气下面其实是害怕被忽视。”</div></div>
+            <div class="row replace"><div class="left">想分手试探</div><div>改成说边界：“我不想用威胁换回应，但这件事需要被认真处理。”</div></div>
+          </div>
+          <div class="callout ochre"><b>自问：</b>我现在是在解决问题，还是在用惩罚、撤退、测试或讨好换取安全感？</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="inner">
+      <div class="content">
+        <header class="header">
+          <div class="num">4</div>
+          <div>
+            <h2>有效沟通 + 安全型冲突原则</h2>
+            <div class="sub">安全不是不冲突，而是冲突时仍能保护连接</div>
+          </div>
+          <div class="tag">照着说</div>
+        </header>
+        <div class="body">
+          <div class="lead"><strong>有效沟通</strong>不是控诉对方，而是直接、具体、不过度包装地表达感受与需要。</div>
+          <div class="script">“刚才发生的是：____。我脑中冒出的解释是：____，但我知道这不一定是事实。我的感受是：____。我需要 / 希望：____。你愿意和我一起确认一下吗？”</div>
+          <div class="section-title">安全型冲突五原则</div>
+          <div class="principles">
+            <div class="principle"><span class="n">1</span><b>关心对方福祉</b><br>不把关系变成输赢。</div>
+            <div class="principle"><span class="n">2</span><b>聚焦当前问题</b><br>不翻旧账，不扩大战场。</div>
+            <div class="principle"><span class="n">3</span><b>不人格化</b><br>说具体行为，不给对方定性。</div>
+            <div class="principle"><span class="n">4</span><b>愿意留在对话里</b><br>可暂停，但不消失。</div>
+            <div class="principle"><span class="n">5</span><b>表达需要</b><br>用请求替代审判。</div>
+            <div class="principle"><span class="n">✓</span><b>修复句</b><br>“我被触发了，本意是靠近。”</div>
+          </div>
+          <div class="callout sage"><b>顺序：</b>先稳身体 → 再说事实 → 再说感受 → 再提请求 → 最后一起找下一步。</div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <div class="footer">基于成人依恋理论整理｜用于自我稳定与沟通练习；不替代心理咨询、医学诊断或危机干预</div>
+</main>
+<div class="print-note">打印建议：选择 <code>A4</code>、<code>横向</code>、<code>缩放100%</code>、<code>边距无/最小</code>，开启“打印背景图形”。</div>
+</body>
+</html>
