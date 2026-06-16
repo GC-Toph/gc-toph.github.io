@@ -1,0 +1,494 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>依恋类型测评｜自己与伴侣</title>
+  <style>
+    :root {
+      --bg: #f7f3ed;
+      --card: #fffaf3;
+      --text: #241f1a;
+      --muted: #71675b;
+      --line: #e2d6c8;
+      --accent: #8f5f35;
+      --accent-2: #c7874b;
+      --good: #407d56;
+      --warn: #b36b20;
+      --bad: #9b4c45;
+      --shadow: 0 18px 50px rgba(47, 34, 23, .11);
+      --radius: 22px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(199, 135, 75, .20), transparent 32rem),
+        radial-gradient(circle at 90% 15%, rgba(64, 125, 86, .12), transparent 28rem),
+        var(--bg);
+      min-height: 100vh;
+    }
+
+    .wrap { width: min(1120px, calc(100% - 32px)); margin: 0 auto; }
+    header { padding: 56px 0 28px; }
+    .hero {
+      display: grid;
+      grid-template-columns: 1.25fr .75fr;
+      gap: 24px;
+      align-items: stretch;
+    }
+    .hero-card, .side-card, .panel, .question, .result-card {
+      background: rgba(255,250,243,.88);
+      border: 1px solid rgba(226,214,200,.85);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(12px);
+    }
+    .hero-card { padding: 38px; }
+    .side-card { padding: 28px; display: flex; flex-direction: column; justify-content: space-between; gap: 20px; }
+    .eyebrow { color: var(--accent); font-weight: 800; letter-spacing: .08em; font-size: 13px; text-transform: uppercase; }
+    h1 { margin: 12px 0 14px; font-size: clamp(34px, 5vw, 58px); line-height: 1.03; letter-spacing: -.04em; }
+    .lead { font-size: 18px; line-height: 1.75; color: var(--muted); margin: 0; }
+    .notice { font-size: 14px; line-height: 1.7; color: var(--muted); padding: 14px 16px; background: rgba(143,95,53,.08); border-radius: 16px; border: 1px solid rgba(143,95,53,.14); }
+
+    main { padding: 18px 0 72px; }
+    .panel { padding: 24px; margin-top: 22px; }
+    .mode-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-top: 18px; }
+    .mode-btn, button {
+      appearance: none;
+      border: 0;
+      cursor: pointer;
+      font: inherit;
+    }
+    .mode-btn {
+      text-align: left;
+      padding: 22px;
+      border-radius: 18px;
+      background: #fff;
+      border: 1px solid var(--line);
+      transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+    }
+    .mode-btn:hover { transform: translateY(-2px); border-color: rgba(143,95,53,.45); box-shadow: 0 16px 32px rgba(47,34,23,.08); }
+    .mode-btn strong { display: block; font-size: 21px; margin-bottom: 8px; }
+    .mode-btn span { color: var(--muted); line-height: 1.55; }
+
+    .toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 18px; }
+    .title-block h2 { margin: 0 0 6px; font-size: 26px; }
+    .title-block p { margin: 0; color: var(--muted); line-height: 1.6; }
+    .actions { display: flex; gap: 10px; flex-wrap: wrap; }
+    .btn {
+      padding: 11px 15px;
+      border-radius: 999px;
+      color: #fff;
+      background: var(--accent);
+      font-weight: 750;
+      box-shadow: 0 10px 20px rgba(143,95,53,.18);
+    }
+    .btn.secondary { color: var(--accent); background: rgba(143,95,53,.10); box-shadow: none; }
+    .btn.ghost { color: var(--text); background: #fff; border: 1px solid var(--line); box-shadow: none; }
+    .btn:disabled { opacity: .45; cursor: not-allowed; }
+
+    .progress-wrap { margin: 10px 0 20px; }
+    .progress-meta { display: flex; justify-content: space-between; font-size: 13px; color: var(--muted); margin-bottom: 8px; }
+    .progress { height: 12px; background: rgba(113,103,91,.13); border-radius: 999px; overflow: hidden; }
+    .progress > div { height: 100%; width: 0%; background: linear-gradient(90deg, var(--accent), var(--accent-2)); border-radius: inherit; transition: width .25s ease; }
+
+    .question-list { display: grid; gap: 14px; }
+    .question { padding: 18px; box-shadow: none; }
+    .q-top { display: grid; grid-template-columns: 42px 1fr; gap: 12px; align-items: start; }
+    .q-num { width: 34px; height: 34px; border-radius: 999px; display: grid; place-items: center; background: rgba(143,95,53,.10); color: var(--accent); font-weight: 800; }
+    .q-text { font-size: 16px; line-height: 1.65; }
+    .scale { margin-top: 14px; display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+    .scale.self { grid-template-columns: repeat(4, 1fr); }
+    .choice {
+      min-height: 44px;
+      padding: 9px 8px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: #fff;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .choice.selected { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .choice:hover { border-color: rgba(143,95,53,.55); }
+
+    .hidden { display: none !important; }
+    .result-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 18px; }
+    .result-card { padding: 18px; box-shadow: none; }
+    .result-card h3 { margin: 0 0 10px; font-size: 20px; }
+    .percent { font-size: 42px; font-weight: 900; letter-spacing: -.04em; margin: 4px 0 6px; }
+    .bar { height: 10px; border-radius: 999px; background: rgba(113,103,91,.13); overflow: hidden; margin: 12px 0; }
+    .bar > div { height: 100%; width: 0%; border-radius: inherit; }
+    .secure .bar > div { background: var(--good); }
+    .anxious .bar > div { background: var(--warn); }
+    .avoidant .bar > div { background: var(--bad); }
+    .result-card p { margin: 0; color: var(--muted); line-height: 1.6; font-size: 14px; }
+    .summary { margin-top: 16px; padding: 18px; border-radius: 18px; background: rgba(64,125,86,.08); border: 1px solid rgba(64,125,86,.18); line-height: 1.7; color: var(--muted); }
+    .summary strong { color: var(--text); }
+
+    .footer-note { margin-top: 18px; font-size: 13px; color: var(--muted); line-height: 1.7; }
+
+    @media (max-width: 820px) {
+      .hero { grid-template-columns: 1fr; }
+      .hero-card { padding: 26px; }
+      .mode-grid, .result-grid { grid-template-columns: 1fr; }
+      .scale, .scale.self { grid-template-columns: 1fr 1fr; }
+      .toolbar { align-items: stretch; }
+      .actions { width: 100%; }
+      .btn { flex: 1; }
+    }
+  </style>
+</head>
+<body>
+  <header class="wrap">
+    <section class="hero">
+      <div class="hero-card">
+        <div class="eyebrow">Attachment Style Assessment</div>
+        <h1>依恋类型测评</h1>
+      </div>
+      <aside class="side-card">
+        <div class="notice">本工具用于自我觉察与关系沟通，不等同于心理诊断。结果会受当下关系状态、压力水平和理解偏差影响。</div>
+      </aside>
+    </section>
+  </header>
+
+  <main class="wrap">
+    <section id="start" class="panel">
+      <div class="title-block">
+        <h2>请选择测评对象</h2>
+      </div>
+      <div class="mode-grid">
+        <button class="mode-btn" data-mode="self">
+          <strong>测自己</strong>
+          <span>根据你在亲密关系中的感受和行为作答。</span>
+        </button>
+        <button class="mode-btn" data-mode="partner">
+          <strong>测伴侣 / 约会对象</strong>
+          <span>根据你观察到的对方行为、沟通方式和亲密态度作答。</span>
+        </button>
+      </div>
+    </section>
+
+    <section id="quiz" class="panel hidden">
+      <div class="toolbar">
+        <div class="title-block">
+          <h2 id="quizTitle">测评</h2>
+          <p id="quizDesc">请按直觉作答。</p>
+        </div>
+        <div class="actions">
+          <button id="shuffleBtn" class="btn secondary">重新打乱</button>
+          <button id="resetBtn" class="btn ghost">重置</button>
+        </div>
+      </div>
+      <div class="progress-wrap">
+        <div class="progress-meta"><span id="answeredText">已回答 0/0</span><span id="progressText">0%</span></div>
+        <div class="progress"><div id="progressBar"></div></div>
+      </div>
+      <div id="questionList" class="question-list"></div>
+      <div class="footer-note">建议不要过度思考单题答案，选择最接近长期模式的选项即可。</div>
+      <div class="actions">
+          <button id="submitBtn" class="btn">查看结果</button>
+      </div>
+    </section>
+
+    <section id="results" class="panel hidden">
+      <div class="toolbar">
+        <div class="title-block">
+          <h2>测评结果</h2>
+          <p id="resultSubtitle">三个百分比代表相对倾向，不代表固定标签。</p>
+        </div>
+        <div class="actions">
+          <button id="copyBtn" class="btn secondary">复制结果</button>
+          <button id="againBtn" class="btn">重新测</button>
+        </div>
+      </div>
+      <div class="result-grid">
+        <article class="result-card secure">
+          <h3>安全型</h3>
+          <div id="securePct" class="percent">0%</div>
+          <div class="bar"><div id="secureBar"></div></div>
+          <p>亲密与独立相对平衡，能表达需求、回应伴侣，也较少被关系焦虑吞没。</p>
+        </article>
+        <article class="result-card anxious">
+          <h3>焦虑型</h3>
+          <div id="anxiousPct" class="percent">0%</div>
+          <div class="bar"><div id="anxiousBar"></div></div>
+          <p>渴望亲密，但容易担心被拒绝、被冷落，关系中的小变化可能带来强烈不安。</p>
+        </article>
+        <article class="result-card avoidant">
+          <h3>回避型</h3>
+          <div id="avoidantPct" class="percent">0%</div>
+          <div class="bar"><div id="avoidantBar"></div></div>
+          <p>重视自主和空间，过多亲密可能带来压力，倾向于通过距离维持安全感。</p>
+        </article>
+      </div>
+      <div id="summary" class="summary"></div>
+      <div class="footer-note">若两种或三种比例接近，说明你的模式可能受对象、情境或关系阶段影响较大。可以把结果当作讨论入口，而不是结论。</div>
+    </section>
+  </main>
+
+  <script>
+    const selfItems = [
+      {type:'anxious', text:'我常担心伴侣会不再爱我。'},
+      {type:'anxious', text:'我害怕一旦有人了解真实的我，他/她就不会喜欢我。'},
+      {type:'anxious', text:'当我没有处在一段关系中时，我会感到有些焦虑和不完整。'},
+      {type:'anxious', text:'当伴侣不在身边时，我会担心他/她可能对别人产生兴趣。'},
+      {type:'anxious', text:'当我向伴侣表达感受时，我害怕他/她不会有同样的感觉。'},
+      {type:'anxious', text:'我经常思考自己的关系。'},
+      {type:'anxious', text:'我很快就会对恋爱对象产生依恋。'},
+      {type:'anxious', text:'我对伴侣的情绪非常敏感。'},
+      {type:'anxious', text:'我担心如果伴侣离开我，我可能再也找不到别人。'},
+      {type:'anxious', text:'冲突中，我容易冲动地做出或说出之后会后悔的事，而不是冷静思考。'},
+      {type:'anxious', text:'我担心自己不够有吸引力。'},
+      {type:'anxious', text:'如果我感兴趣的人在看其他人，我会感到沮丧。'},
+      {type:'anxious', text:'如果我约会的人开始变得冷淡疏远，我会担心是不是自己做错了什么。'},
+      {type:'anxious', text:'如果伴侣要和我分手，我会尽力让他/她看到自己错过了什么；让对方有点嫉妒也无妨。'},
+      {type:'secure', text:'我觉得和伴侣表达亲昵很容易。'},
+      {type:'secure', text:'我能自在地依赖恋爱伴侣。'},
+      {type:'secure', text:'我通常对自己的恋爱关系感到满意。'},
+      {type:'secure', text:'在恋爱关系中，我不太需要通过激烈行为来表达自己。'},
+      {type:'secure', text:'我能比较容易地向伴侣表达自己的需求和愿望。'},
+      {type:'secure', text:'我相信大多数人本质上是诚实、可靠的。'},
+      {type:'secure', text:'我能自在地和伴侣分享个人想法和感受。'},
+      {type:'secure', text:'和伴侣发生争论，通常不会让我怀疑整段关系。'},
+      {type:'secure', text:'有时别人会觉得我在关系中太平稳、缺乏戏剧性，因此有点无聊。'},
+      {type:'secure', text:'当我不同意某个人时，我能自在地表达自己的看法。'},
+      {type:'secure', text:'如果我感兴趣的人在看其他人，我不会让这件事影响太久。也许会有一点嫉妒，但很快就过去。'},
+      {type:'secure', text:'如果我约会的人开始冷淡疏远，我也许会疑惑发生了什么，但我知道这很可能不是我的问题。'},
+      {type:'secure', text:'如果一个约会了几个月的人告诉我不想继续见面，我一开始会受伤，但能走出来。'},
+      {type:'secure', text:'我可以和前任保持联系，只要是纯粹柏拉图式的关系；毕竟我们有很多共同点。'},
+      {type:'avoidant', text:'分手后我恢复得很快。有时我自己也觉得奇怪，怎么能这么快把一个人从脑子里拿掉。'},
+      {type:'avoidant', text:'当伴侣情绪低落时，我很难在情感上支持他/她。'},
+      {type:'avoidant', text:'我的独立性比我的关系更重要。'},
+      {type:'avoidant', text:'我不太愿意和伴侣分享内心最深处的感受。'},
+      {type:'avoidant', text:'我觉得依赖恋爱伴侣很困难。'},
+      {type:'avoidant', text:'有时我会对伴侣感到生气或烦躁，却不知道为什么。'},
+      {type:'avoidant', text:'相比和一个人保持亲密关系，我更偏好没有承诺对象的随意性关系。'},
+      {type:'avoidant', text:'当伴侣靠得太近时，我会紧张。'},
+      {type:'avoidant', text:'我的伴侣常常希望我比自己舒服的程度更亲密。'},
+      {type:'avoidant', text:'当我和伴侣分开时，我会想念他/她；但当我们在一起时，我又会想逃开。'},
+      {type:'avoidant', text:'我讨厌别人依赖我的感觉。'},
+      {type:'avoidant', text:'如果我感兴趣的人在看其他人，我会松一口气，因为这说明他/她并不想让关系变得排他。'},
+      {type:'avoidant', text:'如果我约会的人开始冷淡疏远，我可能没什么感觉，甚至会松一口气。'},
+      {type:'avoidant', text:'有时当我在关系中得到了自己想要的东西，我反而不确定自己还想要什么。'}
+    ];
+
+    const partnerItems = [
+      {type:'avoidant', text:'发出混乱信号：有时亲密、有时疏远，让你难以判断对方真实意图。'},
+      {type:'avoidant', text:'非常重视自己的独立性，轻视依赖和“需要别人”。'},
+      {type:'avoidant', text:'贬低你，或贬低过去的伴侣，即使是以玩笑方式。'},
+      {type:'avoidant', text:'使用疏远策略，无论是情感上还是身体上，例如不明确计划、偏好分开。'},
+      {type:'avoidant', text:'强调关系中的边界，让你感觉难以进入其朋友、家人或私人世界。'},
+      {type:'avoidant', text:'对关系抱有不现实的浪漫想象，例如执着于完美伴侣或理想化前任。'},
+      {type:'avoidant', text:'不信任伴侣，害怕被利用、被套牢或被占便宜。'},
+      {type:'avoidant', text:'对关系有僵硬看法和不妥协规则，且要求你遵守。'},
+      {type:'avoidant', text:'发生分歧时，需要逃开，或突然爆发。'},
+      {type:'avoidant', text:'不清楚表达自己的意图，让你猜测他/她的感受。'},
+      {type:'avoidant', text:'难以谈论你们之间正在发生什么，某些关系话题完全不能谈。'},
+      {type:'secure', text:'可靠且一致，说会做的事通常会做到。'},
+      {type:'secure', text:'和你一起做决定，而不是单方面决定。'},
+      {type:'secure', text:'对关系有灵活看法，能开放讨论同居、承诺、生活安排等。'},
+      {type:'secure', text:'能很好地沟通关系问题，即使答案不完美，也让你感觉可以提问。'},
+      {type:'secure', text:'争吵时能达成妥协，关注解决真正的问题。'},
+      {type:'secure', text:'不害怕承诺或依赖，不会把亲密等同于被控制。'},
+      {type:'secure', text:'不把关系看成艰苦工作，即使环境不完美也愿意投入关系。'},
+      {type:'secure', text:'亲密会带来更多亲密，而不是突然疏远。'},
+      {type:'secure', text:'较早把你介绍给朋友和家人，愿意让你进入其生活圈。'},
+      {type:'secure', text:'自然表达对你的感情，能慷慨而直接地表达喜欢或爱。'},
+      {type:'secure', text:'不玩游戏，不故意让你猜、不算计联系频率、不制造嫉妒。'},
+      {type:'anxious', text:'希望关系中有大量亲密，关系早期就愿意快速靠近。'},
+      {type:'anxious', text:'表达不安全感，担心被拒绝、被替代或失去吸引力。'},
+      {type:'anxious', text:'不在关系中时不快乐，急切想找到或维持一段关系。'},
+      {type:'anxious', text:'通过游戏手段维持你的注意或兴趣，例如假装冷淡或忙碌。'},
+      {type:'anxious', text:'很难解释是什么在困扰自己，期待你猜出来。'},
+      {type:'anxious', text:'用行为发泄，而不是直接解决你们之间的问题。'},
+      {type:'anxious', text:'很难不把关系中的事情都理解成关于自己。'},
+      {type:'anxious', text:'为了避免受伤，让你决定关系的调子，至少一开始如此。'},
+      {type:'anxious', text:'被这段关系占据心神，常常复盘、频繁联系或防御性不联系。'},
+      {type:'anxious', text:'害怕小动作会毁掉关系，认为必须很努力才能保持你的兴趣。'},
+      {type:'anxious', text:'怀疑你可能不忠，过度警觉你的行踪或隐私。'}
+    ];
+
+    const labels = {
+      secure: '安全型',
+      anxious: '焦虑型',
+      avoidant: '回避型'
+    };
+
+    const state = { mode: null, items: [], answers: {} };
+    const $ = (id) => document.getElementById(id);
+
+    function shuffle(array) {
+      const copy = array.map((item, idx) => ({...item, id: `${item.type}-${idx}-${Math.random().toString(16).slice(2)}`}));
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+
+    function start(mode) {
+      state.mode = mode;
+      state.answers = {};
+      state.items = shuffle(mode === 'self' ? selfItems : partnerItems);
+      $('start').classList.add('hidden');
+      $('results').classList.add('hidden');
+      $('quiz').classList.remove('hidden');
+      $('quizTitle').textContent = mode === 'self' ? '测自己：依恋类型' : '测伴侣 / 约会对象：依恋类型';
+      $('quizDesc').textContent = mode === 'self'
+        ? '请判断每句陈述与你的符合程度。'
+        : '请根据你观察到的整体模式，为每项特征打分。';
+      renderQuestions();
+      updateProgress();
+      window.scrollTo({ top: $('quiz').offsetTop - 12, behavior: 'smooth' });
+    }
+
+    function renderQuestions() {
+      const list = $('questionList');
+      list.innerHTML = '';
+      const isSelf = state.mode === 'self';
+      const options = isSelf
+        ? [
+            {v:0, t:'不符合'}, {v:1, t:'有点符合'}, {v:2, t:'比较符合'}, {v:3, t:'非常符合'}
+          ]
+        : [
+            {v:1, t:'1 非常不符合'}, {v:2, t:'2 中等符合'}, {v:3, t:'3 非常符合'}
+          ];
+
+      state.items.forEach((item, idx) => {
+        const card = document.createElement('article');
+        card.className = 'question';
+        card.innerHTML = `
+          <div class="q-top">
+            <div class="q-num">${idx + 1}</div>
+            <div>
+              <div class="q-text">${item.text}</div>
+              <div class="scale ${isSelf ? 'self' : ''}">
+                ${options.map(o => `<button class="choice" data-id="${item.id}" data-value="${o.v}">${o.t}</button>`).join('')}
+              </div>
+            </div>
+          </div>`;
+        list.appendChild(card);
+      });
+
+      list.querySelectorAll('.choice').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const id = btn.dataset.id;
+          state.answers[id] = Number(btn.dataset.value);
+          document.querySelectorAll(`.choice[data-id="${CSS.escape(id)}"]`).forEach(b => b.classList.remove('selected'));
+          btn.classList.add('selected');
+          updateProgress();
+        });
+      });
+    }
+
+    function updateProgress() {
+      const answered = Object.keys(state.answers).length;
+      const total = state.items.length;
+      const pct = total ? Math.round(answered / total * 100) : 0;
+      $('answeredText').textContent = `已回答 ${answered}/${total}`;
+      $('progressText').textContent = `${pct}%`;
+      $('progressBar').style.width = `${pct}%`;
+    }
+
+    function calculate() {
+      const raw = { secure: 0, anxious: 0, avoidant: 0 };
+      const max = { secure: 0, anxious: 0, avoidant: 0 };
+      const maxPerItem = state.mode === 'self' ? 3 : 3;
+      const minPerItem = state.mode === 'self' ? 0 : 1;
+
+      for (const item of state.items) {
+        const value = state.answers[item.id];
+        if (value === undefined) return null;
+        raw[item.type] += value;
+        max[item.type] += maxPerItem;
+      }
+
+      let normalized;
+      if (state.mode === 'partner') {
+        const min = { secure: 11, anxious: 11, avoidant: 11 };
+        normalized = {
+          secure: Math.max(0, raw.secure - min.secure),
+          anxious: Math.max(0, raw.anxious - min.anxious),
+          avoidant: Math.max(0, raw.avoidant - min.avoidant)
+        };
+      } else {
+        normalized = {...raw};
+      }
+
+      const total = normalized.secure + normalized.anxious + normalized.avoidant;
+      let pct;
+      if (total === 0) {
+        pct = { secure: 0, anxious: 0, avoidant: 0 };
+      } else {
+        pct = {
+          secure: Math.round(normalized.secure / total * 100),
+          anxious: Math.round(normalized.anxious / total * 100),
+          avoidant: Math.round(normalized.avoidant / total * 100)
+        };
+        const diff = 100 - (pct.secure + pct.anxious + pct.avoidant);
+        const leader = Object.keys(pct).sort((a,b) => pct[b] - pct[a])[0];
+        pct[leader] += diff;
+      }
+      return { raw, pct };
+    }
+
+    function showResults() {
+      const res = calculate();
+      if (!res) {
+        alert('还有题目未作答，请完成全部题目后查看结果。');
+        return;
+      }
+      const { pct, raw } = res;
+      $('securePct').textContent = `${pct.secure}%`;
+      $('anxiousPct').textContent = `${pct.anxious}%`;
+      $('avoidantPct').textContent = `${pct.avoidant}%`;
+      $('secureBar').style.width = `${pct.secure}%`;
+      $('anxiousBar').style.width = `${pct.anxious}%`;
+      $('avoidantBar').style.width = `${pct.avoidant}%`;
+
+      const ranked = Object.entries(pct).sort((a,b) => b[1] - a[1]);
+      const top = ranked[0];
+      const second = ranked[1];
+      const close = top[1] - second[1] <= 10;
+      const rawText = state.mode === 'partner'
+        ? `原始分：安全型 ${raw.secure}/33，焦虑型 ${raw.anxious}/33，回避型 ${raw.avoidant}/33。`
+        : `原始分：安全型 ${raw.secure}，焦虑型 ${raw.anxious}，回避型 ${raw.avoidant}。`;
+      $('summary').innerHTML = close
+        ? `<strong>结果较接近：</strong>${labels[top[0]]} ${top[1]}%，${labels[second[0]]} ${second[1]}%。这可能表示你或对方在不同关系阶段、不同对象面前会呈现不同策略。${rawText}`
+        : `<strong>主要倾向：</strong>${labels[top[0]]} ${top[1]}%。这表示当前答案中，${labels[top[0]]}特征最明显。${rawText}`;
+      $('results').classList.remove('hidden');
+      window.scrollTo({ top: $('results').offsetTop - 12, behavior: 'smooth' });
+    }
+
+    function resetCurrent() {
+      state.answers = {};
+      renderQuestions();
+      updateProgress();
+      $('results').classList.add('hidden');
+    }
+
+    function copyResult() {
+      const text = `依恋类型测评结果：安全型 ${$('securePct').textContent}，焦虑型 ${$('anxiousPct').textContent}，回避型 ${$('avoidantPct').textContent}。`;
+      navigator.clipboard.writeText(text).then(() => alert('结果已复制。')).catch(() => alert(text));
+    }
+
+    document.querySelectorAll('.mode-btn').forEach(btn => btn.addEventListener('click', () => start(btn.dataset.mode)));
+    $('shuffleBtn').addEventListener('click', () => start(state.mode));
+    $('resetBtn').addEventListener('click', resetCurrent);
+    $('submitBtn').addEventListener('click', showResults);
+    $('againBtn').addEventListener('click', () => {
+      $('quiz').classList.add('hidden');
+      $('results').classList.add('hidden');
+      $('start').classList.remove('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+    $('copyBtn').addEventListener('click', copyResult);
+  </script>
+</body>
+</html>
