@@ -1,0 +1,985 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>新父母照护助手｜本地单页版</title>
+  <style>
+    :root {
+      --bg: #f7f4ef;
+      --panel: #ffffff;
+      --panel-soft: #fffaf2;
+      --text: #2a2723;
+      --muted: #6c6258;
+      --line: #e6ded2;
+      --brand: #7c5c42;
+      --brand-2: #9f7655;
+      --green: #1f7a52;
+      --green-bg: #eaf7ef;
+      --yellow: #9a6700;
+      --yellow-bg: #fff6d6;
+      --red: #b42318;
+      --red-bg: #fdecec;
+      --blue: #245a8d;
+      --blue-bg: #eaf3ff;
+      --shadow: 0 10px 30px rgba(45, 34, 20, .08);
+      --radius: 18px;
+      --radius-sm: 12px;
+      --focus: 0 0 0 3px rgba(124, 92, 66, .22);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", Arial, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: radial-gradient(circle at 20% 0%, #fff8ea 0%, var(--bg) 42%, #f2eee7 100%);
+      color: var(--text);
+      line-height: 1.55;
+      min-height: 100vh;
+    }
+    button, input, select, textarea { font: inherit; }
+    button { cursor: pointer; }
+    a { color: var(--brand); }
+    .app-shell { max-width: 1180px; margin: 0 auto; padding: 20px 16px 60px; }
+    .topbar {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 20px;
+      background: rgba(255,255,255,.78);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(230,222,210,.8);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      position: sticky;
+      top: 12px;
+      z-index: 10;
+    }
+    .brand-block h1 { margin: 0; font-size: 24px; letter-spacing: .2px; }
+    .brand-block p { margin: 4px 0 0; color: var(--muted); font-size: 14px; }
+    .save-status { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 13px; white-space: nowrap; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); box-shadow: 0 0 0 4px rgba(31,122,82,.12); }
+    .tabbar {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 10px;
+      margin: 16px 0;
+    }
+    .tab-btn {
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.72);
+      color: var(--text);
+      border-radius: 999px;
+      padding: 11px 12px;
+      font-weight: 650;
+      box-shadow: 0 5px 18px rgba(45, 34, 20, .04);
+    }
+    .tab-btn.active { background: var(--brand); border-color: var(--brand); color: #fff; }
+    .tab-btn:focus-visible, .btn:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible { outline: none; box-shadow: var(--focus); }
+    .view { display: none; }
+    .view.active { display: block; }
+    .grid { display: grid; gap: 16px; }
+    .grid.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .grid.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 18px;
+      box-shadow: var(--shadow);
+    }
+    .card.soft { background: var(--panel-soft); }
+    .card h2, .card h3 { margin: 0 0 10px; }
+    .card h2 { font-size: 22px; }
+    .card h3 { font-size: 17px; }
+    .muted { color: var(--muted); }
+    .small { font-size: 13px; }
+    .pill-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    .pill { display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px; border-radius: 999px; border: 1px solid var(--line); background: #fff; color: var(--muted); font-size: 13px; }
+    .pill.green { background: var(--green-bg); color: var(--green); border-color: #b8e1c7; }
+    .pill.yellow { background: var(--yellow-bg); color: var(--yellow); border-color: #eedc94; }
+    .pill.red { background: var(--red-bg); color: var(--red); border-color: #f4b8b4; }
+    .pill.blue { background: var(--blue-bg); color: var(--blue); border-color: #bfd8ef; }
+    .btn-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+    .btn {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 10px 12px;
+      background: #fff;
+      color: var(--text);
+      font-weight: 650;
+    }
+    .btn.primary { background: var(--brand); color: #fff; border-color: var(--brand); }
+    .btn.secondary { background: #fff8ee; color: var(--brand); border-color: #e7d0b3; }
+    .btn.danger { background: var(--red-bg); color: var(--red); border-color: #f0b3ae; }
+    .btn.ghost { background: transparent; }
+    .btn[disabled] { opacity: .5; cursor: not-allowed; }
+    .form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    label { font-weight: 650; font-size: 13px; color: var(--muted); }
+    input, select, textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 10px 11px;
+      background: #fff;
+      color: var(--text);
+    }
+    textarea { min-height: 82px; resize: vertical; }
+    .full { grid-column: 1 / -1; }
+    .section-title { display: flex; align-items: end; justify-content: space-between; gap: 14px; margin: 18px 0 10px; }
+    .section-title h2 { margin: 0; font-size: 22px; }
+    .section-title p { margin: 0; color: var(--muted); }
+    .tip-list, .alert-list, .plain-list { margin: 0; padding-left: 18px; }
+    .tip-list li, .alert-list li, .plain-list li { margin: 7px 0; }
+    .alert-box { border-radius: var(--radius-sm); padding: 13px 14px; border: 1px solid var(--line); }
+    .alert-box.red { background: var(--red-bg); border-color: #f0b3ae; color: #64110c; }
+    .alert-box.yellow { background: var(--yellow-bg); border-color: #eedc94; color: #5d4100; }
+    .alert-box.green { background: var(--green-bg); border-color: #b8e1c7; color: #144c34; }
+    .alert-box.blue { background: var(--blue-bg); border-color: #bfd8ef; color: #173d61; }
+    .mini-stat { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+    .stat {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      padding: 12px;
+    }
+    .stat .num { font-size: 22px; font-weight: 800; }
+    .stat .label { color: var(--muted); font-size: 12px; }
+    .log-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .log-table th, .log-table td { text-align: left; padding: 9px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    .log-table th { color: var(--muted); font-size: 12px; }
+    .scroll-table { overflow-x: auto; }
+    .empty { color: var(--muted); background: #fff; border: 1px dashed var(--line); padding: 12px; border-radius: var(--radius-sm); }
+    .task-list { display: grid; gap: 9px; }
+    .task-item { display: grid; grid-template-columns: auto 1fr auto; gap: 10px; align-items: start; background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 12px; }
+    .task-item input[type="checkbox"] { width: 18px; height: 18px; margin-top: 3px; }
+    .task-item.done .task-title { text-decoration: line-through; color: var(--muted); }
+    .task-title { font-weight: 750; }
+    .task-meta { color: var(--muted); font-size: 12px; margin-top: 3px; }
+    .symptom-controls { display: grid; grid-template-columns: 1fr 180px 180px; gap: 10px; margin-bottom: 14px; }
+    .symptom-list { display: grid; gap: 12px; }
+    .symptom-card { background: #fff; border: 1px solid var(--line); border-radius: var(--radius); padding: 14px; }
+    .symptom-head { display: flex; justify-content: space-between; gap: 12px; align-items: start; }
+    .symptom-card h3 { margin: 0 0 4px; }
+    details { border: 1px solid var(--line); background: #fff; border-radius: var(--radius-sm); padding: 12px; }
+    details + details { margin-top: 8px; }
+    summary { cursor: pointer; font-weight: 750; }
+    .notice { font-size: 13px; color: var(--muted); padding: 11px 12px; border: 1px dashed var(--line); border-radius: var(--radius-sm); background: rgba(255,255,255,.65); }
+    .critical-strip { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+    .critical-strip .alert-box { min-height: 104px; }
+    .stage-badge { display: inline-flex; align-items: center; padding: 8px 12px; border-radius: 999px; background: #fff; border: 1px solid var(--line); font-weight: 800; color: var(--brand); }
+    .contraction-panel { display: grid; gap: 12px; }
+    .timer-display { font-size: 42px; font-weight: 900; letter-spacing: .5px; }
+    .hidden { display: none !important; }
+    .backup-box { border: 1px dashed #d4c5b2; background: #fffdf8; border-radius: var(--radius); padding: 14px; }
+    .footer-note { margin-top: 18px; color: var(--muted); font-size: 12px; text-align: center; }
+    @media (max-width: 860px) {
+      .topbar { position: static; align-items: flex-start; flex-direction: column; }
+      .tabbar { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .grid.two, .grid.three { grid-template-columns: 1fr; }
+      .form-grid { grid-template-columns: 1fr; }
+      .mini-stat, .critical-strip { grid-template-columns: 1fr 1fr; }
+      .symptom-controls { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 520px) {
+      .mini-stat, .critical-strip { grid-template-columns: 1fr; }
+      .brand-block h1 { font-size: 20px; }
+      .timer-display { font-size: 34px; }
+      .tabbar { grid-template-columns: 1fr; }
+    }
+    @media print {
+      .topbar, .tabbar, .btn, input, select, textarea { box-shadow: none !important; }
+      body { background: #fff; }
+      .view { display: block !important; page-break-after: always; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand-block">
+        <h1>新父母照护助手</h1>
+        <p>备孕、孕期、分娩、产后与新生儿早期的本地记录工具</p>
+      </div>
+      <div class="save-status" aria-live="polite"><span class="dot"></span><span id="saveStatus">已自动保存到本机</span></div>
+    </header>
+
+    <nav class="tabbar" aria-label="主导航">
+      <button class="tab-btn active" data-tab="dashboard">今天</button>
+      <button class="tab-btn" data-tab="records">记录</button>
+      <button class="tab-btn" data-tab="symptoms">症状提示</button>
+      <button class="tab-btn" data-tab="tasks">任务</button>
+      <button class="tab-btn" data-tab="profile">档案/备份</button>
+    </nav>
+
+    <main>
+      <section id="dashboard" class="view active">
+        <div class="grid two">
+          <article class="card soft">
+            <div class="stage-badge" id="stageBadge">阶段待设置</div>
+            <h2 id="todayTitle" style="margin-top:14px;">今天最重要</h2>
+            <p id="todaySubtitle" class="muted">先到“档案/备份”填写末次月经、预产期或宝宝生日，系统会自动切换阶段。</p>
+            <div class="pill-row" id="todayPills"></div>
+          </article>
+          <article class="card">
+            <h2>今日关键提示</h2>
+            <ul class="tip-list" id="coreTips"></ul>
+          </article>
+        </div>
+
+        <div class="section-title">
+          <div>
+            <h2>需要优先关注的警讯</h2>
+            <p>这些不是诊断结论；出现相应情况时，请联系医生、产科急诊或当地急救服务。</p>
+          </div>
+        </div>
+        <div class="critical-strip" id="criticalStrip"></div>
+
+        <div class="section-title">
+          <div>
+            <h2>今日摘要</h2>
+            <p>根据最近记录自动生成。</p>
+          </div>
+          <div class="btn-row">
+            <button class="btn secondary" data-tab-jump="records">添加记录</button>
+            <button class="btn" data-tab-jump="tasks">查看任务</button>
+          </div>
+        </div>
+        <div class="mini-stat" id="summaryStats"></div>
+
+        <div class="grid two" style="margin-top:16px;">
+          <article class="card">
+            <h3>临近事项</h3>
+            <div id="upcomingList" class="task-list"></div>
+          </article>
+          <article class="card">
+            <h3>给伴侣/家人的今日建议</h3>
+            <ul class="plain-list" id="partnerTips"></ul>
+          </article>
+        </div>
+      </section>
+
+      <section id="records" class="view">
+        <div class="section-title">
+          <div>
+            <h2>记录</h2>
+            <p>只记录会影响判断的关键内容。所有数据保存在本机浏览器 localStorage。</p>
+          </div>
+        </div>
+
+        <div class="grid two">
+          <article class="card">
+            <h3>妈妈/孕期记录</h3>
+            <form id="motherForm" class="form-grid">
+              <div class="field"><label>日期</label><input name="date" type="date" required></div>
+              <div class="field"><label>阶段</label><select name="phase"><option>备孕</option><option>孕期</option><option>分娩前后</option><option>产后</option></select></div>
+              <div class="field"><label>体重 kg</label><input name="weight" inputmode="decimal" placeholder="可选"></div>
+              <div class="field"><label>体温 °C</label><input name="temp" inputmode="decimal" placeholder="可选"></div>
+              <div class="field"><label>收缩压 mmHg</label><input name="bpSys" inputmode="numeric" placeholder="如 118"></div>
+              <div class="field"><label>舒张压 mmHg</label><input name="bpDia" inputmode="numeric" placeholder="如 76"></div>
+              <div class="field"><label>胎动/小时</label><input name="fetalMovement" inputmode="numeric" placeholder="孕晚期可填"></div>
+              <div class="field"><label>睡眠 小时</label><input name="sleep" inputmode="decimal" placeholder="可选"></div>
+              <div class="field"><label>情绪 1-5</label><select name="mood"><option value="">未记录</option><option value="1">1 很低落/焦虑</option><option value="2">2 偏低</option><option value="3">3 一般</option><option value="4">4 较好</option><option value="5">5 很好</option></select></div>
+              <div class="field"><label>恶露/出血</label><select name="bleeding"><option value="">未记录</option><option>无</option><option>少量/点滴</option><option>类似月经</option><option>较多</option><option>大量或大血块</option></select></div>
+              <div class="field full"><label>症状</label><textarea name="symptoms" placeholder="例如：头痛、视物模糊、腹痛、尿痛、乳房红肿、伤口疼痛等"></textarea></div>
+              <div class="field full"><label>备注/医生建议</label><textarea name="notes" placeholder="记录用药、检查、医生建议、下一步计划"></textarea></div>
+              <div class="full btn-row"><button class="btn primary" type="submit">保存妈妈记录</button><button class="btn" type="button" id="clearMotherForm">清空</button></div>
+            </form>
+          </article>
+
+          <article class="card">
+            <h3>宝宝记录</h3>
+            <form id="babyForm" class="form-grid">
+              <div class="field"><label>日期</label><input name="date" type="date" required></div>
+              <div class="field"><label>宝宝体重 kg</label><input name="weight" inputmode="decimal" placeholder="可选"></div>
+              <div class="field"><label>喂养次数</label><input name="feeds" inputmode="numeric" placeholder="24小时"></div>
+              <div class="field"><label>瓶喂总量 ml</label><input name="milkMl" inputmode="numeric" placeholder="如适用"></div>
+              <div class="field"><label>尿布数量</label><input name="wetDiapers" inputmode="numeric" placeholder="24小时"></div>
+              <div class="field"><label>大便次数</label><input name="dirtyDiapers" inputmode="numeric" placeholder="24小时"></div>
+              <div class="field"><label>睡眠 小时</label><input name="sleep" inputmode="decimal" placeholder="粗略即可"></div>
+              <div class="field"><label>体温 °C</label><input name="temp" inputmode="decimal" placeholder="可选"></div>
+              <div class="field"><label>黄疸观察</label><select name="jaundice"><option value="">未记录</option><option>无明显</option><option>轻微</option><option>加重/到四肢</option><option>已就医/复查</option></select></div>
+              <div class="field"><label>喂养方式</label><select name="feedingType"><option>亲喂/胸乳</option><option>瓶喂母乳</option><option>配方奶</option><option>混合喂养</option><option>供乳</option></select></div>
+              <div class="field full"><label>异常或备注</label><textarea name="notes" placeholder="例如：吃奶差、嗜睡、尿少、吐奶、呼吸异常、复诊结果"></textarea></div>
+              <div class="full btn-row"><button class="btn primary" type="submit">保存宝宝记录</button><button class="btn" type="button" id="clearBabyForm">清空</button></div>
+            </form>
+          </article>
+        </div>
+
+        <div class="grid two" style="margin-top:16px;">
+          <article class="card">
+            <h3>宫缩计时</h3>
+            <div class="contraction-panel">
+              <div class="timer-display" id="contractionTimer">00:00</div>
+              <div class="btn-row">
+                <button class="btn primary" id="contractionToggle" type="button">开始宫缩</button>
+                <button class="btn" id="manualContraction" type="button">手动添加</button>
+                <button class="btn danger" id="clearContractions" type="button">清空宫缩记录</button>
+              </div>
+              <div class="notice" id="contractionSummary">暂无宫缩记录。规律、增强、变密的宫缩，或破水/出血/胎动减少时，请联系医疗团队。</div>
+            </div>
+          </article>
+
+          <article class="card">
+            <h3>最近记录摘要</h3>
+            <div id="recentWarnings" class="grid"></div>
+          </article>
+        </div>
+
+        <div class="grid two" style="margin-top:16px;">
+          <article class="card">
+            <h3>妈妈/孕期最近记录</h3>
+            <div class="scroll-table"><table class="log-table" id="motherLogTable"></table></div>
+          </article>
+          <article class="card">
+            <h3>宝宝最近记录</h3>
+            <div class="scroll-table"><table class="log-table" id="babyLogTable"></table></div>
+          </article>
+        </div>
+      </section>
+
+      <section id="symptoms" class="view">
+        <div class="section-title">
+          <div>
+            <h2>症状提示</h2>
+            <p>按症状搜索。这里提供风险提示和就医建议，不替代医生诊断。</p>
+          </div>
+        </div>
+        <div class="alert-box red" style="margin-bottom:14px;">
+          <strong>立即就医类信号：</strong>大量出血、破水样流液、胎动明显减少、严重腹痛、严重头痛伴视力变化、胸痛/明显气短、一侧腿红肿热痛、晕厥、高热、产后大量出血、新生儿发热/吃奶差/呼吸异常、出现伤害自己或宝宝的想法。
+        </div>
+        <div class="symptom-controls">
+          <input id="symptomSearch" placeholder="搜索：出血、胎动、头痛、尿痛、乳房、黄疸……" />
+          <select id="symptomStage"><option value="all">所有阶段</option><option value="pregnancy">孕期</option><option value="labor">分娩</option><option value="postpartum">产后妈妈</option><option value="newborn">新生儿</option></select>
+          <select id="symptomLevel"><option value="all">所有等级</option><option value="green">常见/可先照护</option><option value="yellow">建议联系医生</option><option value="red">立即评估</option></select>
+        </div>
+        <div id="symptomList" class="symptom-list"></div>
+      </section>
+
+      <section id="tasks" class="view">
+        <div class="section-title">
+          <div>
+            <h2>任务</h2>
+            <p>按阶段生成，也可以添加家庭协作任务。</p>
+          </div>
+          <div class="btn-row"><button class="btn secondary" id="resetDefaultTasks" type="button">恢复默认任务状态</button></div>
+        </div>
+
+        <div class="grid two">
+          <article class="card">
+            <h3>阶段任务</h3>
+            <div class="field" style="margin-bottom:12px;"><label>筛选阶段</label><select id="taskStageFilter"></select></div>
+            <div id="defaultTaskList" class="task-list"></div>
+          </article>
+          <article class="card">
+            <h3>家庭自定义任务</h3>
+            <form id="customTaskForm" class="form-grid" style="margin-bottom:14px;">
+              <div class="field full"><label>任务内容</label><input name="title" required placeholder="例如：伴侣负责预约产后复诊"></div>
+              <div class="field"><label>负责人</label><input name="assignee" placeholder="妈妈/伴侣/家人"></div>
+              <div class="field"><label>截止日期</label><input name="due" type="date"></div>
+              <div class="field full"><label>备注</label><input name="note" placeholder="可选"></div>
+              <div class="full"><button class="btn primary" type="submit">添加任务</button></div>
+            </form>
+            <div id="customTaskList" class="task-list"></div>
+          </article>
+        </div>
+      </section>
+
+      <section id="profile" class="view">
+        <div class="section-title">
+          <div>
+            <h2>档案 / 备份</h2>
+            <p>请优先填写这些信息，系统会据此调整阶段提示。数据只保存在本机。</p>
+          </div>
+        </div>
+
+        <div class="grid two">
+          <article class="card">
+            <h3>基础档案</h3>
+            <form id="profileForm" class="form-grid">
+              <div class="field"><label>孕产者姓名/昵称</label><input name="parentName" placeholder="可选"></div>
+              <div class="field"><label>宝宝昵称</label><input name="babyName" placeholder="可选"></div>
+              <div class="field"><label>末次月经第一天</label><input name="lmp" type="date"></div>
+              <div class="field"><label>预产期</label><input name="dueDate" type="date"></div>
+              <div class="field"><label>宝宝生日</label><input name="birthDate" type="date"></div>
+              <div class="field"><label>当前阶段模式</label><select name="stageMode"><option value="auto">自动判断</option><option value="manual">手动选择</option></select></div>
+              <div class="field full" id="manualStageWrap"><label>手动阶段</label><select name="manualStage"></select></div>
+              <div class="field full"><label>重要病史/风险</label><textarea name="risks" placeholder="例如：妊娠期糖尿病、高血压、Rh阴性、剖宫产史、VBAC、早产史、甲状腺病、哮喘、抑郁焦虑等"></textarea></div>
+              <div class="field full"><label>用药/补充剂</label><textarea name="meds" placeholder="例如：产前维生素、铁剂、胰岛素、降压药、抗抑郁药、哮喘吸入药等"></textarea></div>
+              <div class="field full"><label>医生/医院联系方式</label><textarea name="contacts" placeholder="产科电话、急诊地址、儿科电话、哺乳顾问等"></textarea></div>
+              <div class="full"><button class="btn primary" type="submit">保存档案</button></div>
+            </form>
+          </article>
+
+          <article class="card">
+            <h3>产检/复诊/疫苗事项</h3>
+            <form id="appointmentForm" class="form-grid" style="margin-bottom:14px;">
+              <div class="field"><label>日期</label><input name="date" type="date" required></div>
+              <div class="field"><label>类型</label><select name="type"><option>产检</option><option>超声/筛查</option><option>疫苗</option><option>分娩/入院</option><option>产后复诊</option><option>儿科复诊</option><option>其他</option></select></div>
+              <div class="field full"><label>事项</label><input name="title" required placeholder="例如：GBS筛查 / 宝宝黄疸复查"></div>
+              <div class="field full"><label>备注</label><input name="note" placeholder="可选"></div>
+              <div class="full"><button class="btn primary" type="submit">添加事项</button></div>
+            </form>
+            <div id="appointmentList" class="task-list"></div>
+          </article>
+        </div>
+
+        <div class="grid two" style="margin-top:16px;">
+          <article class="card">
+            <h3>医生沟通摘要</h3>
+            <p class="muted small">用于产检或复诊时快速说明最近情况。可复制到备忘录或发给家人。</p>
+            <textarea id="doctorSummary" readonly style="min-height:240px;"></textarea>
+            <div class="btn-row" style="margin-top:10px;"><button class="btn secondary" id="copySummary" type="button">复制摘要</button><button class="btn" onclick="window.print()" type="button">打印页面</button></div>
+          </article>
+
+          <article class="card">
+            <h3>导出 / 导入 JSON 备份</h3>
+            <div class="backup-box">
+              <p><strong>自动保存：</strong>每次修改会自动写入本机浏览器 localStorage。</p>
+              <p><strong>导出：</strong>下载一个 JSON 文件，适合换设备或定期备份。</p>
+              <p><strong>导入：</strong>会用备份文件替换当前浏览器中的数据。建议先导出当前数据。</p>
+              <div class="btn-row">
+                <button class="btn primary" id="exportJson" type="button">导出 JSON</button>
+                <label class="btn secondary" for="importJson">导入 JSON</label>
+                <input id="importJson" type="file" accept="application/json,.json" class="hidden">
+                <button class="btn danger" id="wipeData" type="button">清空本机数据</button>
+              </div>
+            </div>
+            <div class="notice" style="margin-top:12px;">医疗提示：本工具仅用于记录和提示，不能替代医生诊断、处方、急救或产检安排。</div>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <p class="footer-note">本地单页版 v1.0｜数据保存在当前浏览器 localStorage；更换浏览器或清理缓存前请导出备份。</p>
+  </div>
+
+<script>
+(function(){
+  'use strict';
+  const KEY = 'newParentCareApp.v1';
+  const todayISO = () => new Date().toISOString().slice(0,10);
+  const uid = () => 'id_' + Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
+  const byId = id => document.getElementById(id);
+  const parseDate = s => s ? new Date(s + 'T00:00:00') : null;
+  const diffDays = (a,b) => Math.floor((a-b)/(1000*60*60*24));
+  const clamp = (n,min,max) => Math.max(min, Math.min(max,n));
+  const safeText = v => String(v ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+  const STAGES = [
+    {id:'preconception', name:'备孕期'},
+    {id:'pregnancy_early', name:'孕早期 1–12周'},
+    {id:'pregnancy_mid', name:'孕中期 13–27周'},
+    {id:'pregnancy_late', name:'孕晚期 28–40+周'},
+    {id:'labor', name:'临产/分娩'},
+    {id:'postpartum_0_6', name:'产后 0–6周'},
+    {id:'postpartum_6_12', name:'产后 6–12周'},
+    {id:'newborn_0_12', name:'新生儿 0–12周'}
+  ];
+
+  const STAGE_CONTENT = {
+    preconception: {
+      tips: ['先处理慢性病、用药和疫苗，再追求排卵日精准。','从备孕期开始补充叶酸，因为神经管在很早期形成。','按年龄和尝试时间判断是否需要生育力评估。'],
+      alerts: ['既往严重慢性病、反复流产、遗传病家族史或正在使用长期药物时，建议孕前咨询。','备孕中不要自行停药，尤其是降压药、抗癫痫药、精神心理药物和内分泌药物。','如果出现月经长期不规律或停经，应咨询医生评估排卵和内分泌。'],
+      partner: ['一起整理家族史和用药清单。','协助戒烟、停酒和改善饮食运动。','把“要孩子后生活如何变化”提前讨论清楚。']
+    },
+    pregnancy_early: {
+      tips: ['早孕出血不一定是流产，但任何出血都值得联系医生评估。','严重孕吐不是必须硬忍，无法进食饮水或尿少要就医。','所有药物、草药和补充剂都要让医生知道。'],
+      alerts: ['出血伴明显腹痛、一侧腹痛、肩痛、头晕或晕厥，要排除异位妊娠。','持续呕吐、体重下降、尿量明显减少或口干心悸，应联系医生。','发热、严重腹痛、持续头痛或情绪危机需要及时就医。'],
+      partner: ['陪同首次产检，记录医生建议。','准备清淡食物和液体，减少气味刺激。','主动分担家务，让孕早期疲劳者能休息。']
+    },
+    pregnancy_mid: {
+      tips: ['孕中期通常较舒服，但仍要关注早产信号。','18–20周结构超声的重点是评估胎儿结构，不只是看性别。','胎动刚开始可不规律，之后要熟悉自己宝宝的活动模式。'],
+      alerts: ['37周前规律宫缩、低位腰痛、盆腔压力、流液或出血，应联系医疗团队。','尿痛、发热、血尿或腰痛可能提示尿路感染。','严重瘙痒、持续皮疹、明显头痛或视力变化需要评估。'],
+      partner: ['开始了解分娩课程、产假和托育安排。','协助记录产检问题和超声结果。','一起准备舒适运动、饮食和睡眠环境。']
+    },
+    pregnancy_late: {
+      tips: ['胎动明显减少不要等待，应联系医疗团队。','假性宫缩通常不规律；规律、增强、变密的宫缩需要重视。','分娩计划要有弹性，目标是安全、被尊重和可承受。'],
+      alerts: ['破水样流液、鲜红出血、胎动减少、严重头痛、视力变化或右上腹痛，应及时就医。','一侧腿红肿热痛、胸痛或突然气短，要警惕血栓或肺栓塞。','37周前规律宫缩或持续骨盆压力仍属于早产信号。'],
+      partner: ['确认入院路线、产包、证件、陪产安排和大宝/宠物照护。','学习宫缩计时、破水后处理和产后警讯。','不要把恐怖分娩故事带进产前环境。']
+    },
+    labor: {
+      tips: ['真正临产宫缩通常越来越规律、越来越强、间隔越来越短。','破水、出血、胎动减少或羊水颜色异常时，应联系医院。','镇痛不是失败，疼痛管理目标是安全和可承受。'],
+      alerts: ['绿色或黄色羊水、有臭味羊水、发热或胎动减少需要立即评估。','鲜红出血、严重腹痛或晕厥应尽快就医。','孕37周前出现规律宫缩或破水，要按早产处理。'],
+      partner: ['负责记录宫缩、拿证件和联系医院。','宫缩时少说教，多按对方当下需要支持。','限制手机和访客，把注意力放在分娩者身上。']
+    },
+    postpartum_0_6: {
+      tips: ['产后不是风险结束，出血、感染、血栓和情绪问题都要关注。','恶露会逐渐变少变浅；突然大量出血或大血块要就医。','产后情绪低落常见，但超过两周或有伤害念头要立即求助。'],
+      alerts: ['连续大量浸透卫生巾、头晕心慌、大血块或虚弱，应立即就医。','发热、恶露臭味、切口红肿渗液、乳房红肿热痛或尿痛，应联系医生。','胸痛、突然气短、一侧腿红肿热痛，需立即排除血栓。'],
+      partner: ['观察妈妈出血、体温、伤口和情绪，而不只看宝宝。','负责夜间部分换尿布、拍嗝和补给。','管理访客，让分娩者有真实休息时间。']
+    },
+    postpartum_6_12: {
+      tips: ['产后复诊应关注盆底、情绪、避孕、哺乳、血压和血糖。','漏尿、盆腔坠胀、性交痛或大便控制问题不必忍。','恢复运动要循序渐进，高冲击运动前最好评估盆底和腹壁。'],
+      alerts: ['持续低落、焦虑、失眠或无法照顾自己和宝宝，需要专业帮助。','严重头痛、视力变化、胸痛气短或一侧腿痛仍需及时评估。','剖宫产切口疼痛加重、渗液、红肿或发热需联系医生。'],
+      partner: ['继续共同育儿，不要让一方承担全部隐形管理。','一起讨论避孕、复工、托育和夜间分工。','保留关系中的小连接，例如散步、聊天和互相感谢。']
+    },
+    newborn_0_12: {
+      tips: ['新生儿最初几周没有稳定作息，频繁吃奶和夜醒很常见。','安全睡眠底线：每次仰卧，硬床垫，床上不放软物。','宝宝发热、吃奶差、尿少、嗜睡或呼吸异常，要联系儿科医生。'],
+      alerts: ['新生儿发热、嘴唇发紫、呼吸困难、难以叫醒吃奶，应立即就医。','黄疸明显加重、尿布明显减少、频繁绿色呕吐或大便带血，需要联系医生。','哭闹到照护者快失控时，把宝宝放到安全处，先寻求帮助；绝不摇晃宝宝。'],
+      partner: ['学习换尿布、拍嗝、瓶喂、安全睡眠和安抚。','记录尿布和喂养，帮助判断宝宝是否吃够。','主动承担家务和补给，不让照护者独自熬夜。']
+    }
+  };
+
+  const DEFAULT_TASKS = [
+    ['preconception','预约孕前咨询','慢性病、用药、疫苗、家族史和生活方式都适合提前讨论。'],
+    ['preconception','开始叶酸或产前维生素','多数备孕者至少从受孕前 1 个月开始补充叶酸。'],
+    ['preconception','整理双方家族史','遗传病、出生缺陷、反复流产和儿童早逝都应记录。'],
+    ['preconception','记录月经和备孕开始日期','用于估算排卵、孕周和何时需要生育力评估。'],
+    ['pregnancy_early','联系医疗团队安排首次产检','阳性验孕后确认下一步检查和首次产检。'],
+    ['pregnancy_early','整理所有药物和补充剂','不要自行停药，带清单给医生评估。'],
+    ['pregnancy_early','了解早孕筛查和遗传筛查选择','筛查不是诊断，异常结果需要专业解释。'],
+    ['pregnancy_early','记录出血、腹痛和孕吐情况','早孕出血、单侧痛或严重呕吐需联系医生。'],
+    ['pregnancy_mid','预约或完成 18–20 周结构超声','重点评估胎儿结构、胎盘、羊水和孕周。'],
+    ['pregnancy_mid','开始记录第一次胎动日期','首次胎动可像气泡或轻微 flutter。'],
+    ['pregnancy_mid','了解早产信号','37周前规律宫缩、流液、出血、低位腰痛或盆腔压力要联系医生。'],
+    ['pregnancy_mid','开始了解分娩课程和托育安排','孕中期通常更有精力处理后勤事项。'],
+    ['pregnancy_late','完成妊娠期糖尿病筛查','通常在 24–28 周左右，具体按医院安排。'],
+    ['pregnancy_late','确认 Rh 阴性处理是否需要','Rh 阴性者可能需要 Rh 免疫球蛋白。'],
+    ['pregnancy_late','完成 GBS 筛查','孕晚期筛查 B 族链球菌，阳性者临产时用抗生素。'],
+    ['pregnancy_late','确认胎位和分娩计划','臀位、横位或 VBAC 需要更早讨论。'],
+    ['pregnancy_late','准备产包、入院路线和婴儿安全座椅','分娩前确认支持者、证件、医院流程和备用方案。'],
+    ['labor','记录宫缩频率和持续时间','规律、增强、变密的宫缩更像真正临产。'],
+    ['labor','破水后记录时间、颜色和气味','绿色、黄色、有臭味或胎动减少需要立即评估。'],
+    ['labor','确认镇痛偏好但保留弹性','硬膜外、笑气、非药物方法都可根据情况组合。'],
+    ['postpartum_0_6','观察恶露、体温和伤口','大量出血、发热、臭味或伤口红肿渗液需就医。'],
+    ['postpartum_0_6','记录乳房胀痛、硬块和乳头疼痛','红肿热痛伴发热或寒战要警惕乳腺炎。'],
+    ['postpartum_0_6','完成产后复诊安排','复诊应讨论身体恢复、情绪、盆底、避孕和喂养。'],
+    ['postpartum_0_6','每天做一次情绪自查','低落或焦虑超过两周、或出现伤害念头应立即求助。'],
+    ['postpartum_6_12','评估盆底和腹壁恢复','漏尿、坠胀、膨出感或性交痛可寻求盆底物理治疗。'],
+    ['postpartum_6_12','确定长期避孕方案','月经没恢复也可能先排卵。'],
+    ['postpartum_6_12','逐步恢复运动','先低冲击和功能恢复，再考虑跑步等高冲击运动。'],
+    ['newborn_0_12','记录喂养、尿布和体重','帮助判断宝宝是否吃够和是否需要儿科复查。'],
+    ['newborn_0_12','确认新生儿筛查、听力和心脏筛查结果','筛查异常不等于确诊，但必须按要求复查。'],
+    ['newborn_0_12','观察黄疸和精神状态','黄疸加重、吃奶差、尿少或嗜睡需联系儿科医生。'],
+    ['newborn_0_12','落实安全睡眠环境','仰卧、硬床垫、无枕头被子软玩具。']
+  ].map((x,i)=>({id:'task_'+i, stage:x[0], title:x[1], hint:x[2]}));
+
+  const SYMPTOMS = [
+    {title:'阴道出血', stage:'pregnancy', level:'red', common:'孕早期少量出血并不少见，但任何孕期出血都应告知医生。', self:'记录孕周、颜色、量、是否伴腹痛或组织排出。', contact:'少量点滴出血也建议联系医生，尤其孕中晚期。', urgent:'鲜红出血、中到大量出血、伴腹痛/宫缩/发热/胎动减少/头晕时立即就医。'},
+    {title:'破水样流液', stage:'pregnancy', level:'red', common:'羊水可能一股流出，也可能持续渗漏，常与漏尿难区分。', self:'记录时间、颜色、气味和是否有宫缩。不要使用卫生棉条或性生活。', contact:'怀疑破水就联系医院。', urgent:'绿色、黄色、有臭味、伴发热、腹痛或胎动减少时立即就医。'},
+    {title:'胎动减少', stage:'pregnancy', level:'red', common:'孕晚期胎动形式可变化，但不应明显减少。', self:'安静侧卧或按医生方法数胎动。', contact:'只要明显少于平时，就联系医疗团队。', urgent:'长时间无胎动或伴出血、腹痛、发热、头痛视力变化时立即评估。'},
+    {title:'规律宫缩/早产信号', stage:'pregnancy', level:'red', common:'假性宫缩通常不规律；规律、增强、变密更需要重视。', self:'记录宫缩间隔和持续时间，补水、休息、改变体位观察是否缓解。', contact:'37周前出现规律宫缩、低位腰痛、盆腔压力或分泌物改变应联系医生。', urgent:'宫缩伴出血、流液、严重疼痛或胎动减少时立即就医。'},
+    {title:'严重头痛或视力变化', stage:'pregnancy', level:'red', common:'轻度头痛可与疲劳、脱水或睡眠有关，但严重头痛需重视。', self:'记录血压、头痛持续时间、是否有眼前闪光或上腹痛。', contact:'持续头痛或视物模糊应联系医生。', urgent:'严重头痛伴视力变化、右上腹痛、气短或明显水肿时立即评估子痫前期。'},
+    {title:'一侧腿红肿热痛', stage:'pregnancy', level:'red', common:'孕期和产后血栓风险升高。', self:'不要按摩疼痛腿部。记录是否伴胸痛或气短。', contact:'一侧腿明显肿痛应当天联系医生。', urgent:'伴胸痛、突然气短、咳血或晕厥时立即急诊。'},
+    {title:'孕吐/持续呕吐', stage:'pregnancy', level:'yellow', common:'孕早期恶心呕吐常见，但严重时可变成妊娠剧吐。', self:'少量多餐、小口补液、避开气味、尝试医生认可的止吐方案。', contact:'无法进食饮水、体重下降、尿少、头晕或心跳快时联系医生。', urgent:'脱水明显、呕吐带血、发热或严重腹痛时及时就医。'},
+    {title:'尿痛/尿灼热', stage:'pregnancy', level:'yellow', common:'尿频常见，但尿痛不是普通孕期现象。', self:'多喝水，不憋尿，记录发热、腰痛和尿液变化。', contact:'尿痛、血尿、发热、尿液异味或腰痛应联系医生。', urgent:'高热、寒战、腰痛明显或全身不适时立即就医。'},
+    {title:'便秘和痔疮', stage:'pregnancy', level:'green', common:'孕期激素、铁剂和子宫压迫会让便秘、痔疮常见。', self:'补水、高纤维、规律活动、避免用力排便。', contact:'便秘持续、痔疮疼痛明显或直肠出血应咨询医生。', urgent:'大量直肠出血、严重腹痛或发热需就医。'},
+    {title:'烧心/反酸', stage:'pregnancy', level:'green', common:'子宫压迫和消化道平滑肌放松会加重烧心。', self:'少量多餐、饭后不立刻躺下、避免诱发食物、睡觉垫高上半身。', contact:'频繁需要药物、体重下降或吞咽困难时咨询医生。', urgent:'严重胸痛、呼吸困难或呕血需立即评估。'},
+    {title:'背痛/骨盆痛', stage:'pregnancy', level:'green', common:'重心变化、韧带松弛和胎儿压迫可导致疼痛。', self:'支撑带、枕头、温热敷、温和拉伸、避免久站和单侧负重。', contact:'疼痛影响走路或睡眠，可咨询医生或物理治疗师。', urgent:'伴出血、宫缩、流液、发热、腿部无力或麻木加重时及时就医。'},
+    {title:'皮肤严重瘙痒', stage:'pregnancy', level:'yellow', common:'皮肤拉伸和干燥常见，但严重瘙痒需评估。', self:'保湿、穿宽松衣物、避免热水和刺激性产品。', contact:'全身瘙痒或手掌脚底瘙痒应联系医生。', urgent:'伴黄疸、尿色加深、明显不适时尽快就医。'},
+    {title:'产后大量出血', stage:'postpartum', level:'red', common:'恶露正常，但大量出血不是正常恢复。', self:'记录卫生巾浸透速度、血块大小、头晕心慌。', contact:'出血突然增多或排出大血块应联系医生。', urgent:'连续大量浸透卫生巾、头晕、晕厥、心跳快或虚弱时立即就医。'},
+    {title:'产后发热/恶露臭味', stage:'postpartum', level:'red', common:'产后感染可发生在子宫、切口、尿路或乳房。', self:'测体温，观察恶露气味、腹痛和伤口。', contact:'发热、恶露臭味、下腹痛或全身不适应联系医生。', urgent:'高热、寒战、腹痛加重或虚弱时及时就医。'},
+    {title:'剖宫产或会阴伤口异常', stage:'postpartum', level:'yellow', common:'轻微疼痛和拉扯感可见，但感染或裂开需处理。', self:'保持清洁干燥，避免摩擦，观察红肿渗液。', contact:'伤口红肿热痛、流脓、异味、裂开或疼痛加重应联系医生。', urgent:'伴发热、快速恶化或大量出血时立即就医。'},
+    {title:'乳房红肿热痛/乳腺炎信号', stage:'postpartum', level:'yellow', common:'堵奶或乳腺炎可导致局部疼痛和全身不适。', self:'继续按医生或哺乳顾问建议排空乳房，冷敷或止痛。', contact:'局部红肿热痛、硬块、发热、寒战或类似流感感应联系医生。', urgent:'高热、症状快速恶化或乳房脓肿样表现需及时就医。'},
+    {title:'产后情绪低落/焦虑', stage:'postpartum', level:'yellow', common:'前两周情绪波动常见，但持续或严重症状需要帮助。', self:'睡眠、营养、求助家人、减少访客、表达真实感受。', contact:'低落、焦虑、失眠、无望或无法照顾自己/宝宝超过两周应联系医生。', urgent:'出现伤害自己、宝宝或他人的想法，立即寻求急诊或危机支持。'},
+    {title:'新生儿发热或体温异常', stage:'newborn', level:'red', common:'新生儿发热比成人更需要重视。', self:'用可靠体温计复测，记录喂养、尿布和精神状态。', contact:'任何新生儿发热或体温异常都应联系儿科医生。', urgent:'发热伴吃奶差、嗜睡、呼吸异常或嘴唇发紫时立即就医。'},
+    {title:'新生儿吃奶差/尿少', stage:'newborn', level:'red', common:'吃奶和尿布是判断新生儿状态的重要线索。', self:'记录喂养次数、时长或量、尿布和大便。', contact:'持续拒奶、吸吮无力、尿布明显减少或体重问题应联系儿科医生。', urgent:'难以叫醒吃奶、明显脱水、持续呕吐或精神差时立即就医。'},
+    {title:'新生儿黄疸加重', stage:'newborn', level:'yellow', common:'黄疸常见，但胆红素过高需要治疗。', self:'观察皮肤和眼白颜色、吃奶、尿便和精神状态。', contact:'黄疸明显加重、到四肢、嗜睡或吃奶差应联系儿科医生。', urgent:'宝宝精神差、难叫醒、尖叫、肌张力异常时立即就医。'},
+    {title:'新生儿呼吸异常', stage:'newborn', level:'red', common:'新生儿偶有不规则呼吸，但明显呼吸困难需急诊。', self:'观察是否鼻翼扇动、胸口凹陷、嘴唇发紫、呼吸暂停。', contact:'呼吸比平时明显异常应联系儿科医生。', urgent:'嘴唇发紫、呼吸暂停、明显费力或无法吃奶时立即就医。'}
+  ];
+
+  function defaultState(){
+    return {
+      meta:{version:'1.0.0', createdAt:new Date().toISOString(), updatedAt:new Date().toISOString()},
+      profile:{parentName:'', babyName:'', lmp:'', dueDate:'', birthDate:'', stageMode:'auto', manualStage:'preconception', risks:'', meds:'', contacts:''},
+      taskDone:{},
+      customTasks:[],
+      motherLogs:[],
+      babyLogs:[],
+      contractionLogs:[],
+      appointments:[]
+    };
+  }
+
+  let state = loadState();
+  let contractionStart = null;
+  let timerInterval = null;
+
+  function loadState(){
+    try {
+      const raw = localStorage.getItem(KEY);
+      if (!raw) return defaultState();
+      const obj = JSON.parse(raw);
+      return Object.assign(defaultState(), obj, {profile:Object.assign(defaultState().profile, obj.profile || {})});
+    } catch(e) {
+      console.warn(e);
+      return defaultState();
+    }
+  }
+  function saveState(){
+    state.meta.updatedAt = new Date().toISOString();
+    localStorage.setItem(KEY, JSON.stringify(state));
+    const el = byId('saveStatus');
+    if (el) {
+      el.textContent = '已自动保存 ' + new Date().toLocaleTimeString('zh-CN', {hour:'2-digit', minute:'2-digit'});
+    }
+  }
+  function saveAndRender(){ saveState(); renderAll(); }
+
+  function getGestationInfo(){
+    const now = new Date();
+    const lmp = parseDate(state.profile.lmp);
+    const due = parseDate(state.profile.dueDate);
+    if (lmp) {
+      const d = diffDays(now,lmp);
+      if (d >= 0) return {days:d, weeks:Math.floor(d/7), rem:d%7, text:`孕 ${Math.floor(d/7)}周+${d%7}天`};
+    }
+    if (due) {
+      const d = 280 - diffDays(due, now);
+      if (d >= 0) return {days:d, weeks:Math.floor(d/7), rem:d%7, text:`约孕 ${Math.floor(d/7)}周+${d%7}天`};
+    }
+    return null;
+  }
+  function getBabyAgeInfo(){
+    const bd = parseDate(state.profile.birthDate);
+    if (!bd) return null;
+    const d = diffDays(new Date(), bd);
+    if (d < 0) return null;
+    return {days:d, weeks:Math.floor(d/7), rem:d%7, text:`宝宝 ${d}天（${Math.floor(d/7)}周+${d%7}天）`};
+  }
+  function getCurrentStage(){
+    if (state.profile.stageMode === 'manual') return state.profile.manualStage || 'preconception';
+    const baby = getBabyAgeInfo();
+    if (baby) {
+      if (baby.days <= 42) return 'postpartum_0_6';
+      if (baby.days <= 84) return 'postpartum_6_12';
+      return 'newborn_0_12';
+    }
+    const g = getGestationInfo();
+    if (!g) return 'preconception';
+    if (g.weeks < 13) return 'pregnancy_early';
+    if (g.weeks < 28) return 'pregnancy_mid';
+    return 'pregnancy_late';
+  }
+  function stageName(id){ return (STAGES.find(s=>s.id===id)||{}).name || '未知阶段'; }
+
+  function renderAll(){
+    renderProfileForm(); renderDashboard(); renderRecords(); renderSymptoms(); renderTasks(); renderAppointments(); renderDoctorSummary();
+  }
+
+  function renderDashboard(){
+    const stage = getCurrentStage();
+    const content = STAGE_CONTENT[stage] || STAGE_CONTENT.preconception;
+    const g = getGestationInfo();
+    const b = getBabyAgeInfo();
+    byId('stageBadge').textContent = stageName(stage);
+    const name = state.profile.parentName ? `${state.profile.parentName}，` : '';
+    byId('todayTitle').textContent = `${name}今天最重要`;
+    let subtitle = [];
+    if (g && !b) subtitle.push(g.text);
+    if (b) subtitle.push(`产后 ${b.days}天`, b.text);
+    if (!subtitle.length) subtitle.push('未设置孕周或宝宝生日');
+    byId('todaySubtitle').textContent = subtitle.join('｜');
+    const pills = [];
+    if (state.profile.risks) pills.push(['blue','风险/病史已记录']);
+    if (state.profile.meds) pills.push(['yellow','用药清单已记录']);
+    if (nextAppointment()) pills.push(['green','有临近事项']);
+    if (!pills.length) pills.push(['yellow','建议完善档案']);
+    byId('todayPills').innerHTML = pills.map(p=>`<span class="pill ${p[0]}">${p[1]}</span>`).join('');
+    byId('coreTips').innerHTML = content.tips.map(x=>`<li>${safeText(x)}</li>`).join('');
+    byId('criticalStrip').innerHTML = content.alerts.map(x=>`<div class="alert-box red"><strong>警讯</strong><br>${safeText(x)}</div>`).join('');
+    byId('partnerTips').innerHTML = content.partner.map(x=>`<li>${safeText(x)}</li>`).join('');
+    renderSummaryStats(); renderUpcoming();
+  }
+
+  function latest(arr){ return arr && arr.length ? [...arr].sort((a,b)=>(b.date||'').localeCompare(a.date||''))[0] : null; }
+  function renderSummaryStats(){
+    const m = latest(state.motherLogs);
+    const baby = latest(state.babyLogs);
+    const cLastHour = contractionsLastHours(1).length;
+    const openTasks = DEFAULT_TASKS.filter(t=>t.stage===getCurrentStage() && !state.taskDone[t.id]).length + state.customTasks.filter(t=>!t.done).length;
+    const items = [
+      ['妈妈最近记录', m ? m.date : '暂无', m ? (m.symptoms || m.notes || '已记录') : '点击“记录”添加'],
+      ['宝宝最近记录', baby ? baby.date : '暂无', baby ? `${baby.feeds || 0}次喂养 / ${baby.wetDiapers || 0}片尿布` : '出生后可记录'],
+      ['近1小时宫缩', cLastHour + '次', '规律且增强时联系医院'],
+      ['未完成任务', openTasks + '项', '阶段任务 + 家庭任务']
+    ];
+    byId('summaryStats').innerHTML = items.map(([label,num,sub])=>`<div class="stat"><div class="num">${safeText(num)}</div><div class="label">${safeText(label)}</div><div class="small muted">${safeText(sub)}</div></div>`).join('');
+  }
+
+  function nextAppointment(){
+    const today = todayISO();
+    return state.appointments.filter(a=>a.date>=today).sort((a,b)=>a.date.localeCompare(b.date))[0] || null;
+  }
+  function renderUpcoming(){
+    const today = todayISO();
+    const aps = state.appointments.filter(a=>a.date>=today).sort((a,b)=>a.date.localeCompare(b.date)).slice(0,5);
+    const tasks = [...DEFAULT_TASKS.filter(t=>t.stage===getCurrentStage() && !state.taskDone[t.id]).slice(0,4), ...state.customTasks.filter(t=>!t.done).slice(0,4)].slice(0,6);
+    let html = '';
+    aps.forEach(a=> html += `<div class="task-item"><span class="pill blue">${safeText(a.type)}</span><div><div class="task-title">${safeText(a.title)}</div><div class="task-meta">${safeText(a.date)} ${safeText(a.note||'')}</div></div><button class="btn ghost" data-del-appt="${a.id}">删除</button></div>`);
+    tasks.forEach(t=> html += `<div class="task-item"><input type="checkbox" data-task-check="${t.id}"><div><div class="task-title">${safeText(t.title)}</div><div class="task-meta">${safeText(t.hint || t.note || t.assignee || '')}</div></div><span class="pill yellow">待办</span></div>`);
+    byId('upcomingList').innerHTML = html || '<div class="empty">暂无临近事项。可在“档案/备份”添加产检、复诊或疫苗提醒。</div>';
+  }
+
+  function renderProfileForm(){
+    const f = byId('profileForm'); if (!f) return;
+    Object.entries(state.profile).forEach(([k,v])=>{ if (f.elements[k]) f.elements[k].value = v || ''; });
+    const manualStage = byId('manualStageWrap')?.querySelector('select');
+    if (manualStage) {
+      const val = manualStage.value || state.profile.manualStage || 'preconception';
+      manualStage.innerHTML = STAGES.map(s=>`<option value="${s.id}">${s.name}</option>`).join('');
+      manualStage.value = val;
+    }
+    f.elements.manualStage.value = state.profile.manualStage || 'preconception';
+    byId('manualStageWrap').style.display = state.profile.stageMode === 'manual' ? 'block' : 'none';
+  }
+
+  function renderRecords(){ renderMotherTable(); renderBabyTable(); renderContractionSummary(); renderRecentWarnings(); }
+  function renderMotherTable(){
+    const table = byId('motherLogTable');
+    const rows = [...state.motherLogs].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,8);
+    if (!rows.length) { table.innerHTML = '<tr><td class="empty">暂无妈妈/孕期记录</td></tr>'; return; }
+    table.innerHTML = '<thead><tr><th>日期</th><th>指标</th><th>症状/备注</th><th></th></tr></thead><tbody>' + rows.map(r=>{
+      const metrics = [`体重 ${r.weight||'-'}kg`, `血压 ${r.bpSys||'-'}/${r.bpDia||'-'}`, `体温 ${r.temp||'-'}°C`, `胎动 ${r.fetalMovement||'-'}`, `情绪 ${r.mood||'-'}`].join('<br>');
+      return `<tr><td>${safeText(r.date)}<br><span class="muted">${safeText(r.phase||'')}</span></td><td>${metrics}</td><td>${safeText(r.symptoms||'')}<br><span class="muted">${safeText(r.notes||'')}</span></td><td><button class="btn ghost" data-del-mother="${r.id}">删除</button></td></tr>`;
+    }).join('') + '</tbody>';
+  }
+  function renderBabyTable(){
+    const table = byId('babyLogTable');
+    const rows = [...state.babyLogs].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,8);
+    if (!rows.length) { table.innerHTML = '<tr><td class="empty">暂无宝宝记录</td></tr>'; return; }
+    table.innerHTML = '<thead><tr><th>日期</th><th>喂养/尿便</th><th>状态/备注</th><th></th></tr></thead><tbody>' + rows.map(r=>{
+      const metrics = [`${r.feedingType||''}`, `喂养 ${r.feeds||'-'}次`, `瓶喂 ${r.milkMl||'-'}ml`, `尿布 ${r.wetDiapers||'-'}`, `大便 ${r.dirtyDiapers||'-'}`].join('<br>');
+      return `<tr><td>${safeText(r.date)}<br><span class="muted">${safeText(r.weight ? r.weight+'kg' : '')}</span></td><td>${metrics}</td><td>黄疸：${safeText(r.jaundice||'-')}<br><span class="muted">${safeText(r.notes||'')}</span></td><td><button class="btn ghost" data-del-baby="${r.id}">删除</button></td></tr>`;
+    }).join('') + '</tbody>';
+  }
+  function contractionsLastHours(h){
+    const cutoff = Date.now() - h*60*60*1000;
+    return state.contractionLogs.filter(c=>new Date(c.start).getTime() >= cutoff);
+  }
+  function renderContractionSummary(){
+    const all = [...state.contractionLogs].sort((a,b)=>new Date(b.start)-new Date(a.start));
+    if (!all.length) { byId('contractionSummary').textContent = '暂无宫缩记录。规律、增强、变密的宫缩，或破水/出血/胎动减少时，请联系医疗团队。'; return; }
+    const last6 = all.slice(0,6).reverse();
+    const intervals = [];
+    for (let i=1; i<last6.length; i++) intervals.push((new Date(last6[i].start)-new Date(last6[i-1].start))/60000);
+    const avgInterval = intervals.length ? (intervals.reduce((a,b)=>a+b,0)/intervals.length).toFixed(1) : '-';
+    const avgDuration = (last6.reduce((a,b)=>a+(b.durationSec||0),0)/last6.length).toFixed(0);
+    byId('contractionSummary').innerHTML = `最近 ${last6.length} 次：平均间隔约 <strong>${avgInterval}</strong> 分钟，平均持续 <strong>${avgDuration}</strong> 秒。<br><span class="muted">若宫缩规律、增强、变密，或伴破水/出血/胎动减少，请按医生规则联系医院。</span>`;
+  }
+  function renderRecentWarnings(){
+    const box = byId('recentWarnings');
+    const warnings = [];
+    const m = latest(state.motherLogs);
+    if (m) {
+      const sys = Number(m.bpSys), dia = Number(m.bpDia), temp = Number(m.temp);
+      if (sys >= 140 || dia >= 90) warnings.push(['yellow','最近血压偏高','孕期或产后血压升高应告知医生，若伴头痛、视力变化或上腹痛需及时评估。']);
+      if (temp >= 38) warnings.push(['red','最近体温 ≥38°C','孕期或产后发热应联系医生，尤其伴腹痛、恶露臭味、伤口或乳房异常。']);
+      if ((m.bleeding||'').includes('大量')) warnings.push(['red','记录到大量出血/大血块','产后或孕期大量出血需要尽快就医。']);
+      if (Number(m.mood) && Number(m.mood) <= 2) warnings.push(['yellow','最近情绪评分偏低','若低落/焦虑持续超过两周，或出现伤害念头，应寻求专业帮助。']);
+      if (Number(m.fetalMovement) === 0) warnings.push(['red','记录到胎动为 0','如果这是孕晚期真实观察，应立即联系医疗团队。']);
+    }
+    const baby = latest(state.babyLogs);
+    if (baby) {
+      if (Number(baby.temp) >= 38) warnings.push(['red','宝宝体温偏高','新生儿发热应联系儿科医生或急诊。']);
+      if ((baby.jaundice||'').includes('加重')) warnings.push(['yellow','宝宝黄疸记录为加重','黄疸加重、吃奶差或嗜睡应联系儿科医生。']);
+      if (baby.wetDiapers !== '' && Number(baby.wetDiapers) <= 2) warnings.push(['yellow','宝宝尿布偏少','新生儿尿少可能提示摄入不足或脱水，需要结合日龄咨询医生。']);
+    }
+    box.innerHTML = warnings.length ? warnings.slice(0,4).map(w=>`<div class="alert-box ${w[0]}"><strong>${safeText(w[1])}</strong><br>${safeText(w[2])}</div>`).join('') : '<div class="alert-box green"><strong>暂无自动识别的高风险记录</strong><br>这不代表没有风险；如果你感觉不对劲，请联系医疗团队。</div>';
+  }
+
+  function renderSymptoms(){
+    const q = (byId('symptomSearch')?.value || '').trim().toLowerCase();
+    const stage = byId('symptomStage')?.value || 'all';
+    const level = byId('symptomLevel')?.value || 'all';
+    const filtered = SYMPTOMS.filter(s=>{
+      const matchQ = !q || (s.title+s.common+s.contact+s.urgent).toLowerCase().includes(q);
+      const matchStage = stage==='all' || s.stage===stage;
+      const matchLevel = level==='all' || s.level===level;
+      return matchQ && matchStage && matchLevel;
+    });
+    const levelName = {green:'常见/先照护', yellow:'建议联系医生', red:'立即评估'};
+    byId('symptomList').innerHTML = filtered.length ? filtered.map(s=>`
+      <article class="symptom-card">
+        <div class="symptom-head">
+          <div><h3>${safeText(s.title)}</h3><p class="muted small">${safeText(s.common)}</p></div>
+          <span class="pill ${s.level}">${levelName[s.level]}</span>
+        </div>
+        <details open><summary>可以先做什么</summary><p>${safeText(s.self)}</p></details>
+        <details><summary>何时联系医生</summary><p>${safeText(s.contact)}</p></details>
+        <details><summary>需要立即评估的情况</summary><p>${safeText(s.urgent)}</p></details>
+      </article>`).join('') : '<div class="empty">没有找到匹配症状。</div>';
+  }
+
+  function renderTasks(){
+    const filter = byId('taskStageFilter')?.value || getCurrentStage();
+    if (byId('taskStageFilter') && !byId('taskStageFilter').value) byId('taskStageFilter').value = getCurrentStage();
+    const defaults = DEFAULT_TASKS.filter(t=>filter==='all' || t.stage===filter);
+    byId('defaultTaskList').innerHTML = defaults.map(t=>taskHtml(t, !!state.taskDone[t.id], false)).join('') || '<div class="empty">暂无阶段任务。</div>';
+    byId('customTaskList').innerHTML = state.customTasks.length ? state.customTasks.map(t=>taskHtml(t, !!t.done, true)).join('') : '<div class="empty">暂无自定义任务。</div>';
+  }
+  function taskHtml(t, done, custom){
+    return `<div class="task-item ${done?'done':''}">
+      <input type="checkbox" ${done?'checked':''} data-${custom?'custom-task-check':'task-check'}="${t.id}">
+      <div><div class="task-title">${safeText(t.title)}</div><div class="task-meta">${safeText(t.hint || t.note || '')}${t.assignee ? '｜负责人：'+safeText(t.assignee) : ''}${t.due ? '｜截止：'+safeText(t.due) : ''}</div></div>
+      ${custom ? `<button class="btn ghost" data-del-custom-task="${t.id}">删除</button>` : `<span class="pill blue">${safeText(stageName(t.stage))}</span>`}
+    </div>`;
+  }
+
+  function renderAppointments(){
+    const el = byId('appointmentList');
+    const rows = [...state.appointments].sort((a,b)=>a.date.localeCompare(b.date));
+    el.innerHTML = rows.length ? rows.map(a=>`<div class="task-item"><span class="pill blue">${safeText(a.type)}</span><div><div class="task-title">${safeText(a.title)}</div><div class="task-meta">${safeText(a.date)} ${safeText(a.note||'')}</div></div><button class="btn ghost" data-del-appt="${a.id}">删除</button></div>`).join('') : '<div class="empty">暂无事项。</div>';
+  }
+
+  function renderDoctorSummary(){
+    const m = latest(state.motherLogs), b = latest(state.babyLogs), ap = nextAppointment();
+    const g = getGestationInfo(), babyAge = getBabyAgeInfo();
+    const lines = [];
+    lines.push('【阶段】' + stageName(getCurrentStage()));
+    if (g && !babyAge) lines.push('【孕周】' + g.text);
+    if (babyAge) lines.push('【产后/宝宝】产后 ' + babyAge.days + ' 天；' + babyAge.text);
+    if (state.profile.risks) lines.push('【重要病史/风险】' + state.profile.risks);
+    if (state.profile.meds) lines.push('【用药/补充剂】' + state.profile.meds);
+    if (m) lines.push(`【妈妈最近记录 ${m.date}】血压 ${m.bpSys||'-'}/${m.bpDia||'-'}，体温 ${m.temp||'-'}，体重 ${m.weight||'-'}kg，情绪 ${m.mood||'-'}，出血/恶露 ${m.bleeding||'-'}，胎动 ${m.fetalMovement||'-'}。症状：${m.symptoms||'无记录'}。备注：${m.notes||'无'}`);
+    if (b) lines.push(`【宝宝最近记录 ${b.date}】体重 ${b.weight||'-'}kg，喂养 ${b.feeds||'-'} 次，瓶喂 ${b.milkMl||'-'}ml，尿布 ${b.wetDiapers||'-'}，大便 ${b.dirtyDiapers||'-'}，黄疸 ${b.jaundice||'-'}。备注：${b.notes||'无'}`);
+    if (state.contractionLogs.length) {
+      const last = [...state.contractionLogs].sort((a,b)=>new Date(b.start)-new Date(a.start)).slice(0,6);
+      lines.push('【最近宫缩】' + last.map(c=>`${new Date(c.start).toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'})} 持续${c.durationSec}秒`).join('；'));
+    }
+    if (ap) lines.push(`【下个事项】${ap.date} ${ap.type}：${ap.title} ${ap.note||''}`);
+    lines.push('【想问医生】请根据近期症状、检查结果和个人风险，确认下一步需要观察/检查/用药/就医的标准。');
+    byId('doctorSummary').value = lines.join('\n');
+  }
+
+  function formToObject(form){
+    const obj = {};
+    Array.from(new FormData(form).entries()).forEach(([k,v])=>obj[k]=v.trim ? v.trim() : v);
+    return obj;
+  }
+  function fillDefaultDates(){
+    const d = todayISO();
+    const mf = byId('motherForm'); if (mf && !mf.elements.date.value) mf.elements.date.value = d;
+    const bf = byId('babyForm'); if (bf && !bf.elements.date.value) bf.elements.date.value = d;
+    const af = byId('appointmentForm'); if (af && !af.elements.date.value) af.elements.date.value = d;
+  }
+
+  function setupEvents(){
+    document.querySelectorAll('.tab-btn').forEach(btn=>btn.addEventListener('click',()=>switchTab(btn.dataset.tab)));
+    document.addEventListener('click', e=>{
+      const jump = e.target.closest('[data-tab-jump]'); if (jump) switchTab(jump.dataset.tabJump);
+      const dm = e.target.closest('[data-del-mother]'); if (dm) { state.motherLogs = state.motherLogs.filter(x=>x.id!==dm.dataset.delMother); saveAndRender(); }
+      const db = e.target.closest('[data-del-baby]'); if (db) { state.babyLogs = state.babyLogs.filter(x=>x.id!==db.dataset.delBaby); saveAndRender(); }
+      const da = e.target.closest('[data-del-appt]'); if (da) { state.appointments = state.appointments.filter(x=>x.id!==da.dataset.delAppt); saveAndRender(); }
+      const dct = e.target.closest('[data-del-custom-task]'); if (dct) { state.customTasks = state.customTasks.filter(x=>x.id!==dct.dataset.delCustomTask); saveAndRender(); }
+    });
+    document.addEventListener('change', e=>{
+      if (e.target.matches('[data-task-check]')) { state.taskDone[e.target.dataset.taskCheck] = e.target.checked; saveAndRender(); }
+      if (e.target.matches('[data-custom-task-check]')) { const t = state.customTasks.find(x=>x.id===e.target.dataset.customTaskCheck); if (t) t.done = e.target.checked; saveAndRender(); }
+    });
+    byId('profileForm').addEventListener('submit', e=>{ e.preventDefault(); state.profile = Object.assign(state.profile, formToObject(e.target)); saveAndRender(); });
+    byId('profileForm').elements.stageMode.addEventListener('change', e=>{ byId('manualStageWrap').style.display = e.target.value === 'manual' ? 'block' : 'none'; });
+    byId('motherForm').addEventListener('submit', e=>{ e.preventDefault(); const obj = formToObject(e.target); obj.id=uid(); state.motherLogs.push(obj); saveAndRender(); e.target.reset(); fillDefaultDates(); });
+    byId('babyForm').addEventListener('submit', e=>{ e.preventDefault(); const obj = formToObject(e.target); obj.id=uid(); state.babyLogs.push(obj); saveAndRender(); e.target.reset(); fillDefaultDates(); });
+    byId('appointmentForm').addEventListener('submit', e=>{ e.preventDefault(); const obj = formToObject(e.target); obj.id=uid(); state.appointments.push(obj); saveAndRender(); e.target.reset(); fillDefaultDates(); });
+    byId('customTaskForm').addEventListener('submit', e=>{ e.preventDefault(); const obj = formToObject(e.target); obj.id=uid(); obj.done=false; state.customTasks.push(obj); saveAndRender(); e.target.reset(); });
+    byId('clearMotherForm').addEventListener('click', ()=>{ byId('motherForm').reset(); fillDefaultDates(); });
+    byId('clearBabyForm').addEventListener('click', ()=>{ byId('babyForm').reset(); fillDefaultDates(); });
+    byId('symptomSearch').addEventListener('input', renderSymptoms);
+    byId('symptomStage').addEventListener('change', renderSymptoms);
+    byId('symptomLevel').addEventListener('change', renderSymptoms);
+    byId('taskStageFilter').addEventListener('change', renderTasks);
+    byId('resetDefaultTasks').addEventListener('click', ()=>{ if(confirm('确定清空默认阶段任务的完成状态吗？自定义任务不会删除。')) { state.taskDone={}; saveAndRender(); }});
+    byId('contractionToggle').addEventListener('click', toggleContraction);
+    byId('manualContraction').addEventListener('click', manualContraction);
+    byId('clearContractions').addEventListener('click', ()=>{ if(confirm('确定清空所有宫缩记录吗？')) { state.contractionLogs=[]; saveAndRender(); }});
+    byId('exportJson').addEventListener('click', exportJson);
+    byId('importJson').addEventListener('change', importJson);
+    byId('wipeData').addEventListener('click', wipeData);
+    byId('copySummary').addEventListener('click', async ()=>{ await navigator.clipboard.writeText(byId('doctorSummary').value); alert('已复制医生沟通摘要'); });
+  }
+  function switchTab(tab){
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active', b.dataset.tab===tab));
+    document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active', v.id===tab));
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+
+  function toggleContraction(){
+    if (!contractionStart) {
+      contractionStart = new Date();
+      byId('contractionToggle').textContent = '结束宫缩';
+      byId('contractionToggle').classList.add('danger');
+      timerInterval = setInterval(updateTimer, 250);
+      updateTimer();
+    } else {
+      const end = new Date();
+      const durationSec = Math.max(1, Math.round((end - contractionStart)/1000));
+      state.contractionLogs.push({id:uid(), start:contractionStart.toISOString(), end:end.toISOString(), durationSec});
+      contractionStart = null;
+      clearInterval(timerInterval); timerInterval=null;
+      byId('contractionTimer').textContent = '00:00';
+      byId('contractionToggle').textContent = '开始宫缩';
+      byId('contractionToggle').classList.remove('danger');
+      saveAndRender();
+    }
+  }
+  function updateTimer(){
+    if (!contractionStart) return;
+    const sec = Math.round((new Date()-contractionStart)/1000);
+    const m = String(Math.floor(sec/60)).padStart(2,'0');
+    const s = String(sec%60).padStart(2,'0');
+    byId('contractionTimer').textContent = `${m}:${s}`;
+  }
+  function manualContraction(){
+    const start = prompt('请输入宫缩开始时间，例如 14:30。留空表示现在。');
+    const dur = prompt('请输入持续秒数，例如 60。');
+    const durationSec = Number(dur);
+    if (!durationSec || durationSec < 1) return alert('持续秒数无效。');
+    let startDate = new Date();
+    if (start && /^\d{1,2}:\d{2}$/.test(start)) {
+      const [h,m] = start.split(':').map(Number);
+      startDate.setHours(h,m,0,0);
+    }
+    const end = new Date(startDate.getTime() + durationSec*1000);
+    state.contractionLogs.push({id:uid(), start:startDate.toISOString(), end:end.toISOString(), durationSec});
+    saveAndRender();
+  }
+
+  function exportJson(){
+    const data = JSON.stringify(state, null, 2);
+    const blob = new Blob([data], {type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = `new-parent-care-backup-${todayISO()}.json`;
+    document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+  }
+  function importJson(e){
+    const file = e.target.files[0]; if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const obj = JSON.parse(reader.result);
+        if (!obj || !obj.profile || !obj.meta) throw new Error('格式不匹配');
+        if (!confirm('导入会替换当前本机数据。建议已先导出当前数据。确定导入吗？')) return;
+        state = Object.assign(defaultState(), obj, {profile:Object.assign(defaultState().profile, obj.profile || {})});
+        saveAndRender();
+        alert('导入成功。');
+      } catch(err) { alert('导入失败：不是有效的备份 JSON 文件。'); }
+      e.target.value = '';
+    };
+    reader.readAsText(file);
+  }
+  function wipeData(){
+    if (!confirm('确定清空当前浏览器中的全部数据吗？此操作不可撤销。建议先导出备份。')) return;
+    localStorage.removeItem(KEY);
+    state = defaultState();
+    saveAndRender(); fillDefaultDates(); alert('已清空。');
+  }
+
+  function init(){
+    // Populate manual stage and filter before first render
+    const manual = byId('profileForm').elements.manualStage;
+    manual.innerHTML = STAGES.map(s=>`<option value="${s.id}">${s.name}</option>`).join('');
+    const filter = byId('taskStageFilter');
+    filter.innerHTML = '<option value="all">所有阶段</option>' + STAGES.map(s=>`<option value="${s.id}">${s.name}</option>`).join('');
+    filter.value = getCurrentStage();
+    setupEvents(); fillDefaultDates(); renderAll();
+  }
+
+  document.addEventListener('DOMContentLoaded', init);
+})();
+</script>
+</body>
+</html>
