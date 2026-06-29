@@ -1,0 +1,699 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>自适应词汇测试系统</title>
+    <style>
+      :root {
+        --bg: #f2f5f9;
+        --panel: #ffffff;
+        --panel-soft: #f8fafc;
+        --text: #1e293b;
+        --muted: #64748b;
+        --line: #e2e8f0;
+        --accent: #3b82f6;
+        --accent-hover: #2563eb;
+        --good: #16a34a;
+        --good-bg: #dcfce7;
+        --bad: #dc2626;
+        --bad-bg: #fee2e2;
+        --shadow: 0 4px 20px rgba(15, 23, 42, 0.05);
+        --radius: 16px;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        padding: 30px 20px;
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          "Helvetica Neue", Arial, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.6;
+        display: flex;
+        justify-content: center;
+      }
+
+      .app-container {
+        width: 100%;
+        max-width: 760px;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+
+      .panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        padding: 24px;
+      }
+
+      .metric-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16px;
+        margin-bottom: 20px;
+      }
+
+      .metric {
+        background: var(--panel-soft);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 14px;
+        text-align: center;
+      }
+
+      .metric .label {
+        color: var(--muted);
+        font-size: 13px;
+        margin-bottom: 4px;
+      }
+
+      .metric .value {
+        font-size: 22px;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+      }
+
+      .progress {
+        height: 10px;
+        background: var(--line);
+        border-radius: 999px;
+        overflow: hidden;
+        margin-bottom: 8px;
+      }
+
+      .bar {
+        height: 100%;
+        width: 0%;
+        background: var(--accent);
+        border-radius: inherit;
+        transition: width 0.3s ease;
+      }
+
+      .mini {
+        font-size: 13px;
+        color: var(--muted);
+        text-align: center;
+      }
+
+      .test-area {
+        text-align: center;
+      }
+
+      .word {
+        font-size: 48px;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+        margin: 10px 0 24px;
+      }
+
+      .options {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-bottom: 20px;
+      }
+
+      button {
+        font: inherit;
+        cursor: pointer;
+        border: 0;
+        border-radius: 12px;
+        padding: 14px 20px;
+        font-weight: 600;
+        font-size: 16px;
+        transition: all 0.15s ease;
+      }
+
+      button:disabled {
+        cursor: not-allowed;
+        opacity: 0.6;
+      }
+
+      .option {
+        background: var(--panel-soft);
+        border: 2px solid var(--line);
+        color: var(--text);
+      }
+
+      .option:hover:not(:disabled) {
+        border-color: var(--accent);
+        background: #eff6ff;
+      }
+
+      .option.correct {
+        border-color: var(--good);
+        background: var(--good-bg);
+        color: var(--good);
+      }
+
+      .option.wrong {
+        border-color: var(--bad);
+        background: var(--bad-bg);
+        color: var(--bad);
+      }
+
+      .status-line {
+        min-height: 24px;
+        font-weight: 600;
+        margin: 16px 0;
+      }
+
+      .status-line.good {
+        color: var(--good);
+      }
+      .status-line.bad {
+        color: var(--bad);
+      }
+
+      .actions {
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+        margin-top: 24px;
+      }
+
+      .primary {
+        background: var(--accent);
+        color: #fff;
+      }
+
+      .primary:hover:not(:disabled) {
+        background: var(--accent-hover);
+      }
+
+      .secondary {
+        background: #fff;
+        color: var(--text);
+        border: 1px solid var(--line);
+      }
+
+      .secondary:hover:not(:disabled) {
+        background: var(--panel-soft);
+      }
+
+      .chart-container {
+        position: relative;
+        height: 200px;
+        width: 100%;
+      }
+
+      canvas {
+        width: 100%;
+        height: 100%;
+      }
+
+      .report {
+        display: none;
+        background: var(--good-bg);
+        border: 1px solid rgba(22, 163, 74, 0.3);
+        border-radius: 12px;
+        padding: 20px;
+        margin-top: 20px;
+        text-align: left;
+      }
+
+      @media (max-width: 600px) {
+        .metric-grid,
+        .options {
+          grid-template-columns: 1fr 1fr;
+        }
+        .word {
+          font-size: 36px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app-container">
+      <!-- 仪表盘 -->
+      <div class="panel">
+        <div class="metric-grid">
+          <div class="metric">
+            <div class="label">当前能力 θ</div>
+            <div class="value" id="theta">0.000</div>
+          </div>
+          <div class="metric">
+            <div class="label">当前误差 SE</div>
+            <div class="value" id="se">∞</div>
+          </div>
+          <div class="metric">
+            <div class="label">Zipf 阈值</div>
+            <div class="value" id="zipf">4.500</div>
+          </div>
+          <div class="metric">
+            <div class="label">估计词汇量</div>
+            <div class="value" id="vocab">0</div>
+          </div>
+        </div>
+        <div class="progress"><div class="bar" id="progressBar"></div></div>
+        <div class="mini" id="progressText">已完成 0 / 20 道基础题</div>
+      </div>
+
+      <!-- 答题区 -->
+      <div class="panel test-area">
+        <div class="mini" id="questionMeta">准备就绪</div>
+        <div class="word" id="word">等待开始</div>
+
+        <div class="options" id="options"></div>
+        <div class="status-line" id="feedback"></div>
+
+        <div class="actions">
+          <button class="primary" id="startBtn">开始测试</button>
+          <button class="primary" id="nextBtn" style="display: none">
+            下一题
+          </button>
+          <button class="secondary" id="finishBtn" style="display: none">
+            提前结束
+          </button>
+          <button class="secondary" id="resetBtn" style="display: none">
+            重新测试
+          </button>
+        </div>
+
+        <div class="report" id="report"></div>
+      </div>
+
+      <!-- 数据图表 -->
+      <div class="panel">
+        <div class="mini" style="margin-bottom: 12px; text-align: left">
+          能力值 (θ) 收敛轨迹曲线
+        </div>
+        <div class="chart-container">
+          <canvas id="chart" width="700" height="200"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <script>
+    const itemBank = [
+      // === Level 1: 极简词汇 (Diff -3.5 ~ -2.0) / 词汇量 1000 以内 ===
+      { word: "book", correct: "书", options: ["书", "车", "树", "水"], zipf: 6.9, difficulty: -3.5 },
+      { word: "road", correct: "路", options: ["路", "云", "风", "桥"], zipf: 6.7, difficulty: -3.3 },
+      { word: "happy", correct: "快乐的", options: ["快乐的", "悲伤的", "生气的", "疲劳的"], zipf: 6.5, difficulty: -3.1 },
+      { word: "fast", correct: "快的", options: ["快的", "慢的", "重的", "轻的"], zipf: 6.4, difficulty: -2.8 },
+      { word: "water", correct: "水", options: ["水", "火", "土壤", "空气"], zipf: 6.4, difficulty: -2.6 },
+      { word: "build", correct: "建筑", options: ["建筑", "破坏", "睡觉", "移动"], zipf: 6.2, difficulty: -2.4 },
+      { word: "simple", correct: "简单的", options: ["简单的", "复杂的", "危险的", "安全的"], zipf: 6.0, difficulty: -2.2 },
+      { word: "animal", correct: "动物", options: ["动物", "植物", "矿物", "机器"], zipf: 5.8, difficulty: -2.0 },
+
+      // === Level 2: 基础词汇 (Diff -2.0 ~ -0.5) / 词汇量 1000 - 4000 (中高考) ===
+      { word: "accept", correct: "接受", options: ["接受", "拒绝", "忽略", "逃避"], zipf: 5.6, difficulty: -1.9 },
+      { word: "balance", correct: "平衡", options: ["平衡", "混乱", "坠落", "跳跃"], zipf: 5.4, difficulty: -1.7 },
+      { word: "compare", correct: "比较", options: ["比较", "隐藏", "遗忘", "分开"], zipf: 5.3, difficulty: -1.5 },
+      { word: "decide", correct: "决定", options: ["决定", "犹豫", "拖延", "猜测"], zipf: 5.0, difficulty: -1.3 },
+      { word: "effect", correct: "影响", options: ["影响", "原因", "过程", "起点"], zipf: 4.9, difficulty: -1.1 },
+      { word: "gather", correct: "收集", options: ["收集", "丢弃", "散播", "破坏"], zipf: 4.7, difficulty: -0.9 },
+      { word: "impact", correct: "冲击", options: ["冲击", "抚摸", "静止", "逃离"], zipf: 4.6, difficulty: -0.7 },
+      { word: "manage", correct: "管理", options: ["管理", "服从", "放弃", "破坏"], zipf: 4.4, difficulty: -0.5 },
+
+      // === Level 3: 中阶词汇 (Diff -0.5 ~ 1.0) / 词汇量 4000 - 7000 (四六级) ===
+      { word: "arbitrary", correct: "武断的", options: ["武断的", "理性的", "胆小的", "温和的"], zipf: 4.2, difficulty: -0.4 },
+      { word: "bias", correct: "偏见", options: ["偏见", "公正", "真理", "运气"], zipf: 4.1, difficulty: -0.2 },
+      { word: "comprehensive", correct: "综合的", options: ["综合的", "单一的", "残缺的", "具体的"], zipf: 4.0, difficulty: 0.0 },
+      { word: "deviate", correct: "偏离", options: ["偏离", "靠近", "稳定", "旋转"], zipf: 3.9, difficulty: 0.2 },
+      { word: "empirical", correct: "经验主义的", options: ["经验主义的", "理论的", "虚幻的", "情感的"], zipf: 3.8, difficulty: 0.4 },
+      { word: "fluctuate", correct: "波动", options: ["波动", "静止", "沉没", "坚固"], zipf: 3.7, difficulty: 0.5 },
+      { word: "hierarchy", correct: "等级制度", options: ["等级制度", "无政府", "平面化", "环形"], zipf: 3.6, difficulty: 0.7 },
+      { word: "implicit", correct: "含蓄的", options: ["含蓄的", "直白的", "愤怒的", "明确的"], zipf: 3.5, difficulty: 0.8 },
+      { word: "justify", correct: "证明合法", options: ["证明合法", "定罪", "隐瞒", "放弃"], zipf: 3.4, difficulty: 0.9 },
+      { word: "paradigm", correct: "范例", options: ["范例", "混乱", "错误", "边界"], zipf: 3.3, difficulty: 1.0 },
+
+      // === Level 4: 进阶词汇 (Diff 1.0 ~ 2.5) / 词汇量 7000 - 12000 (雅思/托福) ===
+      { word: "alleviate", correct: "减轻", options: ["减轻", "加重", "创造", "毁坏"], zipf: 3.2, difficulty: 1.1 },
+      { word: "bolster", correct: "支持", options: ["支持", "削弱", "忽略", "阻碍"], zipf: 3.1, difficulty: 1.2 },
+      { word: "catalyst", correct: "催化剂", options: ["催化剂", "抑制剂", "生成物", "容器"], zipf: 3.0, difficulty: 1.3 },
+      { word: "daunting", correct: "令人畏惧的", options: ["令人畏惧的", "令人愉悦的", "平淡的", "滑稽的"], zipf: 2.9, difficulty: 1.4 },
+      { word: "eccentric", correct: "古怪的", options: ["古怪的", "普通的", "现代的", "传统的"], zipf: 2.8, difficulty: 1.5 },
+      { word: "facetious", correct: "爱开玩笑的", options: ["爱开玩笑的", "严肃的", "悲伤的", "愤怒的"], zipf: 2.7, difficulty: 1.6 },
+      { word: "gregarious", correct: "群居的", options: ["群居的", "孤僻的", "危险的", "灭绝的"], zipf: 2.6, difficulty: 1.7 },
+      { word: "hinder", correct: "阻碍", options: ["阻碍", "促进", "允许", "理解"], zipf: 2.5, difficulty: 1.8 },
+      { word: "indigenous", correct: "本土的", options: ["本土的", "外来的", "工业的", "虚拟的"], zipf: 2.4, difficulty: 1.9 },
+      { word: "jeopardize", correct: "危害", options: ["危害", "保护", "装饰", "建立"], zipf: 2.3, difficulty: 2.0 },
+      { word: "lucrative", correct: "有利可图的", options: ["有利可图的", "亏损的", "违法的", "慈善的"], zipf: 2.2, difficulty: 2.1 },
+      { word: "mundane", correct: "世俗的", options: ["世俗的", "神圣的", "奇幻的", "刺激的"], zipf: 2.1, difficulty: 2.2 },
+      { word: "nostalgia", correct: "怀旧", options: ["怀旧", "对未来的恐惧", "失忆", "现实主义"], zipf: 2.0, difficulty: 2.3 },
+      { word: "obsolete", correct: "过时的", options: ["过时的", "先进的", "流行的", "未知的"], zipf: 1.9, difficulty: 2.4 },
+      { word: "prolific", correct: "多产的", options: ["多产的", "不育的", "懒惰的", "匮乏的"], zipf: 1.8, difficulty: 2.5 },
+
+      // === Level 5: 高阶词汇 (Diff 2.5 ~ 4.5) / 词汇量 12000 - 25000+ (GRE/GMAT/极低频母语词) ===
+      // (大幅强化此部分以满足高水平测试者)
+      { word: "alacrity", correct: "敏捷", options: ["敏捷", "迟钝", "悲伤", "恐惧"], zipf: 1.7, difficulty: 2.6 },
+      { word: "burgeon", correct: "迅速增长", options: ["迅速增长", "逐渐萎缩", "保持静止", "彻底消失"], zipf: 1.6, difficulty: 2.7 },
+      { word: "cacophony", correct: "刺耳的声音", options: ["刺耳的声音", "悦耳的音乐", "绝对安静", "低声耳语"], zipf: 1.5, difficulty: 2.8 },
+      { word: "dirge", correct: "挽歌", options: ["挽歌", "赞歌", "摇篮曲", "进行曲"], zipf: 1.4, difficulty: 2.9 },
+      { word: "elegy", correct: "哀歌", options: ["哀歌", "喜剧", "史诗", "童话"], zipf: 1.3, difficulty: 3.0 },
+      { word: "fatuous", correct: "愚笨的", options: ["愚笨的", "睿智的", "敏捷的", "残忍的"], zipf: 1.2, difficulty: 3.1 },
+      { word: "grandiloquent", correct: "夸张的", options: ["夸张的", "朴素的", "简短的", "沉默的"], zipf: 1.1, difficulty: 3.2 },
+      { word: "hegemony", correct: "霸权", options: ["霸权", "服从", "平等", "混乱"], zipf: 1.0, difficulty: 3.3 },
+      { word: "iconoclast", correct: "反传统者", options: ["反传统者", "保守派", "追随者", "旁观者"], zipf: 0.9, difficulty: 3.4 },
+      { word: "juxtaposition", correct: "并置", options: ["并置", "隔离", "消灭", "融合"], zipf: 0.8, difficulty: 3.5 },
+      { word: "laconic", correct: "简洁的", options: ["简洁的", "啰嗦的", "华丽的", "含糊的"], zipf: 0.7, difficulty: 3.6 },
+      { word: "mendacious", correct: "虚假的", options: ["虚假的", "真实的", "美丽的", "丑陋的"], zipf: 0.6, difficulty: 3.7 },
+      { word: "obdurate", correct: "固执的", options: ["固执的", "灵活的", "聪明的", "脆弱的"], zipf: 0.5, difficulty: 3.8 },
+      { word: "quixotic", correct: "异想天开的", options: ["异想天开的", "务实的", "冷酷的", "常见的"], zipf: 0.4, difficulty: 3.9 },
+      { word: "recalcitrant", correct: "桀骜不驯的", options: ["桀骜不驯的", "顺从的", "热情的", "抑郁的"], zipf: 0.3, difficulty: 4.0 },
+      { word: "sycophant", correct: "阿谀奉承者", options: ["阿谀奉承者", "独裁者", "叛乱者", "隐士"], zipf: 0.2, difficulty: 4.1 },
+      { word: "truculent", correct: "好斗的", options: ["好斗的", "温和的", "悲伤的", "幽默的"], zipf: 0.1, difficulty: 4.2 },
+      { word: "ubiquitous", correct: "无处不在的", options: ["无处不在的", "稀有的", "隐藏的", "临时的"], zipf: 0.05, difficulty: 4.3 },
+      { word: "vacillate", correct: "摇摆不定", options: ["摇摆不定", "坚定不移", "迅速前进", "彻底放弃"], zipf: 0.04, difficulty: 4.4 },
+      { word: "zephyr", correct: "和风", options: ["和风", "暴风雨", "烈日", "冰雹"], zipf: 0.03, difficulty: 4.5 },
+      
+      // === 额外补充极难词 (防 30 题高分穿穿透) ===
+      { word: "abstruse", correct: "深奥的", options: ["深奥的", "浅显的", "平淡的", "滑稽的"], zipf: 0.02, difficulty: 4.6 },
+      { word: "bellicose", correct: "好战的", options: ["好战的", "和平的", "懒惰的", "勤奋的"], zipf: 0.01, difficulty: 4.7 },
+      { word: "chicanery", correct: "诡计", options: ["诡计", "诚实", "财富", "贫穷"], zipf: 0.005, difficulty: 4.8 },
+      { word: "deleterious", correct: "有毒的", options: ["有毒的", "有益的", "美味的", "无味的"], zipf: 0.004, difficulty: 4.9 },
+      { word: "enervate", correct: "使衰弱", options: ["使衰弱", "使强壮", "激怒", "安抚"], zipf: 0.003, difficulty: 5.0 },
+      { word: "fractious", correct: "易怒的", options: ["易怒的", "平静的", "开朗的", "专注的"], zipf: 0.002, difficulty: 5.1 },
+      { word: "garrulous", correct: "喋喋不休的", options: ["喋喋不休的", "沉默寡言的", "深思熟虑的", "行动敏捷的"], zipf: 0.001, difficulty: 5.2 }
+    ];
+
+      const config = {
+        minQuestions: 20,
+        maxQuestions: 50,
+        targetSe: 0.38,
+        totalLexiconSize: 50000,
+      };
+      const state = {
+        theta: 0,
+        responses: [],
+        usedWords: new Set(),
+        currentItem: null,
+        locked: false,
+        history: [0],
+      };
+      const $ = (id) => document.getElementById(id);
+
+      function sigmoid(x) {
+        return x >= 0
+          ? 1 / (1 + Math.exp(-x))
+          : Math.exp(x) / (1 + Math.exp(x));
+      }
+
+      function probabilityCorrect(theta, item) {
+        return sigmoid(theta - item.difficulty);
+      }
+
+      function itemInformation(theta, item) {
+        const p = probabilityCorrect(theta, item);
+        return p * (1 - p);
+      }
+
+      function selectNextItem() {
+        const unused = itemBank.filter(
+          (item) => !state.usedWords.has(item.word),
+        );
+        if (unused.length === 0) return null;
+
+        return unused.reduce((best, item) => {
+          const infoCurrent = itemInformation(state.theta, item);
+          const infoBest = itemInformation(state.theta, best);
+          // 增加微小随机扰动，防止信息量等效时总是选择词库最前面的词
+          if (Math.abs(infoCurrent - infoBest) < 0.02)
+            return Math.random() > 0.5 ? item : best;
+          return infoCurrent > infoBest ? item : best;
+        }, unused[0]);
+      }
+
+      function updateTheta() {
+        if (state.responses.length === 0) return;
+
+        let thetaTemp = state.theta;
+        const score = state.responses.reduce((sum, r) => sum + r.correct, 0);
+
+        // 极端情况保护：全对或全错时不使用牛顿迭代，避免由于偏导过小导致步长无穷大（发散）
+        if (score === 0) {
+          state.theta = Math.max(-4, state.theta - 0.5);
+        } else if (score === state.responses.length) {
+          state.theta = Math.min(4, state.theta + 0.5);
+        } else {
+          // 正常情况使用牛顿迭代求解最大似然估计 MLE
+          for (let iter = 0; iter < 10; iter++) {
+            let gradient = 0,
+              information = 0;
+            for (const resp of state.responses) {
+              const p = probabilityCorrect(thetaTemp, resp.item);
+              gradient += resp.correct - p;
+              information += p * (1 - p);
+            }
+            if (information < 1e-5) break;
+            let step = gradient / information;
+            step = Math.max(Math.min(step, 1), -1);
+            thetaTemp += step;
+            if (Math.abs(step) < 1e-4) break;
+          }
+          state.theta = Math.max(Math.min(thetaTemp, 4), -4);
+        }
+        state.history.push(state.theta);
+      }
+
+      function standardError() {
+        let information = 0;
+        for (const resp of state.responses) {
+          const p = probabilityCorrect(state.theta, resp.item);
+          information += p * (1 - p);
+        }
+        return information <= 1e-5 ? Infinity : 1 / Math.sqrt(information);
+      }
+
+      function thetaToZipfThreshold(theta = state.theta) {
+        return 4.5 - 0.725 * theta;
+      }
+
+      function estimateVocabSize(theta = state.theta) {
+        // 当 theta 为 -4 时，词汇量保底约 500
+        if (theta <= -4) return 500;
+
+        // 基础水平：theta=0 时，约 6000 词 (相当于大学四六级)
+        // 高阶水平：theta=2 时，约 12500 词 (相当于托福/GRE良好)
+        // 母语水平：theta=4 时，约 26000 词
+
+        const baseVocab = 6000;
+        const growthFactor = 0.366; // 调节增长陡峭程度的系数
+
+        let vocab = baseVocab * Math.exp(growthFactor * theta);
+
+        // 加上一点随机抖动或取整，使其看起来更自然
+        return Math.round(vocab / 50) * 50;
+      }
+
+      function isDone() {
+        const answered = state.responses.length;
+        const se = standardError();
+        if (answered >= config.maxQuestions) return true;
+        if (answered >= config.minQuestions && se <= config.targetSe)
+          return true;
+        return false;
+      }
+
+      function formatNumber(n) {
+        return Number.isFinite(n) ? n.toLocaleString("zh-CN") : "∞";
+      }
+
+      function updateDashboard() {
+        const theta = state.theta;
+        const se = standardError();
+        const zipf = thetaToZipfThreshold();
+        const vocab = estimateVocabSize();
+        const answered = state.responses.length;
+
+        $("theta").textContent = theta.toFixed(3);
+        $("se").textContent = Number.isFinite(se) ? se.toFixed(3) : "∞";
+        $("zipf").textContent = zipf.toFixed(3);
+        $("vocab").textContent = formatNumber(vocab);
+
+        const pct = Math.min(answered / config.minQuestions, 1) * 100;
+        $("progressBar").style.width = `${pct}%`;
+        $("progressText").textContent =
+          answered < config.minQuestions
+            ? `已完成 ${answered} / ${config.minQuestions} 道基础题`
+            : `已完成 ${answered} 道，当前 SE ${Number.isFinite(se) ? se.toFixed(3) : "∞"}`;
+
+        drawChart();
+      }
+
+      function nextQuestion() {
+        const item = selectNextItem();
+        if (!item) return showReport(); // 题库用尽
+
+        state.currentItem = item;
+        state.locked = false;
+
+        $("report").style.display = "none";
+        $("feedback").textContent = "";
+        $("feedback").className = "status-line";
+        $("word").textContent = item.word;
+        $("questionMeta").textContent =
+          `第 ${state.responses.length + 1} 题 · 难度系数 ${item.difficulty.toFixed(2)}`;
+
+        const optionBox = $("options");
+        optionBox.innerHTML = "";
+
+        // 打乱选项
+        const shuffled = [...item.options].sort(() => Math.random() - 0.5);
+        for (const option of shuffled) {
+          const btn = document.createElement("button");
+          btn.className = "option";
+          btn.textContent = option;
+          btn.onclick = () => answer(option, btn);
+          optionBox.appendChild(btn);
+        }
+
+        $("nextBtn").style.display = "none";
+        updateDashboard();
+      }
+
+      function answer(chosen, btn) {
+        if (state.locked || !state.currentItem) return;
+        state.locked = true;
+
+        const item = state.currentItem;
+        const correct = chosen === item.correct ? 1 : 0;
+
+        state.usedWords.add(item.word);
+        state.responses.push({ item, correct, chosen });
+
+        updateTheta();
+
+        for (const optionBtn of document.querySelectorAll(".option")) {
+          optionBtn.disabled = true;
+          if (optionBtn.textContent === item.correct)
+            optionBtn.classList.add("correct");
+          if (optionBtn.textContent === chosen && chosen !== item.correct)
+            optionBtn.classList.add("wrong");
+        }
+
+        $("feedback").textContent = correct
+          ? "正确，算法将增加测验难度"
+          : `错误，正确释义：${item.correct}`;
+        $("feedback").className = `status-line ${correct ? "good" : "bad"}`;
+
+        updateDashboard();
+
+        if (isDone()) {
+          $("finishBtn").style.display = "none";
+          showReport();
+        } else {
+          $("nextBtn").style.display = "inline-block";
+        }
+      }
+
+      function showReport() {
+        const se = standardError();
+        const vocab = estimateVocabSize();
+        const lowTheta = Math.max(state.theta - 1.96 * se, -4);
+        const highTheta = Math.min(state.theta + 1.96 * se, 4);
+
+        const intervalText = Number.isFinite(se)
+          ? `${formatNumber(Math.min(estimateVocabSize(lowTheta), estimateVocabSize(highTheta)))} ~ ${formatNumber(Math.max(estimateVocabSize(lowTheta), estimateVocabSize(highTheta)))}`
+          : "数据不足";
+
+        $("report").style.display = "block";
+        $("report").innerHTML = `
+      <h3 style="margin-top:0">评测报告已生成</h3>
+      <p>本次自适应测试共完成 ${state.responses.length} 题。</p>
+      <p>系统为您估计的最终词汇量约为：<strong style="font-size:18px; color:var(--good);">${formatNumber(vocab)} 词</strong></p>
+      <p style="margin-bottom:0; font-size:14px; color:var(--muted)">按 95% 置信区间计算，您的词汇量介于 <strong>${intervalText}</strong> 之间。</p>
+    `;
+        $("nextBtn").style.display = "none";
+        $("finishBtn").style.display = "none";
+      }
+
+      function drawChart() {
+        const canvas = $("chart");
+        const ctx = canvas.getContext("2d");
+        const w = canvas.width;
+        const h = canvas.height;
+
+        ctx.clearRect(0, 0, w, h);
+
+        // 绘制坐标轴线
+        ctx.strokeStyle = "#e2e8f0";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(30, 20);
+        ctx.lineTo(30, h - 20); // Y轴
+        ctx.moveTo(30, h / 2);
+        ctx.lineTo(w - 20, h / 2); // X中轴(θ=0)
+        ctx.stroke();
+
+        ctx.fillStyle = "#64748b";
+        ctx.font = "12px sans-serif";
+        ctx.fillText("+4", 5, 24);
+        ctx.fillText("0", 12, h / 2 + 4);
+        ctx.fillText("-4", 5, h - 16);
+
+        const values = state.history;
+        if (values.length < 2) return;
+
+        // 固定最大 X 轴跨度为配置的 maxQuestions，防止图表忽长忽短
+        const maxSteps = config.maxQuestions;
+        const xStep = (w - 50) / maxSteps;
+        const yFor = (theta) => 20 + ((4 - theta) / 8) * (h - 40);
+
+        ctx.strokeStyle = "#3b82f6";
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+
+        values.forEach((value, idx) => {
+          const x = 30 + idx * xStep;
+          const y = yFor(value);
+          idx === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+        });
+        ctx.stroke();
+
+        ctx.fillStyle = "#2563eb";
+        values.forEach((value, idx) => {
+          const x = 30 + idx * xStep;
+          const y = yFor(value);
+          ctx.beginPath();
+          ctx.arc(x, y, 3.5, 0, Math.PI * 2);
+          ctx.fill();
+        });
+      }
+
+      // 绑定按钮事件
+      $("startBtn").onclick = () => {
+        $("startBtn").style.display = "none";
+        $("finishBtn").style.display = "inline-block";
+        $("resetBtn").style.display = "inline-block";
+        nextQuestion();
+      };
+
+      $("nextBtn").onclick = nextQuestion;
+      $("finishBtn").onclick = showReport;
+
+      $("resetBtn").onclick = () => {
+        state.theta = 0;
+        state.responses = [];
+        state.usedWords = new Set();
+        state.currentItem = null;
+        state.locked = false;
+        state.history = [0];
+
+        $("word").textContent = "等待开始";
+        $("questionMeta").textContent = "准备就绪";
+        $("options").innerHTML = "";
+        $("feedback").textContent = "";
+        $("report").style.display = "none";
+
+        $("startBtn").style.display = "inline-block";
+        $("nextBtn").style.display = "none";
+        $("finishBtn").style.display = "none";
+        $("resetBtn").style.display = "none";
+        updateDashboard();
+      };
+
+      updateDashboard(); // 初始化界面
+    </script>
+  </body>
+</html>
