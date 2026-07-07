@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>主题知识海报组</title>
+
+<!--
+  LLM 生成要求：
+  1. 保持本 HTML 的整体结构、筛选功能和批量导出功能。
+  2. 根据用户提供的新文章内容，替换 categories 与 posterData。
+  3. 每张海报数据建议包含：
+     - categories：用于筛选分类，可多个分类，用数组表示。
+     - title：用于导出图片文件名。
+     - theme：用于配色。
+     - tag：标签文案。
+     - headline：标题。
+     - lead：核心结论。
+     - contentType：可选，"points" 或 "paragraph"。不填时自动判断。
+     - points：和body二选一。适合 2–5 条要点，每条包含 label 与 text。
+     - body：和points二选一。适合一段完整文本，不强制拆成 3–5 条。
+     - note：行动提醒。
+  4. 内容必须来自文章，不要虚构。但卡片内容不能有"文章指出 / 文章强调 / 文章解释" “报告强调 / 报告把 / 报告指出”等转述口吻，要求直接呈现结论。
+  5. 标题要短；正文要具体、有信息密度。
+  6. 总海报数量根据文章信息量决定，通常 20–40 张。
+-->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+
+  <style>
+    :root {
+      --bg: #eee7dc;
+      --paper: #fffaf2;
+      --paper-2: #ffffff;
+      --ink: #2f2a25;
+      --muted: #74685f;
+      --line: rgba(47, 42, 37, 0.14);
+      --soft: rgba(255,255,255,0.68);
+      --soft-2: rgba(255,255,255,0.48);
+
+      --accent: #8aa6a3;
+      --accent-deep: #426963;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "PingFang SC",
+        "Microsoft YaHei",
+        "Noto Sans CJK SC",
+        Arial,
+        sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+    }
+
+    .page-header {
+      max-width: 1200px;
+      margin: 40px auto 20px;
+      padding: 0 24px;
+    }
+
+    .page-header h1 {
+      margin: 0 0 10px;
+      font-size: clamp(32px, 5vw, 56px);
+      line-height: 1.05;
+      letter-spacing: -0.06em;
+    }
+
+    .page-header p {
+      margin: 0;
+      max-width: 760px;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.8;
+    }
+
+    .toolbar {
+      max-width: 1320px;
+      margin: 0 auto;
+      padding: 0 24px 4px;
+    }
+
+    .toolbar-inner {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: end;
+      gap: 14px;
+      padding: 16px;
+      border-radius: 22px;
+      background: rgba(255,250,242,0.82);
+      border: 1px solid var(--line);
+      box-shadow: 0 14px 42px rgba(60,45,32,0.10);
+    }
+
+    .field { display: grid; gap: 6px; }
+
+    .field label {
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 850;
+      letter-spacing: 0.04em;
+    }
+
+    .field select {
+      height: 42px;
+      min-width: 220px;
+      padding: 0 13px;
+      border-radius: 14px;
+      border: 1px solid rgba(47,42,37,0.18);
+      background: #fffaf2;
+      color: var(--ink);
+      font-size: 14px;
+      font-weight: 700;
+      outline: none;
+    }
+
+    .actions { display: flex; flex-wrap: wrap; gap: 10px; }
+
+    .actions button,
+    .poster-control {
+      height: 42px;
+      padding: 0 16px;
+      border: 0;
+      border-radius: 14px;
+      background: var(--ink);
+      color: #fffaf2;
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: transform 0.15s ease, opacity 0.15s ease;
+    }
+
+    .actions button:hover,
+    .poster-control:hover { transform: translateY(-1px); }
+
+    .actions button:disabled {
+      cursor: not-allowed;
+      opacity: 0.48;
+      transform: none;
+    }
+
+    .actions button.secondary { background: rgba(47,42,37,0.72); }
+
+    .actions button.light {
+      background: #fffaf2;
+      color: var(--ink);
+      border: 1px solid rgba(47,42,37,0.18);
+    }
+
+    .export-status {
+      margin: 0 0 6px auto;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .poster-grid {
+      max-width: 1320px;
+      margin: 0 auto 80px;
+      padding: 24px;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 28px;
+    }
+
+    .poster {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 3 / 4;
+      min-height: 760px;
+      padding: 34px 30px 30px;
+      border-radius: 30px;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 90% 8%, rgba(255,255,255,0.9), transparent 28%),
+        radial-gradient(circle at 4% 96%, rgba(255,255,255,0.55), transparent 24%),
+        linear-gradient(135deg, var(--paper), var(--paper-2));
+      box-shadow: 0 24px 70px rgba(60,45,32,0.14);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      isolation: isolate;
+    }
+
+    .poster::before {
+      content: "";
+      position: absolute;
+      width: 260px;
+      height: 260px;
+      border-radius: 50%;
+      top: -100px;
+      right: -100px;
+      background: var(--accent);
+      opacity: 0.42;
+      z-index: -1;
+    }
+
+    .poster::after {
+      content: "";
+      position: absolute;
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      left: -70px;
+      bottom: -70px;
+      border: 26px solid var(--accent);
+      opacity: 0.18;
+      z-index: -1;
+    }
+
+    .poster.is-hidden { display: none; }
+    .poster.is-exporting { box-shadow: none !important; }
+    .poster.is-exporting .poster-controls { display: none !important; }
+    .poster.is-exporting [contenteditable="true"] { outline: none !important; }
+
+    .poster[data-theme="green"] { --accent: #9bb5a0; --accent-deep: #57765d; }
+    .poster[data-theme="blue"] { --accent: #9eb7c9; --accent-deep: #587891; }
+    .poster[data-theme="orange"] { --accent: #e7b37d; --accent-deep: #9b6530; }
+    .poster[data-theme="rose"] { --accent: #dfa0a0; --accent-deep: #a65353; }
+    .poster[data-theme="purple"] { --accent: #baa7cc; --accent-deep: #735b8d; }
+    .poster[data-theme="teal"] { --accent: #86aaa2; --accent-deep: #4c756e; }
+
+    .poster-controls {
+      position: absolute;
+      top: 18px;
+      left: 18px;
+      z-index: 4;
+      display: flex;
+      gap: 8px;
+    }
+
+    .poster-control {
+      height: 32px;
+      padding: 0 11px;
+      border-radius: 999px;
+      background: rgba(47,42,37,0.76);
+      font-size: 12px;
+      backdrop-filter: blur(8px);
+    }
+
+    .poster-control.delete { background: rgba(166,83,83,0.9); }
+
+    [contenteditable="true"] {
+      outline: 1px dashed transparent;
+      border-radius: 8px;
+      transition: outline-color 0.15s ease, background 0.15s ease;
+    }
+
+    [contenteditable="true"]:hover,
+    [contenteditable="true"]:focus {
+      outline-color: rgba(47,42,37,0.24);
+      background: rgba(255,255,255,0.36);
+    }
+
+    .meta {
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-right: 110px;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.58);
+      color: var(--accent-deep);
+      font-size: 14px;
+      font-weight: 850;
+      letter-spacing: 0.06em;
+    }
+
+    .tag::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent-deep);
+    }
+
+    h2 {
+      margin: 0;
+      font-size: clamp(38px, 5vw, 58px);
+      line-height: 1.04;
+      letter-spacing: -0.07em;
+    }
+
+    .lead {
+      margin: 20px 0 22px;
+      padding: 18px 20px;
+      border-left: 7px solid var(--accent-deep);
+      border-radius: 18px;
+      background: var(--soft);
+      font-size: 21px;
+      line-height: 1.58;
+      font-weight: 800;
+    }
+
+    .section-title {
+      margin: 14px 0 9px;
+      color: var(--accent-deep);
+      font-size: 15px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+    }
+
+    .points { display: grid; gap: 12px; }
+
+    .point {
+      display: grid;
+      grid-template-columns: 18px 1fr;
+      gap: 12px;
+      padding: 14px 15px;
+      border-radius: 15px;
+      border: 1px solid rgba(47,42,37,0.09);
+      background: var(--soft-2);
+    }
+
+    .dot {
+      width: 11px;
+      height: 11px;
+      margin-top: 9px;
+      border-radius: 50%;
+      background: var(--accent-deep);
+    }
+
+    .point p {
+      margin: 0;
+      font-size: 18px;
+      line-height: 1.62;
+    }
+
+    .point b { color: var(--accent-deep); }
+
+    .note {
+      margin-top: 14px;
+      padding: 13px 14px;
+      border-radius: 17px;
+      background: rgba(47,42,37,0.88);
+      color: #fffaf2;
+      font-size: 18px;
+      line-height: 1.62;
+      font-weight: 700;
+    }
+
+    .body-text {
+      margin: 0;
+      padding: 18px 20px;
+      border-radius: 18px;
+      border: 1px solid rgba(47,42,37,0.09);
+      background: var(--soft-2);
+      font-size: 20px;
+      line-height: 1.72;
+      font-weight: 650;
+      white-space: pre-wrap;
+    }
+
+    .big-no {
+      position: absolute;
+      top: 24px;
+      right: 28px;
+      z-index: 2;
+      color: rgba(47,42,37,0.14);
+      font-size: 64px;
+      font-weight: 950;
+      line-height: 0.9;
+      letter-spacing: -0.08em;
+      pointer-events: none;
+    }
+
+    @media (max-width: 900px) { .poster-grid { grid-template-columns: 1fr; } }
+
+    @media (max-width: 760px) {
+      .toolbar { padding: 0 16px 4px; }
+      .toolbar-inner { align-items: stretch; }
+      .field, .field select, .actions, .actions button { width: 100%; }
+      .export-status { margin-left: 0; }
+    }
+
+    @media (max-width: 520px) {
+      .poster-grid { padding: 16px; }
+      .poster { min-height: 760px; padding: 30px 22px 24px; border-radius: 24px; }
+      .meta { padding-right: 92px; }
+      .poster-controls { top: 14px; left: 14px; }
+      .big-no { top: 22px; right: 22px; font-size: 58px; }
+      h2 { font-size: clamp(36px, 10vw, 48px); }
+      .lead { font-size: 20px; }
+      .point p { font-size: 18px; }
+      .body-text { font-size: 19px; }
+    }
+
+    @media print {
+      body { background: #fff; }
+      .page-header, .toolbar, .poster-controls { display: none; }
+      .poster-grid { display: block; padding: 0; margin: 0; }
+      .poster {
+        width: 210mm;
+        height: 280mm;
+        min-height: 0;
+        aspect-ratio: auto;
+        border-radius: 0;
+        box-shadow: none;
+        page-break-after: always;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="page-header">
+    <h1 id="pageTitle" contenteditable="true">主题知识海报组</h1>
+    <p id="pageDesc" contenteditable="true">根据文章内容提炼核心知识点，适合用于科普、课程、社群分享或内容沉淀。</p>
+  </header>
+
+  <section class="toolbar" aria-label="海报筛选和批量导出工具栏">
+    <div class="toolbar-inner">
+      <div class="field">
+        <label for="categoryFilter">按分类筛选</label>
+        <select id="categoryFilter"></select>
+      </div>
+
+      <div class="field">
+        <label for="exportScale">导出清晰度</label>
+        <select id="exportScale">
+          <option value="2">2x 标准清晰</option>
+          <option value="3" selected>3x 高清推荐</option>
+          <option value="4">4x 超清较慢</option>
+        </select>
+      </div>
+
+      <div class="actions">
+        <button type="button" id="exportVisibleBtn">导出当前分类 PNG</button>
+        <button type="button" id="exportAllBtn" class="secondary">导出全部 PNG</button>
+        <button type="button" id="resetBtn" class="light">恢复示例数据</button>
+      </div>
+
+      <p id="exportStatus" class="export-status">当前显示：0 张海报</p>
+    </div>
+  </section>
+
+  <main class="poster-grid" id="posterGrid"></main>
+
+  <script>
+    const STORAGE_KEY = "poster-array-template-mobile-readable-v2-clean";
+
+    const initialCategories = [
+      { value: "example_a", label: "示例分类 A" },
+      { value: "example_b", label: "示例分类 B" },
+      { value: "example_c", label: "示例分类 C" },
+      { value: "example_d", label: "示例分类 D" }
+    ];
+
+    const initialPosterData = [
+      {
+        id: "poster_001",
+        theme: "green",
+        categories: ["example_a"],
+        title: "示例海报一",
+        tag: "示例分类 A",
+        headline: "先抓住文章主问题",
+        lead: "一张好海报首先要回答：这篇文章到底在解决什么问题，读者为什么需要关心。",
+        points: [
+          { label: "提炼对象", text: "从文章开头、标题、小标题和反复出现的关键词中，判断核心讨论对象。" },
+          { label: "明确问题", text: "把文章中的背景、现象或痛点压缩成一个清楚的问题句。" },
+          { label: "识别受众", text: "判断文章主要写给谁，比如普通读者、专业人士、家长、管理者或初学者。" },
+          { label: "避免跑题", text: "不要把文章没有重点展开的内容扩写成海报主题。" }
+        ],
+        note: "正式生成时，把这一张替换为文章中最基础、最总览的主题海报。"
+      },
+      {
+        id: "poster_002",
+        theme: "blue",
+        categories: ["example_b"],
+        title: "示例海报二",
+        tag: "示例分类 B",
+        headline: "把复杂内容拆成层次",
+        lead: "当文章信息量很大时，海报不应照搬原文，而要把内容拆成更容易浏览的知识层级。",
+        contentType: "paragraph",
+        body: "当文章信息量很大时，不必把每张海报都拆成 3–5 条要点。更适合讲概念、故事、背景或判断逻辑的内容，可以直接写成一段完整文本。关键是让读者在手机上不用反复缩放，也能顺着语气读完，并快速抓住主线。",
+        note: "正式生成时，可根据内容自动选择“要点型”或“段落型”卡片。"
+      },
+      {
+        id: "poster_003",
+        theme: "rose",
+        categories: ["example_c"],
+        title: "示例海报三",
+        tag: "示例分类 C",
+        headline: "只写文章支持的内容",
+        lead: "海报可以压缩、改写和重组文章信息，但不能补充文章没有提供的事实或结论。",
+        points: [
+          { label: "不虚构", text: "不要自行添加数据、剂量、比例、案例、专家观点或研究结论。" },
+          { label: "不扩大", text: "文章只说“可能相关”时，不要改写成“必然有效”或“已经证实”。" },
+          { label: "不绝对化", text: "避免使用“所有人都应该”“一定可以”“完全避免”等过强表述。" },
+          { label: "保留边界", text: "如果文章提到适用人群、限制条件或风险提醒，海报中必须保留。" }
+        ],
+        note: "正式生成时，医学、法律、金融等高风险内容尤其要忠实于原文。"
+      },
+      {
+        id: "poster_004",
+        theme: "purple",
+        categories: ["example_d"],
+        title: "示例海报四",
+        tag: "示例分类 D",
+        headline: "最后转成可执行提醒",
+        lead: "海报组不只是摘要，还要帮助读者把文章里的关键内容转化为下一步行动。",
+        points: [
+          { label: "立即可做", text: "提炼一个读者今天就能执行的小动作，降低开始成本。" },
+          { label: "持续可做", text: "提炼一个需要反复执行的习惯、流程或检查方式。" },
+          { label: "需要判断", text: "说明读者在什么情况下应暂停、自查、调整或寻求专业帮助。" },
+          { label: "避免空话", text: "行动提醒要具体，少写“提高意识”，多写“记录、检查、询问、安排、减少”。" }
+        ],
+        note: "正式生成时，每张海报的 note 都应是一条来自文章内容的具体行动建议。"
+      }
+    ];
+
+    let categories = structuredClone(initialCategories);
+    let posterData = structuredClone(initialPosterData);
+
+    const categoryFilter = document.getElementById("categoryFilter");
+    const exportScale = document.getElementById("exportScale");
+    const exportVisibleBtn = document.getElementById("exportVisibleBtn");
+    const exportAllBtn = document.getElementById("exportAllBtn");
+    const resetBtn = document.getElementById("resetBtn");
+    const exportStatus = document.getElementById("exportStatus");
+    const posterGrid = document.getElementById("posterGrid");
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function getSafeFileName(text) {
+      return String(text || "poster")
+        .trim()
+        .replace(/[\\/:*?"<>|]/g, "")
+        .replace(/\s+/g, "_")
+        .slice(0, 80) || "poster";
+    }
+
+    function getCategoryLabel(value) {
+      return categories.find((item) => item.value === value)?.label || value;
+    }
+
+    function normalizePosterItem(item, index) {
+      const fallbackCategory = item.categories?.[0] || categories[0]?.value || "default";
+      const hasPoints = Array.isArray(item.points) && item.points.length > 0;
+      const body = item.body || item.paragraph || "请编辑正文内容。";
+      const contentType = item.contentType || (hasPoints ? "points" : "paragraph");
+
+      return {
+        id: item.id || `poster_${Date.now()}_${index}`,
+        theme: item.theme || "green",
+        categories: Array.isArray(item.categories) && item.categories.length ? item.categories : [fallbackCategory],
+        title: item.title || item.headline || `海报 ${index + 1}`,
+        tag: item.tag || getCategoryLabel(fallbackCategory),
+        headline: item.headline || "未命名标题",
+        lead: item.lead || "请编辑核心结论。",
+        contentType,
+        points: hasPoints ? item.points : [],
+        body,
+        note: item.note || "请编辑行动提醒。"
+      };
+    }
+
+    function saveState() {
+      const state = {
+        categories,
+        posterData,
+        pageTitle: document.getElementById("pageTitle").textContent,
+        pageDesc: document.getElementById("pageDesc").textContent
+      };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return;
+        const state = JSON.parse(raw);
+        if (Array.isArray(state.categories)) categories = state.categories;
+        if (Array.isArray(state.posterData)) posterData = state.posterData.map(normalizePosterItem);
+        if (state.pageTitle) document.getElementById("pageTitle").textContent = state.pageTitle;
+        if (state.pageDesc) document.getElementById("pageDesc").textContent = state.pageDesc;
+      } catch (error) {
+        console.warn("读取本地保存失败，已使用初始数据。", error);
+      }
+    }
+
+    function renderCategoryOptions() {
+      const selected = categoryFilter.value || "all";
+      categoryFilter.innerHTML = [
+        `<option value="all">全部分类</option>`,
+        ...categories.map((item) => `<option value="${escapeHtml(item.value)}">${escapeHtml(item.label)}</option>`)
+      ].join("\n");
+
+      const values = ["all", ...categories.map((item) => item.value)];
+      categoryFilter.value = values.includes(selected) ? selected : "all";
+    }
+
+    function renderPosters() {
+      posterData = posterData.map(normalizePosterItem);
+
+      posterGrid.innerHTML = posterData.map((poster, index) => {
+        const no = String(index + 1).padStart(2, "0");
+        const useParagraph = poster.contentType === "paragraph" || !poster.points.length;
+        const contentHtml = useParagraph
+          ? `
+              <div class="section-title">正文</div>
+              <p class="body-text" contenteditable="true" data-edit="body" data-id="${escapeHtml(poster.id)}">${escapeHtml(poster.body)}</p>
+            `
+          : `
+              <div class="section-title">核心要点</div>
+              <div class="points">
+                ${poster.points.map((point, pointIndex) => `
+                  <div class="point">
+                    <i class="dot"></i>
+                    <p>
+                      <b contenteditable="true" data-edit="point-label" data-id="${escapeHtml(poster.id)}" data-point-index="${pointIndex}">${escapeHtml(point.label)}：</b><span contenteditable="true" data-edit="point-text" data-id="${escapeHtml(poster.id)}" data-point-index="${pointIndex}">${escapeHtml(point.text)}</span>
+                    </p>
+                  </div>
+                `).join("")}
+              </div>
+            `;
+
+        return `
+          <section class="poster" data-id="${escapeHtml(poster.id)}" data-theme="${escapeHtml(poster.theme)}" data-category="${escapeHtml(poster.categories.join(" "))}" data-title="${escapeHtml(poster.title)}">
+            <span class="big-no">${no}</span>
+
+            <div class="poster-controls">
+              <button type="button" class="poster-control delete" data-action="delete" data-id="${escapeHtml(poster.id)}">删除</button>
+            </div>
+
+            <div>
+              <div class="meta">
+                <span class="tag" contenteditable="true" data-edit="tag" data-id="${escapeHtml(poster.id)}">${escapeHtml(poster.tag)}</span>
+              </div>
+
+              <h2 contenteditable="true" data-edit="headline" data-id="${escapeHtml(poster.id)}">${escapeHtml(poster.headline)}</h2>
+
+              <p class="lead" contenteditable="true" data-edit="lead" data-id="${escapeHtml(poster.id)}">${escapeHtml(poster.lead)}</p>
+
+              ${contentHtml}
+            </div>
+
+            <div>
+              <div class="note">
+                <strong>行动提醒：</strong><span contenteditable="true" data-edit="note" data-id="${escapeHtml(poster.id)}">${escapeHtml(poster.note)}</span>
+              </div>
+            </div>
+          </section>
+        `;
+      }).join("\n");
+
+      updateVisiblePosters();
+    }
+
+    function syncEdit(target) {
+      const id = target.dataset.id;
+      const field = target.dataset.edit;
+      const poster = posterData.find((item) => item.id === id);
+      if (!poster || !field) return;
+
+      const value = target.textContent.trim();
+
+      if (field === "point-label" || field === "point-text") {
+        const pointIndex = Number(target.dataset.pointIndex);
+        if (!poster.points[pointIndex]) return;
+        if (field === "point-label") poster.points[pointIndex].label = value.replace(/：$/, "");
+        if (field === "point-text") poster.points[pointIndex].text = value;
+      } else {
+        poster[field] = value;
+        if (field === "headline") {
+          poster.title = value;
+          const card = posterGrid.querySelector(`[data-id="${CSS.escape(id)}"]`);
+          if (card) card.dataset.title = value;
+        }
+      }
+
+      saveState();
+    }
+
+    function deletePoster(id) {
+      const poster = posterData.find((item) => item.id === id);
+      const title = poster?.headline || poster?.title || "这张海报";
+      const confirmed = window.confirm(`确认删除「${title}」吗？删除后编号会自动重排。`);
+      if (!confirmed) return;
+
+      posterData = posterData.filter((item) => item.id !== id);
+      saveState();
+      renderPosters();
+    }
+
+    function updateVisiblePosters() {
+      const selected = categoryFilter.value || "all";
+      const posters = Array.from(document.querySelectorAll(".poster"));
+      let visibleCount = 0;
+
+      posters.forEach((poster) => {
+        const card = posterData.find((item) => item.id === poster.dataset.id);
+        const cardCategories = card?.categories || [];
+        const shouldShow = selected === "all" || cardCategories.includes(selected);
+
+        poster.classList.toggle("is-hidden", !shouldShow);
+        if (shouldShow) visibleCount += 1;
+      });
+
+      exportStatus.textContent = `当前显示：${visibleCount} 张海报`;
+    }
+
+    async function exportPosterAsBlob(poster, scale) {
+      poster.classList.add("is-exporting");
+
+      const canvas = await html2canvas(poster, {
+        scale,
+        backgroundColor: null,
+        useCORS: true
+      });
+
+      poster.classList.remove("is-exporting");
+
+      return new Promise((resolve) => {
+        canvas.toBlob((blob) => resolve(blob), "image/png", 1);
+      });
+    }
+
+    async function exportPosters(targetPosters, zipName) {
+      if (!targetPosters.length) {
+        exportStatus.textContent = "没有可导出的海报";
+        return;
+      }
+
+      const scale = Number(exportScale.value || 3);
+      const zip = new JSZip();
+
+      exportVisibleBtn.disabled = true;
+      exportAllBtn.disabled = true;
+      resetBtn.disabled = true;
+
+      for (let i = 0; i < targetPosters.length; i += 1) {
+        const poster = targetPosters[i];
+        const title = poster.dataset.title || poster.querySelector("h2")?.textContent || `poster-${i + 1}`;
+        const fileName = `${String(i + 1).padStart(2, "0")}-${getSafeFileName(title)}.png`;
+
+        exportStatus.textContent = `正在导出 ${i + 1}/${targetPosters.length}：${title}`;
+
+        const blob = await exportPosterAsBlob(poster, scale);
+        zip.file(fileName, blob);
+      }
+
+      exportStatus.textContent = "正在打包 ZIP...";
+
+      const content = await zip.generateAsync({ type: "blob" });
+      saveAs(content, zipName);
+
+      exportStatus.textContent = `导出完成：${targetPosters.length} 张海报`;
+
+      exportVisibleBtn.disabled = false;
+      exportAllBtn.disabled = false;
+      resetBtn.disabled = false;
+    }
+
+    categoryFilter.addEventListener("change", updateVisiblePosters);
+
+    posterGrid.addEventListener("input", (event) => {
+      if (event.target.matches("[contenteditable='true']")) syncEdit(event.target);
+    });
+
+    posterGrid.addEventListener("click", (event) => {
+      const deleteButton = event.target.closest("[data-action='delete']");
+      if (deleteButton) deletePoster(deleteButton.dataset.id);
+    });
+
+    document.getElementById("pageTitle").addEventListener("input", saveState);
+    document.getElementById("pageDesc").addEventListener("input", saveState);
+
+    exportVisibleBtn.addEventListener("click", () => {
+      const visiblePosters = Array.from(document.querySelectorAll(".poster:not(.is-hidden)"));
+      const selectedText = categoryFilter.options[categoryFilter.selectedIndex]?.textContent || "当前分类";
+      exportPosters(visiblePosters, `${getSafeFileName(selectedText)}-海报.zip`);
+    });
+
+    exportAllBtn.addEventListener("click", () => {
+      const allPosters = Array.from(document.querySelectorAll(".poster"));
+      exportPosters(allPosters, "全部海报.zip");
+    });
+
+    resetBtn.addEventListener("click", () => {
+      const confirmed = window.confirm("确认恢复示例数据吗？当前编辑和删除记录会被清除。 ");
+      if (!confirmed) return;
+      localStorage.removeItem(STORAGE_KEY);
+      categories = structuredClone(initialCategories);
+      posterData = structuredClone(initialPosterData);
+      document.getElementById("pageTitle").textContent = "主题知识海报组";
+      document.getElementById("pageDesc").textContent = "根据文章内容提炼核心知识点，适合用于科普、课程、社群分享或内容沉淀。";
+      renderCategoryOptions();
+      renderPosters();
+      saveState();
+    });
+
+    loadState();
+    renderCategoryOptions();
+    renderPosters();
+  </script>
+</body>
+</html>
