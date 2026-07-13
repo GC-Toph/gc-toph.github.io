@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="静息能量消耗 REE 与 BMI 计算器" />
+  <title>静息能量消耗REE计算器</title>
+  <style>
+    :root {
+      --bg: #f4f7fb;
+      --surface: rgba(255, 255, 255, 0.95);
+      --surface-solid: #ffffff;
+      --text: #142033;
+      --muted: #617086;
+      --primary: #2166f3;
+      --primary-dark: #1649b8;
+      --border: #dbe3ee;
+      --shadow: 0 12px 40px rgba(34, 60, 100, 0.08);
+      --radius: 16px;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Inter, "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      line-height: 1.6;
+    }
+
+    .container {
+      width: min(960px, calc(100% - 32px));
+      margin: 40px auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    header h1 {
+      margin: 0;
+      font-size: clamp(28px, 4vw, 40px);
+      letter-spacing: -0.03em;
+    }
+
+    .calculator {
+      display: grid;
+      grid-template-columns: 1fr 1.1fr;
+      gap: 24px;
+      align-items: start;
+      margin-bottom: 32px;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 24px;
+    }
+    .card h3 { margin: 0 0 20px; font-size: 18px; }
+
+    /* 表单样式 */
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+    .field { display: grid; gap: 8px; }
+    .field.full { grid-column: 1 / -1; }
+    label { font-size: 14px; font-weight: 700; color: var(--text); }
+
+    input, select {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 14px;
+      color: var(--text);
+      background: var(--surface-solid);
+      outline: none;
+      transition: 0.2s;
+      font-size: 15px;
+    }
+    input:focus, select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(33,102,243,.15);
+    }
+    .helper { font-size: 12px; color: var(--muted); margin-top: -2px; }
+
+    /* 性别分段按钮 */
+    .segment-control {
+      display: flex;
+      background: #edf2f8;
+      border-radius: 10px;
+      padding: 4px;
+    }
+    .segment-control label {
+      flex: 1;
+      text-align: center;
+      position: relative;
+      cursor: pointer;
+    }
+    .segment-control input {
+      position: absolute;
+      opacity: 0;
+    }
+    .segment-control span {
+      display: block;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 14px;
+      color: var(--muted);
+      transition: 0.25s ease;
+    }
+    .segment-control input:checked + span {
+      background: var(--surface-solid);
+      color: var(--primary);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+
+    .actions { display: flex; gap: 12px; margin-top: 24px; }
+    .btn {
+      flex: 1;
+      border: 0;
+      border-radius: 10px;
+      padding: 12px;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 15px;
+      transition: 0.2s;
+    }
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-primary:hover { background: var(--primary-dark); }
+    .btn-secondary { background: #edf2f8; color: var(--text); }
+    .btn-secondary:hover { background: #e2e8f0; }
+
+    /* BMI 区域 */
+    .bmi-card {
+      background: var(--bg);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 24px;
+      border: 1px solid var(--border);
+    }
+    .bmi-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+    .bmi-val-wrap { display: flex; align-items: baseline; gap: 8px; }
+    .bmi-val { font-size: 28px; font-weight: 800; line-height: 1; color: var(--text); }
+    .bmi-tag {
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      color: white;
+    }
+    .bmi-advice { font-size: 13px; color: var(--muted); margin: 0; }
+
+    /* 结果指标区域 */
+    .target-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .target-card {
+      padding: 14px 8px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--surface-solid);
+      text-align: center;
+    }
+    .target-card.featured {
+      background: #edf3ff;
+      border-color: rgba(33,102,243,.3);
+    }
+    .target-card span { display: block; font-weight: 700; font-size: 14px; }
+    .target-card strong { display: block; margin: 4px 0 2px; font-size: 20px; color: var(--primary-dark); }
+    .target-card small { color: var(--muted); font-size: 12px; }
+
+    /* 宏量营养素微型网格 */
+    .macro-mini {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px dashed var(--border);
+    }
+    .macro-mini div {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      font-size: 12px;
+    }
+    .macro-mini .m-label { color: var(--muted); font-size: 11px; }
+    .macro-mini .m-val { font-weight: 700; color: var(--text); }
+
+    /* 列表区域 */
+    .result-list { display: grid; gap: 8px; }
+    .result-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 14px;
+      background: var(--surface-solid);
+      border: 1px solid #e5ebf3;
+      border-radius: 10px;
+      font-size: 14px;
+    }
+    .result-row small { color: var(--muted); margin-left: 8px; font-size: 12px; }
+    .result-row strong { font-size: 16px; }
+
+    .note { margin-top: 16px; font-size: 12px; color: var(--muted); text-align: center; line-height: 1.6; }
+
+    /* 食物与公式说明区域 */
+    .section-title { margin: 32px 0 16px; font-size: 22px; font-weight: 700; }
+    
+    .food-grid, .formula-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+    .formula-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    
+    .info-card {
+      background: var(--surface-solid);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px;
+    }
+    .info-card.carb { border-top: 4px solid #f4a261; }
+    .info-card.pro { border-top: 4px solid #e76f51; }
+    .info-card.fat { border-top: 4px solid #e9c46a; }
+
+    .info-card h4 { margin: 0 0 12px; font-size: 16px; }
+    .info-card ul { margin: 0; padding-left: 18px; color: var(--muted); font-size: 13.5px; }
+    .info-card li { margin-bottom: 8px; }
+    .info-card li strong { color: var(--text); }
+
+    .formula-tag {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 6px;
+      background: #e9f1ff;
+      color: var(--primary-dark);
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+    .info-card p { margin: 8px 0 0; font-size: 13.5px; color: var(--muted); }
+    .info-card p strong { color: var(--text); }
+    .formula-eq {
+      padding: 12px;
+      background: #f8f9fa;
+      border-radius: 8px;
+      font-family: Consolas, monospace;
+      font-size: 13px;
+      color: #334155;
+      line-height: 1.7;
+      margin-top: 8px;
+    }
+
+    @media (max-width: 860px) {
+      .calculator { grid-template-columns: 1fr; }
+      .formula-grid, .food-grid { grid-template-columns: 1fr; }
+      .container { margin: 24px auto; }
+    }
+    @media (max-width: 480px) {
+      .form-grid { grid-template-columns: 1fr; }
+      .field.full { grid-column: auto; }
+      .actions { flex-direction: column; }
+      .target-card strong { font-size: 18px; }
+      .macro-mini { flex-direction: column; gap: 8px; align-items: center; }
+      .macro-mini div { flex-direction: row; justify-content: space-between; width: 100%; padding: 0 10px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>静息能量消耗 REE 计算器</h1>
+    </header>
+
+    <div class="calculator">
+      <!-- 左侧：输入表单 -->
+      <div class="card">
+        <h3>基本信息</h3>
+        <div class="form-grid">
+          <div class="field full">
+            <label>生理性别</label>
+            <div class="segment-control" id="sexGroup">
+              <label>
+                <input type="radio" name="sex" value="male" checked />
+                <span>男性</span>
+              </label>
+              <label>
+                <input type="radio" name="sex" value="female" />
+                <span>女性</span>
+              </label>
+            </div>
+          </div>
+          <div class="field">
+            <label for="age">年龄（岁）</label>
+            <input id="age" type="number" min="14" max="100" value="25" />
+          </div>
+          <div class="field">
+            <label for="weight">体重（kg）</label>
+            <input id="weight" type="number" min="30" max="300" step="0.1" value="70" />
+          </div>
+          <div class="field full">
+            <label for="height">身高（cm）</label>
+            <input id="height" type="number" min="120" max="230" step="0.1" value="175" />
+          </div>
+          <div class="field full">
+            <label for="activity">日常活动水平</label>
+            <select id="activity">
+              <option value="1.2" selected>久坐：几乎不运动 (* 1.2)</option>
+              <option value="1.375">轻度活动：每周运动 1～3 天 (* 1.375)</option>
+              <option value="1.55">中度活动：每周运动 3～5 天 (* 1.55)</option>
+              <option value="1.725">高度活动：每周运动 6～7 天 (* 1.725)</option>
+              <option value="1.9">非常活跃：高强度训练或重体力劳动 (* 1.9)</option>
+            </select>
+          </div>
+          <div class="field full">
+            <label for="bodyfat">体脂率（可选，%）</label>
+            <input id="bodyfat" type="number" min="3" max="65" step="0.1" placeholder="例如：20" />
+            <div class="helper">填写后可额外计算基于瘦体重的 Katch 和 Cunningham 公式。</div>
+          </div>
+        </div>
+        <div class="actions">
+          <button class="btn btn-secondary" id="resetBtn">重置</button>
+          <button class="btn btn-primary" id="calculateBtn">开始计算</button>
+        </div>
+      </div>
+
+      <!-- 右侧：计算结果 -->
+      <div class="card" aria-live="polite">
+        <h3>计算结果</h3>
+        
+        <!-- BMI 指标卡 -->
+        <div class="bmi-card">
+          <div class="bmi-header">
+            <div class="bmi-val-wrap">
+              <span style="font-size: 14px; font-weight: 700;">BMI 指数</span>
+              <span class="bmi-val" id="bmiValue">--</span>
+            </div>
+            <span class="bmi-tag" id="bmiTag" style="background: var(--muted);">--</span>
+          </div>
+          <p class="bmi-advice" id="bmiAdvice">请在左侧输入身高体重信息以获取健康建议。</p>
+        </div>
+
+        <!-- TDEE 目标建议 & 营养素 -->
+        <div class="target-grid">
+          <!-- 减脂 -->
+          <div class="target-card">
+            <span>减脂</span>
+            <strong id="cutResult">--</strong>
+            <small>TDEE − √((TDEE × 20%) × 400)</small>
+            <div class="macro-mini">
+              <div><span class="m-label">碳水</span><span class="m-val"><span id="cutCarb">--</span>g</span></div>
+              <div><span class="m-label">蛋白</span><span class="m-val"><span id="cutPro">--</span>g</span></div>
+              <div><span class="m-label">脂肪</span><span class="m-val"><span id="cutFat">--</span>g</span></div>
+            </div>
+          </div>
+          <!-- 维持 -->
+          <div class="target-card featured">
+            <span>维持 (TDEE)</span>
+            <strong id="maintainResult">--</strong>
+            <small>日常总消耗</small>
+            <div class="macro-mini">
+              <div><span class="m-label">碳水</span><span class="m-val"><span id="maintCarb">--</span>g</span></div>
+              <div><span class="m-label">蛋白</span><span class="m-val"><span id="maintPro">--</span>g</span></div>
+              <div><span class="m-label">脂肪</span><span class="m-val"><span id="maintFat">--</span>g</span></div>
+            </div>
+          </div>
+          <!-- 增肌 -->
+          <div class="target-card">
+            <span>增肌</span>
+            <strong id="gainResult">--</strong>
+            <small>TDEE + 10%</small>
+            <div class="macro-mini">
+              <div><span class="m-label">碳水</span><span class="m-val"><span id="gainCarb">--</span>g</span></div>
+              <div><span class="m-label">蛋白</span><span class="m-val"><span id="gainPro">--</span>g</span></div>
+              <div><span class="m-label">脂肪</span><span class="m-val"><span id="gainFat">--</span>g</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- BMR 公式对比 -->
+        <div class="result-list">
+          <div class="result-row">
+            <div>Mifflin–St Jeor <small>(推荐标准)</small></div>
+            <strong id="mifflinResult">--</strong>
+          </div>
+          <div class="result-row">
+            <div>Harris–Benedict <small>(经典参照)</small></div>
+            <strong id="harrisResult">--</strong>
+          </div>
+          <div class="result-row">
+            <div>Katch–McArdle <small>(需体脂)</small></div>
+            <strong id="katchResult">--</strong>
+          </div>
+          <div class="result-row">
+            <div>Cunningham <small>(需体脂)</small></div>
+            <strong id="cunninghamResult">--</strong>
+          </div>
+        </div>
+        <div class="note">
+          三大营养素按 <strong>碳水 45% / 蛋白质 23% / 脂肪 32%</strong> 比例计算。<br>
+          (热量换算：碳水/蛋白 4 kcal/g，脂肪 9 kcal/g)
+        </div>
+      </div>
+    </div>
+
+    <!-- 优质食物推荐区 -->
+    <div class="section-title">优质食物推荐</div>
+    <div class="food-grid">
+      <div class="info-card carb">
+        <h4>🌾 碳水化合物 (供能主力)</h4>
+        <ul>
+          <li><strong>生燕麦片：</strong>含碳水约 68g/100g。低 GI 强饱腹感，富含膳食纤维。</li>
+          <li><strong>红薯/紫薯：</strong>含碳水约 20g/100g。富含维生素，热量比米饭低。</li>
+          <li><strong>糙米/黑米：</strong>含碳水约 73g/100g。全谷物，富含 B 族维生素。</li>
+          <li><strong>老南瓜：</strong>含碳水约 5g/100g。低碳水蔬菜，适合大体积充饥。</li>
+        </ul>
+      </div>
+      <div class="info-card pro">
+        <h4>🥩 蛋白质 (肌肉修复)</h4>
+        <ul>
+          <li><strong>鸡胸肉：</strong>含蛋白约 24g/100g。低脂肪，性价比极高的蛋白来源。</li>
+          <li><strong>瘦牛肉：</strong>含蛋白约 22g/100g。富含肌酸与铁元素，适合力量训练。</li>
+          <li><strong>鸡蛋：</strong>含蛋白约 13g/100g。吸收率极高，且含有优质脂肪。</li>
+          <li><strong>大豆：</strong>含蛋白约 12g/100g。植物蛋白优选，含丰富钙质。</li>
+        </ul>
+      </div>
+      <div class="info-card fat">
+        <h4>🥑 健康脂肪 (激素合成)</h4>
+        <ul>
+          <li><strong>橄榄油：</strong>含脂肪约 100g/100g。单不饱和脂肪酸，抗氧化极佳。</li>
+          <li><strong>坚果(扁桃仁等)：</strong>含脂肪约 50g/100g。含微量元素，切忌过量。</li>
+          <li><strong>牛油果：</strong>含脂肪约 15g/100g。健康植物脂肪，口感顺滑。</li>
+          <li><strong>深海无汞鱼(三文鱼)：</strong>含脂肪约 13g/100g。提供珍贵的 Omega-3。</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- 公式说明区 -->
+    <div class="section-title">公式说明</div>
+    <div class="formula-grid">
+      <article class="info-card">
+        <span class="formula-tag">普通成年人首选</span>
+        <h4>Mifflin–St Jeor</h4>
+        <div class="formula-eq">
+          男性：REE = 10W + 6.25H − 5A + 5<br>
+          女性：REE = 10W + 6.25H − 5A − 161
+        </div>
+        <p><strong>输入：</strong>体重 W（kg）、身高 H（cm）、年龄 A（岁）、生理性别。</p>
+        <p><strong>特点：</strong>输入简单，适用于多数健康成年人，常作为体重管理的初步估算。</p>
+      </article>
+
+      <article class="info-card">
+        <span class="formula-tag">经典对照公式</span>
+        <h4>修订版 Harris–Benedict</h4>
+        <div class="formula-eq">
+          男性：REE = 88.362 + 13.397W + 4.799H − 5.677A<br>
+          女性：REE = 447.593 + 9.247W + 3.098H − 4.330A
+        </div>
+        <p><strong>输入：</strong>体重、身高、年龄、生理性别。</p>
+        <p><strong>特点：</strong>适合与既往营养评估或其他公式交叉比较。</p>
+      </article>
+
+      <article class="info-card">
+        <span class="formula-tag">基于瘦体重</span>
+        <h4>Katch–McArdle</h4>
+        <div class="formula-eq">
+          BMR = 370 + 21.6 × LBM<br>
+          LBM = 体重 × (1 − 体脂率)
+        </div>
+        <p><strong>输入：</strong>体重与体脂率，或直接输入瘦体重 LBM（kg）。</p>
+        <p><strong>特点：</strong>适合肌肉量较高、体脂较低且体成分数据可靠的人群。</p>
+      </article>
+
+      <article class="info-card">
+        <span class="formula-tag">运动人群常用</span>
+        <h4>Cunningham</h4>
+        <div class="formula-eq">
+          RMR = 500 + 22 × FFM
+        </div>
+        <p><strong>输入：</strong>去脂体重 FFM（kg）。</p>
+        <p><strong>特点：</strong>常用于运动员或身体组成明显偏离普通人群者。FFM 包括肌肉、器官、骨骼和体液。</p>
+      </article>
+    </div>
+
+  </div>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+
+    function round(value) {
+      return Number.isFinite(value) ? Math.round(value) : '--';
+    }
+
+    // 根据总热量计算三大营养素 (碳水45%，蛋白23%，脂肪32%)
+    // 碳水/蛋白 4 kcal/g，脂肪 9 kcal/g
+    function calcMacros(cals) {
+      if (!Number.isFinite(cals)) return { carb: '--', pro: '--', fat: '--' };
+      return {
+        carb: Math.round((cals * 0.45) / 4),
+        pro: Math.round((cals * 0.23) / 4),
+        fat: Math.round((cals * 0.32) / 9)
+      };
+    }
+
+    function calculate() {
+      // 获取输入值
+      const sex = document.querySelector('input[name="sex"]:checked').value;
+      const age = parseFloat($('age').value);
+      const weight = parseFloat($('weight').value);
+      const height = parseFloat($('height').value);
+      const bodyFatRaw = $('bodyfat').value.trim();
+      const bodyFat = bodyFatRaw === '' ? null : parseFloat(bodyFatRaw);
+      const activity = parseFloat($('activity').value);
+
+      if (![age, weight, height].every(Number.isFinite) || age <= 0 || weight <= 0 || height <= 0) {
+        return; // 数据不完整时跳过计算
+      }
+
+      // --- 1. 计算 BMI 及建议 ---
+      const heightMeter = height / 100;
+      const bmi = weight / (heightMeter * heightMeter);
+      $('bmiValue').textContent = bmi.toFixed(1);
+      
+      let tagText = '', tagColor = '', adviceText = '';
+      if (bmi < 18.5) {
+        tagText = '偏瘦'; tagColor = '#617086';
+        adviceText = '您的体重偏轻。建议适当增加热量摄入，多补充优质蛋白质与碳水化合物，并配合适度力量训练以健康增重。';
+      } else if (bmi < 24) {
+        tagText = '正常'; tagColor = '#11a683';
+        adviceText = '您的体重处于健康范围。建议继续保持均衡饮食和规律运动，可根据自身目标选择维持现状或局部塑形。';
+      } else if (bmi < 28) {
+        tagText = '超重'; tagColor = '#e8bf47';
+        adviceText = '您的体重偏重。建议适当制造热量缺口，减少高糖高脂食物，增加有氧与力量训练。';
+      } else {
+        tagText = '肥胖'; tagColor = '#ff5252';
+        adviceText = '您的体重处于肥胖范围。建议在控制饮食和规律运动的基础上逐步减重，必要时可寻求专业医师或营养师指导。';
+      }
+      $('bmiTag').textContent = tagText;
+      $('bmiTag').style.background = tagColor;
+      $('bmiAdvice').textContent = adviceText;
+
+      // --- 2. 计算 BMR 及 TDEE ---
+      const mifflin = sex === 'male'
+        ? 10 * weight + 6.25 * height - 5 * age + 5
+        : 10 * weight + 6.25 * height - 5 * age - 161;
+
+      const harris = sex === 'male'
+        ? 88.362 + 13.397 * weight + 4.799 * height - 5.677 * age
+        : 447.593 + 9.247 * weight + 3.098 * height - 4.330 * age;
+
+      $('mifflinResult').textContent = round(mifflin);
+      $('harrisResult').textContent = round(harris);
+
+      const tdee = mifflin * activity;
+      const cutDeficit = Math.sqrt((tdee * 0.20) * 400);
+      const cutCals = tdee - cutDeficit;
+      const maintCals = tdee;
+      const gainCals = tdee * 1.10;
+
+      $('cutResult').textContent = round(cutCals);
+      $('maintainResult').textContent = round(maintCals);
+      $('gainResult').textContent = round(gainCals);
+
+      // --- 3. 计算 宏量营养素 ---
+      const cutM = calcMacros(cutCals);
+      $('cutCarb').textContent = cutM.carb;
+      $('cutPro').textContent = cutM.pro;
+      $('cutFat').textContent = cutM.fat;
+
+      const maintM = calcMacros(maintCals);
+      $('maintCarb').textContent = maintM.carb;
+      $('maintPro').textContent = maintM.pro;
+      $('maintFat').textContent = maintM.fat;
+
+      const gainM = calcMacros(gainCals);
+      $('gainCarb').textContent = gainM.carb;
+      $('gainPro').textContent = gainM.pro;
+      $('gainFat').textContent = gainM.fat;
+
+      // --- 4. 计算含体脂率的公式 ---
+      if (bodyFat !== null && Number.isFinite(bodyFat) && bodyFat > 0 && bodyFat < 100) {
+        const ffm = weight * (1 - bodyFat / 100);
+        const katch = 370 + 21.6 * ffm;
+        const cunningham = 500 + 22 * ffm;
+        $('katchResult').textContent = round(katch);
+        $('cunninghamResult').textContent = round(cunningham);
+      } else {
+        $('katchResult').textContent = '--';
+        $('cunninghamResult').textContent = '--';
+      }
+    }
+
+    // 事件绑定
+    $('calculateBtn').addEventListener('click', calculate);
+    
+    $('resetBtn').addEventListener('click', () => {
+      document.querySelector('input[name="sex"][value="male"]').checked = true;
+      $('age').value = 25;
+      $('weight').value = 70;
+      $('height').value = 175;
+      $('bodyfat').value = '';
+      $('activity').value = '1.2';
+      calculate();
+    });
+
+    // 实时监听输入变化
+    const inputs = document.querySelectorAll('input, select');
+    inputs.forEach(input => input.addEventListener('input', calculate));
+    inputs.forEach(input => input.addEventListener('change', calculate));
+
+    // 初始执行一次计算
+    calculate();
+  </script>
+</body>
+</html>

@@ -1,7 +1,6 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-  <meta charset="UTF-8">
+<html lang="zh-CN"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <title>拼豆图纸生成器</title>
   <style>
@@ -43,11 +42,8 @@
     main { max-width: 1600px; margin: 0 auto; padding: 16px; display: grid; grid-template-columns: 320px minmax(0,1fr) 340px; gap: 16px; align-items: start; }
     .panel { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); position:relative; }
     
-    /* 左侧设置区 */
     .left-panel { padding: 18px; position: sticky; top: 76px; max-height: calc(100vh - 90px); overflow-y: auto; }
-    /* 中间画布区 */
     .center-panel { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
-    /* 右侧颜色区 */
     .right-panel { position: sticky; top: 76px; height: calc(100vh - 90px); display: flex; flex-direction: column; overflow: hidden; }
     
     h2 { font-size: 15px; margin: 0 0 14px; color:#0f172a; font-weight: 700;}
@@ -63,15 +59,17 @@
     
     .adv-box { background: #f8fafc; border: 1px solid var(--line); border-radius: 10px; padding: 14px; margin-top: 20px; }
 
-    /* 顶部状态统计 */
     .stats-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
     .stat { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); padding: 14px; text-align: center;}
     .stat b { font-size: 22px; display: block; margin-bottom: 2px; font-family: var(--mono); color: var(--brand);}
     .stat span { font-size: 12px; color: var(--muted); font-weight: 600;}
     
-    /* 画布区域 */
     .canvas-wrap { display: flex; flex-direction: column; box-shadow: var(--shadow-lg); border-radius: var(--radius); border: 1px solid var(--line); background: #fff; overflow: hidden;}
-    .toolbar { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid var(--line); background:#f8fafc;}
+    .toolbar { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 10px 14px; border-bottom: 1px solid var(--line); background:#f8fafc; flex-wrap: wrap;}
+    .toolbar-title { color:#0f172a; font-size:14px; white-space: nowrap; }
+    .preview-controls { display: flex; align-items: center; gap: 8px; flex: 1; justify-content: flex-end; min-width: 360px; }
+    .preview-controls .zoom-slider { display: grid; grid-template-columns: minmax(110px, 180px) 52px; gap: 8px; align-items: center; }
+    .view-btn.active { border-color: var(--brand); color: var(--brand2); background: var(--brand-light); }
     .status-badge { font-size: 12px; padding: 4px 10px; border-radius: 20px; background: #e2e8f0; color: #475569; font-weight: 700; display: flex; align-items: center; gap: 6px; }
     .status-badge.active { background: #fef08a; color: #854d0e; }
     .status-badge.done { background: #dcfce7; color: #166534; }
@@ -83,7 +81,6 @@
     .canvasStage { display: inline-block; background: white; box-shadow: 0 10px 25px rgba(0,0,0,.1); transform-origin: top left; }
     canvas { display: block; image-rendering: pixelated; }
     
-    /* 右侧颜色面板 */
     .color-list-wrap { flex: 1; overflow-y: auto; padding: 0; background: #fff;}
     table { width: 100%; border-collapse: collapse; font-size: 13px; text-align: left; }
     th, td { border-bottom: 1px solid var(--line); padding: 10px 12px; }
@@ -100,7 +97,19 @@
     .toast { position: fixed; left: 50%; bottom: 30px; transform: translateX(-50%); background: #0f172a; color: #fff; padding: 12px 20px; border-radius: 8px; opacity: 0; transition: .3s; z-index: 100; pointer-events: none; font-weight: 600; box-shadow: var(--shadow-lg);}
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(-10px); }
 
-    /* 📱 移动端和窄屏自适应 */
+    /* 弹窗样式 */
+    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); display: none; place-items: center; z-index: 100; }
+    .modal-overlay.show { display: grid; }
+    .modal { background: #fff; padding: 24px; border-radius: var(--radius); width: 600px; max-width: 90vw; max-height: 85vh; display: flex; flex-direction: column; box-shadow: var(--shadow-lg); }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+    .modal-header h3 { margin: 0; font-size: 18px; color: var(--text); }
+    .modal-body { overflow-y: auto; flex: 1; margin-bottom: 20px; }
+    .color-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; }
+    .color-chip { border: 2px solid var(--line); border-radius: 8px; padding: 8px; display: flex; align-items: center; gap: 8px; cursor: pointer; transition: 0.15s; user-select: none;}
+    .color-chip:hover { border-color: #cbd5e1; }
+    .color-chip.selected { border-color: var(--brand); background: var(--brand-light); }
+    .modal-footer { display: flex; justify-content: flex-end; gap: 12px; border-top: 1px solid var(--line); padding-top: 16px;}
+
     @media (max-width: 1280px) {
       main { grid-template-columns: 280px minmax(0, 1fr); }
       .right-panel { grid-column: 1 / -1; height: 400px; position: static; }
@@ -125,32 +134,32 @@
     <div class="title">拼豆图纸生成器 <span>Potts Model</span></div>
     <div class="row">
       <label class="filebtn">1. 选择图片<input id="file" type="file" accept="image/*"></label>
-      <button class="primary" id="generate">2. 开始生成</button>
-      <button id="exportFull" disabled>3. 导出图纸 (带色卡)</button>
+      <button class="primary" id="generate" disabled>2. 开始生成</button>
+      <button id="exportFull" disabled>3A. 导出全图</button>
+      <button id="exportRegions" disabled>3B. 分区域批量导出</button>
     </div>
   </div>
 </header>
 
 <main>
-  <!-- 左侧设置面板 -->
   <aside class="panel left-panel">
-    <div id="drop" class="drop"><span style="color:var(--muted); font-weight: 600;">点击或拖拽图片至此</span></div>
+    <div id="drop" class="drop">点击或拖拽上传图片</div>
 
     <h2>基础尺寸与色卡</h2>
     <div class="field"><label>格子宽度</label><input id="gridWidth" type="number" min="10" max="320" value="64"></div>
     <div class="field"><label>拼豆底板</label><select id="sectionSize">
       <option value="15">15 × 15 小板</option>
-      <option value="29" selected>29 × 29 大板</option>
+      <option value="29" selected="">29 × 29 大板</option>
       <option value="50">50 × 50 融合板</option>
     </select></div>
     <div class="field"><label>内置色卡</label><select id="paletteType">
       <option value="mard291">MARD 全色 291</option>
-      <option value="mard221" selected>MARD 标准 221</option>
+      <option value="mard221" selected="">MARD 标准 221</option>
       <option value="artkalS">Artkal S 5mm</option>
       <option value="perler">Perler 标准色</option>
       <option value="hama">Hama 标准色</option>
     </select></div>
-    <div class="field"><label>当前加载</label><span id="paletteStatus" class="value" style="text-align:left; font-weight:600; color:var(--brand);">Perler</span></div>
+    <div class="field"><label>当前加载</label><span id="paletteStatus" class="value" style="text-align:left; font-weight:600; color:var(--brand);">载入中...</span></div>
 
     <div class="adv-box">
       <h2>平滑算法调优 (高级)</h2>
@@ -159,32 +168,46 @@
       <div class="field" title="自动消除单独的杂色豆子。"><label>去孤立噪点</label><div class="slider"><input id="curvatureK" type="range" min="0" max="10" value="2" step="0.5"><span id="curvatureKv" class="value">2.0</span></div></div>
     </div>
     
-    <div class="field" style="margin-top:20px"><label>图纸缩放</label><div class="slider"><input id="screenZoom" type="range" min="20" max="400" value="100"><span id="screenZoomv" class="value">100%</span></div></div>
+    <div id="phase2Box" class="adv-box" style="display:none; margin-top:15px; border: 1px solid var(--brand); background: var(--brand-light);">
+      <h2 style="color:var(--brand2); margin-bottom:10px;">第二阶段：精简色号</h2>
+      <div class="field" title="输入你期望保留的最多颜色数量。">
+        <label style="color:var(--brand2)">保留上限</label>
+        <input id="maxColorsLimit" type="number" min="1" max="255" value="15" style="border-color:var(--brand);">
+      </div>
+      <button id="btnOpenLockModal" class="primary" style="width:100%; margin-top:10px;">智能压缩颜色并二次优化</button>
+    </div>
+
   </aside>
 
-  <!-- 中间画布与统计 -->
   <section class="center-panel">
     <div class="stats-row">
-      <div class="stat"><b id="statGrid">0×0</b><span>尺寸(格)</span></div>
-      <div class="stat"><b id="statTemp">0 %</b><span>优化进度</span></div>
-      <div class="stat"><b id="statBeads">0</b><span>用豆总计</span></div>
-      <div class="stat"><b id="statColors">0</b><span>颜色种类</span></div>
-      <div class="stat"><b id="statEnergy">0.0</b><span>系统能量</span></div>
+      <div class="stat"><b id="statGrid">-</b><span>尺寸(格)</span></div>
+      <div class="stat"><b id="statTemp">-</b><span>优化进度</span></div>
+      <div class="stat"><b id="statBeads">-</b><span>用豆总计</span></div>
+      <div class="stat"><b id="statColors">-</b><span>颜色种类</span></div>
+      <div class="stat"><b id="statEnergy">-</b><span>系统能量</span></div>
     </div>
     
     <div class="canvas-wrap">
       <div class="toolbar">
-        <b style="color:#0f172a; font-size:14px;">图纸预览区 (在右侧点击色号后，可直接在此处涂改)</b>
-        <div id="statusBadge" class="status-badge">
-          <span id="statusText">等待生成</span>
-          <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+        <b class="toolbar-title">图纸预览区（右侧选色后涂改，Ctrl+Z 撤销）</b>
+        <div class="preview-controls">
+          <button id="fitPanorama" class="view-btn" type="button" title="自动缩放到完整显示整张图纸">全景视角</button>
+          <button id="fitLocal" class="view-btn" type="button" title="自动缩放到适合编辑一个底板区域">局部视角</button>
+          <div class="zoom-slider">
+            <input id="screenZoom" type="range" min="10" max="400" value="100" aria-label="图纸缩放">
+            <span id="screenZoomv" class="value">100%</span>
+          </div>
+          <div id="statusBadge" class="status-badge">
+            <span id="statusText">等待生成</span>
+            <div class="progress-track"><div class="progress-fill" id="progressFill" style="width: 0%;"></div></div>
+          </div>
         </div>
       </div>
-      <div class="canvasShell" id="canvasShell"><div class="canvasStage" id="canvasStage"><canvas id="sheet"></canvas></div></div>
+      <div class="canvasShell" id="canvasShell"><div class="canvasStage" id="canvasStage" style="transform: scale(1);"><canvas id="sheet" width="600" height="600"></canvas></div></div>
     </div>
   </section>
 
-  <!-- 右侧颜色列表面板 -->
   <aside class="panel right-panel">
     <div style="padding: 14px 16px; font-weight: 700; border-bottom: 1px solid var(--line); background: #f8fafc; font-size: 15px; border-radius: var(--radius) var(--radius) 0 0;">
       所需色号清单 (点击选取)
@@ -198,700 +221,35 @@
   </aside>
 </main>
 
+<!-- 颜色锁定弹窗 -->
+<div id="lockModal" class="modal-overlay">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>选择强制保留的颜色 (白名单)</h3>
+      <span style="font-size:13px; color:var(--muted)">已选: <b id="modalSelectedCount" style="color:var(--brand)">0</b> / <span id="modalMaxCount">15</span></span>
+    </div>
+    <div style="font-size:13px; color:var(--muted); margin-bottom:12px;">已自动为您勾选反差最大的核心极值色。您可以手动点击修改，不足上限的部分将由AI智能补齐。</div>
+    <div class="modal-body">
+      <div id="modalColorGrid" class="color-grid"></div>
+    </div>
+    <div class="modal-footer">
+      <button id="btnCancelModal">取消</button>
+      <button id="btnConfirmModal" class="primary">确认并开始优化</button>
+    </div>
+  </div>
+</div>
+
 <div id="toast" class="toast"></div>
 
-<!-- 核心离线数据与逻辑脚本 -->
+<!-- 核心数据与逻辑 -->
 <script>
-// ==================== 离线完整色卡数据区 ====================
+const MARD_CSV = `A1,A1,250,244,200,Asher\nA10,A10,247,124,49,Asher\nA11,A11,255,221,153,Asher\nA12,A12,254,159,114,Asher\nA13,A13,255,195,101,Asher\nA14,A14,253,84,61,Asher\nA15,A15,255,243,101,Asher\nA16,A16,255,255,159,Asher\nA17,A17,255,227,110,Asher\nA18,A18,254,190,125,Asher\nA19,A19,253,124,114,Asher\nA2,A2,255,255,213,Asher\nA20,A20,255,213,104,Asher\nA21,A21,255,227,149,Asher\nA22,A22,244,245,125,Asher\nA23,A23,230,201,183,Asher\nA24,A24,247,248,162,Asher\nA25,A25,255,214,125,Asher\nA26,A26,255,200,48,Asher\nA3,A3,254,255,139,Asher\nA4,A4,251,237,86,Asher\nA5,A5,244,215,56,Asher\nA6,A6,254,172,76,Asher\nA7,A7,254,139,76,Asher\nA8,A8,255,218,69,Asher\nA9,A9,255,153,91,Asher\nB1,B1,230,238,49,Asher\nB10,B10,149,211,194,Asher\nB11,B11,93,114,42,Asher\nB12,B12,22,111,65,Asher\nB13,B13,202,235,123,Asher\nB14,B14,173,233,70,Asher\nB15,B15,46,81,50,Asher\nB16,B16,197,237,156,Asher\nB17,B17,155,177,58,Asher\nB18,B18,230,238,73,Asher\nB19,B19,36,184,140,Asher\nB2,B2,99,243,71,Asher\nB20,B20,194,240,204,Asher\nB21,B21,21,106,107,Asher\nB22,B22,11,60,67,Asher\nB23,B23,48,58,33,Asher\nB24,B24,238,252,165,Asher\nB25,B25,78,132,109,Asher\nB26,B26,141,122,53,Asher\nB27,B27,204,225,175,Asher\nB28,B28,158,229,185,Asher\nB29,B29,197,226,84,Asher\nB3,B3,158,247,128,Asher\nB30,B30,226,252,177,Asher\nB31,B31,176,231,146,Asher\nB32,B32,156,171,90,Asher\nB4,B4,93,224,53,Asher\nB5,B5,53,227,82,Asher\nB6,B6,101,226,166,Asher\nB7,B7,61,175,128,Asher\nB8,B8,28,156,79,Asher\nB9,B9,39,82,58,Asher\nC1,C1,232,255,231,Asher\nC10,C10,62,188,226,Asher\nC11,C11,40,221,222,Asher\nC12,C12,28,51,77,Asher\nC13,C13,205,232,255,Asher\nC14,C14,213,253,255,Asher\nC15,C15,34,196,198,Asher\nC16,C16,21,87,168,Asher\nC17,C17,4,209,246,Asher\nC18,C18,29,51,68,Asher\nC19,C19,24,135,162,Asher\nC2,C2,169,249,252,Asher\nC20,C20,23,109,175,Asher\nC21,C21,190,221,255,Asher\nC22,C22,103,180,190,Asher\nC23,C23,200,226,255,Asher\nC24,C24,124,196,255,Asher\nC25,C25,169,229,229,Asher\nC26,C26,60,174,216,Asher\nC27,C27,211,223,250,Asher\nC28,C28,187,207,237,Asher\nC29,C29,52,72,142,Asher\nC3,C3,160,226,251,Asher\nC4,C4,65,204,255,Asher\nC5,C5,1,172,235,Asher\nC6,C6,80,170,240,Asher\nC7,C7,54,119,210,Asher\nC8,C8,15,84,192,Asher\nC9,C9,50,75,202,Asher\nD1,D1,174,180,242,Asher\nD10,D10,54,24,81,Asher\nD11,D11,185,186,225,Asher\nD12,D12,222,154,212,Asher\nD13,D13,185,0,149,Asher\nD14,D14,139,39,155,Asher\nD15,D15,47,31,144,Asher\nD16,D16,227,225,238,Asher\nD17,D17,196,212,246,Asher\nD18,D18,164,94,199,Asher\nD19,D19,216,195,215,Asher\nD2,D2,133,142,221,Asher\nD20,D20,156,50,178,Asher\nD21,D21,154,0,155,Asher\nD22,D22,51,58,149,Asher\nD23,D23,235,218,252,Asher\nD24,D24,119,134,229,Asher\nD25,D25,73,79,199,Asher\nD26,D26,223,194,248,Asher\nD3,D3,47,84,175,Asher\nD4,D4,24,42,132,Asher\nD5,D5,184,67,197,Asher\nD6,D6,172,123,222,Asher\nD7,D7,136,84,179,Asher\nD8,D8,226,211,255,Asher\nD9,D9,213,185,248,Asher\nE1,E1,253,211,204,Asher\nE10,E10,211,55,147,Asher\nE11,E11,252,221,210,Asher\nE12,E12,247,143,195,Asher\nE13,E13,181,0,109,Asher\nE14,E14,255,209,186,Asher\nE15,E15,248,199,201,Asher\nE16,E16,255,243,235,Asher\nE17,E17,255,226,234,Asher\nE18,E18,255,199,219,Asher\nE19,E19,254,186,213,Asher\nE2,E2,254,192,223,Asher\nE20,E20,216,199,209,Asher\nE21,E21,189,157,161,Asher\nE22,E22,183,133,161,Asher\nE23,E23,147,122,141,Asher\nE24,E24,225,188,232,Asher\nE3,E3,255,183,231,Asher\nE4,E4,232,100,158,Asher\nE5,E5,245,81,162,Asher\nE6,E6,241,61,116,Asher\nE7,E7,198,52,120,Asher\nE8,E8,255,219,233,Asher\nE9,E9,233,112,204,Asher\nF1,F1,253,149,123,Asher\nF10,F10,138,69,38,Asher\nF11,F11,90,33,33,Asher\nF12,F12,253,78,106,Asher\nF13,F13,243,87,68,Asher\nF14,F14,255,169,173,Asher\nF15,F15,211,0,34,Asher\nF16,F16,254,194,166,Asher\nF17,F17,230,156,121,Asher\nF18,F18,211,124,70,Asher\nF19,F19,193,68,74,Asher\nF2,F2,252,61,70,Asher\nF20,F20,205,147,145,Asher\nF21,F21,247,180,198,Asher\nF22,F22,253,192,208,Asher\nF23,F23,246,126,102,Asher\nF24,F24,230,152,170,Asher\nF25,F25,229,75,79,Asher\nF3,F3,247,73,65,Asher\nF4,F4,252,40,60,Asher\nF5,F5,231,0,47,Asher\nF6,F6,148,54,48,Asher\nF7,F7,151,25,55,Asher\nF8,F8,188,0,40,Asher\nF9,F9,226,103,122,Asher\nG1,G1,255,226,206,Asher\nG10,G10,217,140,57,Asher\nG11,G11,224,197,147,Asher\nG12,G12,255,200,144,Asher\nG13,G13,183,113,74,Asher\nG14,G14,141,97,76,Asher\nG15,G15,252,249,224,Asher\nG16,G16,242,217,186,Asher\nG17,G17,120,82,75,Asher\nG18,G18,255,228,204,Asher\nG19,G19,224,121,53,Asher\nG2,G2,255,196,170,Asher\nG20,G20,169,64,35,Asher\nG21,G21,184,133,88,Asher\nG3,G3,244,195,165,Asher\nG4,G4,225,179,131,Asher\nG5,G5,237,176,69,Asher\nG6,G6,233,156,23,Asher\nG7,G7,157,91,62,Asher\nG8,G8,117,56,50,Asher\nG9,G9,230,180,131,Asher\nH1,H1,253,251,255,Asher\nH10,H10,238,233,234,Asher\nH11,H11,206,205,213,Asher\nH12,H12,255,245,237,Asher\nH13,H13,245,236,210,Asher\nH14,H14,207,215,211,Asher\nH15,H15,152,166,168,Asher\nH16,H16,29,20,20,Asher\nH17,H17,241,237,237,Asher\nH18,H18,255,253,240,Asher\nH19,H19,246,239,226,Asher\nH2,H2,254,255,255,Asher\nH20,H20,148,159,163,Asher\nH21,H21,255,251,225,Asher\nH22,H22,202,202,212,Asher\nH23,H23,154,157,148,Asher\nH3,H3,182,177,186,Asher\nH4,H4,137,133,140,Asher\nH5,H5,72,70,78,Asher\nH6,H6,47,43,47,Asher\nH7,H7,0,0,0,Asher\nH8,H8,231,214,219,Asher\nH9,H9,237,237,237,Asher\nM1,M1,188,198,184,Asher\nM10,M10,197,178,188,Asher\nM11,M11,159,117,148,Asher\nM12,M12,100,71,73,Asher\nM13,M13,209,144,102,Asher\nM14,M14,199,115,98,Asher\nM15,M15,117,125,120,Asher\nM2,M2,138,163,134,Asher\nM3,M3,105,125,128,Asher\nM4,M4,227,210,188,Asher\nM5,M5,208,204,170,Asher\nM6,M6,176,167,130,Asher\nM7,M7,180,164,151,Asher\nM8,M8,179,130,129,Asher\nM9,M9,165,135,103,Asher\nP1,P1,252,247,248,Asher\nP10,P10,217,199,234,Asher\nP11,P11,243,236,201,Asher\nP12,P12,230,238,242,Asher\nP13,P13,170,203,239,Asher\nP14,P14,51,118,128,Asher\nP15,P15,102,133,117,Asher\nP16,P16,254,191,69,Asher\nP17,P17,254,163,36,Asher\nP18,P18,254,184,159,Asher\nP19,P19,255,254,236,Asher\nP2,P2,176,169,172,Asher\nP20,P20,254,190,207,Asher\nP21,P21,236,190,191,Asher\nP22,P22,228,168,159,Asher\nP23,P23,165,98,104,Asher\nP3,P3,175,220,171,Asher\nP4,P4,254,164,159,Asher\nP5,P5,238,140,62,Asher\nP6,P6,95,208,167,Asher\nP7,P7,235,146,112,Asher\nP8,P8,240,217,88,Asher\nP9,P9,217,217,217,Asher\nQ1,Q1,242,165,232,Asher\nQ2,Q2,233,236,145,Asher\nQ3,Q3,255,255,0,Asher\nQ4,Q4,255,235,250,Asher\nQ5,Q5,118,206,222,Asher\nR1,R1,213,13,33,Asher\nR10,R10,255,219,76,Asher\nR11,R11,255,235,250,Asher\nR12,R12,216,213,206,Asher\nR13,R13,85,81,76,Asher\nR14,R14,159,228,223,Asher\nR15,R15,119,206,233,Asher\nR16,R16,62,207,202,Asher\nR17,R17,74,134,122,Asher\nR18,R18,127,205,157,Asher\nR19,R19,205,229,93,Asher\nR2,R2,249,47,131,Asher\nR20,R20,232,199,180,Asher\nR21,R21,173,111,60,Asher\nR22,R22,108,55,47,Asher\nR23,R23,254,184,114,Asher\nR24,R24,243,193,192,Asher\nR25,R25,201,103,94,Asher\nR26,R26,210,147,190,Asher\nR27,R27,234,140,177,Asher\nR28,R28,156,135,214,Asher\nR3,R3,253,131,36,Asher\nR4,R4,248,236,49,Asher\nR5,R5,53,199,91,Asher\nR6,R6,35,136,145,Asher\nR7,R7,25,119,157,Asher\nR8,R8,26,96,195,Asher\nR9,R9,154,86,180,Asher\nT1,T1,255,255,255,Asher\nY1,Y1,253,111,180,Asher\nY2,Y2,254,180,129,Asher\nY3,Y3,215,250,160,Asher\nY4,Y4,139,219,250,Asher\nY5,Y5,233,135,234,Asher\nZG1,ZG1,218,171,179,Asher\nZG2,ZG2,214,170,135,Asher\nZG3,ZG3,193,189,141,Asher\nZG4,ZG4,150,134,159,Asher\nZG5,ZG5,132,144,166,Asher\nZG6,ZG6,148,191,226,Asher\nZG7,ZG7,226,169,210,Asher\nZG8,ZG8,171,145,192,Asher`;
 
-const MARD_CSV = `A1,A1,250,244,200,Asher
-A10,A10,247,124,49,Asher
-A11,A11,255,221,153,Asher
-A12,A12,254,159,114,Asher
-A13,A13,255,195,101,Asher
-A14,A14,253,84,61,Asher
-A15,A15,255,243,101,Asher
-A16,A16,255,255,159,Asher
-A17,A17,255,227,110,Asher
-A18,A18,254,190,125,Asher
-A19,A19,253,124,114,Asher
-A2,A2,255,255,213,Asher
-A20,A20,255,213,104,Asher
-A21,A21,255,227,149,Asher
-A22,A22,244,245,125,Asher
-A23,A23,230,201,183,Asher
-A24,A24,247,248,162,Asher
-A25,A25,255,214,125,Asher
-A26,A26,255,200,48,Asher
-A3,A3,254,255,139,Asher
-A4,A4,251,237,86,Asher
-A5,A5,244,215,56,Asher
-A6,A6,254,172,76,Asher
-A7,A7,254,139,76,Asher
-A8,A8,255,218,69,Asher
-A9,A9,255,153,91,Asher
-B1,B1,230,238,49,Asher
-B10,B10,149,211,194,Asher
-B11,B11,93,114,42,Asher
-B12,B12,22,111,65,Asher
-B13,B13,202,235,123,Asher
-B14,B14,173,233,70,Asher
-B15,B15,46,81,50,Asher
-B16,B16,197,237,156,Asher
-B17,B17,155,177,58,Asher
-B18,B18,230,238,73,Asher
-B19,B19,36,184,140,Asher
-B2,B2,99,243,71,Asher
-B20,B20,194,240,204,Asher
-B21,B21,21,106,107,Asher
-B22,B22,11,60,67,Asher
-B23,B23,48,58,33,Asher
-B24,B24,238,252,165,Asher
-B25,B25,78,132,109,Asher
-B26,B26,141,122,53,Asher
-B27,B27,204,225,175,Asher
-B28,B28,158,229,185,Asher
-B29,B29,197,226,84,Asher
-B3,B3,158,247,128,Asher
-B30,B30,226,252,177,Asher
-B31,B31,176,231,146,Asher
-B32,B32,156,171,90,Asher
-B4,B4,93,224,53,Asher
-B5,B5,53,227,82,Asher
-B6,B6,101,226,166,Asher
-B7,B7,61,175,128,Asher
-B8,B8,28,156,79,Asher
-B9,B9,39,82,58,Asher
-C1,C1,232,255,231,Asher
-C10,C10,62,188,226,Asher
-C11,C11,40,221,222,Asher
-C12,C12,28,51,77,Asher
-C13,C13,205,232,255,Asher
-C14,C14,213,253,255,Asher
-C15,C15,34,196,198,Asher
-C16,C16,21,87,168,Asher
-C17,C17,4,209,246,Asher
-C18,C18,29,51,68,Asher
-C19,C19,24,135,162,Asher
-C2,C2,169,249,252,Asher
-C20,C20,23,109,175,Asher
-C21,C21,190,221,255,Asher
-C22,C22,103,180,190,Asher
-C23,C23,200,226,255,Asher
-C24,C24,124,196,255,Asher
-C25,C25,169,229,229,Asher
-C26,C26,60,174,216,Asher
-C27,C27,211,223,250,Asher
-C28,C28,187,207,237,Asher
-C29,C29,52,72,142,Asher
-C3,C3,160,226,251,Asher
-C4,C4,65,204,255,Asher
-C5,C5,1,172,235,Asher
-C6,C6,80,170,240,Asher
-C7,C7,54,119,210,Asher
-C8,C8,15,84,192,Asher
-C9,C9,50,75,202,Asher
-D1,D1,174,180,242,Asher
-D10,D10,54,24,81,Asher
-D11,D11,185,186,225,Asher
-D12,D12,222,154,212,Asher
-D13,D13,185,0,149,Asher
-D14,D14,139,39,155,Asher
-D15,D15,47,31,144,Asher
-D16,D16,227,225,238,Asher
-D17,D17,196,212,246,Asher
-D18,D18,164,94,199,Asher
-D19,D19,216,195,215,Asher
-D2,D2,133,142,221,Asher
-D20,D20,156,50,178,Asher
-D21,D21,154,0,155,Asher
-D22,D22,51,58,149,Asher
-D23,D23,235,218,252,Asher
-D24,D24,119,134,229,Asher
-D25,D25,73,79,199,Asher
-D26,D26,223,194,248,Asher
-D3,D3,47,84,175,Asher
-D4,D4,24,42,132,Asher
-D5,D5,184,67,197,Asher
-D6,D6,172,123,222,Asher
-D7,D7,136,84,179,Asher
-D8,D8,226,211,255,Asher
-D9,D9,213,185,248,Asher
-E1,E1,253,211,204,Asher
-E10,E10,211,55,147,Asher
-E11,E11,252,221,210,Asher
-E12,E12,247,143,195,Asher
-E13,E13,181,0,109,Asher
-E14,E14,255,209,186,Asher
-E15,E15,248,199,201,Asher
-E16,E16,255,243,235,Asher
-E17,E17,255,226,234,Asher
-E18,E18,255,199,219,Asher
-E19,E19,254,186,213,Asher
-E2,E2,254,192,223,Asher
-E20,E20,216,199,209,Asher
-E21,E21,189,157,161,Asher
-E22,E22,183,133,161,Asher
-E23,E23,147,122,141,Asher
-E24,E24,225,188,232,Asher
-E3,E3,255,183,231,Asher
-E4,E4,232,100,158,Asher
-E5,E5,245,81,162,Asher
-E6,E6,241,61,116,Asher
-E7,E7,198,52,120,Asher
-E8,E8,255,219,233,Asher
-E9,E9,233,112,204,Asher
-F1,F1,253,149,123,Asher
-F10,F10,138,69,38,Asher
-F11,F11,90,33,33,Asher
-F12,F12,253,78,106,Asher
-F13,F13,243,87,68,Asher
-F14,F14,255,169,173,Asher
-F15,F15,211,0,34,Asher
-F16,F16,254,194,166,Asher
-F17,F17,230,156,121,Asher
-F18,F18,211,124,70,Asher
-F19,F19,193,68,74,Asher
-F2,F2,252,61,70,Asher
-F20,F20,205,147,145,Asher
-F21,F21,247,180,198,Asher
-F22,F22,253,192,208,Asher
-F23,F23,246,126,102,Asher
-F24,F24,230,152,170,Asher
-F25,F25,229,75,79,Asher
-F3,F3,247,73,65,Asher
-F4,F4,252,40,60,Asher
-F5,F5,231,0,47,Asher
-F6,F6,148,54,48,Asher
-F7,F7,151,25,55,Asher
-F8,F8,188,0,40,Asher
-F9,F9,226,103,122,Asher
-G1,G1,255,226,206,Asher
-G10,G10,217,140,57,Asher
-G11,G11,224,197,147,Asher
-G12,G12,255,200,144,Asher
-G13,G13,183,113,74,Asher
-G14,G14,141,97,76,Asher
-G15,G15,252,249,224,Asher
-G16,G16,242,217,186,Asher
-G17,G17,120,82,75,Asher
-G18,G18,255,228,204,Asher
-G19,G19,224,121,53,Asher
-G2,G2,255,196,170,Asher
-G20,G20,169,64,35,Asher
-G21,G21,184,133,88,Asher
-G3,G3,244,195,165,Asher
-G4,G4,225,179,131,Asher
-G5,G5,237,176,69,Asher
-G6,G6,233,156,23,Asher
-G7,G7,157,91,62,Asher
-G8,G8,117,56,50,Asher
-G9,G9,230,180,131,Asher
-H1,H1,253,251,255,Asher
-H10,H10,238,233,234,Asher
-H11,H11,206,205,213,Asher
-H12,H12,255,245,237,Asher
-H13,H13,245,236,210,Asher
-H14,H14,207,215,211,Asher
-H15,H15,152,166,168,Asher
-H16,H16,29,20,20,Asher
-H17,H17,241,237,237,Asher
-H18,H18,255,253,240,Asher
-H19,H19,246,239,226,Asher
-H2,H2,254,255,255,Asher
-H20,H20,148,159,163,Asher
-H21,H21,255,251,225,Asher
-H22,H22,202,202,212,Asher
-H23,H23,154,157,148,Asher
-H3,H3,182,177,186,Asher
-H4,H4,137,133,140,Asher
-H5,H5,72,70,78,Asher
-H6,H6,47,43,47,Asher
-H7,H7,0,0,0,Asher
-H8,H8,231,214,219,Asher
-H9,H9,237,237,237,Asher
-M1,M1,188,198,184,Asher
-M10,M10,197,178,188,Asher
-M11,M11,159,117,148,Asher
-M12,M12,100,71,73,Asher
-M13,M13,209,144,102,Asher
-M14,M14,199,115,98,Asher
-M15,M15,117,125,120,Asher
-M2,M2,138,163,134,Asher
-M3,M3,105,125,128,Asher
-M4,M4,227,210,188,Asher
-M5,M5,208,204,170,Asher
-M6,M6,176,167,130,Asher
-M7,M7,180,164,151,Asher
-M8,M8,179,130,129,Asher
-M9,M9,165,135,103,Asher
-P1,P1,252,247,248,Asher
-P10,P10,217,199,234,Asher
-P11,P11,243,236,201,Asher
-P12,P12,230,238,242,Asher
-P13,P13,170,203,239,Asher
-P14,P14,51,118,128,Asher
-P15,P15,102,133,117,Asher
-P16,P16,254,191,69,Asher
-P17,P17,254,163,36,Asher
-P18,P18,254,184,159,Asher
-P19,P19,255,254,236,Asher
-P2,P2,176,169,172,Asher
-P20,P20,254,190,207,Asher
-P21,P21,236,190,191,Asher
-P22,P22,228,168,159,Asher
-P23,P23,165,98,104,Asher
-P3,P3,175,220,171,Asher
-P4,P4,254,164,159,Asher
-P5,P5,238,140,62,Asher
-P6,P6,95,208,167,Asher
-P7,P7,235,146,112,Asher
-P8,P8,240,217,88,Asher
-P9,P9,217,217,217,Asher
-Q1,Q1,242,165,232,Asher
-Q2,Q2,233,236,145,Asher
-Q3,Q3,255,255,0,Asher
-Q4,Q4,255,235,250,Asher
-Q5,Q5,118,206,222,Asher
-R1,R1,213,13,33,Asher
-R10,R10,255,219,76,Asher
-R11,R11,255,235,250,Asher
-R12,R12,216,213,206,Asher
-R13,R13,85,81,76,Asher
-R14,R14,159,228,223,Asher
-R15,R15,119,206,233,Asher
-R16,R16,62,207,202,Asher
-R17,R17,74,134,122,Asher
-R18,R18,127,205,157,Asher
-R19,R19,205,229,93,Asher
-R2,R2,249,47,131,Asher
-R20,R20,232,199,180,Asher
-R21,R21,173,111,60,Asher
-R22,R22,108,55,47,Asher
-R23,R23,254,184,114,Asher
-R24,R24,243,193,192,Asher
-R25,R25,201,103,94,Asher
-R26,R26,210,147,190,Asher
-R27,R27,234,140,177,Asher
-R28,R28,156,135,214,Asher
-R3,R3,253,131,36,Asher
-R4,R4,248,236,49,Asher
-R5,R5,53,199,91,Asher
-R6,R6,35,136,145,Asher
-R7,R7,25,119,157,Asher
-R8,R8,26,96,195,Asher
-R9,R9,154,86,180,Asher
-T1,T1,255,255,255,Asher
-Y1,Y1,253,111,180,Asher
-Y2,Y2,254,180,129,Asher
-Y3,Y3,215,250,160,Asher
-Y4,Y4,139,219,250,Asher
-Y5,Y5,233,135,234,Asher
-ZG1,ZG1,218,171,179,Asher
-ZG2,ZG2,214,170,135,Asher
-ZG3,ZG3,193,189,141,Asher
-ZG4,ZG4,150,134,159,Asher
-ZG5,ZG5,132,144,166,Asher
-ZG6,ZG6,148,191,226,Asher
-ZG7,ZG7,226,169,210,Asher
-ZG8,ZG8,171,145,192,Asher`;
+const ARTKALS_CSV = `S01,White,234,238,243,Perlervault\nS02,Burning Sand,238,146,124,Perlervault\nS03,Tangerine,255,166,48,Perlervault\nS04,Orange,235,96,39,Perlervault\nS05,Tall Poppy,203,53,49,Perlervault\nS06,Raspberry Pink,239,103,178,Perlervault\nS07,Gray,149,150,152,Perlervault\nS08,Emerald,31,196,103,Perlervault\nS09,Dark Green,0,104,94,Perlervault\nS10,Baby Blue,46,171,216,Perlervault\nS11,Dark Blue,0,79,164,Perlervault\nS12,Pastel Lavender,145,101,178,Perlervault\nS13,Black,41,42,43,Perlervault\nS14,Sandstorm,225,200,53,Perlervault\nS15,Redwood,154,69,65,Perlervault\nS16,Brown,101,70,61,Perlervault\nS17,Light Brown,137,93,73,Perlervault\nS18,Sand,220,163,132,Perlervault\nS19,Bubble Gun,242,191,184,Perlervault\nS20,Green,0,144,83,Perlervault\nS21,Pastel Green,139,178,58,Perlervault\nS22,Purple,72,51,126,Perlervault\nS23,Royal Purple,100,79,164,Perlervault\nS24,True Blue,0,120,191,Perlervault\nS25,Hot Pink,220,81,154,Perlervault\nS26,Magenta,218,67,131,Perlervault\nS27,Yellow,234,193,37,Perlervault\nS28,Lily Pink,221,161,204,Perlervault\nS29,Pastel Yellow,225,211,103,Perlervault\nS30,Shadow Green,158,201,205,Perlervault\nS31,Sea Mist,178,215,206,Perlervault\nS32,Beeswax,238,211,158,Perlervault\nS33,Maverick,192,183,215,Perlervault\nS34,Red,182,25,39,Perlervault\nS35,Mona Lisa,225,204,210,Perlervault\nS36,Old Pink,206,109,131,Perlervault\nS37,Blue-Green,96,191,203,Perlervault\nS38,Burgundy,163,19,74,Perlervault\nS39,Yellow Orange,230,135,57,Perlervault\nS40,Carnation Pink,225,130,176,Perlervault\nS41,Copper,157,91,46,LThanda\nS42,Silver,103,107,115,LThanda\nS43,Dark Gray,112,117,123,Perlervault\nS44,Sky Blue,167,205,222,Perlervault\nS45,Medium Turquoise,0,165,161,Perlervault\nS46,Bright Green,142,195,36,Perlervault\nS47,Marigold,178,121,56,Perlervault\nS48,Corn,236,192,61,Perlervault\nS49,Mulberry Wood,146,30,93,Perlervault\nS50,Mandys Pink,226,164,136,Perlervault\nS51,Spring Sun,223,218,189,Perlervault\nS52,Picasso,234,222,127,Perlervault\nS53,Turquoise,85,164,217,Perlervault\nS54,Light Blue,0,132,206,Perlervault\nS55,Pistachio,151,207,135,Perlervault\nS56,Bright Carrot,249,111,64,Perlervault\nS57,Buccaneer,179,85,64,Perlervault\nS58,Paprika,177,24,54,Perlervault\nS59,Butterfly Bush,79,57,137,Perlervault\nS60,Lavender,138,126,194,Perlervault\nS61,Key Lomen Pie,205,192,63,Perlervault\nS62,Green Tea,0,118,95,Perlervault\nS63,Metallic Gold,105,96,70,LThanda\nS64,Black Rock,54,56,77,Perlervault\nS65,Canary,226,230,93,Perlervault\nS66,Blaze Orange,229,83,60,Perlervault\nS67,Vanilla,233,193,166,Perlervault\nS68,Tan,204,155,116,Perlervault\nS69,Mine Shaft,56,62,68,Perlervault\nS70,Drark Algae,173,173,41,Perlervault\nS71,Jade Green,0,125,43,Perlervault\nS72,Light Sea Blue,104,196,210,Perlervault\nS73,Steel Blue,90,176,191,Perlervault\nS74,Azure,0,158,194,Perlervault\nS75,Dark Steel Blue,0,132,178,Perlervault\nS76,Sea Blue,0,147,169,Perlervault\nS77,Ghost While,212,216,211,Perlervault\nS78,Ash Grey,194,196,194,Perlervault\nS79,Light Gray,167,172,173,Perlervault\nS80,Dark Olive,143,142,60,Perlervault\nS81,Deer,191,145,104,Perlervault\nS82,Clay,170,116,78,Perlervault\nS83,Sienna,187,104,51,Perlervault\nS84,Deep Chestnut,190,93,101,Perlervault\nS85,Red Wine,153,50,58,Perlervault\nS86,Goldenrod,232,174,0,Perlervault\nS87,Coral Red,236,98,94,Perlervault\nS88,Dark Pink,214,39,121,Perlervault\nS89,Charcoal Gray,86,90,94,Perlervault\nS90,Pastel Orange,217,179,94,Perlervault\nS91,Brunswick Green,21,56,56,Perlervault\nS92,Dandelion,206,164,51,Perlervault\nS93,Pale Skin,220,183,148,Perlervault\nS94,Warm Blush,221,146,133,Perlervault\nS95,Salmon,224,123,105,Perlervault\nS96,Apricot,239,127,97,Perlervault\nS97,Papaya,220,119,43,Perlervault\nS98,Himalaya Blue,106,174,219,Perlervault\nS99,Waterfall,97,187,211,Perlervault\nS100,Lagoon,39,155,190,Perlervault\nS101,Electric Blue,0,167,227,Perlervault\nS102,Pool Blue,0,119,202,Perlervault\nS103,Caribbian Blue,0,90,169,Perlervault\nS104,Deep Water,0,127,158,Perlervault\nS105,Petrol Blue,0,125,145,Perlervault\nS106,Wegdewood Blue,0,100,154,Perlervault\nS107,Pond Blue,0,108,159,Perlervault\nS108,Seashell Beige,207,193,121,Perlervault\nS109,Beige,196,174,100,Perlervault\nS110,Beach Beige,171,151,69,Perlervault\nS111,Caffe Latté,151,129,56,Perlervault\nS112,Oaktree Brown,144,124,65,Perlervault\nS113,Khaki,182,174,132,Perlervault\nS114,Light Greengray,165,159,101,Perlervault\nS115,Mossy Green,147,141,84,Perlervault\nS116,Earth Green,141,139,81,Perlervault\nS117,Sage Green,127,126,73,Perlervault\nS118,Pinetree Green,91,110,53,Perlervault\nS119,Frosty Blue,138,213,201,Perlervault\nS120,Polar Mint,124,210,165,Perlervault\nS121,Celadon Green,114,172,154,Perlervault\nS122,Eucalyptus,0,178,111,Perlervault\nS123,Clover Field,62,183,36,Perlervault\nS124,Pooltable Felt,13,117,53,Perlervault\nS125,Snake Green,0,125,110,Perlervault\nS126,Dark Eucalyptus,0,110,105,Perlervault\nS127,Marsmallow Rose,223,195,225,Perlervault\nS128,Light Grape,211,142,212,Perlervault\nS129,Rosebud Pink,213,166,186,Perlervault\nS130,Fuschia,214,102,142,Perlervault\nS131,Candy Violet,184,170,217,Perlervault\nS132,Flamingo,223,72,109,Perlervault\nS133,Pink Plum,188,60,166,Perlervault\nS134,Amethyst,128,56,151,Perlervault\nS135,Moonlight Blue,167,186,225,Perlervault\nS136,Summer Rain,175,184,223,Perlervault\nS137,Azur Blue,107,154,212,Perlervault\nS138,Cornflower Blue,90,137,206,Perlervault\nS139,Forget Me Not,101,138,208,Perlervault\nS140,Indigo,86,108,189,Perlervault\nS141,Horizon Blue,77,116,198,Perlervault\nS142,Cobolt,65,109,190,Perlervault\nS143,Royal Blue,48,66,158,Perlervault\nS144,Marine,2,66,136,Perlervault\nS145,Pale Yellow Moss,214,202,106,Perlervault\nS146,Bloodrose Red,157,26,56,Perlervault\nS147,Spearmint,128,183,161,Perlervault\nS148,Mocha,122,89,79,Perlervault\nS149,Creme,239,219,161,Perlervault\nS150,Iris Violet,136,132,208,Perlervault\nS151,Forrest Green,52,86,33,Perlervault\nS152,Lilac,174,173,220,Perlervault\nS153,Pale Lilac,188,195,225,Perlervault\nS154,Sahara Sand,227,192,154,Perlervault\nS155,Sunkissed Teint,197,139,96,Perlervault\nS156,Steel Grey,90,95,101,Perlervault\nS157,Iron Grey,76,81,86,Perlervault\nS158,Pepper,58,62,66,Perlervault\nS159,Oslo Gray,130,135,139,Perlervault\nSE1,Moon,241,244,250,Exodeca1\nSE2,Raincloud,162,178,211,Exodeca1\nSE3,Winter,131,166,220,Exodeca1\nSE4,Tide,112,216,237,Exodeca1\nSE5,Aquamarine,105,227,213,Exodeca1\nSE6,Neptune,042,099,200,Exodeca1\nSE7,Rose Quartz,213,174,201,Exodeca1\nSE8,Mauve,175,115,154,Exodeca1\nSE9,Dark Mauve,112,075,109,Exodeca1\nSE10,Wild Berry,217,119,205,Exodeca1\nSE11,Sugar Plum,182,067,172,Exodeca1\nSE12,Desert,222,177,129,Exodeca1\nSE13,Peanut,188,157,119,Exodeca1\nSE14,Toffee,172,127,093,Exodeca1\nSE15,Bark,163,126,102,Exodeca1\nSG1,Glow Yellow,198,192,180,LThanda\nSG2,Glow Pink,223,171,188,LThanda\nSG3,Glow Blue,111,173,193,LThanda\nSL1,Glitter Blue,54,135,178,LThanda\nSL2,Glitter Green,17,124,82,LThanda\nSL3,Glitter Red,194,41,51,LThanda\nSL4,Glitter Yellow,205,189,0,LThanda\nSN1,Neon Orange,255,116,5,LThanda\nSN2,Neon Green,1,198,62,LThanda\nSN3,Neon Yellow,242,243,60,LThanda\nSN4,Neon Rose,255,71,122,LThanda\nSP1,Pearlescent Green,147,202,135,LThanda\nSP2,Pearlescent Tangerine,254,127,84,LThanda\nSP3,Pearlescent Orange,240,161,73,LThanda\nSP4,Pearlescent Pink,220,158,169,LThanda\nSP5,Pearlescent Red,214,60,83,LThanda\nSP6,Pearlescent Blue,44,78,151,LThanda\nSP7,Pearlescent Purple,100,66,126,LThanda\nSP8,Pearlescent White,224,219,202,LThanda\nST1,Transparent,199,188,184,LThanda\nST2,Transparent Pink,249,84,152,LThanda\nST3,Transparent Tangering,255,124,69,LThanda\nST4,Transparent Yellow,218,223,61,LThanda\nST5,Transparent Green,15,174,88,LThanda\nST6,Transparent Purple,132,119,179,LThanda`;
 
-const ARTKALS_CSV = `S01,White,234,238,243,Perlervault
-S02,Burning Sand,238,146,124,Perlervault
-S03,Tangerine,255,166,48,Perlervault
-S04,Orange,235,96,39,Perlervault
-S05,Tall Poppy,203,53,49,Perlervault
-S06,Raspberry Pink,239,103,178,Perlervault
-S07,Gray,149,150,152,Perlervault
-S08,Emerald,31,196,103,Perlervault
-S09,Dark Green,0,104,94,Perlervault
-S10,Baby Blue,46,171,216,Perlervault
-S11,Dark Blue,0,79,164,Perlervault
-S12,Pastel Lavender,145,101,178,Perlervault
-S13,Black,41,42,43,Perlervault
-S14,Sandstorm,225,200,53,Perlervault
-S15,Redwood,154,69,65,Perlervault
-S16,Brown,101,70,61,Perlervault
-S17,Light Brown,137,93,73,Perlervault
-S18,Sand,220,163,132,Perlervault
-S19,Bubble Gun,242,191,184,Perlervault
-S20,Green,0,144,83,Perlervault
-S21,Pastel Green,139,178,58,Perlervault
-S22,Purple,72,51,126,Perlervault
-S23,Royal Purple,100,79,164,Perlervault
-S24,True Blue,0,120,191,Perlervault
-S25,Hot Pink,220,81,154,Perlervault
-S26,Magenta,218,67,131,Perlervault
-S27,Yellow,234,193,37,Perlervault
-S28,Lily Pink,221,161,204,Perlervault
-S29,Pastel Yellow,225,211,103,Perlervault
-S30,Shadow Green,158,201,205,Perlervault
-S31,Sea Mist,178,215,206,Perlervault
-S32,Beeswax,238,211,158,Perlervault
-S33,Maverick,192,183,215,Perlervault
-S34,Red,182,25,39,Perlervault
-S35,Mona Lisa,225,204,210,Perlervault
-S36,Old Pink,206,109,131,Perlervault
-S37,Blue-Green,96,191,203,Perlervault
-S38,Burgundy,163,19,74,Perlervault
-S39,Yellow Orange,230,135,57,Perlervault
-S40,Carnation Pink,225,130,176,Perlervault
-S41,Copper,157,91,46,LThanda
-S42,Silver,103,107,115,LThanda
-S43,Dark Gray,112,117,123,Perlervault
-S44,Sky Blue,167,205,222,Perlervault
-S45,Medium Turquoise,0,165,161,Perlervault
-S46,Bright Green,142,195,36,Perlervault
-S47,Marigold,178,121,56,Perlervault
-S48,Corn,236,192,61,Perlervault
-S49,Mulberry Wood,146,30,93,Perlervault
-S50,Mandys Pink,226,164,136,Perlervault
-S51,Spring Sun,223,218,189,Perlervault
-S52,Picasso,234,222,127,Perlervault
-S53,Turquoise,85,164,217,Perlervault
-S54,Light Blue,0,132,206,Perlervault
-S55,Pistachio,151,207,135,Perlervault
-S56,Bright Carrot,249,111,64,Perlervault
-S57,Buccaneer,179,85,64,Perlervault
-S58,Paprika,177,24,54,Perlervault
-S59,Butterfly Bush,79,57,137,Perlervault
-S60,Lavender,138,126,194,Perlervault
-S61,Key Lomen Pie,205,192,63,Perlervault
-S62,Green Tea,0,118,95,Perlervault
-S63,Metallic Gold,105,96,70,LThanda
-S64,Black Rock,54,56,77,Perlervault
-S65,Canary,226,230,93,Perlervault
-S66,Blaze Orange,229,83,60,Perlervault
-S67,Vanilla,233,193,166,Perlervault
-S68,Tan,204,155,116,Perlervault
-S69,Mine Shaft,56,62,68,Perlervault
-S70,Drark Algae,173,173,41,Perlervault
-S71,Jade Green,0,125,43,Perlervault
-S72,Light Sea Blue,104,196,210,Perlervault
-S73,Steel Blue,90,176,191,Perlervault
-S74,Azure,0,158,194,Perlervault
-S75,Dark Steel Blue,0,132,178,Perlervault
-S76,Sea Blue,0,147,169,Perlervault
-S77,Ghost While,212,216,211,Perlervault
-S78,Ash Grey,194,196,194,Perlervault
-S79,Light Gray,167,172,173,Perlervault
-S80,Dark Olive,143,142,60,Perlervault
-S81,Deer,191,145,104,Perlervault
-S82,Clay,170,116,78,Perlervault
-S83,Sienna,187,104,51,Perlervault
-S84,Deep Chestnut,190,93,101,Perlervault
-S85,Red Wine,153,50,58,Perlervault
-S86,Goldenrod,232,174,0,Perlervault
-S87,Coral Red,236,98,94,Perlervault
-S88,Dark Pink,214,39,121,Perlervault
-S89,Charcoal Gray,86,90,94,Perlervault
-S90,Pastel Orange,217,179,94,Perlervault
-S91,Brunswick Green,21,56,56,Perlervault
-S92,Dandelion,206,164,51,Perlervault
-S93,Pale Skin,220,183,148,Perlervault
-S94,Warm Blush,221,146,133,Perlervault
-S95,Salmon,224,123,105,Perlervault
-S96,Apricot,239,127,97,Perlervault
-S97,Papaya,220,119,43,Perlervault
-S98,Himalaya Blue,106,174,219,Perlervault
-S99,Waterfall,97,187,211,Perlervault
-S100,Lagoon,39,155,190,Perlervault
-S101,Electric Blue,0,167,227,Perlervault
-S102,Pool Blue,0,119,202,Perlervault
-S103,Caribbian Blue,0,90,169,Perlervault
-S104,Deep Water,0,127,158,Perlervault
-S105,Petrol Blue,0,125,145,Perlervault
-S106,Wegdewood Blue,0,100,154,Perlervault
-S107,Pond Blue,0,108,159,Perlervault
-S108,Seashell Beige,207,193,121,Perlervault
-S109,Beige,196,174,100,Perlervault
-S110,Beach Beige,171,151,69,Perlervault
-S111,Caffe Latté,151,129,56,Perlervault
-S112,Oaktree Brown,144,124,65,Perlervault
-S113,Khaki,182,174,132,Perlervault
-S114,Light Greengray,165,159,101,Perlervault
-S115,Mossy Green,147,141,84,Perlervault
-S116,Earth Green,141,139,81,Perlervault
-S117,Sage Green,127,126,73,Perlervault
-S118,Pinetree Green,91,110,53,Perlervault
-S119,Frosty Blue,138,213,201,Perlervault
-S120,Polar Mint,124,210,165,Perlervault
-S121,Celadon Green,114,172,154,Perlervault
-S122,Eucalyptus,0,178,111,Perlervault
-S123,Clover Field,62,183,36,Perlervault
-S124,Pooltable Felt,13,117,53,Perlervault
-S125,Snake Green,0,125,110,Perlervault
-S126,Dark Eucalyptus,0,110,105,Perlervault
-S127,Marsmallow Rose,223,195,225,Perlervault
-S128,Light Grape,211,142,212,Perlervault
-S129,Rosebud Pink,213,166,186,Perlervault
-S130,Fuschia,214,102,142,Perlervault
-S131,Candy Violet,184,170,217,Perlervault
-S132,Flamingo,223,72,109,Perlervault
-S133,Pink Plum,188,60,166,Perlervault
-S134,Amethyst,128,56,151,Perlervault
-S135,Moonlight Blue,167,186,225,Perlervault
-S136,Summer Rain,175,184,223,Perlervault
-S137,Azur Blue,107,154,212,Perlervault
-S138,Cornflower Blue,90,137,206,Perlervault
-S139,Forget Me Not,101,138,208,Perlervault
-S140,Indigo,86,108,189,Perlervault
-S141,Horizon Blue,77,116,198,Perlervault
-S142,Cobolt,65,109,190,Perlervault
-S143,Royal Blue,48,66,158,Perlervault
-S144,Marine,2,66,136,Perlervault
-S145,Pale Yellow Moss,214,202,106,Perlervault
-S146,Bloodrose Red,157,26,56,Perlervault
-S147,Spearmint,128,183,161,Perlervault
-S148,Mocha,122,89,79,Perlervault
-S149,Creme,239,219,161,Perlervault
-S150,Iris Violet,136,132,208,Perlervault
-S151,Forrest Green,52,86,33,Perlervault
-S152,Lilac,174,173,220,Perlervault
-S153,Pale Lilac,188,195,225,Perlervault
-S154,Sahara Sand,227,192,154,Perlervault
-S155,Sunkissed Teint,197,139,96,Perlervault
-S156,Steel Grey,90,95,101,Perlervault
-S157,Iron Grey,76,81,86,Perlervault
-S158,Pepper,58,62,66,Perlervault
-S159,Oslo Gray,130,135,139,Perlervault
-SE1,Moon,241,244,250,Exodeca1
-SE2,Raincloud,162,178,211,Exodeca1
-SE3,Winter,131,166,220,Exodeca1
-SE4,Tide,112,216,237,Exodeca1
-SE5,Aquamarine,105,227,213,Exodeca1
-SE6,Neptune,042,099,200,Exodeca1
-SE7,Rose Quartz,213,174,201,Exodeca1
-SE8,Mauve,175,115,154,Exodeca1
-SE9,Dark Mauve,112,075,109,Exodeca1
-SE10,Wild Berry,217,119,205,Exodeca1
-SE11,Sugar Plum,182,067,172,Exodeca1
-SE12,Desert,222,177,129,Exodeca1
-SE13,Peanut,188,157,119,Exodeca1
-SE14,Toffee,172,127,093,Exodeca1
-SE15,Bark,163,126,102,Exodeca1
-SG1,Glow Yellow,198,192,180,LThanda
-SG2,Glow Pink,223,171,188,LThanda
-SG3,Glow Blue,111,173,193,LThanda
-SL1,Glitter Blue,54,135,178,LThanda
-SL2,Glitter Green,17,124,82,LThanda
-SL3,Glitter Red,194,41,51,LThanda
-SL4,Glitter Yellow,205,189,0,LThanda
-SN1,Neon Orange,255,116,5,LThanda
-SN2,Neon Green,1,198,62,LThanda
-SN3,Neon Yellow,242,243,60,LThanda
-SN4,Neon Rose,255,71,122,LThanda
-SP1,Pearlescent Green,147,202,135,LThanda
-SP2,Pearlescent Tangerine,254,127,84,LThanda
-SP3,Pearlescent Orange,240,161,73,LThanda
-SP4,Pearlescent Pink,220,158,169,LThanda
-SP5,Pearlescent Red,214,60,83,LThanda
-SP6,Pearlescent Blue,44,78,151,LThanda
-SP7,Pearlescent Purple,100,66,126,LThanda
-SP8,Pearlescent White,224,219,202,LThanda
-ST1,Transparent,199,188,184,LThanda
-ST2,Transparent Pink,249,84,152,LThanda
-ST3,Transparent Tangering,255,124,69,LThanda
-ST4,Transparent Yellow,218,223,61,LThanda
-ST5,Transparent Green,15,174,88,LThanda
-ST6,Transparent Purple,132,119,179,LThanda`;
+const PERLER_CSV = `80-15179,Evergreen,48,85,69,Perlervault\n80-15181,Light Grey,179,186,184,Perlervault\n80-15182,Lavender,175,159,206,Perlervault\n80-15199,Shamrock,0,143,83,Perlervault\n80-15200,Cobalt,0,101,177,Perlervault\n80-15201,Midnight,47,60,85,Perlervault\n80-15202,Robin's Egg,169,205,213,Perlervault\n80-15203,Flamingo,242,175,183,Perlervault\n80-15204,Salmon,225,116,122,Perlervault\n80-15205,Fawn,201,163,133,Perlervault\n80-15206,Pewter,148,161,157,Perlervault\n80-15207,Charcoal,79,89,90,Perlervault\n80-15208,Toasted Marshmallow,222,218,206,Perlervault\n80-15210,Orchid,177,98,142,Perlervault\n80-15211,Tomato,209,67,55,Perlervault\n80-15212,Spice,217,89,58,Perlervault\n80-15213,Apricot,245,161,104,Perlervault\n80-15214,Sherbet,216,228,124,Perlervault\n80-15215,Mist,147,176,189,Perlervault\n80-15216,Sky,74,192,216,Perlervault\n80-15217,Lagoon,0,164,172,Perlervault\n80-15218,Teal,4,127,138,Perlervault\n80-15219,Fern,127,151,26,Perlervault\n80-15220,Olive,105,110,49,Perlervault\n80-15961,Cherry,157,43,58,Perlervault\n80-19001,White,234,239,238,Perlervault\n80-19002,Creme,225,226,187,Perlervault\n80-19003,Yellow,231,206,62,Perlervault\n80-19004,Orange,235,123,49,Perlervault\n80-19005,Red,176,53,60,Perlervault\n80-19006,Bubblegum,216,114,154,Perlervault\n80-19007,Purple,104,75,134,Perlervault\n80-19008,Dark Blue,14,80,146,Perlervault\n80-19009,Light Blue,39,140,201,Perlervault\n80-19010,Dark Green,0,123,78,Perlervault\n80-19011,Light Green,24,199,177,Perlervault\n80-19012,Brown,103,76,68,Perlervault\n80-19017,Grey,144,148,151,Perlervault\n80-19018,Black,50,50,52,Perlervault\n80-19020,Rust,153,80,67,Perlervault\n80-19021,Light Brown,147,104,72,Perlervault\n80-19033,Peach,233,191,185,Perlervault\n80-19035,Tan,197,172,144,Perlervault\n80-19038,Magenta,224,66,132,Perlervault\n80-19052,Pastel Blue,74,156,207,Perlervault\n80-19053,Pastel Green,109,204,148,Perlervault\n80-19054,Pastel Lavender,147,127,191,Perlervault\n80-19056,Pastel Yellow,233,226,144,Perlervault\n80-19057,Cheddar,251,177,70,Perlervault\n80-19058,Toothpaste,150,209,212,Perlervault\n80-19059,Hot Coral,221,89,91,Perlervault\n80-19060,Plum,167,93,157,Perlervault\n80-19061,Kiwi Lime,105,184,69,Perlervault\n80-19062,Turquoise,0,152,197,Perlervault\n80-19063,Blush,249,146,151,Perlervault\n80-19070,Periwinkle Blue,102,131,183,Perlervault\n80-19079,Light Pink,225,188,206,Perlervault\n80-19080,Green,77,171,100,Perlervault\n80-19083,Pink,212,84,150,Perlervault\n80-19088,Raspberry,152,56,100,Perlervault\n80-19090,Butterscotch,218,153,100,Perlervault\n80-19091,Parrot Green,0,145,136,Perlervault\n80-19092,Dark Grey,88,92,97,Perlervault\n80-19093,Blueberry Creme,133,168,227,Perlervault\n80-19096,Cranapple,132,57,71,Perlervault\n80-19097,Prickly Pear,187,201,56,Perlervault\n80-19098,Sand,229,190,158,Perlervault\n80-15240,Mint,179,238,213,BIORIO\n80-15241,Sour Apple,163,222,111,BIORIO\n80-15242,Cotton Candy,244,121,176,BIORIO\n80-15243,Grape,80,59,156,BIORIO\n80-15244,Rose,210,93,114,BIORIO\n80-15245,Iris,78,86,163,BIORIO\n80-15246,Tangerine,253,89,24,BIORIO\n80-15247,Forest,0,93,87,BIORIO\n80-15248,Eggplant,111,50,85,BIORIO\n80-15249,Honey,218,140,44,BIORIO\n80-15250,Gingerbread,126,84,70,BIORIO\n80-15251,Thistle,140,140,167,Exodeca1\n80-15252,Slate Blue,94,109,123,Exodeca1\n80-15253,Denim,76,99,136,Exodeca1\n80-15254,Sage,154,169,142,Exodeca1\n80-15255,Orange Cream,239,183,155,Exodeca1\n80-15256,Fruit Punch,202,59,101,Exodeca1\n80-15257,Fuchsia,203,89,185,Exodeca1\n80-15258,Mulberry,113,72,117,Exodeca1\n80-15259,Slime,200,200,92,Exodeca1\n80-15260,Stone,152,140,140,Exodeca1\n80-15261,Dark Spruce,20,49,59,Exodeca1\n80-15262,Cocoa,57,41,40,Exodeca1\n80-15265,Twilight Plum,198,133,177,Exodeca1\n80-15266,Caribbean Sea,108,200,173,Exodeca1\n80-15267,Frosted Lilac,205,183,195,Exodeca1\n80-15273,Brick,252,149,116,toptierbeads.com\n80-15274,Rich Butter,246,202,105,toptierbeads.com\n80-15275,Peacock,0,144,172,toptierbeads.com\n80-15276,Carnation Pink,248,199,201,rYonder\n80-15089,Neon Blue,64,106,225,LizzyJanee\n80-15268,Sunflower,222,186,11,LizzyJanee\n80-15269,Lemon,246,217,1,LizzyJanee\n80-15263,Celery,190,212,166,LizzyJanee\n80-15239,Mocha,200,182,147,LizzyJanee\n80-15272,Coral,255,154,139,SteelSkyStudios`;
 
-const PERLER_CSV = `80-15179,Evergreen,48,85,69,Perlervault
-80-15181,Light Grey,179,186,184,Perlervault
-80-15182,Lavender,175,159,206,Perlervault
-80-15199,Shamrock,0,143,83,Perlervault
-80-15200,Cobalt,0,101,177,Perlervault
-80-15201,Midnight,47,60,85,Perlervault
-80-15202,Robin's Egg,169,205,213,Perlervault
-80-15203,Flamingo,242,175,183,Perlervault
-80-15204,Salmon,225,116,122,Perlervault
-80-15205,Fawn,201,163,133,Perlervault
-80-15206,Pewter,148,161,157,Perlervault
-80-15207,Charcoal,79,89,90,Perlervault
-80-15208,Toasted Marshmallow,222,218,206,Perlervault
-80-15210,Orchid,177,98,142,Perlervault
-80-15211,Tomato,209,67,55,Perlervault
-80-15212,Spice,217,89,58,Perlervault
-80-15213,Apricot,245,161,104,Perlervault
-80-15214,Sherbet,216,228,124,Perlervault
-80-15215,Mist,147,176,189,Perlervault
-80-15216,Sky,74,192,216,Perlervault
-80-15217,Lagoon,0,164,172,Perlervault
-80-15218,Teal,4,127,138,Perlervault
-80-15219,Fern,127,151,26,Perlervault
-80-15220,Olive,105,110,49,Perlervault
-80-15961,Cherry,157,43,58,Perlervault
-80-19001,White,234,239,238,Perlervault
-80-19002,Creme,225,226,187,Perlervault
-80-19003,Yellow,231,206,62,Perlervault
-80-19004,Orange,235,123,49,Perlervault
-80-19005,Red,176,53,60,Perlervault
-80-19006,Bubblegum,216,114,154,Perlervault
-80-19007,Purple,104,75,134,Perlervault
-80-19008,Dark Blue,14,80,146,Perlervault
-80-19009,Light Blue,39,140,201,Perlervault
-80-19010,Dark Green,0,123,78,Perlervault
-80-19011,Light Green,24,199,177,Perlervault
-80-19012,Brown,103,76,68,Perlervault
-80-19017,Grey,144,148,151,Perlervault
-80-19018,Black,50,50,52,Perlervault
-80-19020,Rust,153,80,67,Perlervault
-80-19021,Light Brown,147,104,72,Perlervault
-80-19033,Peach,233,191,185,Perlervault
-80-19035,Tan,197,172,144,Perlervault
-80-19038,Magenta,224,66,132,Perlervault
-80-19052,Pastel Blue,74,156,207,Perlervault
-80-19053,Pastel Green,109,204,148,Perlervault
-80-19054,Pastel Lavender,147,127,191,Perlervault
-80-19056,Pastel Yellow,233,226,144,Perlervault
-80-19057,Cheddar,251,177,70,Perlervault
-80-19058,Toothpaste,150,209,212,Perlervault
-80-19059,Hot Coral,221,89,91,Perlervault
-80-19060,Plum,167,93,157,Perlervault
-80-19061,Kiwi Lime,105,184,69,Perlervault
-80-19062,Turquoise,0,152,197,Perlervault
-80-19063,Blush,249,146,151,Perlervault
-80-19070,Periwinkle Blue,102,131,183,Perlervault
-80-19079,Light Pink,225,188,206,Perlervault
-80-19080,Green,77,171,100,Perlervault
-80-19083,Pink,212,84,150,Perlervault
-80-19088,Raspberry,152,56,100,Perlervault
-80-19090,Butterscotch,218,153,100,Perlervault
-80-19091,Parrot Green,0,145,136,Perlervault
-80-19092,Dark Grey,88,92,97,Perlervault
-80-19093,Blueberry Creme,133,168,227,Perlervault
-80-19096,Cranapple,132,57,71,Perlervault
-80-19097,Prickly Pear,187,201,56,Perlervault
-80-19098,Sand,229,190,158,Perlervault
-80-15240,Mint,179,238,213,BIORIO
-80-15241,Sour Apple,163,222,111,BIORIO
-80-15242,Cotton Candy,244,121,176,BIORIO
-80-15243,Grape,80,59,156,BIORIO
-80-15244,Rose,210,93,114,BIORIO
-80-15245,Iris,78,86,163,BIORIO
-80-15246,Tangerine,253,89,24,BIORIO
-80-15247,Forest,0,93,87,BIORIO
-80-15248,Eggplant,111,50,85,BIORIO
-80-15249,Honey,218,140,44,BIORIO
-80-15250,Gingerbread,126,84,70,BIORIO
-80-15251,Thistle,140,140,167,Exodeca1
-80-15252,Slate Blue,94,109,123,Exodeca1
-80-15253,Denim,76,99,136,Exodeca1
-80-15254,Sage,154,169,142,Exodeca1
-80-15255,Orange Cream,239,183,155,Exodeca1
-80-15256,Fruit Punch,202,59,101,Exodeca1
-80-15257,Fuchsia,203,89,185,Exodeca1
-80-15258,Mulberry,113,72,117,Exodeca1
-80-15259,Slime,200,200,92,Exodeca1
-80-15260,Stone,152,140,140,Exodeca1
-80-15261,Dark Spruce,20,49,59,Exodeca1
-80-15262,Cocoa,57,41,40,Exodeca1
-80-15265,Twilight Plum,198,133,177,Exodeca1
-80-15266,Caribbean Sea,108,200,173,Exodeca1
-80-15267,Frosted Lilac,205,183,195,Exodeca1
-80-15273,Brick,252,149,116,toptierbeads.com
-80-15274,Rich Butter,246,202,105,toptierbeads.com
-80-15275,Peacock,0,144,172,toptierbeads.com
-80-15276,Carnation Pink,248,199,201,rYonder
-80-15089,Neon Blue,64,106,225,LizzyJanee
-80-15268,Sunflower,222,186,11,LizzyJanee
-80-15269,Lemon,246,217,1,LizzyJanee
-80-15263,Celery,190,212,166,LizzyJanee
-80-15239,Mocha,200,182,147,LizzyJanee
-80-15272,Coral,255,154,139,SteelSkyStudios`;
-
-const HAMA_CSV = `H01,White,229,236,241,Jeppewl
-H02,Cream,228,228,197,Jeppewl
-H03,Yellow,233,199,4,Jeppewl
-H04,Orange,209,72,3,Jeppewl
-H05,Red,180,6,14,Jeppewl
-H06,Pink,234,138,165,Jeppewl
-H07,Purple,113,34,151,Jeppewl
-H08,Blue,2,57,163,Jeppewl
-H09,Light Blue,2,91,195,Jeppewl
-H10,Green,2,118,67,Jeppewl
-H11,Light Green,25,205,167,Jeppewl
-H12,Brown,62,39,26,Jeppewl
-H13,Transparent Red,192,36,53,LThanda
-H14,Transparent Yellow,228,170,50,galaxy
-H16,Transparent Green,55,184,118,LThanda
-H17,Grey,131,143,152,Jeppewl
-H18,Black,20,19,21,Jeppewl
-H19,Clear,216,210,206,LThanda
-H20,Reddish Brown,141,42,15,Jeppewl
-H21,Light Brown,190,108,33,Jeppewl
-H22,Dark Red,145,2,10,Jeppewl
-H24,Translucent Purple,104,62,154,LThanda
-H25,Translucent Brown,135,89,61,LThanda
-H26,Matt Rose,232,164,152,Jeppewl
-H27,Beige,220,177,142,Jeppewl
-H28,Dark Green,30,44,28,Jeppewl
-H29,Claret,191,1,66,Jeppewl
-H30,Burgundy,78,12,27,Jeppewl
-H31,Turquoise,72,154,185,Jeppewl
-H32,Neon Fuchsia,255,32,141,LThanda
-H33,Cerise,255,57,86,Jeppewl
-H34,Neon Yellow,229,239,19,LThanda
-H35,Neon Red,255,40,51,LThanda
-H36,Neon Blue,35,83,176,LThanda
-H37,Neon Green,6,183,60,LThanda
-H38,Neon Orange,253,134,0,LThanda
-H39,Fluorescent Yellow,241,242,28,LThanda
-H40,Fluorescent Orange,254,99,11,LThanda
-H41,Fluorescent Blue,38,89,178,LThanda
-H42,Fluorescent Green,12,189,81,LThanda
-H43,Pastel Yellow,231,228,90,Jeppewl
-H44,Pastel Red,249,97,96,Jeppewl
-H45,Pastel Purple,142,105,205,Jeppewl
-H46,Pastel Blue,81,174,228,Jeppewl
-H47,Pastel Green,128,223,150,Jeppewl
-H48,Pastel Pink,214,122,209,Jeppewl
-H49,Azure,15,172,209,Jeppewl
-H60,Teddybear Brown,240,152,30,Jeppewl
-H70,Light Grey,165,179,192,Jeppewl
-H71,Dark Grey,68,80,89,Jeppewl
-H75,Tan,183,140,109,Jeppewl
-H76,Nougat,138,89,55,Jeppewl
-H77,Cloudy White,206,209,200,Jeppewl
-H78,Light Peach,247,193,170,Jeppewl
-H79,Apricot,248,118,51,Jeppewl
-H82,Plum,145,23,90,Jeppewl
-H83,Petrol Blue,3,122,159,Jeppewl
-H84,Olive Green,104,120,54,Jeppewl
-H95,Pastel Rose,221,155,163,Jeppewl
-H96,Pastel Lilac,180,145,173,Jeppewl
-H97,Pastel Ice Blue,138,175,194,Jeppewl
-H98,Pastel Mint,148,204,164,Jeppewl
-H15,Transparent Blue,72,126,213,Exodeca1
-H55,Green (Glow in the Dark),250,248,237,Exodeca1
-H56,Red (Glow in the Dark),237,191,159,Exodeca1
-H57,Blue (Glow in the Dark),196,208,227,Exodeca1
-H61,Gold,217,147,80,Exodeca1
-H62,Silver,72,71,74,Exodeca1
-H63,Bronze,66,49,47,Exodeca1
-H64,Pearl,239,235,228,Exodeca1
-H72,Translucent Pink,240,151,176,Exodeca1
-H73,Translucent Aqua,89,174,245,Exodeca1
-H74,Translucent Lilac,91,85,189,Exodeca1
-H101,Eucalyptus,169,195,155,Tryk47
-H102,Forest Green,53,107,45,Tryk47
-H103,Light Yellow,255,230,96,Tryk47
-H104,Lime,188,209,34,Tryk47
-H105,Light Apricot,255,172,120,Tryk47
-H106,Light Lavender,204,197,237,Tryk47
-H107,Lavender,106,135,193,Tryk47
-H108,Aubergine,42,37,54,rYonder
-H109,Cloudy Grey,138,132,127,rYonder
-H110,Matcha,131,137,86,rYonder
-H111,Dark Blush,131,88,84,rYonder
-H112,Blush,173,138,130,rYonder
-H113,Aqua,95,136,123,rYonder
-H114,Cherry Red,154,44,49,rYonder
-H115,Bright Green,110,151,95,rYonder
-H116,Midnight Blue,34,40,56,rYonder
-H117,Taupe Grey,119,113,105,rYonder
-H118,Maroon Red,97,41,50,rYonder
-H119,Sky Blue,65,103,180,rYonder`;
+const HAMA_CSV = `H01,White,229,236,241,Jeppewl\nH02,Cream,228,228,197,Jeppewl\nH03,Yellow,233,199,4,Jeppewl\nH04,Orange,209,72,3,Jeppewl\nH05,Red,180,6,14,Jeppewl\nH06,Pink,234,138,165,Jeppewl\nH07,Purple,113,34,151,Jeppewl\nH08,Blue,2,57,163,Jeppewl\nH09,Light Blue,2,91,195,Jeppewl\nH10,Green,2,118,67,Jeppewl\nH11,Light Green,25,205,167,Jeppewl\nH12,Brown,62,39,26,Jeppewl\nH13,Transparent Red,192,36,53,LThanda\nH14,Transparent Yellow,228,170,50,galaxy\nH16,Transparent Green,55,184,118,LThanda\nH17,Grey,131,143,152,Jeppewl\nH18,Black,20,19,21,Jeppewl\nH19,Clear,216,210,206,LThanda\nH20,Reddish Brown,141,42,15,Jeppewl\nH21,Light Brown,190,108,33,Jeppewl\nH22,Dark Red,145,2,10,Jeppewl\nH24,Translucent Purple,104,62,154,LThanda\nH25,Translucent Brown,135,89,61,LThanda\nH26,Matt Rose,232,164,152,Jeppewl\nH27,Beige,220,177,142,Jeppewl\nH28,Dark Green,30,44,28,Jeppewl\nH29,Claret,191,1,66,Jeppewl\nH30,Burgundy,78,12,27,Jeppewl\nH31,Turquoise,72,154,185,Jeppewl\nH32,Neon Fuchsia,255,32,141,LThanda\nH33,Cerise,255,57,86,Jeppewl\nH34,Neon Yellow,229,239,19,LThanda\nH35,Neon Red,255,40,51,LThanda\nH36,Neon Blue,35,83,176,LThanda\nH37,Neon Green,6,183,60,LThanda\nH38,Neon Orange,253,134,0,LThanda\nH39,Fluorescent Yellow,241,242,28,LThanda\nH40,Fluorescent Orange,254,99,11,LThanda\nH41,Fluorescent Blue,38,89,178,LThanda\nH42,Fluorescent Green,12,189,81,LThanda\nH43,Pastel Yellow,231,228,90,Jeppewl\nH44,Pastel Red,249,97,96,Jeppewl\nH45,Pastel Purple,142,105,205,Jeppewl\nH46,Pastel Blue,81,174,228,Jeppewl\nH47,Pastel Green,128,223,150,Jeppewl\nH48,Pastel Pink,214,122,209,Jeppewl\nH49,Azure,15,172,209,Jeppewl\nH60,Teddybear Brown,240,152,30,Jeppewl\nH70,Light Grey,165,179,192,Jeppewl\nH71,Dark Grey,68,80,89,Jeppewl\nH75,Tan,183,140,109,Jeppewl\nH76,Nougat,138,89,55,Jeppewl\nH77,Cloudy White,206,209,200,Jeppewl\nH78,Light Peach,247,193,170,Jeppewl\nH79,Apricot,248,118,51,Jeppewl\nH82,Plum,145,23,90,Jeppewl\nH83,Petrol Blue,3,122,159,Jeppewl\nH84,Olive Green,104,120,54,Jeppewl\nH95,Pastel Rose,221,155,163,Jeppewl\nH96,Pastel Lilac,180,145,173,Jeppewl\nH97,Pastel Ice Blue,138,175,194,Jeppewl\nH98,Pastel Mint,148,204,164,Jeppewl\nH15,Transparent Blue,72,126,213,Exodeca1\nH55,Green (Glow in the Dark),250,248,237,Exodeca1\nH56,Red (Glow in the Dark),237,191,159,Exodeca1\nH57,Blue (Glow in the Dark),196,208,227,Exodeca1\nH61,Gold,217,147,80,Exodeca1\nH62,Silver,72,71,74,Exodeca1\nH63,Bronze,66,49,47,Exodeca1\nH64,Pearl,239,235,228,Exodeca1\nH72,Translucent Pink,240,151,176,Exodeca1\nH73,Translucent Aqua,89,174,245,Exodeca1\nH74,Translucent Lilac,91,85,189,Exodeca1\nH101,Eucalyptus,169,195,155,Tryk47\nH102,Forest Green,53,107,45,Tryk47\nH103,Light Yellow,255,230,96,Tryk47\nH104,Lime,188,209,34,Tryk47\nH105,Light Apricot,255,172,120,Tryk47\nH106,Light Lavender,204,197,237,Tryk47\nH107,Lavender,106,135,193,Tryk47\nH108,Aubergine,42,37,54,rYonder\nH109,Cloudy Grey,138,132,127,rYonder\nH110,Matcha,131,137,86,rYonder\nH111,Dark Blush,131,88,84,rYonder\nH112,Blush,173,138,130,rYonder\nH113,Aqua,95,136,123,rYonder\nH114,Cherry Red,154,44,49,rYonder\nH115,Bright Green,110,151,95,rYonder\nH116,Midnight Blue,34,40,56,rYonder\nH117,Taupe Grey,119,113,105,rYonder\nH118,Maroon Red,97,41,50,rYonder\nH119,Sky Blue,65,103,180,rYonder`;
 
 (() => {
   const $ = id => document.getElementById(id);
@@ -900,7 +258,12 @@ H119,Sky Blue,65,103,180,rYonder`;
   let animFrame = null, isAnimating = false;
   let activeBrushIndex = null; 
   let isDrawing = false;
+  let hasChangedInStroke = false; // 用于判断本次涂抹是否真的修改了颜色
   let lastFrameTime = 0; const fpsInterval = 1000 / 30;
+
+  // 历史撤销栈
+  let historyStack = [];
+  const MAX_HISTORY = 30;
 
   const SYMBOL_CHARS = "●▲■◆★✚✿✦○△□◇×+▧▩◐◑♣♥♠♢◎◍ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#&%*=-~?<>abcdefghijklmnopqrstuvwxyz①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮⑯⑰⑱⑲⑳㉑㉒㉓㉔㉕㉖㉗㉘㉙㉚㉛㉜㉝㉞㉟㊱㊲㊳㊴㊵".split('');
 
@@ -989,7 +352,6 @@ H119,Sky Blue,65,103,180,rYonder`;
       return FULL_PALETTE;
     }
     
-    // 离线读取预制常量并模拟异步微小延迟确保渲染不卡顿
     $("paletteStatus").textContent = `载入中...`;
     await new Promise(r => setTimeout(r, 10)); 
     
@@ -1020,14 +382,12 @@ H119,Sky Blue,65,103,180,rYonder`;
   }
   function labChroma(lab){ return Math.sqrt(lab.a*lab.a + lab.b*lab.b); }
 
-  // 标准 CIE94：把第一个颜色视为“标准色”，因此用于 原图像素 -> 色卡颜色 的单向数据项。
   function deltaE94(l1, l2){
     let dL = l1.l - l2.l, c1 = labChroma(l1), c2 = labChroma(l2), dC = c1 - c2;
     let dH_sq = (l1.a - l2.a)**2 + (l1.b - l2.b)**2 - dC*dC; let dH = dH_sq > 0 ? Math.sqrt(dH_sq) : 0;
     return Math.sqrt(dL*dL + (dC/(1+0.045*c1))**2 + (dH/(1+0.015*c1))**2);
   }
 
-  // 对称 CIE94：使用两个颜色的平均色度，适合无向邻接边、Potts/MRF 平滑项。
   function deltaE94Sym(l1, l2){
     let dL = l1.l - l2.l, c1 = labChroma(l1), c2 = labChroma(l2), cBar = (c1 + c2) * 0.5, dC = c1 - c2;
     let dH_sq = (l1.a - l2.a)**2 + (l1.b - l2.b)**2 - dC*dC; let dH = dH_sq > 0 ? Math.sqrt(dH_sq) : 0;
@@ -1047,10 +407,12 @@ H119,Sky Blue,65,103,180,rYonder`;
   $("generate").onclick = async () => {
     if(!img) return;
     if(isAnimating) { isAnimating = false; cancelAnimationFrame(animFrame); }
-    $("generate").disabled = true; $("exportFull").disabled = true;
+    $("generate").disabled = true; $("exportFull").disabled = true; $("exportRegions").disabled = true;
+    $("phase2Box").style.display = "none";
     $("statusBadge").className = "status-badge active"; $("statusText").textContent = "正在构建物理场...";
     $("progressFill").style.width = "0%";
     activeBrushIndex = null;
+    historyStack = []; // 清空历史
     try {
       await loadPaletteByKey($("paletteType").value);
       setTimeout(() => { setupPhysicalSystem(); }, 50);
@@ -1065,7 +427,7 @@ H119,Sky Blue,65,103,180,rYonder`;
 
   $("paletteType").onchange = async () => {
     result = null; activeBrushIndex = null;
-    $("colorList").innerHTML = ""; $("exportFull").disabled = true;
+    $("colorList").innerHTML = ""; $("exportFull").disabled = true; $("exportRegions").disabled = true;
     try { await loadPaletteByKey($("paletteType").value); }
     catch (err) { console.error(err); $("paletteStatus").textContent = "加载失败"; }
   };
@@ -1119,22 +481,10 @@ H119,Sky Blue,65,103,180,rYonder`;
     for (let y = 0; y < gh; y++) {
       for (let x = 0; x < gw; x++) {
         let p = y * gw + x;
-
-        if (x < gw - 1) {
-          W_right[p] = edgeWeight(deltaE94Sym(obsField[p], obsField[p + 1]));
-        }
-
-        if (y < gh - 1) {
-          W_bottom[p] = edgeWeight(deltaE94Sym(obsField[p], obsField[p + gw]));
-        }
-
-        if (x < gw - 1 && y < gh - 1) {
-          W_dr[p] = edgeWeight(deltaE94Sym(obsField[p], obsField[p + gw + 1]));
-        }
-
-        if (x > 0 && y < gh - 1) {
-          W_dl[p] = edgeWeight(deltaE94Sym(obsField[p], obsField[p + gw - 1]));
-        }
+        if (x < gw - 1) W_right[p] = edgeWeight(deltaE94Sym(obsField[p], obsField[p + 1]));
+        if (y < gh - 1) W_bottom[p] = edgeWeight(deltaE94Sym(obsField[p], obsField[p + gw]));
+        if (x < gw - 1 && y < gh - 1) W_dr[p] = edgeWeight(deltaE94Sym(obsField[p], obsField[p + gw + 1]));
+        if (x > 0 && y < gh - 1) W_dl[p] = edgeWeight(deltaE94Sym(obsField[p], obsField[p + gw - 1]));
       }
     }
 
@@ -1178,11 +528,6 @@ H119,Sky Blue,65,103,180,rYonder`;
     let candidateArr = new Int32Array(1 + s.topKCount + 8); 
     const numStates = FULL_PALETTE.length;
 
-    // 4-phase update for 8-neighborhood dependencies.
-    // phase = 2 * (x mod 2) + (y mod 2) creates four groups:
-    // (0,0), (0,1), (1,0), (1,1). Cells in the same group are
-    // separated by at least 2 cells horizontally/vertically/diagonally,
-    // so no two cells in the same phase are direct 8-neighbors.
     for(let phase = 0; phase < 4; phase++) {
         for(let y=0; y<s.h; y++) {
             for(let x=0; x<s.w; x++) {
@@ -1264,13 +609,16 @@ H119,Sky Blue,65,103,180,rYonder`;
         $("statusBadge").className = "status-badge done"; 
         $("statusText").textContent = "计算完成";
         $("progressFill").style.width = "100%";
-        $("generate").disabled = false; $("exportFull").disabled = false;
+        $("generate").disabled = false; 
+        $("exportFull").disabled = false; $("exportRegions").disabled = false;
+        $("btnOpenLockModal").disabled = false;
+        historyStack = []; // 每次大生成完成，清空重做历史
         toast("✨ 图纸生成完毕！点击右侧颜色可手动涂抹修改。");
         finalizeResult();
     }
   }
 
-  const CW = 24; // 输出格子的像素大小 (保证导出图表清晰度)
+  const CW = 24; 
 
   function renderCurrentState() {
     let s = simState; 
@@ -1351,58 +699,232 @@ H119,Sky Blue,65,103,180,rYonder`;
     zoomUpdate();
   }
 
-  function maybeMergeRareColors(maxCount = 2) {
-    if(!result) return false;
-
-    const counts = getColorCounts(result.cells);
-    const rareIdxs = Object.entries(counts)
-      .filter(([, count]) => count <= maxCount)
-      .map(([idx]) => Number(idx));
-
-    if(rareIdxs.length === 0) return false;
-
-    const rareSet = new Set(rareIdxs);
-    const replacementCandidates = Object.keys(counts)
-      .map(Number)
-      .filter(idx => !rareSet.has(idx));
-
-    if(replacementCandidates.length === 0) return false;
-
-    const rareText = rareIdxs
-      .map(idx => `${FULL_PALETTE[idx].code} ${FULL_PALETTE[idx].name}：${counts[idx]} 颗`)
-      .join("\n");
-
-    const ok = confirm(`检测到以下色号使用极少 (≤${maxCount}颗)：\n\n${rareText}\n\n是否自动用最相近的颜色进行合并？`);
-
-    if(!ok) return false;
-
-    const numStates = FULL_PALETTE.length;
-    let mergedCells = 0;
-
-    for(let p=0; p<result.cells.length; p++) {
-      if(!rareSet.has(result.cells[p])) continue;
-      let bestIdx = replacementCandidates[0];
-      let bestE = simState.E_data[p * numStates + bestIdx];
-      for(let i=1; i<replacementCandidates.length; i++) {
-        const candidateIdx = replacementCandidates[i];
-        const e = simState.E_data[p * numStates + candidateIdx];
-        if(e < bestE) { bestE = e; bestIdx = candidateIdx; }
-      }
-      result.cells[p] = bestIdx;
-      mergedCells++;
-    }
-
-    if(activeBrushIndex !== null && rareSet.has(activeBrushIndex)) activeBrushIndex = null;
-    toast(`已自动合并 ${mergedCells} 颗低数量色号。`);
-    return true;
-  }
-
   function finalizeResult() {
     let s = simState;
     result = { w: s.w, h: s.h, cells: Array.from(s.labels) };
-    maybeMergeRareColors(2);
+    
+    const finalUsed = getFinalUsedColors(result.cells);
+    $("maxColorsLimit").value = Math.max(1, finalUsed.length);
+    $("phase2Box").style.display = "block";
+    
     renderFinalResultGrid();
   }
+
+  // ==== 锁色模态框逻辑 ====
+  let currentLockedIndices = new Set();
+  let currentModalTargetK = 0;
+
+  $("btnOpenLockModal").onclick = () => {
+    if (!result) return;
+    let targetColorCount = parseInt($("maxColorsLimit").value, 10);
+    if (isNaN(targetColorCount) || targetColorCount < 1) return;
+
+    let finalUsed = getFinalUsedColors(result.cells);
+    if (finalUsed.length <= targetColorCount) {
+      toast("当前颜色数已少于或等于目标上限，无需优化！");
+      return;
+    }
+
+    currentModalTargetK = targetColorCount;
+    currentLockedIndices.clear();
+    $("modalMaxCount").textContent = targetColorCount;
+    $("modalSelectedCount").textContent = "0";
+
+    // 寻找极值黑白以预选
+    let bestBlackIdx = -1, minL = 25;
+    let bestWhiteIdx = -1, maxL = 85;
+    finalUsed.forEach(c => {
+      if (c.lab.l < minL) { minL = c.lab.l; bestBlackIdx = c.idx; }
+      if (c.lab.l > maxL) { maxL = c.lab.l; bestWhiteIdx = c.idx; }
+    });
+
+    if (bestBlackIdx !== -1) currentLockedIndices.add(bestBlackIdx);
+    if (bestWhiteIdx !== -1 && currentLockedIndices.size < targetColorCount) currentLockedIndices.add(bestWhiteIdx);
+
+    // 渲染网格
+    const grid = $("modalColorGrid");
+    grid.innerHTML = "";
+    finalUsed.forEach(c => {
+      let div = document.createElement("div");
+      div.className = "color-chip" + (currentLockedIndices.has(c.idx) ? " selected" : "");
+      div.innerHTML = `<span class="swatch" style="background:${c.hex}"></span>
+                       <div style="font-size:12px; line-height:1.2;">
+                         <div style="font-weight:700; color:#0f172a">${c.code}</div>
+                         <div style="color:var(--muted)">${c.count} 颗</div>
+                       </div>`;
+      
+      div.onclick = () => {
+        if (currentLockedIndices.has(c.idx)) {
+          currentLockedIndices.delete(c.idx);
+          div.classList.remove("selected");
+        } else {
+          if (currentLockedIndices.size >= currentModalTargetK) {
+            toast(`最多只能强制保留 ${currentModalTargetK} 种颜色`);
+            return;
+          }
+          currentLockedIndices.add(c.idx);
+          div.classList.add("selected");
+        }
+        $("modalSelectedCount").textContent = currentLockedIndices.size;
+      };
+      grid.appendChild(div);
+    });
+
+    $("modalSelectedCount").textContent = currentLockedIndices.size;
+    $("lockModal").classList.add("show");
+  };
+
+  $("btnCancelModal").onclick = () => $("lockModal").classList.remove("show");
+
+  // ==== 核心：通过聚类挑选兼具频次与色系覆盖度的代表色 ====
+  function selectRepresentativeColors(usedColorCounts, K, fullPalette, userLockedSet) {
+    if (usedColorCounts.length <= K) return usedColorCounts.map(c => c.idx);
+
+    let points = usedColorCounts.map(c => ({
+      idx: c.idx,
+      lab: fullPalette[c.idx].lab,
+      weight: Math.sqrt(c.count)
+    }));
+
+    let centers = [];
+    let protectedIndices = new Set();
+
+    // 1. 优先加载用户手动锁定的颜色
+    for (let lockedIdx of userLockedSet) {
+      if (centers.length >= K) break;
+      let pt = points.find(p => p.idx === lockedIdx);
+      if (pt) {
+        centers.push({ ...pt.lab });
+        protectedIndices.add(pt.idx);
+      }
+    }
+
+    // 如果一个都没选，拿数量最多的兜底
+    if (centers.length === 0) {
+      points.sort((a, b) => b.weight - a.weight);
+      centers.push({ ...points[0].lab });
+      protectedIndices.add(points[0].idx);
+    }
+
+    // 2. K-Means++ 继续挑选剩下的初始中心
+    while (centers.length < K) {
+      let maxScore = -1, bestPoint = null;
+      for (let pt of points) {
+        if (protectedIndices.has(pt.idx)) continue; 
+
+        let minDist = Infinity;
+        for (let c of centers) {
+          let d = deltaE94Sym(pt.lab, c);
+          if (d < minDist) minDist = d;
+        }
+        let score = pt.weight * (minDist * minDist);
+        if (score > maxScore) { maxScore = score; bestPoint = pt; }
+      }
+      if (bestPoint) {
+        centers.push({ ...bestPoint.lab });
+        protectedIndices.add(bestPoint.idx);
+      } else { break; }
+    }
+
+    // 3. K-Means 迭代优化重心
+    for (let iter = 0; iter < 10; iter++) {
+      let clusters = Array.from({length: K}, () => ({ l:0, a:0, b:0, w:0 }));
+      
+      for (let pt of points) {
+        let minD = Infinity, bestK = 0;
+        for (let k = 0; k < K; k++) {
+          let d = deltaE94Sym(pt.lab, centers[k]);
+          if (d < minD) { minD = d; bestK = k; }
+        }
+        clusters[bestK].l += pt.lab.l * pt.weight;
+        clusters[bestK].a += pt.lab.a * pt.weight;
+        clusters[bestK].b += pt.lab.b * pt.weight;
+        clusters[bestK].w += pt.weight;
+      }
+
+      for (let k = 0; k < K; k++) {
+        if (clusters[k].w > 0) {
+          centers[k].l = clusters[k].l / clusters[k].w;
+          centers[k].a = clusters[k].a / clusters[k].w;
+          centers[k].b = clusters[k].b / clusters[k].w;
+        }
+      }
+    }
+
+    // 4. 吸附回色卡
+    let selectedIndices = new Set();
+
+    // 强制保护用户选择的
+    for (let lockedIdx of userLockedSet) {
+      if (selectedIndices.size < K) selectedIndices.add(lockedIdx);
+    }
+
+    for (let center of centers) {
+      if (selectedIndices.size >= K) break;
+      let bestIdx = -1, minD = Infinity;
+      for (let i = 0; i < fullPalette.length; i++) {
+        if (selectedIndices.has(i)) continue;
+        let d = deltaE94Sym(center, fullPalette[i].lab);
+        if (d < minD) { minD = d; bestIdx = i; }
+      }
+      if (bestIdx !== -1) selectedIndices.add(bestIdx);
+    }
+
+    return Array.from(selectedIndices);
+  }
+
+  // 第二阶段：限制颜色继续优化
+  $("btnConfirmModal").onclick = () => {
+    $("lockModal").classList.remove("show");
+    if (!result) return;
+    
+    let targetColorCount = currentModalTargetK;
+    let counts = {};
+    result.cells.forEach(idx => counts[idx] = (counts[idx] || 0) + 1);
+    let usedData = Object.entries(counts).map(([idx, count]) => ({ idx: Number(idx), count }));
+
+    // 调用智能聚类，带入用户锁定的 Set
+    let allowedArr = selectRepresentativeColors(usedData, targetColorCount, FULL_PALETTE, currentLockedIndices);
+    let allowedIndices = new Set(allowedArr);
+
+    let N = simState.w * simState.h;
+    let newTopKCount = Math.min(TOP_K_COUNT, allowedArr.length);
+    let newTopK = new Int32Array(N * newTopKCount);
+
+    for (let p = 0; p < N; p++) {
+      let dists = [];
+      for (let i = 0; i < allowedArr.length; i++) {
+        let k = allowedArr[i];
+        dists.push({ k: k, e: simState.E_data[p * FULL_PALETTE.length + k] });
+      }
+      dists.sort((a, b) => a.e - b.e);
+      for (let i = 0; i < newTopKCount; i++) {
+        newTopK[p * newTopKCount + i] = dists[i].k;
+      }
+      if (!allowedIndices.has(simState.labels[p])) {
+        simState.labels[p] = dists[0].k;
+      }
+    }
+
+    simState.topK = newTopK;
+    simState.topKCount = newTopKCount;
+    simState.temp = 2.5; 
+    simState.iter = 0;
+    simState.maxIter = 150; 
+    historyStack = []; // 清空撤销历史
+
+    isAnimating = true;
+    $("statusBadge").className = "status-badge active";
+    $("statusText").textContent = "限制颜色并二次优化中...";
+    $("progressFill").style.width = "0%";
+    $("generate").disabled = true;
+    $("exportFull").disabled = true;
+    $("exportRegions").disabled = true;
+    $("btnOpenLockModal").disabled = true;
+
+    lastFrameTime = performance.now();
+    animFrame = requestAnimationFrame(animationLoop);
+  };
 
   function updateColorTable() {
     if(!result) return;
@@ -1426,6 +948,29 @@ H119,Sky Blue,65,103,180,rYonder`;
     });
   }
 
+  // --- 涂抹与撤销历史记录功能 ---
+  function saveStateToHistory() {
+    if(!result) return;
+    if(historyStack.length >= MAX_HISTORY) historyStack.shift();
+    // 深度拷贝当前画布一维数组
+    historyStack.push(new Int32Array(result.cells));
+  }
+
+  function undoLastAction() {
+    if(historyStack.length === 0 || isAnimating) return;
+    result.cells = Array.from(historyStack.pop());
+    renderFinalResultGrid();
+    toast("已撤销上一步操作");
+  }
+
+  // 监听 Ctrl+Z 快捷键
+  window.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && (e.key === 'z' || e.key === 'Z')) {
+      e.preventDefault();
+      undoLastAction();
+    }
+  });
+
   function handlePaint(e) {
     if(isAnimating || !result || activeBrushIndex === null) return;
     
@@ -1433,13 +978,17 @@ H119,Sky Blue,65,103,180,rYonder`;
     const rect = sheet.getBoundingClientRect();
     const scale = Number($("screenZoom").value) / 100;
     
-    // 正确映射带有 CSS transform 缩放的画布坐标
     const x = Math.floor((event.clientX - rect.left) / scale / CW);
     const y = Math.floor((event.clientY - rect.top) / scale / CW);
     
     if(x >= 0 && x < result.w && y >= 0 && y < result.h) {
         let linearIdx = y * result.w + x;
         if(result.cells[linearIdx] !== activeBrushIndex) {
+            // 在这一笔画真正产生修改前，保存状态 (只保存一次)
+            if(!hasChangedInStroke) {
+                saveStateToHistory();
+                hasChangedInStroke = true;
+            }
             result.cells[linearIdx] = activeBrushIndex;
             drawSingleCell(x, y, FULL_PALETTE[activeBrushIndex]);
             renderFullGridLines(); 
@@ -1452,14 +1001,19 @@ H119,Sky Blue,65,103,180,rYonder`;
       if(result && !isAnimating) toast("请先在右侧列表中点击选取一种画笔颜色！");
       return;
     }
-    isDrawing = true; handlePaint(e);
+    isDrawing = true; 
+    hasChangedInStroke = false; 
+    handlePaint(e);
   });
   sheet.addEventListener('mousemove', (e) => { if(isDrawing) handlePaint(e); });
   window.addEventListener('mouseup', () => { if(isDrawing) { isDrawing = false; updateColorTable(); } });
   
   sheet.addEventListener('touchstart', (e) => {
     if(!result || activeBrushIndex === null) return;
-    e.preventDefault(); isDrawing = true; handlePaint(e);
+    e.preventDefault(); 
+    isDrawing = true; 
+    hasChangedInStroke = false;
+    handlePaint(e);
   }, {passive: false});
   sheet.addEventListener('touchmove', (e) => {
     if(isDrawing) { e.preventDefault(); handlePaint(e); }
@@ -1468,8 +1022,55 @@ H119,Sky Blue,65,103,180,rYonder`;
     if(isDrawing) { isDrawing = false; updateColorTable(); }
   });
 
-  function zoomUpdate(){ $("canvasStage").style.transform = `scale(${$("screenZoom").value/100})`; }
-  $("screenZoom").oninput = e => { $("screenZoomv").textContent = e.target.value + "%"; zoomUpdate(); };
+  let autoViewMode = null;
+
+  function setZoom(percent, mode = null) {
+    const zoom = Math.max(10, Math.min(400, Math.round(percent)));
+    $("screenZoom").value = zoom;
+    $("screenZoomv").textContent = zoom + "%";
+    $("canvasStage").style.transform = `scale(${zoom / 100})`;
+    autoViewMode = mode;
+    $("fitPanorama").classList.toggle("active", mode === "panorama");
+    $("fitLocal").classList.toggle("active", mode === "local");
+  }
+
+  function zoomUpdate(){ setZoom(Number($("screenZoom").value), null); }
+
+  function fitPanoramaView() {
+    if (!sheet.width || !sheet.height) return;
+    const shell = $("canvasShell");
+    const availableW = Math.max(1, shell.clientWidth - 40);
+    const availableH = Math.max(1, shell.clientHeight - 40);
+    const zoom = Math.min(availableW / sheet.width, availableH / sheet.height) * 100;
+    setZoom(zoom, "panorama");
+    shell.scrollTo({ left: 0, top: 0, behavior: "smooth" });
+  }
+
+  function fitLocalView() {
+    if (!sheet.width || !sheet.height) return;
+    const shell = $("canvasShell");
+    const boardSize = Math.max(1, Number($("sectionSize").value) || 29);
+    const cellPx = result ? CW : 14;
+    const localW = Math.min(sheet.width, boardSize * cellPx);
+    const localH = Math.min(sheet.height, boardSize * cellPx);
+    const availableW = Math.max(1, shell.clientWidth - 56);
+    const availableH = Math.max(1, shell.clientHeight - 56);
+    const zoom = Math.min(availableW / localW, availableH / localH) * 100;
+    setZoom(zoom, "local");
+    shell.scrollTo({ left: 0, top: 0, behavior: "smooth" });
+  }
+
+  $("screenZoom").oninput = e => setZoom(Number(e.target.value), null);
+  $("fitPanorama").onclick = fitPanoramaView;
+  $("fitLocal").onclick = fitLocalView;
+  $("sectionSize").addEventListener("change", () => { if (autoViewMode === "local") fitLocalView(); });
+  window.addEventListener("resize", () => {
+    clearTimeout(window.__beadResizeTimer);
+    window.__beadResizeTimer = setTimeout(() => {
+      if (autoViewMode === "panorama") fitPanoramaView();
+      else if (autoViewMode === "local") fitLocalView();
+    }, 120);
+  });
   ["couplingJ","edgeGamma","curvatureK"].forEach(id => { 
       $(id).oninput = e => { 
           let val = Number(e.target.value);
@@ -1477,68 +1078,158 @@ H119,Sky Blue,65,103,180,rYonder`;
       }; 
   });
 
-  // 初始加载当前默认选择的色卡 (Perler)
   loadPaletteByKey($("paletteType").value).catch(err => { console.warn("初始色卡加载失败", err); $("paletteStatus").textContent = "加载异常"; });
+
+  function getExportColors(cells) {
+    const counts = {};
+    cells.forEach(idx => counts[idx] = (counts[idx] || 0) + 1);
+    return Object.entries(counts)
+      .map(([idx, count]) => ({ ...FULL_PALETTE[Number(idx)], count }))
+      .sort((a, b) => b.count - a.count);
+  }
+
+  function createExportCanvas(region = null) {
+    const x0 = region ? region.x0 : 0;
+    const y0 = region ? region.y0 : 0;
+    const regionW = region ? region.w : result.w;
+    const regionH = region ? region.h : result.h;
+    const regionCells = [];
+    for(let y = 0; y < regionH; y++) {
+      for(let x = 0; x < regionW; x++) {
+        regionCells.push(result.cells[(y0 + y) * result.w + (x0 + x)]);
+      }
+    }
+    const finalUsed = getExportColors(regionCells);
+
+    const exportCell = 32, rulerSize = 34, titleHeight = 86, footerHeight = 42;
+    const padding = 36, legendWidth = 430, legendRowH = 34, legendHeaderH = 122;
+    const boardW = regionW * exportCell, boardH = regionH * exportCell;
+    const legendH = legendHeaderH + finalUsed.length * legendRowH + 28;
+    const outCV = document.createElement("canvas");
+    outCV.width = padding * 3 + rulerSize + boardW + legendWidth;
+    outCV.height = Math.max(padding * 2 + titleHeight + rulerSize + boardH + footerHeight, padding * 2 + legendH);
+    const ctx = outCV.getContext("2d");
+    ctx.imageSmoothingEnabled = false;
+    ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, outCV.width, outCV.height);
+
+    const boardX = padding + rulerSize, boardY = padding + titleHeight + rulerSize;
+    const activeBrandName = PALETTE_CATALOG[$("paletteType").value].label;
+    const sectionSize = Number($("sectionSize").value) || 29;
+    const regionName = region ? `区域 ${region.row}-${region.col}` : "全图";
+
+    ctx.fillStyle = "#0f172a"; ctx.font = "700 28px sans-serif"; ctx.textAlign = "left"; ctx.textBaseline = "alphabetic";
+    ctx.fillText(`拼豆图纸 · ${regionName}`, padding, padding + 30);
+    ctx.font = "15px sans-serif"; ctx.fillStyle = "#64748b";
+    const scopeText = region ? `全图坐标：列 ${x0 + 1}-${x0 + regionW}，行 ${y0 + 1}-${y0 + regionH}` : `底板 ${sectionSize} × ${sectionSize}`;
+    ctx.fillText(`${activeBrandName} ｜ ${regionW} × ${regionH} 格 ｜ ${regionW * regionH} 颗 ｜ ${finalUsed.length} 色 ｜ ${scopeText}`, padding, padding + 58);
+
+    for(let y = 0; y < regionH; y++) for(let x = 0; x < regionW; x++) {
+      const c = FULL_PALETTE[result.cells[(y0 + y) * result.w + (x0 + x)]];
+      const px = boardX + x * exportCell, py = boardY + y * exportCell;
+      ctx.fillStyle = c.hex; ctx.fillRect(px, py, exportCell, exportCell);
+      ctx.fillStyle = luma(c.rgb.r, c.rgb.g, c.rgb.b) < 130 ? "#ffffff" : "#0f172a";
+      ctx.font = "700 16px sans-serif"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+      ctx.fillText(c.symbol, px + exportCell / 2, py + exportCell / 2 + 1);
+    }
+
+    ctx.strokeStyle = "rgba(15,23,42,0.18)"; ctx.lineWidth = 1; ctx.beginPath();
+    for(let x = 0; x <= regionW; x++) { const px = boardX + x * exportCell + .5; ctx.moveTo(px, boardY); ctx.lineTo(px, boardY + boardH); }
+    for(let y = 0; y <= regionH; y++) { const py = boardY + y * exportCell + .5; ctx.moveTo(boardX, py); ctx.lineTo(boardX + boardW, py); }
+    ctx.stroke();
+
+    ctx.strokeStyle = "rgba(15,23,42,0.52)"; ctx.lineWidth = 1.5; ctx.beginPath();
+    for(let x = 0; x <= regionW; x++) if((x0 + x) % 5 === 0) { const px = boardX + x * exportCell; ctx.moveTo(px, boardY); ctx.lineTo(px, boardY + boardH); }
+    for(let y = 0; y <= regionH; y++) if((y0 + y) % 5 === 0) { const py = boardY + y * exportCell; ctx.moveTo(boardX, py); ctx.lineTo(boardX + boardW, py); }
+    ctx.stroke();
+
+    ctx.strokeStyle = "#0f172a"; ctx.lineWidth = 3; ctx.strokeRect(boardX, boardY, boardW, boardH);
+    if(!region) {
+      ctx.beginPath();
+      for(let x = 0; x <= regionW; x += sectionSize) { const px = boardX + x * exportCell; ctx.moveTo(px, boardY); ctx.lineTo(px, boardY + boardH); }
+      for(let y = 0; y <= regionH; y += sectionSize) { const py = boardY + y * exportCell; ctx.moveTo(boardX, py); ctx.lineTo(boardX + boardW, py); }
+      ctx.stroke();
+    }
+
+    ctx.textBaseline = "middle";
+    for(let x = 0; x < regionW; x++) {
+      const n = x0 + x + 1; ctx.font = `${n % 5 === 0 ? "700" : "500"} 12px monospace`;
+      ctx.fillStyle = n % 5 === 0 ? "#0f172a" : "#64748b"; ctx.textAlign = "center";
+      ctx.fillText(String(n), boardX + x * exportCell + exportCell / 2, boardY - rulerSize / 2);
+    }
+    for(let y = 0; y < regionH; y++) {
+      const n = y0 + y + 1; ctx.font = `${n % 5 === 0 ? "700" : "500"} 12px monospace`;
+      ctx.fillStyle = n % 5 === 0 ? "#0f172a" : "#64748b"; ctx.textAlign = "right";
+      ctx.fillText(String(n), boardX - 9, boardY + y * exportCell + exportCell / 2);
+    }
+
+    const legendX = boardX + boardW + padding; let ly = padding + 28;
+    ctx.textAlign = "left"; ctx.textBaseline = "alphabetic"; ctx.fillStyle = "#0f172a"; ctx.font = "700 24px sans-serif";
+    ctx.fillText("本图所需色号", legendX, ly); ly += 30;
+    ctx.font = "14px sans-serif"; ctx.fillStyle = "#64748b"; ctx.fillText("仅统计当前导出范围", legendX, ly); ly += 26;
+    ctx.fillStyle = "#f8fafc"; ctx.fillRect(legendX, ly, legendWidth, 30);
+    ctx.font = "700 13px sans-serif"; ctx.fillStyle = "#475569"; ctx.fillText("序号", legendX + 8, ly + 20); ctx.fillText("颜色 / 符号 / 色号", legendX + 58, ly + 20);
+    ctx.textAlign = "right"; ctx.fillText("数量", legendX + legendWidth - 10, ly + 20); ctx.textAlign = "left"; ly += 30;
+    finalUsed.forEach((c, i) => {
+      const rowY = ly + i * legendRowH;
+      if(i % 2) { ctx.fillStyle = "#f8fafc"; ctx.fillRect(legendX, rowY, legendWidth, legendRowH); }
+      ctx.strokeStyle = "#e2e8f0"; ctx.beginPath(); ctx.moveTo(legendX, rowY + legendRowH); ctx.lineTo(legendX + legendWidth, rowY + legendRowH); ctx.stroke();
+      ctx.font = "700 13px monospace"; ctx.fillStyle = "#475569"; ctx.fillText(String(i + 1).padStart(2, "0"), legendX + 8, rowY + 22);
+      ctx.fillStyle = c.hex; ctx.fillRect(legendX + 58, rowY + 6, 22, 22); ctx.strokeStyle = "#94a3b8"; ctx.strokeRect(legendX + 58, rowY + 6, 22, 22);
+      ctx.font = "700 16px sans-serif"; ctx.fillStyle = "#0f172a"; ctx.fillText(c.symbol, legendX + 91, rowY + 22);
+      ctx.font = "14px sans-serif"; const displayName = c.name.length > 22 ? c.name.slice(0, 21) + "…" : c.name;
+      ctx.fillText(`${c.code}  ${displayName}`, legendX + 120, rowY + 22);
+      ctx.font = "700 14px monospace"; ctx.fillStyle = "#4f46e5"; ctx.textAlign = "right"; ctx.fillText(`${c.count} 颗`, legendX + legendWidth - 10, rowY + 22); ctx.textAlign = "left";
+    });
+    ctx.fillStyle = "#64748b"; ctx.font = "12px sans-serif"; ctx.textAlign = "left";
+    ctx.fillText(region ? "说明：编号沿用全图坐标，便于各区域拼接定位。" : "说明：顶部为列号，左侧为行号；粗线表示底板分区。", padding, outCV.height - 18);
+    return { canvas: outCV, colors: finalUsed.length };
+  }
+
+  function downloadCanvas(canvas, filename) {
+    const a = document.createElement("a");
+    a.href = canvas.toDataURL("image/png", 1.0); a.download = filename;
+    document.body.appendChild(a); a.click(); a.remove();
+  }
 
   $("exportFull").onclick = () => {
     if(!result) return;
-    
-    let counts = {}; result.cells.forEach(idx => counts[idx] = (counts[idx]||0)+1);
-    let finalUsed = Object.entries(counts).map(([idx, count]) => ({...FULL_PALETTE[idx], count})).sort((a,b)=>b.count-a.count);
-    
-    const boardW = result.w * CW;
-    const boardH = result.h * CW;
-    const legendWidth = 360; 
-    const padding = 45;
-    
-    const outCV = document.createElement("canvas");
-    outCV.width = boardW + legendWidth + padding * 3;
-    outCV.height = Math.max(boardH + padding * 2, finalUsed.length * 30 + 160);
-    const ctx = outCV.getContext("2d");
-    
-    ctx.fillStyle = "#ffffff"; 
-    ctx.fillRect(0, 0, outCV.width, outCV.height);
-    
-    // Draw Sheet
-    ctx.drawImage(sheet, padding, padding);
-    
-    let startX = boardW + padding * 2;
-    let startY = padding + 25;
-    
-    ctx.fillStyle = "#0f172a"; ctx.font = "bold 26px sans-serif"; ctx.textAlign = "left";
-    let activeBrandName = PALETTE_CATALOG[$("paletteType").value].label;
-    ctx.fillText(`图纸 (${activeBrandName})`, startX, startY);
-    
-    startY += 38; ctx.font = "bold 15px sans-serif"; ctx.fillStyle = "#64748b";
-    ctx.fillText(`尺寸: ${result.w} × ${result.h} 格    总颜色数量: ${finalUsed.length} 种`, startX, startY);
-    
-    startY += 35; ctx.strokeStyle = "#e2e8f0"; ctx.lineWidth = 1;
-    ctx.beginPath(); ctx.moveTo(startX, startY); ctx.lineTo(startX + legendWidth, startY); ctx.stroke();
-    
-    startY += 30;
-    finalUsed.forEach(c => {
-        ctx.fillStyle = c.hex; ctx.fillRect(startX, startY - 15, 22, 22); 
-        ctx.strokeStyle = "#cbd5e1"; ctx.strokeRect(startX, startY - 15, 22, 22);
-        
-        ctx.fillStyle = "#0f172a"; ctx.font = "bold 17px sans-serif";
-        ctx.fillText(c.symbol, startX + 40, startY + 3);
-        
-        ctx.font = "15px sans-serif";
-        ctx.fillText(`${c.code}  (${c.name})`, startX + 75, startY + 2);
-        
-        ctx.font = "bold 15px monospace"; ctx.textAlign = "right"; ctx.fillStyle = "#4f46e5";
-        ctx.fillText(`${c.count} 颗`, startX + legendWidth, startY + 2);
-        ctx.textAlign = "left"; 
-        
-        startY += 32;
-    });
-
-    const a = document.createElement("a");
-    a.href = outCV.toDataURL("image/png"); 
-    a.download = `拼豆图纸_${result.w}x${result.h}.png`; 
-    a.click();
+    const btn = $("exportFull"), oldText = btn.textContent; btn.disabled = true; btn.textContent = "正在导出全图...";
+    try {
+      const data = createExportCanvas();
+      const stamp = new Date().toISOString().slice(0, 10).replace(/-/g, "");
+      downloadCanvas(data.canvas, `拼豆图纸_全图_${result.w}x${result.h}_${data.colors}色_${stamp}.png`);
+      toast("全图已导出");
+    } catch(err) { console.error(err); toast("全图导出失败，请降低格子宽度后重试"); }
+    finally { btn.disabled = false; btn.textContent = oldText; }
   };
+
+  $("exportRegions").onclick = async () => {
+    if(!result) return;
+    const btn = $("exportRegions"), fullBtn = $("exportFull"), oldText = btn.textContent;
+    btn.disabled = true; fullBtn.disabled = true;
+    const sectionSize = Number($("sectionSize").value) || 29;
+    const cols = Math.ceil(result.w / sectionSize), rows = Math.ceil(result.h / sectionSize);
+    const total = cols * rows;
+    const stamp = new Date().toISOString().slice(0, 10).replace(/-/g, "");
+    try {
+      let n = 0;
+      for(let row = 1; row <= rows; row++) {
+        for(let col = 1; col <= cols; col++) {
+          n++; btn.textContent = `导出区域 ${n}/${total}`;
+          const x0 = (col - 1) * sectionSize, y0 = (row - 1) * sectionSize;
+          const w = Math.min(sectionSize, result.w - x0), h = Math.min(sectionSize, result.h - y0);
+          const data = createExportCanvas({ x0, y0, w, h, row, col });
+          const regionNo = String(n).padStart(2, "0");
+          downloadCanvas(data.canvas, `拼豆图纸_区域${regionNo}_R${row}C${col}_${w}x${h}_${data.colors}色_${stamp}.png`);
+          await new Promise(resolve => setTimeout(resolve, 180));
+        }
+      }
+      toast(`已批量导出 ${total} 个区域；如浏览器询问，请允许多个文件下载`);
+    } catch(err) { console.error(err); toast("分区域导出失败，请检查浏览器下载权限"); }
+    finally { btn.disabled = false; fullBtn.disabled = false; btn.textContent = oldText; }
+  };
+
 })();
 </script>
-</body>
-</html>
+
+</body></html>
