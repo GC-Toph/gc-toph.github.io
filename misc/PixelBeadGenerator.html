@@ -110,6 +110,24 @@
     .color-chip.selected { border-color: var(--brand); background: var(--brand-light); }
     .modal-footer { display: flex; justify-content: flex-end; gap: 12px; border-top: 1px solid var(--line); padding-top: 16px;}
 
+    .list-picker-row, .modal-picker-row { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+    .list-picker-row > button { flex:1; min-width:120px; }
+    .picker-btn.whitelist { border-color:#86efac; background:#f0fdf4; color:#166534; }
+    .picker-btn.blacklist { border-color:#fca5a5; background:#fef2f2; color:#991b1b; }
+    .picker-btn.active { outline:3px solid rgba(79,70,229,.22); border-color:var(--brand); }
+    .list-summary { margin-top:10px; padding:9px 10px; border:1px solid var(--line); border-radius:8px; background:#fff; font-size:12px; }
+    .list-summary div { display:grid; grid-template-columns:58px 1fr; gap:8px; margin:4px 0; }
+    .list-summary span { color:var(--muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .list-counts { font-size:13px; color:var(--muted); }
+    .list-counts b:first-of-type { color:#15803d; } .list-counts b:last-of-type { color:#b91c1c; }
+    .modal-note { font-size:13px; color:var(--muted); margin-bottom:10px; line-height:1.55; }
+    .color-chip { flex-direction:column; align-items:stretch; gap:7px; cursor:default; }
+    .chip-main { display:flex; align-items:center; gap:8px; }
+    .chip-actions { display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+    .chip-actions button { height:30px; padding:0 6px; font-size:12px; }
+    .chip-actions .is-white { background:#dcfce7; border-color:#22c55e; color:#166534; }
+    .chip-actions .is-black { background:#fee2e2; border-color:#ef4444; color:#991b1b; }
+    .canvasShell.picking { cursor:copy; box-shadow:inset 0 0 0 3px var(--brand); }
     @media (max-width: 1280px) {
       main { grid-template-columns: 280px minmax(0, 1fr); }
       .right-panel { grid-column: 1 / -1; height: 400px; position: static; }
@@ -137,6 +155,8 @@
       <button class="primary" id="generate" disabled>2. 开始生成</button>
       <button id="exportFull" disabled>3A. 导出全图</button>
       <button id="exportRegions" disabled>3B. 分区域批量导出</button>
+      <button id="exportProject" disabled>导出pbd文件</button>
+      <label class="filebtn">导入pbd文件<input id="importProject" type="file" accept=".pbd,application/json"></label>
     </div>
   </div>
 </header>
@@ -174,7 +194,15 @@
         <label style="color:var(--brand2)">保留上限</label>
         <input id="maxColorsLimit" type="number" min="1" max="255" value="15" style="border-color:var(--brand);">
       </div>
-      <button id="btnOpenLockModal" class="primary" style="width:100%; margin-top:10px;">智能压缩颜色并二次优化</button>
+      <button id="btnOpenLockModal" class="primary" style="width:100%; margin-top:10px;">配置黑白名单并二次退火</button>
+      <div class="list-picker-row">
+        <button id="pickWhitelist" type="button" class="picker-btn whitelist">吸管：加入白名单</button>
+        <button id="pickBlacklist" type="button" class="picker-btn blacklist">吸管：加入黑名单</button>
+      </div>
+      <div class="list-summary">
+        <div><b>白名单</b><span id="whiteSummary">未选择</span></div>
+        <div><b>黑名单</b><span id="blackSummary">未选择</span></div>
+      </div>
     </div>
 
   </aside>
@@ -221,14 +249,19 @@
   </aside>
 </main>
 
-<!-- 颜色锁定弹窗 -->
+<!-- 颜色黑白名单弹窗 -->
 <div id="lockModal" class="modal-overlay">
   <div class="modal">
     <div class="modal-header">
-      <h3>选择强制保留的颜色 (白名单)</h3>
-      <span style="font-size:13px; color:var(--muted)">已选: <b id="modalSelectedCount" style="color:var(--brand)">0</b> / <span id="modalMaxCount">15</span></span>
+      <h3>压缩颜色：黑白名单</h3>
+      <span class="list-counts">白 <b id="modalWhiteCount">0</b> / 黑 <b id="modalBlackCount">0</b> / 上限 <span id="modalMaxCount">15</span></span>
     </div>
-    <div style="font-size:13px; color:var(--muted); margin-bottom:12px;">已自动为您勾选反差最大的核心极值色。您可以手动点击修改，不足上限的部分将由AI智能补齐。</div>
+    <div class="modal-note">白名单颜色一定保留；黑名单颜色一定排除。点击色卡上的按钮设置，也可使用图纸预览区吸管取色。</div>
+    <div class="modal-picker-row">
+      <button id="modalPickWhite" type="button" class="picker-btn whitelist">去图纸吸取白名单</button>
+      <button id="modalPickBlack" type="button" class="picker-btn blacklist">去图纸吸取黑名单</button>
+      <button id="clearColorLists" type="button">清空名单</button>
+    </div>
     <div class="modal-body">
       <div id="modalColorGrid" class="color-grid"></div>
     </div>
@@ -396,6 +429,178 @@ const HAMA_CSV = `H01,White,229,236,241,Jeppewl\nH02,Cream,228,228,197,Jeppewl\n
 
   function toast(msg){ const t=$("toast"); t.textContent=msg; t.classList.add("show"); setTimeout(()=>t.classList.remove("show"),3000); }
 
+
+  const PROJECT_VERSION = 2;
+  const COMPACT_PROJECT_MAGIC = "PBD2";
+
+  function writeVarUint(out, value) {
+    value = Number(value) >>> 0;
+    while (value >= 0x80) { out.push((value & 0x7f) | 0x80); value >>>= 7; }
+    out.push(value);
+  }
+
+  function readVarUint(bytes, state) {
+    let value = 0, shift = 0;
+    while (state.i < bytes.length) {
+      const b = bytes[state.i++];
+      value |= (b & 0x7f) << shift;
+      if (!(b & 0x80)) return value >>> 0;
+      shift += 7;
+      if (shift > 28) throw new Error("图纸压缩数据损坏");
+    }
+    throw new Error("图纸压缩数据不完整");
+  }
+
+  function bytesToBase64(bytes) {
+    let binary = "";
+    const chunk = 0x8000;
+    for (let i = 0; i < bytes.length; i += chunk) binary += String.fromCharCode(...bytes.subarray(i, i + chunk));
+    return btoa(binary);
+  }
+
+  function base64ToBytes(text) {
+    const binary = atob(text);
+    const out = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) out[i] = binary.charCodeAt(i);
+    return out;
+  }
+
+  function encodeCellsRle(cells) {
+    const out = [];
+    for (let i = 0; i < cells.length;) {
+      const value = cells[i];
+      let count = 1;
+      while (i + count < cells.length && cells[i + count] === value) count++;
+      writeVarUint(out, value); writeVarUint(out, count); i += count;
+    }
+    return bytesToBase64(Uint8Array.from(out));
+  }
+
+  function decodeCellsRle(text, expectedLength) {
+    const bytes = base64ToBytes(text), state = { i: 0 }, cells = new Array(expectedLength);
+    let pos = 0;
+    while (state.i < bytes.length && pos < expectedLength) {
+      const value = readVarUint(bytes, state), count = readVarUint(bytes, state);
+      if (!count || pos + count > expectedLength) throw new Error("图纸格点压缩数据无效");
+      cells.fill(value, pos, pos + count); pos += count;
+    }
+    if (pos !== expectedLength || state.i !== bytes.length) throw new Error("图纸格点数量不匹配");
+    return cells;
+  }
+
+  function buildCompactProjectPayload() {
+    if (!result) throw new Error("当前没有可导出的图纸");
+    const usedGlobal = Array.from(new Set(result.cells)).sort((a,b) => a-b);
+    const globalToLocal = new Map(usedGlobal.map((idx, local) => [idx, local]));
+    const localCells = result.cells.map(idx => globalToLocal.get(idx));
+    const colors = usedGlobal.map(idx => {
+      const c = FULL_PALETTE[idx];
+      return [c.code, c.rawCode || c.code, c.name, c.rgb.r, c.rgb.g, c.rgb.b, c.brand || "", c.symbol || ""];
+    });
+    const localIndex = idx => globalToLocal.has(idx) ? globalToLocal.get(idx) : null;
+    return {
+      f: COMPACT_PROJECT_MAGIC, v: PROJECT_VERSION,
+      w: result.w, h: result.h, b: Number($("sectionSize").value) || 29,
+      p: { k: $("paletteType").value, l: PALETTE_CATALOG[$("paletteType").value]?.label || "自定义色卡", c: colors },
+      a: [Number($("gridWidth").value), Number($("couplingJ").value), Number($("edgeGamma").value), Number($("curvatureK").value), Number($("maxColorsLimit").value)],
+      l: {
+        w: Array.from(currentWhitelist).map(localIndex).filter(Number.isInteger),
+        b: Array.from(currentBlacklist).map(localIndex).filter(Number.isInteger)
+      },
+      d: encodeCellsRle(localCells), t: Date.now()
+    };
+  }
+
+  function downloadText(text, filename, mime = "application/json") {
+    const blob = new Blob([text], { type: `${mime};charset=utf-8` });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
+  function normalizeProjectPayload(data) {
+    if (data?.f === COMPACT_PROJECT_MAGIC) {
+      if (Number(data.v) > PROJECT_VERSION) throw new Error("图纸文件版本过新，请升级生成器");
+      const w = Number(data.w), h = Number(data.h);
+      if (!Number.isInteger(w) || !Number.isInteger(h) || w < 1 || h < 1) throw new Error("图纸尺寸无效");
+      if (!Array.isArray(data.p?.c) || !data.p.c.length || typeof data.d !== "string") throw new Error("图纸缺少色卡或格点数据");
+      const colors = data.p.c.map(row => ({
+        code: String(row[0] || ""), rawCode: String(row[1] || row[0] || ""), name: String(row[2] || row[0] || "未命名"),
+        rgb: { r:Number(row[3]), g:Number(row[4]), b:Number(row[5]) }, brand: String(row[6] || ""), symbol: String(row[7] || "")
+      }));
+      colors.forEach(c => { if (![c.rgb.r,c.rgb.g,c.rgb.b].every(Number.isFinite)) throw new Error("色卡 RGB 数据无效"); c.hex = rgbToHex(c.rgb); });
+      const cells = decodeCellsRle(data.d, w * h);
+      if (cells.some(v => v < 0 || v >= colors.length)) throw new Error("格点数组包含无效色卡索引");
+      const a = Array.isArray(data.a) ? data.a : [];
+      return { w, h, cells, paletteKey:data.p.k, paletteLabel:data.p.l, colors, sectionSize:data.b,
+        params:{gridWidth:a[0], couplingJ:a[1], edgeGamma:a[2], curvatureK:a[3], maxColorsLimit:a[4]},
+        whitelist:data.l?.w || [], blacklist:data.l?.b || [] };
+    }
+
+    throw new Error("仅支持 compact v2 图纸文件（PBD2）");
+  }
+
+  function rebuildImportedSimulationState(w, h, cells) {
+    const N = w * h, numStates = FULL_PALETTE.length, topKCount = Math.min(TOP_K_COUNT, numStates);
+    const E_data = new Float32Array(N * numStates), topK = new Int32Array(N * topKCount);
+    for (let p = 0; p < N; p++) {
+      const observedLab = FULL_PALETTE[cells[p]].lab, dists = new Array(numStates);
+      for (let k = 0; k < numStates; k++) {
+        const e = deltaE94(observedLab, FULL_PALETTE[k].lab);
+        E_data[p * numStates + k] = e; dists[k] = { k, e };
+      }
+      dists.sort((a,b) => a.e - b.e);
+      for (let i = 0; i < topKCount; i++) topK[p * topKCount + i] = dists[i].k;
+    }
+    const W_right = new Float32Array(N), W_bottom = new Float32Array(N), W_dr = new Float32Array(N), W_dl = new Float32Array(N);
+    const gamma = Math.max(0.1, (110 - Number($("edgeGamma").value)) * 0.1), edgeWeight = de => 1 / (1 + Math.exp((de - 8) / gamma));
+    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+      const p = y*w+x, lab = FULL_PALETTE[cells[p]].lab;
+      if (x < w-1) W_right[p] = edgeWeight(deltaE94Sym(lab, FULL_PALETTE[cells[p+1]].lab));
+      if (y < h-1) W_bottom[p] = edgeWeight(deltaE94Sym(lab, FULL_PALETTE[cells[p+w]].lab));
+      if (x < w-1 && y < h-1) W_dr[p] = edgeWeight(deltaE94Sym(lab, FULL_PALETTE[cells[p+w+1]].lab));
+      if (x > 0 && y < h-1) W_dl[p] = edgeWeight(deltaE94Sym(lab, FULL_PALETTE[cells[p+w-1]].lab));
+    }
+    simState = { w, h, labels:Int32Array.from(cells), E_data, topK, topKCount, W_right, W_bottom, W_dr, W_dl, temp:0, iter:0, maxIter:0 };
+  }
+
+  async function importProjectFile(fileObj) {
+    const data = JSON.parse(await fileObj.text());
+    const project = normalizeProjectPayload(data);
+    const { w, h } = project;
+    if (isAnimating) { isAnimating = false; cancelAnimationFrame(animFrame); }
+
+    const paletteRows = project.colors.map(c => ({
+      code:String(c.code || ""), rawCode:String(c.rawCode || c.code || ""), name:String(c.name || c.code || "未命名"),
+      rgb:c.rgb || hexToRgb(c.hex), hex:c.hex || rgbToHex(c.rgb), brand:c.brand || ""
+    }));
+    FULL_PALETTE = buildRuntimePalette(paletteRows);
+    project.colors.forEach((c, i) => { if (c.symbol) FULL_PALETTE[i].symbol = c.symbol; });
+    activePaletteKey = null; rebuildColorDist();
+
+    if (PALETTE_CATALOG[project.paletteKey]) $("paletteType").value = project.paletteKey;
+    $("paletteStatus").textContent = `${project.paletteLabel || "导入色卡"} (${FULL_PALETTE.length}色，来自图纸)`;
+    const params = project.params || {};
+    $("gridWidth").value = params.gridWidth || w; $("sectionSize").value = String(project.sectionSize || 29);
+    if (params.couplingJ != null) $("couplingJ").value = params.couplingJ;
+    if (params.edgeGamma != null) $("edgeGamma").value = params.edgeGamma;
+    if (params.curvatureK != null) $("curvatureK").value = params.curvatureK;
+    if (params.maxColorsLimit != null) $("maxColorsLimit").value = params.maxColorsLimit;
+    ["couplingJ","edgeGamma","curvatureK"].forEach(id => { const val=Number($(id).value); $(id+"v").textContent=id==="edgeGamma"?val:val.toFixed(1); });
+
+    result = { w, h, cells:project.cells.slice() };
+    currentWhitelist = new Set(project.whitelist.filter(i => Number.isInteger(i) && i >= 0 && i < FULL_PALETTE.length));
+    currentBlacklist = new Set(project.blacklist.filter(i => Number.isInteger(i) && i >= 0 && i < FULL_PALETTE.length));
+    rebuildImportedSimulationState(w, h, result.cells);
+    pickerMode=null; activeBrushIndex=null; historyStack=[];
+    $("statGrid").textContent=`${w}×${h}`; $("statBeads").textContent=w*h; $("statTemp").textContent="已导入"; $("statEnergy").textContent="-";
+    $("phase2Box").style.display="block"; $("statusBadge").className="status-badge done"; $("statusText").textContent="图纸已导入";
+    $("generate").disabled=!img; $("exportFull").disabled=false; $("exportRegions").disabled=false; $("exportProject").disabled=false; $("btnOpenLockModal").disabled=false;
+    updateListSummary(); renderFinalResultGrid(); toast(`已导入 ${w}×${h} 图纸，可继续二次优化`);
+  }
+
   drop.onclick = () => file.click();
   file.onchange = e => {
     const f=e.target.files[0]; if(!f) return;
@@ -407,11 +612,13 @@ const HAMA_CSV = `H01,White,229,236,241,Jeppewl\nH02,Cream,228,228,197,Jeppewl\n
   $("generate").onclick = async () => {
     if(!img) return;
     if(isAnimating) { isAnimating = false; cancelAnimationFrame(animFrame); }
-    $("generate").disabled = true; $("exportFull").disabled = true; $("exportRegions").disabled = true;
+    $("generate").disabled = true; $("exportFull").disabled = true; $("exportRegions").disabled = true; $("exportProject").disabled = true;
     $("phase2Box").style.display = "none";
     $("statusBadge").className = "status-badge active"; $("statusText").textContent = "正在构建物理场...";
     $("progressFill").style.width = "0%";
     activeBrushIndex = null;
+    currentWhitelist.clear(); currentBlacklist.clear(); pickerMode = null;
+    updateListSummary();
     historyStack = []; // 清空历史
     try {
       await loadPaletteByKey($("paletteType").value);
@@ -427,7 +634,8 @@ const HAMA_CSV = `H01,White,229,236,241,Jeppewl\nH02,Cream,228,228,197,Jeppewl\n
 
   $("paletteType").onchange = async () => {
     result = null; activeBrushIndex = null;
-    $("colorList").innerHTML = ""; $("exportFull").disabled = true; $("exportRegions").disabled = true;
+    currentWhitelist.clear(); currentBlacklist.clear(); pickerMode = null; updateListSummary();
+    $("colorList").innerHTML = ""; $("exportFull").disabled = true; $("exportRegions").disabled = true; $("exportProject").disabled = true;
     try { await loadPaletteByKey($("paletteType").value); }
     catch (err) { console.error(err); $("paletteStatus").textContent = "加载失败"; }
   };
@@ -610,7 +818,7 @@ const HAMA_CSV = `H01,White,229,236,241,Jeppewl\nH02,Cream,228,228,197,Jeppewl\n
         $("statusText").textContent = "计算完成";
         $("progressFill").style.width = "100%";
         $("generate").disabled = false; 
-        $("exportFull").disabled = false; $("exportRegions").disabled = false;
+        $("exportFull").disabled = false; $("exportRegions").disabled = false; $("exportProject").disabled = false;
         $("btnOpenLockModal").disabled = false;
         historyStack = []; // 每次大生成完成，清空重做历史
         toast("✨ 图纸生成完毕！点击右侧颜色可手动涂抹修改。");
@@ -710,220 +918,207 @@ const HAMA_CSV = `H01,White,229,236,241,Jeppewl\nH02,Cream,228,228,197,Jeppewl\n
     renderFinalResultGrid();
   }
 
-  // ==== 锁色模态框逻辑 ====
-  let currentLockedIndices = new Set();
+  // ==== 第二阶段：白名单、黑名单与图纸取色器 ====
+  let currentWhitelist = new Set();
+  let currentBlacklist = new Set();
   let currentModalTargetK = 0;
+  let pickerMode = null; // "white" | "black" | null
 
-  $("btnOpenLockModal").onclick = () => {
-    if (!result) return;
-    let targetColorCount = parseInt($("maxColorsLimit").value, 10);
-    if (isNaN(targetColorCount) || targetColorCount < 1) return;
+  function colorCodes(setObj) {
+    return Array.from(setObj).map(i => FULL_PALETTE[i]?.code).filter(Boolean);
+  }
 
-    let finalUsed = getFinalUsedColors(result.cells);
-    if (finalUsed.length <= targetColorCount) {
-      toast("当前颜色数已少于或等于目标上限，无需优化！");
-      return;
+  function updateListSummary() {
+    const whites = colorCodes(currentWhitelist);
+    const blacks = colorCodes(currentBlacklist);
+    $("whiteSummary").textContent = whites.length ? whites.join("、") : "未选择";
+    $("blackSummary").textContent = blacks.length ? blacks.join("、") : "未选择";
+    $("modalWhiteCount").textContent = currentWhitelist.size;
+    $("modalBlackCount").textContent = currentBlacklist.size;
+    ["pickWhitelist", "modalPickWhite"].forEach(id => $(id)?.classList.toggle("active", pickerMode === "white"));
+    ["pickBlacklist", "modalPickBlack"].forEach(id => $(id)?.classList.toggle("active", pickerMode === "black"));
+    $("canvasShell").classList.toggle("picking", !!pickerMode);
+  }
+
+  function confirmListTransfer(idx, target) {
+    const color = FULL_PALETTE[idx];
+    const code = color?.code || "该颜色";
+    const fromName = target === "white" ? "黑名单" : "白名单";
+    const toName = target === "white" ? "白名单" : "黑名单";
+    return window.confirm(`${code} 当前已在${fromName}中。\n\n是否将它从${fromName}移除，并加入${toName}？`);
+  }
+
+  function setListMembership(idx, target) {
+    if (target === "white") {
+      if (currentWhitelist.has(idx)) {
+        currentWhitelist.delete(idx);
+      } else {
+        if (currentWhitelist.size >= currentModalTargetK) {
+          toast(`白名单最多可选择 ${currentModalTargetK} 种颜色`);
+          return;
+        }
+        if (currentBlacklist.has(idx) && !confirmListTransfer(idx, "white")) return;
+        currentBlacklist.delete(idx);
+        currentWhitelist.add(idx);
+      }
+    } else {
+      if (currentBlacklist.has(idx)) {
+        currentBlacklist.delete(idx);
+      } else {
+        if (currentWhitelist.has(idx) && !confirmListTransfer(idx, "black")) return;
+        currentWhitelist.delete(idx);
+        currentBlacklist.add(idx);
+      }
     }
+    updateListSummary();
+    renderListModalGrid();
+  }
 
-    currentModalTargetK = targetColorCount;
-    currentLockedIndices.clear();
-    $("modalMaxCount").textContent = targetColorCount;
-    $("modalSelectedCount").textContent = "0";
-
-    // 寻找极值黑白以预选
-    let bestBlackIdx = -1, minL = 25;
-    let bestWhiteIdx = -1, maxL = 85;
-    finalUsed.forEach(c => {
-      if (c.lab.l < minL) { minL = c.lab.l; bestBlackIdx = c.idx; }
-      if (c.lab.l > maxL) { maxL = c.lab.l; bestWhiteIdx = c.idx; }
-    });
-
-    if (bestBlackIdx !== -1) currentLockedIndices.add(bestBlackIdx);
-    if (bestWhiteIdx !== -1 && currentLockedIndices.size < targetColorCount) currentLockedIndices.add(bestWhiteIdx);
-
-    // 渲染网格
+  function renderListModalGrid() {
+    if (!result) return;
+    const finalUsed = getFinalUsedColors(result.cells);
     const grid = $("modalColorGrid");
     grid.innerHTML = "";
     finalUsed.forEach(c => {
-      let div = document.createElement("div");
-      div.className = "color-chip" + (currentLockedIndices.has(c.idx) ? " selected" : "");
-      div.innerHTML = `<span class="swatch" style="background:${c.hex}"></span>
-                       <div style="font-size:12px; line-height:1.2;">
-                         <div style="font-weight:700; color:#0f172a">${c.code}</div>
-                         <div style="color:var(--muted)">${c.count} 颗</div>
-                       </div>`;
-      
-      div.onclick = () => {
-        if (currentLockedIndices.has(c.idx)) {
-          currentLockedIndices.delete(c.idx);
-          div.classList.remove("selected");
-        } else {
-          if (currentLockedIndices.size >= currentModalTargetK) {
-            toast(`最多只能强制保留 ${currentModalTargetK} 种颜色`);
-            return;
-          }
-          currentLockedIndices.add(c.idx);
-          div.classList.add("selected");
-        }
-        $("modalSelectedCount").textContent = currentLockedIndices.size;
-      };
+      const div = document.createElement("div");
+      div.className = "color-chip";
+      div.innerHTML = `<div class="chip-main"><span class="swatch" style="background:${c.hex}"></span>
+        <div style="font-size:12px;line-height:1.25"><div style="font-weight:700">${c.code} · ${c.name}</div><div style="color:var(--muted)">${c.count} 颗</div></div></div>
+        <div class="chip-actions"><button type="button" class="${currentWhitelist.has(c.idx) ? 'is-white' : ''}">白名单</button><button type="button" class="${currentBlacklist.has(c.idx) ? 'is-black' : ''}">黑名单</button></div>`;
+      const buttons = div.querySelectorAll("button");
+      buttons[0].onclick = () => setListMembership(c.idx, "white");
+      buttons[1].onclick = () => setListMembership(c.idx, "black");
       grid.appendChild(div);
     });
+    updateListSummary();
+  }
 
-    $("modalSelectedCount").textContent = currentLockedIndices.size;
+  function startPicker(mode) {
+    if (!result || isAnimating) return;
+    currentModalTargetK = Math.max(1, parseInt($("maxColorsLimit").value, 10) || 1);
+    pickerMode = pickerMode === mode ? null : mode;
+    $("lockModal").classList.remove("show");
+    updateListSummary();
+    toast(pickerMode ? `取色器已开启：点击图纸格子加入${mode === "white" ? "白名单" : "黑名单"}` : "取色器已关闭");
+  }
+
+  $("pickWhitelist").onclick = () => startPicker("white");
+  $("pickBlacklist").onclick = () => startPicker("black");
+  $("modalPickWhite").onclick = () => startPicker("white");
+  $("modalPickBlack").onclick = () => startPicker("black");
+  $("clearColorLists").onclick = () => {
+    currentWhitelist.clear(); currentBlacklist.clear(); pickerMode = null;
+    renderListModalGrid(); toast("黑白名单已清空");
+  };
+
+  $("btnOpenLockModal").onclick = () => {
+    if (!result) return;
+    const targetColorCount = parseInt($("maxColorsLimit").value, 10);
+    if (!Number.isFinite(targetColorCount) || targetColorCount < 1) return;
+    const finalUsed = getFinalUsedColors(result.cells);
+    if (finalUsed.length <= targetColorCount && currentBlacklist.size === 0) {
+      toast("当前颜色数已少于或等于目标上限，无需优化");
+      return;
+    }
+    currentModalTargetK = targetColorCount;
+    $("modalMaxCount").textContent = targetColorCount;
+    pickerMode = null;
+    renderListModalGrid();
     $("lockModal").classList.add("show");
   };
 
-  $("btnCancelModal").onclick = () => $("lockModal").classList.remove("show");
+  $("btnCancelModal").onclick = () => { $("lockModal").classList.remove("show"); pickerMode = null; updateListSummary(); };
 
-  // ==== 核心：通过聚类挑选兼具频次与色系覆盖度的代表色 ====
-  function selectRepresentativeColors(usedColorCounts, K, fullPalette, userLockedSet) {
-    if (usedColorCounts.length <= K) return usedColorCounts.map(c => c.idx);
+  // 通过聚类挑选兼具频次与色系覆盖度的代表色；黑名单从候选池彻底排除
+  function selectRepresentativeColors(usedColorCounts, K, fullPalette, whitelist, blacklist) {
+    const eligibleUsed = usedColorCounts.filter(c => !blacklist.has(c.idx));
+    if (whitelist.size > K) throw new Error(`白名单数量 ${whitelist.size} 超过保留上限 ${K}`);
+    if (!eligibleUsed.length) throw new Error("黑名单排除了全部已用颜色");
 
-    let points = usedColorCounts.map(c => ({
-      idx: c.idx,
-      lab: fullPalette[c.idx].lab,
-      weight: Math.sqrt(c.count)
-    }));
+    const points = eligibleUsed.map(c => ({ idx:c.idx, lab:fullPalette[c.idx].lab, weight:Math.sqrt(c.count) }));
+    const centers = [];
+    const protectedIndices = new Set();
 
-    let centers = [];
-    let protectedIndices = new Set();
-
-    // 1. 优先加载用户手动锁定的颜色
-    for (let lockedIdx of userLockedSet) {
-      if (centers.length >= K) break;
-      let pt = points.find(p => p.idx === lockedIdx);
-      if (pt) {
-        centers.push({ ...pt.lab });
-        protectedIndices.add(pt.idx);
-      }
+    for (const idx of whitelist) {
+      if (blacklist.has(idx)) continue;
+      const pt = points.find(p => p.idx === idx) || { idx, lab:fullPalette[idx].lab, weight:1 };
+      centers.push({...pt.lab}); protectedIndices.add(idx);
+    }
+    if (!centers.length) {
+      points.sort((a,b) => b.weight-a.weight);
+      centers.push({...points[0].lab}); protectedIndices.add(points[0].idx);
     }
 
-    // 如果一个都没选，拿数量最多的兜底
-    if (centers.length === 0) {
-      points.sort((a, b) => b.weight - a.weight);
-      centers.push({ ...points[0].lab });
-      protectedIndices.add(points[0].idx);
-    }
-
-    // 2. K-Means++ 继续挑选剩下的初始中心
-    while (centers.length < K) {
-      let maxScore = -1, bestPoint = null;
-      for (let pt of points) {
-        if (protectedIndices.has(pt.idx)) continue; 
-
+    const target = Math.min(K, fullPalette.length - blacklist.size);
+    while (centers.length < target) {
+      let bestPoint = null, maxScore = -1;
+      for (const pt of points) {
+        if (protectedIndices.has(pt.idx)) continue;
         let minDist = Infinity;
-        for (let c of centers) {
-          let d = deltaE94Sym(pt.lab, c);
-          if (d < minDist) minDist = d;
-        }
-        let score = pt.weight * (minDist * minDist);
+        for (const c of centers) minDist = Math.min(minDist, deltaE94Sym(pt.lab, c));
+        const score = pt.weight * minDist * minDist;
         if (score > maxScore) { maxScore = score; bestPoint = pt; }
       }
-      if (bestPoint) {
-        centers.push({ ...bestPoint.lab });
-        protectedIndices.add(bestPoint.idx);
-      } else { break; }
+      if (!bestPoint) break;
+      centers.push({...bestPoint.lab}); protectedIndices.add(bestPoint.idx);
     }
 
-    // 3. K-Means 迭代优化重心
-    for (let iter = 0; iter < 10; iter++) {
-      let clusters = Array.from({length: K}, () => ({ l:0, a:0, b:0, w:0 }));
-      
-      for (let pt of points) {
-        let minD = Infinity, bestK = 0;
-        for (let k = 0; k < K; k++) {
-          let d = deltaE94Sym(pt.lab, centers[k]);
-          if (d < minD) { minD = d; bestK = k; }
-        }
-        clusters[bestK].l += pt.lab.l * pt.weight;
-        clusters[bestK].a += pt.lab.a * pt.weight;
-        clusters[bestK].b += pt.lab.b * pt.weight;
-        clusters[bestK].w += pt.weight;
+    for (let iter=0; iter<10; iter++) {
+      const clusters = Array.from({length:centers.length}, () => ({l:0,a:0,b:0,w:0}));
+      for (const pt of points) {
+        let best=0, minD=Infinity;
+        centers.forEach((c,k) => { const d=deltaE94Sym(pt.lab,c); if(d<minD){minD=d;best=k;} });
+        const cl=clusters[best]; cl.l+=pt.lab.l*pt.weight; cl.a+=pt.lab.a*pt.weight; cl.b+=pt.lab.b*pt.weight; cl.w+=pt.weight;
       }
+      clusters.forEach((cl,k) => { if(cl.w){centers[k]={l:cl.l/cl.w,a:cl.a/cl.w,b:cl.b/cl.w};} });
+    }
 
-      for (let k = 0; k < K; k++) {
-        if (clusters[k].w > 0) {
-          centers[k].l = clusters[k].l / clusters[k].w;
-          centers[k].a = clusters[k].a / clusters[k].w;
-          centers[k].b = clusters[k].b / clusters[k].w;
-        }
+    const selected = new Set();
+    for (const idx of whitelist) if (!blacklist.has(idx) && selected.size < target) selected.add(idx);
+    for (const center of centers) {
+      if (selected.size >= target) break;
+      let bestIdx=-1, minD=Infinity;
+      for (let i=0;i<fullPalette.length;i++) {
+        if (selected.has(i) || blacklist.has(i)) continue;
+        const d=deltaE94Sym(center, fullPalette[i].lab);
+        if(d<minD){minD=d;bestIdx=i;}
       }
+      if(bestIdx!==-1) selected.add(bestIdx);
     }
-
-    // 4. 吸附回色卡
-    let selectedIndices = new Set();
-
-    // 强制保护用户选择的
-    for (let lockedIdx of userLockedSet) {
-      if (selectedIndices.size < K) selectedIndices.add(lockedIdx);
-    }
-
-    for (let center of centers) {
-      if (selectedIndices.size >= K) break;
-      let bestIdx = -1, minD = Infinity;
-      for (let i = 0; i < fullPalette.length; i++) {
-        if (selectedIndices.has(i)) continue;
-        let d = deltaE94Sym(center, fullPalette[i].lab);
-        if (d < minD) { minD = d; bestIdx = i; }
-      }
-      if (bestIdx !== -1) selectedIndices.add(bestIdx);
-    }
-
-    return Array.from(selectedIndices);
+    return Array.from(selected);
   }
 
-  // 第二阶段：限制颜色继续优化
   $("btnConfirmModal").onclick = () => {
-    $("lockModal").classList.remove("show");
+    $("lockModal").classList.remove("show"); pickerMode = null; updateListSummary();
     if (!result) return;
-    
-    let targetColorCount = currentModalTargetK;
-    let counts = {};
+    const targetColorCount = currentModalTargetK;
+    const counts = {};
     result.cells.forEach(idx => counts[idx] = (counts[idx] || 0) + 1);
-    let usedData = Object.entries(counts).map(([idx, count]) => ({ idx: Number(idx), count }));
+    const usedData = Object.entries(counts).map(([idx,count]) => ({idx:Number(idx),count}));
 
-    // 调用智能聚类，带入用户锁定的 Set
-    let allowedArr = selectRepresentativeColors(usedData, targetColorCount, FULL_PALETTE, currentLockedIndices);
-    let allowedIndices = new Set(allowedArr);
+    let allowedArr;
+    try {
+      allowedArr = selectRepresentativeColors(usedData, targetColorCount, FULL_PALETTE, currentWhitelist, currentBlacklist);
+    } catch (err) {
+      toast(err.message || "黑白名单配置无效"); return;
+    }
+    if (!allowedArr.length) { toast("没有可用于优化的颜色"); return; }
+    const allowedIndices = new Set(allowedArr);
+    const N = simState.w * simState.h;
+    const newTopKCount = Math.min(TOP_K_COUNT, allowedArr.length);
+    const newTopK = new Int32Array(N * newTopKCount);
 
-    let N = simState.w * simState.h;
-    let newTopKCount = Math.min(TOP_K_COUNT, allowedArr.length);
-    let newTopK = new Int32Array(N * newTopKCount);
-
-    for (let p = 0; p < N; p++) {
-      let dists = [];
-      for (let i = 0; i < allowedArr.length; i++) {
-        let k = allowedArr[i];
-        dists.push({ k: k, e: simState.E_data[p * FULL_PALETTE.length + k] });
-      }
-      dists.sort((a, b) => a.e - b.e);
-      for (let i = 0; i < newTopKCount; i++) {
-        newTopK[p * newTopKCount + i] = dists[i].k;
-      }
-      if (!allowedIndices.has(simState.labels[p])) {
-        simState.labels[p] = dists[0].k;
-      }
+    for (let p=0;p<N;p++) {
+      const dists = allowedArr.map(k => ({k,e:simState.E_data[p * FULL_PALETTE.length + k]})).sort((a,b)=>a.e-b.e);
+      for (let i=0;i<newTopKCount;i++) newTopK[p*newTopKCount+i]=dists[i].k;
+      if (!allowedIndices.has(simState.labels[p])) simState.labels[p]=dists[0].k;
     }
 
-    simState.topK = newTopK;
-    simState.topKCount = newTopKCount;
-    simState.temp = 2.5; 
-    simState.iter = 0;
-    simState.maxIter = 150; 
-    historyStack = []; // 清空撤销历史
-
-    isAnimating = true;
-    $("statusBadge").className = "status-badge active";
-    $("statusText").textContent = "限制颜色并二次优化中...";
-    $("progressFill").style.width = "0%";
-    $("generate").disabled = true;
-    $("exportFull").disabled = true;
-    $("exportRegions").disabled = true;
-    $("btnOpenLockModal").disabled = true;
-
-    lastFrameTime = performance.now();
-    animFrame = requestAnimationFrame(animationLoop);
+    simState.topK=newTopK; simState.topKCount=newTopKCount; simState.temp=2.5; simState.iter=0; simState.maxIter=150;
+    historyStack=[]; isAnimating=true;
+    $("statusBadge").className="status-badge active"; $("statusText").textContent="应用黑白名单并二次优化中...";
+    $("progressFill").style.width="0%"; $("generate").disabled=true; $("exportFull").disabled=true; $("exportRegions").disabled=true; $("btnOpenLockModal").disabled=true;
+    lastFrameTime=performance.now(); animFrame=requestAnimationFrame(animationLoop);
   };
 
   function updateColorTable() {
@@ -996,7 +1191,47 @@ const HAMA_CSV = `H01,White,229,236,241,Jeppewl\nH02,Cream,228,228,197,Jeppewl\n
     }
   }
 
+  function pickColorFromSheet(e) {
+    if (!pickerMode || !result || isAnimating) return false;
+    const event = e.touches ? e.touches[0] : e;
+    const rect = sheet.getBoundingClientRect();
+    const scale = Number($("screenZoom").value) / 100;
+    const x = Math.floor((event.clientX - rect.left) / scale / CW);
+    const y = Math.floor((event.clientY - rect.top) / scale / CW);
+    if (x < 0 || x >= result.w || y < 0 || y >= result.h) return true;
+    const idx = result.cells[y * result.w + x];
+    const mode = pickerMode;
+    if (mode === "white" && !currentWhitelist.has(idx) && currentWhitelist.size >= currentModalTargetK) {
+      toast(`白名单最多可选择 ${currentModalTargetK} 种颜色`); return true;
+    }
+
+    const alreadyInTarget = mode === "white" ? currentWhitelist.has(idx) : currentBlacklist.has(idx);
+    if (alreadyInTarget) {
+      toast(`${FULL_PALETTE[idx].code} 已在${mode === "white" ? "白名单" : "黑名单"}中`);
+      return true;
+    }
+
+    const hasConflict = mode === "white" ? currentBlacklist.has(idx) : currentWhitelist.has(idx);
+    if (hasConflict && !confirmListTransfer(idx, mode)) {
+      toast("已取消名单覆盖");
+      return true;
+    }
+
+    if (mode === "white") {
+      currentBlacklist.delete(idx);
+      currentWhitelist.add(idx);
+    } else {
+      currentWhitelist.delete(idx);
+      currentBlacklist.add(idx);
+    }
+    updateListSummary();
+    renderListModalGrid();
+    toast(`${FULL_PALETTE[idx].code} 已加入${mode === "white" ? "白名单" : "黑名单"}`);
+    return true;
+  }
+
   sheet.addEventListener('mousedown', (e) => {
+    if (pickColorFromSheet(e)) { e.preventDefault(); return; }
     if(!result || activeBrushIndex === null) {
       if(result && !isAnimating) toast("请先在右侧列表中点击选取一种画笔颜色！");
       return;
@@ -1009,6 +1244,7 @@ const HAMA_CSV = `H01,White,229,236,241,Jeppewl\nH02,Cream,228,228,197,Jeppewl\n
   window.addEventListener('mouseup', () => { if(isDrawing) { isDrawing = false; updateColorTable(); } });
   
   sheet.addEventListener('touchstart', (e) => {
+    if (pickColorFromSheet(e)) { e.preventDefault(); return; }
     if(!result || activeBrushIndex === null) return;
     e.preventDefault(); 
     isDrawing = true; 
@@ -1201,6 +1437,26 @@ const HAMA_CSV = `H01,White,229,236,241,Jeppewl\nH02,Cream,228,228,197,Jeppewl\n
       toast("全图已导出");
     } catch(err) { console.error(err); toast("全图导出失败，请降低格子宽度后重试"); }
     finally { btn.disabled = false; btn.textContent = oldText; }
+  };
+
+
+  $("exportProject").onclick = () => {
+    try {
+      const payload = buildCompactProjectPayload();
+      const stamp = new Date().toISOString().slice(0, 10).replace(/-/g, "");
+      downloadText(JSON.stringify(payload), `拼豆图纸_${result.w}x${result.h}_${stamp}.pbd`);
+      toast("自定义图纸文件已导出");
+    } catch (err) {
+      console.error(err); toast(err.message || "图纸文件导出失败");
+    }
+  };
+
+  $("importProject").onchange = async e => {
+    const f = e.target.files?.[0];
+    if (!f) return;
+    try { await importProjectFile(f); }
+    catch (err) { console.error(err); toast(err.message || "图纸文件导入失败"); }
+    finally { e.target.value = ""; }
   };
 
   $("exportRegions").onclick = async () => {
