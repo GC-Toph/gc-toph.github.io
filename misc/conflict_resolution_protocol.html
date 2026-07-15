@@ -1,0 +1,1496 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>冲突处理流程</title>
+  <style>
+    :root {
+      --bg: #f4f6f8;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --line: #d7dde5;
+      --accent: #2563eb;
+      --accent-soft: #eef4ff;
+      --warn: #b45309;
+      --warn-soft: #fff7ed;
+      --danger: #b91c1c;
+      --danger-soft: #fef2f2;
+      --success: #047857;
+      --success-soft: #ecfdf5;
+      --purple: #6d28d9;
+      --purple-soft: #f5f3ff;
+      --radius: 14px;
+      --shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+        "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      line-height: 1.55;
+    }
+
+    body.modal-open { overflow: hidden; }
+
+    .app {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, #1d4ed8, #0f766e);
+      color: #fff;
+      padding: 26px;
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      margin-bottom: 14px;
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-size: clamp(26px, 5vw, 38px);
+    }
+
+    .flow {
+      margin-top: 14px;
+      padding: 11px 13px;
+      border: 1px solid rgba(255,255,255,.25);
+      background: rgba(255,255,255,.12);
+      border-radius: 10px;
+      font-size: 14px;
+    }
+
+    .mode-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 8px;
+      padding: 11px 14px;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+    }
+
+    .mode-badge {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      padding: 5px 10px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-weight: 800;
+      font-size: 13px;
+    }
+
+    .mode-badge.review {
+      background: var(--purple-soft);
+      color: var(--purple);
+    }
+
+    .status-text {
+      margin-left: 8px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .toolbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 10px 0;
+      background: rgba(244,246,248,.94);
+      backdrop-filter: blur(10px);
+    }
+
+    button,
+    .file-button {
+      border: 0;
+      border-radius: 9px;
+      padding: 9px 13px;
+      font: inherit;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .primary { background: var(--accent); color: #fff; }
+    .secondary { background: #fff; color: var(--text); border: 1px solid var(--line); }
+    .purple { background: var(--purple); color: #fff; }
+    .danger { background: var(--danger); color: #fff; }
+    .small { padding: 7px 10px; font-size: 13px; }
+    .file-button input { display: none; }
+
+    .section {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 20px;
+      margin-bottom: 14px;
+    }
+
+    .section h2 {
+      margin: 0 0 14px;
+      font-size: 21px;
+    }
+
+    .section h3 {
+      margin: 18px 0 10px;
+      font-size: 17px;
+    }
+
+    .section p.tip {
+      margin: -6px 0 14px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .field { margin-bottom: 14px; }
+
+    label.field-label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    input[type="datetime-local"],
+    select,
+    textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      padding: 10px 11px;
+      background: #fff;
+      color: var(--text);
+      font: inherit;
+      outline: none;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(37,99,235,.1);
+    }
+
+    textarea {
+      min-height: 82px;
+      resize: vertical;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .choice-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .choice {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 10px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: #f8fafc;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .choice input { margin: 0; }
+
+    .callout,
+    .hint {
+      padding: 12px 14px;
+      border-left: 4px solid var(--accent);
+      border-radius: 9px;
+      background: var(--accent-soft);
+      font-size: 14px;
+      margin-bottom: 14px;
+    }
+
+    .callout.warning {
+      border-left-color: var(--warn);
+      background: var(--warn-soft);
+    }
+
+    .callout.review {
+      border-left-color: var(--purple);
+      background: var(--purple-soft);
+    }
+
+    .example-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .example {
+      border-radius: 10px;
+      padding: 12px 13px;
+      font-size: 14px;
+    }
+
+    .example.bad {
+      background: var(--danger-soft);
+      border: 1px solid #fecaca;
+    }
+
+    .example.good {
+      background: var(--success-soft);
+      border: 1px solid #a7f3d0;
+    }
+
+    .example strong {
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .range-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    input[type="range"] { flex: 1; }
+
+    .resume-preview {
+      min-height: 22px;
+      margin-top: 7px;
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .item-list {
+      display: grid;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .item-card {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 14px;
+      background: #fbfcfe;
+    }
+
+    .item-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .item-title {
+      font-weight: 800;
+    }
+
+    .item-actions {
+      display: flex;
+      gap: 7px;
+    }
+
+    .fact-controls {
+      display: grid;
+      grid-template-columns: minmax(180px, 240px) 1fr;
+      gap: 10px;
+      align-items: start;
+      margin-top: 10px;
+    }
+
+    .feeling-box {
+      border: 1px dashed var(--line);
+      border-radius: 10px;
+      padding: 10px;
+      min-height: 46px;
+    }
+
+    .feeling-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-top: 9px;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 9px;
+      border-radius: 999px;
+      background: var(--success-soft);
+      color: var(--success);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .empty-text {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 7px;
+    }
+
+    .review-panel {
+      margin-top: 12px;
+      padding: 12px;
+      border: 1px solid #ddd6fe;
+      border-radius: 10px;
+      background: var(--purple-soft);
+    }
+
+    .review-title {
+      margin-bottom: 8px;
+      color: var(--purple);
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .review-options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .review-option {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 9px;
+      border-radius: 8px;
+      background: #fff;
+      border: 1px solid #ddd6fe;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    
+    .review-option.block {
+      display: flex;
+      width: 100%;
+    }
+
+    .review-comment { min-height: 58px; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 720px;
+    }
+
+    th, td {
+      border-bottom: 1px solid var(--line);
+      padding: 9px;
+      font-size: 14px;
+      text-align: left;
+      vertical-align: middle;
+    }
+
+    th { background: #f8fafc; }
+
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+    }
+
+    .agreement-card {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 14px;
+      background: #fbfcfe;
+      margin-bottom: 12px;
+    }
+
+    .agreement-card h3 { margin-top: 0; }
+
+    details.rule-check {
+      margin-top: 14px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #fbfcfe;
+      padding: 11px 13px;
+    }
+
+    details.rule-check summary {
+      cursor: pointer;
+      font-weight: 800;
+    }
+
+    .rule-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .rule-item {
+      padding: 9px 10px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: #fff;
+      font-size: 13px;
+    }
+
+    .thought-warning {
+      margin-top: 10px;
+      padding: 10px 12px;
+      border: 1px solid #fed7aa;
+      border-left: 4px solid var(--warn);
+      border-radius: 9px;
+      background: var(--warn-soft);
+      color: #92400e;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .hidden { display: none !important; }
+    .readonly-field { background: #f3f4f6 !important; color: #4b5563; }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      background: rgba(15,23,42,.55);
+    }
+
+    .modal-card {
+      width: min(760px, 100%);
+      max-height: 86vh;
+      overflow: auto;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 24px 80px rgba(15,23,42,.28);
+      padding: 20px;
+    }
+    
+    .modal-card.small-dialog {
+      width: min(400px, 100%);
+    }
+
+    .modal-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .modal-head h2, .modal-card h3 { margin: 0; font-size: 21px; }
+    .modal-card.small-dialog p { margin: 16px 0; font-size: 15px; }
+
+    .feeling-category {
+      margin-top: 14px;
+    }
+
+    .feeling-category h3 {
+      margin: 0 0 8px;
+      font-size: 15px;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 18px;
+    }
+
+    @media (max-width: 760px) {
+      .grid-2, .grid-3, .choice-grid, .example-grid, .fact-controls, .rule-grid {
+        grid-template-columns: 1fr;
+      }
+      .app { padding: 12px; }
+      .section { padding: 16px; }
+      .mode-bar { align-items: flex-start; flex-direction: column; }
+      .status-text { margin-left: 0; display: block; margin-top: 6px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="hero">
+      <h1>冲突处理流程</h1>
+      <div class="flow">暂停降温 → 逐条核对事实与感受 → 说明需求 → 设计可执行方案</div>
+    </header>
+
+    <div class="mode-bar">
+      <div>
+        <span id="modeBadge" class="mode-badge">填写我的版本</span>
+        <span id="modeDescription" class="status-text">内容会在修改时自动保存。</span>
+      </div>
+      <span id="fileStatus" class="status-text"></span>
+    </div>
+
+    <div class="toolbar">
+      <button id="exportButton" class="primary" type="button">导出给对方</button>
+      <label class="file-button purple">
+        导入对方视角
+        <input id="importInput" type="file" accept="application/json,.json">
+      </label>
+      <button id="resetButton" class="danger" type="button">清空</button>
+    </div>
+
+    <form id="conflictForm">
+      <section class="section">
+        <h2>1. 暂停</h2>
+        <p class="tip">暂停必须同时确定恢复时间和接触距离，否则容易变成失联或追逐。</p>
+
+        <div class="field">
+          <label for="intensity" class="field-label">我的情绪强度</label>
+          <div class="range-row">
+            <input id="intensity" name="intensity" type="range" min="0" max="10" value="0">
+            <strong id="intensityValue">0 / 10</strong>
+          </div>
+        </div>
+
+        <div id="pauseWarning" class="callout warning hidden">
+          情绪强度达到 7 分以上。此时不继续解释、追问、争辩，也不要求立即和好或恢复亲密。
+        </div>
+
+        <div class="field">
+          <label for="pauseUntil" class="field-label">暂停到什么时候恢复沟通</label>
+          <select id="pauseUntil" name="pauseUntil">
+            <option value="">请选择</option>
+            <option value="none">不需要暂停</option>
+            <option value="15m">15 分钟后</option>
+            <option value="30m">30 分钟后</option>
+            <option value="1h">1 小时后</option>
+            <option value="2h">2 小时后</option>
+            <option value="4h">4 小时后</option>
+            <option value="tomorrow">明天同一时间</option>
+            <option value="custom">指定日期和时间</option>
+          </select>
+          <input id="customResume" class="hidden" type="datetime-local" name="customResume" style="margin-top:8px">
+          <div id="resumePreview" class="resume-preview"></div>
+        </div>
+
+        <div class="field">
+          <label for="distancePlan" class="field-label">暂停时保持什么距离</label>
+          <select id="distancePlan" name="distancePlan">
+            <option value="">请选择</option>
+            <option>稳定保持至少 7 米距离；同一场所只处理必要事项</option>
+            <option>不进入同一房间；各自在独立空间活动</option>
+            <option>暂不见面；各自回自己的休息地点</option>
+            <option>不靠近、不触碰；只保留必要的工作或生活交流</option>
+            <option>只通过文字处理必要事项；暂不讨论冲突</option>
+            <option>完全暂停联系；到约定时间再恢复沟通</option>
+            <option value="custom">自定义距离方案</option>
+          </select>
+          <textarea id="customDistance" class="hidden" name="customDistance" style="margin-top:8px" placeholder="写清楚空间、接触方式和必要交流范围。"></textarea>
+        </div>
+
+        <details class="rule-check" open>
+          <summary>暂停规则质量检查</summary>
+          <div class="rule-grid">
+            <div class="rule-item"><strong>公开：</strong>是否已经明确告知恢复时间和接触距离，而不是直接消失？</div>
+            <div class="rule-item"><strong>明确：</strong>时间、空间距离、接触方式和必要交流范围是否清楚？</div>
+            <div class="rule-item"><strong>可履行：</strong>双方在当前场景下是否确实能够按这个距离执行？</div>
+            <div class="rule-item"><strong>不矛盾：</strong>是否避免一边要求暂停，一边继续追问、发长消息或要求亲密？</div>
+            <div class="rule-item"><strong>稳定：</strong>暂停期间是否不临时加码、不反复改变规则？</div>
+            <div class="rule-item"><strong>言行一致：</strong>是否会在约定时间恢复沟通；需要延长时，是否提前说明新时间？</div>
+          </div>
+        </details>
+      </section>
+
+      <section class="section">
+        <h2>2. 事实与对应感受</h2>
+
+        <div class="example-grid">
+          <div class="example bad">
+            <strong>错误写法</strong>
+            “你就是故意冷落我，你根本不在乎我。”
+          </div>
+          <div class="example good">
+            <strong>正确写法</strong>
+            “昨晚 23:00 后我发了两条消息，今天 08:10 收到回复。”
+          </div>
+        </div>
+        <div class="hint">
+          事实写时间、行为、次数和原话。不能确认的内容选择“推测”或“不确定”。每条事实只关联它直接引发的感受。
+        </div>
+
+        <div id="factList" class="item-list"></div>
+        <button id="addFactBtn" class="secondary small author-only" type="button">＋ 添加事实</button>
+      </section>
+
+      <section class="section">
+        <h2>3. 需求</h2>
+
+        <div class="example-grid">
+          <div class="example bad">
+            <strong>错误写法</strong>
+            “我需要你马上道歉，以后必须按我说的做。”
+          </div>
+          <div class="example good">
+            <strong>正确写法</strong>
+            “我需要重要事情有回应；计划发生变化时，我需要提前知道。”
+          </div>
+        </div>
+        <div class="hint">
+          需求说明什么对我重要，不指定对方必须采取哪一个动作。动作放到方案中协商。
+        </div>
+
+        <div class="choice-grid" id="needsGrid"></div>
+
+        <div class="field" style="margin-top:14px">
+          <label for="needStatement" class="field-label">当前最重要的需求</label>
+          <textarea id="needStatement" name="needStatement" placeholder="例如：我需要清晰、稳定、尊重，以及冲突后能按约定恢复交流。"></textarea>
+        </div>
+        <div id="needReview" class="review-panel review-only hidden"></div>
+      </section>
+
+      <section class="section">
+        <h2>4. 方案</h2>
+
+        <div class="example-grid">
+          <div class="example bad">
+            <strong>错误写法</strong>
+            “以后加强沟通，不许再这样。”
+          </div>
+          <div class="example good">
+            <strong>正确写法</strong>
+            “如果暂时不能回复，先发一句‘现在不方便，20:00 回复’；试行 14 天，以实际回复时间记录。”
+          </div>
+        </div>
+        <div class="hint">
+          方案只约束未来，并应当公开、明确、不矛盾、可履行、在试行期内保持稳定，实际执行与约定一致。
+        </div>
+
+        <div class="grid-2">
+          <div class="field">
+            <label for="targetBehavior" class="field-label">目标行为</label>
+            <textarea id="targetBehavior" name="targetBehavior" placeholder="例如：冲突暂停后按约定时间恢复沟通。"></textarea>
+          </div>
+          <div class="field">
+            <label for="evidenceMethod" class="field-label">计量和核对方式</label>
+            <textarea id="evidenceMethod" name="evidenceMethod" placeholder="例如：按聊天记录中的暂停时间和恢复沟通时间计算。"></textarea>
+          </div>
+        </div>
+
+        <div class="grid-3">
+          <div class="field">
+            <label for="trialPeriod" class="field-label">试行周期</label>
+            <input id="trialPeriod" name="trialPeriod" type="text" placeholder="例如：14 天">
+          </div>
+          <div class="field">
+            <label for="balancePoint" class="field-label">平衡点</label>
+            <input id="balancePoint" name="balancePoint" type="text" placeholder="例如：每周完成 6 次">
+          </div>
+          <div class="field">
+            <label for="reviewFrequency" class="field-label">复核频率</label>
+            <input id="reviewFrequency" name="reviewFrequency" type="text" placeholder="例如：每周日一次">
+          </div>
+        </div>
+
+        <div class="agreement-card">
+          <h3>未达标区：修复责任</h3>
+          <div class="grid-3">
+            <div class="field">
+              <label for="belowCondition" class="field-label">触发条件</label>
+              <input id="belowCondition" name="belowCondition" type="text" placeholder="例如：每周少于 6 次">
+            </div>
+            <div class="field">
+              <label for="belowAction" class="field-label">每少一个单位的修复行动</label>
+              <input id="belowAction" name="belowAction" type="text" placeholder="例如：补做一次 20 分钟复盘">
+            </div>
+            <div class="field">
+              <label for="belowCap" class="field-label">责任上限</label>
+              <input id="belowCap" name="belowCap" type="text" placeholder="例如：每周最多 3 次">
+            </div>
+          </div>
+        </div>
+
+        <div class="agreement-card">
+          <h3>达标区：正向奖励</h3>
+          <div class="grid-3">
+            <div class="field">
+              <label for="aboveCondition" class="field-label">触发条件</label>
+              <input id="aboveCondition" name="aboveCondition" type="text" placeholder="例如：每周超过 6 次">
+            </div>
+            <div class="field">
+              <label for="aboveAction" class="field-label">每多一个单位的奖励</label>
+              <input id="aboveAction" name="aboveAction" type="text" placeholder="例如：增加一次共同活动">
+            </div>
+            <div class="field">
+              <label for="aboveCap" class="field-label">奖励上限</label>
+              <input id="aboveCap" name="aboveCap" type="text" placeholder="例如：每周最多 2 次">
+            </div>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="field">
+            <label for="exceptions" class="field-label">例外情况</label>
+            <textarea id="exceptions" name="exceptions" placeholder="例如：突发疾病、紧急工作；发生后在 24 小时内补充说明。"></textarea>
+          </div>
+          <div class="field">
+            <label for="changeRule" class="field-label">修改规则</label>
+            <textarea id="changeRule" name="changeRule" placeholder="例如：修改只对未来生效，需双方明确同意，不追溯处罚。"></textarea>
+          </div>
+        </div>
+
+        <details class="rule-check" open>
+          <summary>规则质量检查</summary>
+          <div class="rule-grid">
+            <div class="rule-item"><strong>对等：</strong>规则是否同样适用于双方，而不是为一方设置特权？</div>
+            <div class="rule-item"><strong>公开：</strong>规则是否已经明确说出，而不是期待对方自己猜？</div>
+            <div class="rule-item"><strong>面向未来：</strong>是否只约束之后的行为，不用新规则追溯处罚过去？</div>
+            <div class="rule-item"><strong>明确：</strong>触发条件、时间、次数、责任和结果是否可以核对？</div>
+            <div class="rule-item"><strong>不矛盾：</strong>是否和其他规则方案冲突？</div>
+            <div class="rule-item"><strong>可履行：</strong>要求是否过高？</div>
+            <div class="rule-item"><strong>稳定：</strong>试行期间是否避免频繁改动，难以让双方形成可预期性？</div>
+            <div class="rule-item"><strong>言行一致：</strong>实际执行是否与公开约定一致，而不是临时裁决？</div>
+          </div>
+        </details>
+
+        <div id="solutionReview" class="review-panel review-only hidden"></div>
+      </section>
+    </form>
+  </div>
+
+  <div id="feelingModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="feelingModalTitle">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h2 id="feelingModalTitle">选择感受</h2>
+        <button id="closeFeelingBtnTop" class="secondary small" type="button">关闭</button>
+      </div>
+      <div id="feelingModalContent"></div>
+      <div class="modal-actions">
+        <button id="closeFeelingBtnBottom" class="secondary" type="button">取消</button>
+        <button id="confirmFeelingBtn" class="primary" type="button">确认选择</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="sysDialog" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-card small-dialog">
+      <h3 id="sysDialogTitle">提示</h3>
+      <p id="sysDialogMsg"></p>
+      <div class="modal-actions">
+        <button id="sysDialogCancel" class="secondary hidden">取消</button>
+        <button id="sysDialogConfirm" class="primary">确定</button>
+      </div>
+    </div>
+  </div>
+
+  <template id="factTemplate">
+    <div class="item-card fact-item">
+      <div class="item-head">
+        <span class="item-title">事实 <span class="fact-number"></span></span>
+        <div class="item-actions author-only">
+          <button class="secondary small remove-fact-btn" type="button">删除</button>
+        </div>
+      </div>
+      <textarea class="fact-text" placeholder="写时间、行为、次数或原话。"></textarea>
+      <div class="fact-controls">
+        <div class="field" style="margin-bottom:0">
+          <label class="field-label">我对这条内容的分类</label>
+          <select class="fact-self-classification">
+            <option value="fact">事实：可以核对</option>
+            <option value="inference">推测：对动机或态度的解释</option>
+            <option value="uncertain">不确定：记忆或信息不足</option>
+          </select>
+        </div>
+        <div class="feeling-box">
+          <div class="feeling-head">
+            <strong>这条内容引发的感受</strong>
+            <button class="secondary small author-only feeling-button" type="button">选择感受</button>
+          </div>
+          <div class="chips feeling-chips"></div>
+          <div class="empty-text feeling-empty">尚未选择</div>
+        </div>
+      </div>
+      <div class="thought-warning hidden">你的感受是真实的，但想法很可能是错误的。</div>
+      <div class="review-panel review-only hidden fact-review"></div>
+    </div>
+  </template>
+
+  <script>
+  (() => {
+    const STORAGE_KEY = "conflict_protocol_v5_autosave";
+    const SCHEMA = "conflict-protocol-v5";
+
+    const needOptions = [
+      "尊重", "安全", "信任", "公平", "清晰", "理解", "自主", "稳定",
+      "边界", "诚实", "回应", "陪伴", "隐私", "认可", "可预测", "休息",
+      "合作", "选择权", "参与感", "效率"
+    ];
+
+    const feelingGroups = [
+      { name: "低落与受伤", items: ["难过", "失落", "失望", "受伤", "委屈", "悲伤", "孤单", "压抑", "挫败", "无助", "无力", "麻木"] },
+      { name: "紧张与不安全", items: ["不安", "害怕", "焦虑", "紧张", "担忧", "心慌", "困惑", "震惊", "嫉妒", "羞愧", "尴尬", "内疚"] },
+      { name: "愤怒与消耗", items: ["生气", "恼火", "厌烦", "疲惫", "烦躁", "抗拒", "不耐烦"] },
+      { name: "积极感受", items: ["放松", "安心", "感动", "开心", "满足", "甜蜜", "轻松", "感激", "有希望", "被理解"] },
+      { name: "身体与行动反应", items: ["胸闷", "心跳加快", "发抖", "恶心", "头痛", "想躲开", "想哭", "无法集中", "睡不着", "身体僵硬"] }
+    ];
+
+    let state = {
+      mode: "author",
+      resumeAt: "",
+      factSeq: 0,
+      activeFactId: "",
+      pendingFeelings: [],
+      autoSaveTimer: null,
+      currentReview: createEmptyReview()
+    };
+
+    function generateId(prefix) {
+      if (window.crypto && window.crypto.randomUUID) {
+        return `${prefix}_${crypto.randomUUID()}`;
+      }
+      return `${prefix}_${Date.now()}_${Math.random().toString(16).slice(2)}`;
+    }
+
+    function createEmptyReview() {
+      return {
+        facts: {},
+        need: { classification: "", comment: "" },
+        solution: { status: "", comment: "" }
+      };
+    }
+
+    function sysAlert(msg, title = "提示") {
+      return new Promise(resolve => {
+        document.getElementById("sysDialogTitle").textContent = title;
+        document.getElementById("sysDialogMsg").textContent = msg;
+        document.getElementById("sysDialogCancel").classList.add("hidden");
+        const modal = document.getElementById("sysDialog");
+        const confirmBtn = document.getElementById("sysDialogConfirm");
+        
+        const onConfirm = () => {
+          modal.classList.add("hidden");
+          confirmBtn.removeEventListener("click", onConfirm);
+          resolve();
+        };
+        confirmBtn.addEventListener("click", onConfirm);
+        modal.classList.remove("hidden");
+      });
+    }
+
+    function sysConfirm(msg, title = "确认") {
+      return new Promise(resolve => {
+        document.getElementById("sysDialogTitle").textContent = title;
+        document.getElementById("sysDialogMsg").textContent = msg;
+        document.getElementById("sysDialogCancel").classList.remove("hidden");
+        const modal = document.getElementById("sysDialog");
+        const confirmBtn = document.getElementById("sysDialogConfirm");
+        const cancelBtn = document.getElementById("sysDialogCancel");
+
+        const cleanup = () => {
+          modal.classList.add("hidden");
+          confirmBtn.removeEventListener("click", onConfirm);
+          cancelBtn.removeEventListener("click", onCancel);
+        };
+        const onConfirm = () => { cleanup(); resolve(true); };
+        const onCancel = () => { cleanup(); resolve(false); };
+        
+        confirmBtn.addEventListener("click", onConfirm);
+        cancelBtn.addEventListener("click", onCancel);
+        modal.classList.remove("hidden");
+      });
+    }
+
+    function renderChoiceGrid(containerId, name, values) {
+      const container = document.getElementById(containerId);
+      container.innerHTML = values.map(value => `
+        <label class="choice">
+          <input type="checkbox" name="${name}" value="${value}">
+          ${value}
+        </label>
+      `).join("");
+    }
+
+    function formatLocalDateTime(date) {
+      return new Intl.DateTimeFormat("zh-CN", {
+        year: "numeric", month: "2-digit", day: "2-digit",
+        hour: "2-digit", minute: "2-digit", hour12: false
+      }).format(date);
+    }
+
+    function updateIntensity() {
+      const value = Number(document.getElementById("intensity").value);
+      document.getElementById("intensityValue").textContent = `${value} / 10`;
+      document.getElementById("pauseWarning").classList.toggle("hidden", value < 7);
+    }
+
+    function updateDateTimeMin() {
+      const now = new Date();
+      now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+      document.getElementById("customResume").min = now.toISOString().slice(0, 16);
+    }
+
+    function handlePauseUntil(recalculate = true) {
+      const select = document.getElementById("pauseUntil");
+      const custom = document.getElementById("customResume");
+      const preview = document.getElementById("resumePreview");
+      
+      if (select.value === "custom") {
+        custom.classList.remove("hidden");
+        updateDateTimeMin();
+      } else {
+        custom.classList.add("hidden");
+      }
+
+      if (!recalculate) {
+        preview.textContent = state.resumeAt ? `恢复时间：${formatLocalDateTime(new Date(state.resumeAt))}` : "";
+        return;
+      }
+
+      const now = new Date();
+      const offsets = {
+        "15m": 15 * 60 * 1000,
+        "30m": 30 * 60 * 1000,
+        "1h": 60 * 60 * 1000,
+        "2h": 2 * 60 * 60 * 1000,
+        "4h": 4 * 60 * 60 * 1000,
+        "tomorrow": 24 * 60 * 60 * 1000
+      };
+
+      if (select.value === "none") {
+        state.resumeAt = "";
+        preview.textContent = "不暂停，继续沟通前仍需确认情绪强度适合。";
+      } else if (offsets[select.value]) {
+        state.resumeAt = new Date(now.getTime() + offsets[select.value]).toISOString();
+        preview.textContent = `恢复时间：${formatLocalDateTime(new Date(state.resumeAt))}`;
+      } else if (select.value === "custom") {
+        const value = custom.value;
+        state.resumeAt = value ? new Date(value).toISOString() : "";
+        preview.textContent = state.resumeAt ? `恢复时间：${formatLocalDateTime(new Date(state.resumeAt))}` : "";
+      } else {
+        state.resumeAt = "";
+        preview.textContent = "";
+      }
+    }
+
+    function handleDistancePlan() {
+      const value = document.getElementById("distancePlan").value;
+      document.getElementById("customDistance").classList.toggle("hidden", value !== "custom");
+    }
+
+    function addFact(data = {}) {
+      const id = data.id || generateId("fact");
+      const feelings = Array.isArray(data.feelings) ? data.feelings : [];
+      
+      const template = document.getElementById("factTemplate");
+      const clone = template.content.cloneNode(true);
+      const card = clone.querySelector(".fact-item");
+      
+      card.dataset.id = id;
+      card.dataset.feelings = JSON.stringify(feelings);
+      
+      const textArea = card.querySelector(".fact-text");
+      textArea.value = data.text || "";
+      
+      const selectCls = card.querySelector(".fact-self-classification");
+      if (data.selfClassification) {
+        selectCls.value = data.selfClassification;
+      }
+
+      document.getElementById("factList").appendChild(clone);
+      
+      const appendedCard = document.querySelector(`.fact-item[data-id="${id}"]`);
+      renderFeelingChips(appendedCard);
+      renumberFacts();
+      renderFactReview(appendedCard);
+      scheduleAutoSave();
+    }
+
+    function removeFact(button) {
+      const items = document.querySelectorAll(".fact-item");
+      if (items.length <= 1) {
+        sysAlert("至少保留一条事实记录。");
+        return;
+      }
+      const card = button.closest(".fact-item");
+      delete state.currentReview.facts[card.dataset.id];
+      card.remove();
+      renumberFacts();
+      scheduleAutoSave();
+    }
+
+    function renumberFacts() {
+      document.querySelectorAll(".fact-item").forEach((item, index) => {
+        item.querySelector(".fact-number").textContent = index + 1;
+      });
+    }
+
+    function renderFeelingChips(card) {
+      const feelings = JSON.parse(card.dataset.feelings || "[]");
+      const chips = card.querySelector(".feeling-chips");
+      const empty = card.querySelector(".feeling-empty");
+      
+      chips.innerHTML = feelings.map(item => `<span class="chip">${item}</span>`).join("");
+      empty.classList.toggle("hidden", feelings.length > 0);
+      updateThoughtWarning(card);
+    }
+
+    function updateThoughtWarning(card) {
+      const feelings = JSON.parse(card.dataset.feelings || "[]");
+      const classification = card.querySelector(".fact-self-classification")?.value || "fact";
+      const warning = card.querySelector(".thought-warning");
+      const shouldShow = feelings.length > 0 && (classification === "inference" || classification === "uncertain");
+      warning?.classList.toggle("hidden", !shouldShow);
+    }
+
+    function openFeelingModal(factId) {
+      if (state.mode === "review") return;
+      state.activeFactId = factId;
+      const card = document.querySelector(`.fact-item[data-id="${factId}"]`);
+      state.pendingFeelings = JSON.parse(card?.dataset.feelings || "[]");
+      
+      const factIndex = [...document.querySelectorAll('.fact-item')].indexOf(card) + 1;
+      document.getElementById("feelingModalTitle").textContent = `选择事实 ${factIndex} 对应的感受`;
+      
+      document.getElementById("feelingModalContent").innerHTML = feelingGroups.map(group => `
+        <div class="feeling-category">
+          <h3>${group.name}</h3>
+          <div class="choice-grid">
+            ${group.items.map(item => `
+              <label class="choice">
+                <input type="checkbox" class="modal-feeling" value="${item}" ${state.pendingFeelings.includes(item) ? "checked" : ""}>
+                ${item}
+              </label>
+            `).join("")}
+          </div>
+        </div>
+      `).join("");
+      
+      document.getElementById("feelingModal").classList.remove("hidden");
+      document.body.classList.add("modal-open");
+    }
+
+    function closeFeelingModal() {
+      state.activeFactId = "";
+      state.pendingFeelings = [];
+      document.getElementById("feelingModal").classList.add("hidden");
+      document.body.classList.remove("modal-open");
+    }
+
+    function confirmFeelings() {
+      const selected = [...document.querySelectorAll(".modal-feeling:checked")].map(el => el.value);
+      const card = document.querySelector(`.fact-item[data-id="${state.activeFactId}"]`);
+      if (card) {
+        card.dataset.feelings = JSON.stringify(selected);
+        renderFeelingChips(card);
+      }
+      closeFeelingModal();
+      scheduleAutoSave();
+    }
+
+    function renderFactReview(card) {
+      const id = card.dataset.id;
+      const value = state.currentReview.facts[id] || { factStatus: "", comment: "" };
+      const panel = card.querySelector(".fact-review");
+      
+      const fOptions = [
+        ["accepted_fact", "承认：属于事实"],
+        ["partial", "部分承认"],
+        ["inference", "属于推测"],
+        ["unknown", "无法确认"]
+      ];
+
+      panel.innerHTML = `
+        <div class="review-title">对方核对：这条内容是什么</div>
+        <div class="review-options">
+          ${fOptions.map(([v, l]) => `<label class="review-option"><input type="radio" name="factReview_${id}" value="${v}" ${value.factStatus === v ? "checked" : ""}> ${l}</label>`).join("")}
+        </div>
+        <textarea class="review-comment" placeholder="补充承认的范围、不同记忆或需要查证的部分。">${value.comment || ""}</textarea>
+      `;
+    }
+
+    function renderNeedReview() {
+      const value = state.currentReview.need || { classification: "", comment: "" };
+      document.getElementById("needReview").innerHTML = `
+        <div class="review-title">对方核对：这段内容属于需求还是命令</div>
+        <div class="review-options">
+          ${[
+            ["need", "属于需求"],
+            ["mixed", "部分是需求，部分是命令"],
+            ["command", "主要是对对方的命令"],
+            ["unknown", "无法判断"]
+          ].map(([v, label]) => `
+            <label class="review-option">
+              <input type="radio" name="needReview" value="${v}" ${value.classification === v ? "checked" : ""}>
+              ${label}
+            </label>
+          `).join("")}
+        </div>
+        <textarea class="review-comment" placeholder="补充批注。">${value.comment || ""}</textarea>
+      `;
+    }
+
+    function renderSolutionReview() {
+      const value = state.currentReview.solution || { status: "", comment: "" };
+      const opts = [
+        { v: "agree", l: "完全同意并愿意执行" },
+        { v: "modify_metric", l: "同意目标，但需修改计量/复核方式" },
+        { v: "modify_condition", l: "难度过高，需调整周期或平衡点" },
+        { v: "modify_reward_punish", l: "奖惩条件不合理，需调整" },
+        { v: "disagree", l: "不同意此方案" }
+      ];
+      
+      document.getElementById("solutionReview").innerHTML = `
+        <div class="review-title">对方核对方案</div>
+        <div class="review-options" style="flex-direction: column;">
+          ${opts.map(o => `
+            <label class="review-option block">
+              <input type="radio" name="solutionReviewStatus" value="${o.v}" ${value.status === o.v ? "checked" : ""}> 
+              ${o.l}
+            </label>
+          `).join("")}
+        </div>
+        <textarea class="review-comment" style="margin-top:10px" placeholder="详细说明需要修改的条件、上限、例外或计量方式等。">${value.comment || ""}</textarea>
+      `;
+    }
+
+    function collectAuthorData() {
+      return {
+        intensity: Number(document.getElementById("intensity").value),
+        pauseUntil: document.getElementById("pauseUntil").value,
+        customResume: document.getElementById("customResume").value,
+        resumeAt: state.resumeAt,
+        distancePlan: document.getElementById("distancePlan").value,
+        customDistance: document.getElementById("customDistance").value,
+        facts: [...document.querySelectorAll(".fact-item")].map(card => ({
+          id: card.dataset.id,
+          text: card.querySelector(".fact-text").value,
+          selfClassification: card.querySelector(".fact-self-classification").value,
+          feelings: JSON.parse(card.dataset.feelings || "[]")
+        })),
+        needs: [...document.querySelectorAll('input[name="needs"]:checked')].map(el => el.value),
+        needStatement: document.getElementById("needStatement").value,
+        solution: {
+          targetBehavior: document.getElementById("targetBehavior").value,
+          evidenceMethod: document.getElementById("evidenceMethod").value,
+          trialPeriod: document.getElementById("trialPeriod").value,
+          balancePoint: document.getElementById("balancePoint").value,
+          reviewFrequency: document.getElementById("reviewFrequency").value,
+          belowCondition: document.getElementById("belowCondition").value,
+          belowAction: document.getElementById("belowAction").value,
+          belowCap: document.getElementById("belowCap").value,
+          aboveCondition: document.getElementById("aboveCondition").value,
+          aboveAction: document.getElementById("aboveAction").value,
+          aboveCap: document.getElementById("aboveCap").value,
+          exceptions: document.getElementById("exceptions").value,
+          changeRule: document.getElementById("changeRule").value
+        }
+      };
+    }
+
+    function getRadio(name) {
+      return document.querySelector(`input[name="${name}"]:checked`)?.value || "";
+    }
+
+    function collectReviewData() {
+      const review = createEmptyReview();
+      document.querySelectorAll(".fact-item").forEach(card => {
+        const id = card.dataset.id;
+        review.facts[id] = {
+          factStatus: getRadio(`factReview_${id}`),
+          comment: card.querySelector(".fact-review .review-comment")?.value || ""
+        };
+      });
+
+      review.need = {
+        classification: getRadio("needReview"),
+        comment: document.querySelector("#needReview .review-comment")?.value || ""
+      };
+
+      review.solution = {
+        status: getRadio("solutionReviewStatus"),
+        comment: document.querySelector("#solutionReview .review-comment")?.value || ""
+      };
+
+      return review;
+    }
+
+    function createPackage() {
+      return {
+        schema: SCHEMA,
+        exportedAt: new Date().toISOString(),
+        authorData: collectAuthorData(),
+        reviewData: state.mode === "review" ? collectReviewData() : null
+      };
+    }
+    
+    function validateBeforeExport() {
+      if (state.mode === "author") {
+        const factTexts = [...document.querySelectorAll(".fact-text")].map(el => el.value.trim());
+        if (factTexts.every(t => !t)) {
+          sysAlert("请至少填写一条事实记录再导出。");
+          return false;
+        }
+      }
+      return true;
+    }
+
+    function exportPackage() {
+      if (!validateBeforeExport()) return;
+      const payload = createPackage();
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = state.mode === "review" ? "冲突记录_对方批注.json" : "冲突记录_我的视角.json";
+      link.click();
+      URL.revokeObjectURL(url);
+    }
+
+    async function importPackage(event) {
+      const file = event.target.files?.[0];
+      if (!file) return;
+      try {
+        const text = await file.text();
+        const payload = JSON.parse(text);
+        if (payload.schema !== SCHEMA || typeof payload.authorData !== 'object' || payload.authorData === null) {
+          throw new Error("文件格式不匹配或损坏。");
+        }
+        state.mode = "review";
+        state.currentReview = payload.reviewData || createEmptyReview();
+        restoreAuthorData(payload.authorData);
+        applyMode();
+        saveNow();
+        document.getElementById("fileStatus").textContent = `已导入：${file.name}`;
+      } catch (error) {
+        sysAlert(`无法导入：${error.message}`);
+      } finally {
+        event.target.value = "";
+      }
+    }
+
+    function safeString(val) {
+      return typeof val === 'string' ? val : (typeof val === 'number' ? String(val) : "");
+    }
+
+    function restoreAuthorData(data) {
+      document.getElementById("intensity").value = typeof data.intensity === 'number' ? data.intensity : 0;
+      document.getElementById("pauseUntil").value = safeString(data.pauseUntil);
+      document.getElementById("customResume").value = safeString(data.customResume);
+      state.resumeAt = safeString(data.resumeAt);
+      document.getElementById("distancePlan").value = safeString(data.distancePlan);
+      document.getElementById("customDistance").value = safeString(data.customDistance);
+
+      document.getElementById("factList").innerHTML = "";
+      const facts = Array.isArray(data.facts) && data.facts.length ? data.facts : [{}, {}];
+      facts.forEach(addFact);
+
+      const savedNeeds = Array.isArray(data.needs) ? data.needs : [];
+      document.querySelectorAll('input[name="needs"]').forEach(el => {
+        el.checked = savedNeeds.includes(el.value);
+      });
+      document.getElementById("needStatement").value = safeString(data.needStatement);
+
+      const solution = data.solution && typeof data.solution === 'object' ? data.solution : {};
+      const fields = [
+        "targetBehavior", "evidenceMethod", "trialPeriod", "balancePoint", "reviewFrequency",
+        "belowCondition", "belowAction", "belowCap", "aboveCondition", "aboveAction", "aboveCap",
+        "exceptions", "changeRule"
+      ];
+      fields.forEach(id => {
+        document.getElementById(id).value = safeString(solution[id]);
+      });
+
+      updateIntensity();
+      handlePauseUntil(false);
+      handleDistancePlan();
+      renderNeedReview();
+      renderSolutionReview();
+      document.querySelectorAll(".fact-item").forEach(renderFactReview);
+    }
+
+    function applyMode() {
+      const reviewMode = state.mode === "review";
+      document.getElementById("modeBadge").textContent = reviewMode ? "批注对方视角" : "填写我的版本";
+      document.getElementById("modeBadge").classList.toggle("review", reviewMode);
+      document.getElementById("modeDescription").textContent = reviewMode
+        ? "原内容已锁定。请逐条核对并批注，修改会自动保存。"
+        : "内容会在修改时自动保存。";
+      document.getElementById("exportButton").textContent = reviewMode ? "导出批注给对方" : "导出给对方";
+
+      document.querySelectorAll(".review-only").forEach(el => el.classList.toggle("hidden", !reviewMode));
+      document.querySelectorAll(".author-only").forEach(el => el.classList.toggle("hidden", reviewMode));
+
+      document.querySelectorAll(
+        '#conflictForm input:not([type="radio"]):not([type="checkbox"]), #conflictForm select, #conflictForm textarea:not(.review-comment)'
+      ).forEach(el => {
+        if (!el.closest('.review-panel')) {
+          el.disabled = reviewMode;
+          el.classList.toggle("readonly-field", reviewMode);
+        }
+      });
+      
+      document.querySelectorAll('#needsGrid input[type="checkbox"]').forEach(el => {
+        el.disabled = reviewMode;
+      });
+
+      document.querySelectorAll('.review-panel input, .review-panel textarea').forEach(el => {
+        el.disabled = !reviewMode;
+        el.classList.remove("readonly-field");
+      });
+    }
+
+    function saveNow() {
+      try {
+        const payload = {
+          mode: state.mode,
+          package: createPackage()
+        };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+        document.getElementById("fileStatus").textContent = "已自动保存";
+      } catch (e) {
+        console.warn("自动保存失败", e);
+        document.getElementById("fileStatus").textContent = "自动保存失败(存储受限)";
+      }
+    }
+
+    function scheduleAutoSave() {
+      clearTimeout(state.autoSaveTimer);
+      state.autoSaveTimer = setTimeout(saveNow, 300);
+    }
+
+    function loadAutoSave() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return false;
+        const saved = JSON.parse(raw);
+        if (saved.package?.schema !== SCHEMA) return false;
+        state.mode = saved.mode || "author";
+        state.currentReview = saved.package.reviewData || createEmptyReview();
+        restoreAuthorData(saved.package.authorData);
+        applyMode();
+        document.getElementById("fileStatus").textContent = "已恢复自动保存内容";
+        return true;
+      } catch {
+        return false;
+      }
+    }
+
+    async function resetForm() {
+      const confirm = await sysConfirm("确认清空当前记录并重新开始吗？");
+      if (!confirm) return;
+      
+      localStorage.removeItem(STORAGE_KEY);
+      state.mode = "author";
+      state.currentReview = createEmptyReview();
+      state.resumeAt = "";
+      
+      document.getElementById("conflictForm").reset();
+      document.getElementById("factList").innerHTML = "";
+      addFact();
+      addFact();
+      renderNeedReview();
+      renderSolutionReview();
+      updateIntensity();
+      handlePauseUntil(false);
+      handleDistancePlan();
+      applyMode();
+      document.getElementById("fileStatus").textContent = "";
+      saveNow();
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      renderChoiceGrid("needsGrid", "needs", needOptions);
+      renderNeedReview();
+      renderSolutionReview();
+
+      const restored = loadAutoSave();
+      if (!restored) {
+        addFact();
+        addFact();
+        updateIntensity();
+        handlePauseUntil(false);
+        handleDistancePlan();
+        applyMode();
+        saveNow();
+      }
+
+      // Event Bindings
+      document.getElementById("exportButton").addEventListener("click", exportPackage);
+      document.getElementById("importInput").addEventListener("change", importPackage);
+      document.getElementById("resetButton").addEventListener("click", resetForm);
+      
+      document.getElementById("closeFeelingBtnTop").addEventListener("click", closeFeelingModal);
+      document.getElementById("closeFeelingBtnBottom").addEventListener("click", closeFeelingModal);
+      document.getElementById("confirmFeelingBtn").addEventListener("click", confirmFeelings);
+      
+      document.getElementById("feelingModal").addEventListener("click", e => {
+        if (e.target.id === "feelingModal") closeFeelingModal();
+      });
+
+      // Fact List Event Delegation
+      document.getElementById("factList").addEventListener("click", e => {
+        const removeBtn = e.target.closest(".remove-fact-btn");
+        if (removeBtn) removeFact(removeBtn);
+        
+        const feelBtn = e.target.closest(".feeling-button");
+        if (feelBtn) {
+          const card = feelBtn.closest(".fact-item");
+          if (card) openFeelingModal(card.dataset.id);
+        }
+      });
+
+      document.getElementById("addFactBtn").addEventListener("click", () => addFact());
+
+      const form = document.getElementById("conflictForm");
+      form.addEventListener("input", event => {
+        if (event.target.id === "intensity") updateIntensity();
+        scheduleAutoSave();
+      });
+      form.addEventListener("change", event => {
+        if (event.target.id === "pauseUntil" || event.target.id === "customResume") {
+          handlePauseUntil(true);
+        }
+        if (event.target.id === "distancePlan") {
+          handleDistancePlan();
+        }
+        if (event.target.classList.contains("fact-self-classification")) {
+          const card = event.target.closest(".fact-item");
+          if(card) updateThoughtWarning(card);
+        }
+        scheduleAutoSave();
+      });
+    });
+  })();
+  </script>
+</body>
+</html>
