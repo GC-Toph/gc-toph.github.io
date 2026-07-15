@@ -1,0 +1,1166 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="color-scheme" content="light dark" />
+  <title>色差辨别精度测试 · CIEDE2000 + IRT</title>
+  <style>
+    :root {
+      --bg: #f3f5f7;
+      --panel: #ffffff;
+      --text: #17202a;
+      --muted: #68727d;
+      --line: #d9dee4;
+      --accent: #1769e0;
+      --accent-hover: #1254b3;
+      --ok: #0f8b4d;
+      --bad: #d13232;
+      --shadow: 0 10px 30px rgba(16, 24, 40, 0.08);
+      --radius: 18px;
+      --transition-speed: 0.2s;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0d1115;
+        --panel: #161b21;
+        --text: #edf2f7;
+        --muted: #9aa6b2;
+        --line: #2d353f;
+        --accent: #4a94ff;
+        --accent-hover: #7db1ff;
+        --ok: #48d58c;
+        --bad: #ff6b6b;
+        --shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+      }
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+                   "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      display: flex;
+      justify-content: center;
+      padding: max(16px, env(safe-area-inset-top))
+               max(16px, env(safe-area-inset-right))
+               max(24px, env(safe-area-inset-bottom))
+               max(16px, env(safe-area-inset-left));
+    }
+
+    button, input { font: inherit; }
+
+    .app {
+      width: min(980px, 100%);
+      display: grid;
+      gap: 16px;
+      align-content: start;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      transition: box-shadow var(--transition-speed) ease;
+    }
+
+    header.panel {
+      padding: 20px 24px;
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(1.25rem, 4vw, 1.75rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .subtitle {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .btn {
+      border: 1px solid var(--line);
+      background: var(--panel);
+      color: var(--text);
+      border-radius: 12px;
+      padding: 10px 18px;
+      font-weight: 600;
+      cursor: pointer;
+      min-height: 44px;
+      touch-action: manipulation;
+      transition: all var(--transition-speed) ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btn:hover {
+      background: color-mix(in srgb, var(--panel) 95%, var(--text));
+    }
+
+    .btn.primary {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .btn.primary:hover {
+      background: var(--accent-hover);
+      border-color: var(--accent-hover);
+    }
+
+    .btn:focus-visible, .choice:focus-visible {
+      outline: 3px solid color-mix(in srgb, var(--accent) 50%, transparent);
+      outline-offset: 2px;
+    }
+
+    .test-panel {
+      padding: clamp(16px, 4vw, 32px);
+    }
+
+    .instruction {
+      text-align: center;
+      margin: 0 0 16px;
+      font-weight: 700;
+      font-size: clamp(1.05rem, 3.5vw, 1.2rem);
+    }
+
+    .timer-wrap {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .timer-text {
+      min-width: 64px;
+      font-variant-numeric: tabular-nums;
+      font-weight: 800;
+      color: var(--accent);
+    }
+
+    .timer-track {
+      height: 8px;
+      background: var(--line);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .timer-bar {
+      height: 100%;
+      width: 100%;
+      background: var(--accent);
+      transform-origin: left center;
+      will-change: transform;
+    }
+
+    .swatch {
+      border-radius: 16px;
+      border: 1px solid rgba(128, 128, 128, 0.2);
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1), 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .reference-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      margin: 0 auto 24px;
+    }
+
+    .reference {
+      width: min(360px, 85vw);
+      aspect-ratio: 2.2 / 1;
+    }
+
+    .label {
+      color: var(--muted);
+      font-size: 0.9rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+    }
+
+    .choices {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: clamp(12px, 3vw, 24px);
+    }
+
+    .choice {
+      appearance: none;
+      border: 2px solid var(--line);
+      background: var(--panel);
+      border-radius: 20px;
+      padding: 10px;
+      cursor: pointer;
+      touch-action: manipulation;
+      transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .choice:active:not([disabled]) { transform: scale(0.97); }
+    
+    .choice:hover:not([disabled]) { 
+      border-color: var(--accent); 
+      box-shadow: 0 4px 12px color-mix(in srgb, var(--accent) 15%, transparent);
+    }
+    
+    .choice[disabled] { cursor: not-allowed; opacity: 0.7; }
+
+    .choice-swatch {
+      width: 100%;
+      aspect-ratio: 1.4 / 1;
+      border-radius: 12px;
+    }
+
+    .choice-caption {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 4px 4px;
+      color: var(--text);
+      font-weight: 700;
+      font-size: 1.05rem;
+    }
+
+    kbd {
+      min-width: 28px;
+      padding: 3px 8px;
+      border: 1px solid var(--line);
+      border-bottom-width: 3px;
+      border-radius: 6px;
+      background: var(--bg);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.85rem;
+      text-align: center;
+    }
+
+    .feedback {
+      min-height: 28px;
+      text-align: center;
+      margin-top: 16px;
+      font-weight: 800;
+      font-size: 1.1rem;
+      opacity: 0;
+      transform: translateY(5px);
+      transition: all 0.2s ease;
+    }
+
+    .feedback.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .feedback.ok { color: var(--ok); }
+    .feedback.bad { color: var(--bad); }
+
+    .stats-panel { padding: 20px; }
+
+    .stats-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+
+    .stats-head h2 {
+      margin: 0;
+      font-size: 1.1rem;
+    }
+
+    .criterion {
+      color: var(--muted);
+      font-size: 0.85rem;
+      background: var(--bg);
+      padding: 4px 10px;
+      border-radius: 99px;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 12px;
+    }
+
+    .stat {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 12px;
+      background: var(--bg);
+    }
+
+    .stat-name {
+      color: var(--muted);
+      font-size: 0.8rem;
+      margin-bottom: 6px;
+    }
+
+    .stat-value {
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+      font-size: 1.05rem;
+    }
+
+    .intro, .result { padding: clamp(20px, 5vw, 36px); }
+
+    .intro h2, .result h2 { margin-top: 0; font-size: 1.4rem; }
+
+    .intro p, .result p {
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .intro ul {
+      padding-left: 1.5rem;
+      line-height: 1.7;
+      color: var(--muted);
+    }
+
+    .start-row {
+      display: flex;
+      justify-content: center;
+      margin-top: 28px;
+    }
+
+    .result-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+      margin: 20px 0;
+    }
+
+    .result-card {
+      border: 1px solid var(--accent);
+      background: color-mix(in srgb, var(--accent) 5%, transparent);
+      border-radius: 16px;
+      padding: 16px;
+      text-align: center;
+    }
+    
+    .result-card span {
+        color: var(--muted);
+        font-size: 0.9rem;
+    }
+
+    .result-card strong {
+      display: block;
+      margin-top: 8px;
+      font-size: 1.35rem;
+      color: var(--accent);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .chart-container {
+      margin: 24px 0;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 20px;
+      background: var(--bg);
+    }
+
+    .chart-container h3 {
+      margin: 0 0 16px 0;
+      font-size: 1.05rem;
+      text-align: center;
+      color: var(--text);
+    }
+
+    canvas {
+      width: 100%;
+      height: 260px;
+      display: block;
+    }
+
+    .result-explanation {
+      margin-top: 24px;
+      padding: 20px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: var(--bg);
+    }
+
+    .result-explanation h3 {
+      margin: 0 0 12px;
+      font-size: 1.1rem;
+    }
+
+    .hidden { display: none !important; }
+
+    .footnote {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.8rem;
+      line-height: 1.6;
+      text-align: center;
+    }
+
+    @media (max-width: 600px) {
+      .stats { grid-template-columns: repeat(2, 1fr); }
+      header.panel { padding: 16px; }
+      .result-grid { grid-template-columns: 1fr 1fr; }
+      canvas { height: 220px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="panel">
+      <div>
+        <h1>色差辨别精度测试</h1>
+        <p class="subtitle">CIEDE2000 (ΔE00) · 4PL 项目反应理论</p>
+      </div>
+      <div class="header-actions">
+        <button id="restartBtn" class="btn hidden" type="button">重新开始</button>
+      </div>
+    </header>
+
+    <section id="introPanel" class="panel intro">
+      <h2>测试说明</h2>
+      <p>上方是基准色，下方两个色块中，有一个与基准色完全相同，另一个存在微小色差。请凭借直觉选择<strong>相同</strong>的那个色块。</p>
+      <ul>
+        <li><strong>操作：</strong> 触屏设备直接点击，键盘用户可按数字键 <kbd>1</kbd> 或 <kbd>2</kbd>。</li>
+        <li><strong>规则：</strong> 每题限时 3 秒，超时视为错误。系统会根据你的回答自适应调整难度。</li>
+        <li><strong>条件：</strong> 测试至少进行 30 题，当系统对你的能力评估达到预定精度时自动结束。</li>
+        <li><strong>建议：</strong> 为获得准确结果，请关闭原彩显示/护眼模式，保持屏幕亮度在 50% 以上。</li>
+      </ul>
+      <div class="start-row">
+        <button id="startBtn" class="btn primary" type="button">开始测试</button>
+      </div>
+    </section>
+
+    <section id="testPanel" class="panel test-panel hidden" aria-live="polite">
+      <p class="instruction">请选择与基准色相同的色块</p>
+
+      <div class="timer-wrap" aria-label="本题剩余时间">
+        <div id="timerText" class="timer-text">3.0s</div>
+        <div class="timer-track" aria-hidden="true">
+          <div id="timerBar" class="timer-bar"></div>
+        </div>
+      </div>
+
+      <div class="reference-wrap">
+        <div id="referenceSwatch" class="swatch reference"></div>
+        <div class="label">基准色</div>
+      </div>
+
+      <div class="choices">
+        <button id="choice1" class="choice" type="button" aria-label="选择左侧色块">
+          <div id="choiceSwatch1" class="swatch choice-swatch"></div>
+          <div class="choice-caption"><kbd>1</kbd> 选项一</div>
+        </button>
+        <button id="choice2" class="choice" type="button" aria-label="选择右侧色块">
+          <div id="choiceSwatch2" class="swatch choice-swatch"></div>
+          <div class="choice-caption"><kbd>2</kbd> 选项二</div>
+        </button>
+      </div>
+
+      <div id="feedback" class="feedback" aria-live="assertive"></div>
+    </section>
+
+    <section id="statsPanel" class="panel stats-panel hidden">
+      <div class="stats-head">
+        <h2>实时算法监控 (IRT)</h2>
+        <div class="criterion">自动结束条件: 题数 ≥ 30 且 SE ≤ 0.24</div>
+      </div>
+      <div class="stats">
+        <div class="stat">
+          <div class="stat-name">进度 / 正确率</div>
+          <div id="statN" class="stat-value">0 / —</div>
+        </div>
+        <div class="stat">
+          <div class="stat-name">能力值 θ (MAP)</div>
+          <div id="statTheta" class="stat-value">0.000</div>
+        </div>
+        <div class="stat">
+          <div class="stat-name">标准误 SE</div>
+          <div id="statSE" class="stat-value">2.500</div>
+        </div>
+        <div class="stat">
+          <div class="stat-name">当前辨别阈值 ΔE00</div>
+          <div id="statThreshold" class="stat-value">3.000</div>
+        </div>
+        <div class="stat">
+          <div class="stat-name">本题难度 (目标 ΔE00)</div>
+          <div id="statDeltaE" class="stat-value">—</div>
+        </div>
+        <div class="stat">
+          <div class="stat-name">阈值 90% 置信区间</div>
+          <div id="statThresholdCI" class="stat-value">—</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="resultPanel" class="panel result hidden">
+      <h2>测试完成</h2>
+      <p id="resultSummary"></p>
+      <div class="result-grid">
+        <div class="result-card">
+          <span>能力值 θ</span>
+          <strong id="resultTheta">—</strong>
+        </div>
+        <div class="result-card">
+          <span>标准误 SE</span>
+          <strong id="resultSE">—</strong>
+        </div>
+        <div class="result-card">
+          <span>极限辨别阈值 ΔE00</span>
+          <strong id="resultThreshold">—</strong>
+        </div>
+        <div class="result-card">
+          <span>阈值 90% 置信区间</span>
+          <strong id="resultThresholdCIEnd">—</strong>
+        </div>
+      </div>
+      
+      <!-- 能力收敛图表 -->
+      <div class="chart-container">
+        <h3>IRT 潜在能力值 与 90% 置信区间 动态演变</h3>
+        <canvas id="resultChart"></canvas>
+      </div>
+
+      <div class="result-explanation" aria-labelledby="resultExplanationTitle">
+        <h3 id="resultExplanationTitle">📊 结果解读</h3>
+        <p id="resultAbilityExplanation"></p>
+        <p id="resultThresholdExplanation"></p>
+        <p id="resultAccuracyExplanation"></p>
+        <hr style="border:0; border-top:1px dashed var(--line); margin:16px 0;">
+        <p style="font-size: 0.85rem;"><em>注：本结果仅反映当前设备屏幕素质、环境光及你此时的视觉状态，不可替代医学色觉检查（如 FM100 色觉测试）。</em></p>
+      </div>
+      <div class="start-row">
+        <button id="againBtn" class="btn primary" type="button">再测一次</button>
+      </div>
+    </section>
+
+    <p class="footnote">
+      基于 Web 浏览器 sRGB 渲染计算。ΔE00 < 1.0 通常被认为超出了人眼对相邻色块的辨别极限。
+    </p>
+  </main>
+
+  <script>
+    "use strict";
+
+    (function () {
+      // ==========================================
+      // 配置项 (Configuration)
+      // ==========================================
+      const CONFIG = Object.freeze({
+        discriminationA: 1.7, // 3PL/4PL a参数 (区分度)
+        guessingC: 0.5,       // 3PL/4PL c参数 (二选一猜测下限)
+        lapseD: 0.98,         // 【改进】4PL d参数 (失误率上限，容忍 2% 的手滑/超时)
+        priorSD: 2.5,         // 先验标准差 (正态分布)
+        minQuestions: 30,     // 最少题目数
+        targetSE: 0.24,       // 目标标准误 (停止条件)
+        timeLimitMs: 3000,    // 每题限时
+        feedbackMs: 600,      // 反馈展示时间
+        minDeltaE: 0.45,      // 极限界限保护
+        maxDeltaE: 15.0,      
+        thetaSearchMin: -5.0,
+        thetaSearchMax: 5.0,
+        zScore90: 1.645       // 90% 置信区间的 Z 分数
+      });
+
+      // 状态管理
+      const state = {
+        running: false,
+        locked: false,
+        sessionToken: 0,
+        responses: [],
+        history: [],          // 用于记录每道题后的 (theta, se) 以绘制图表
+        current: null,
+        theta: 0,
+        se: CONFIG.priorSD,
+        timerAnimation: null,
+        timerInterval: 0,
+        deadline: 0
+      };
+
+      // ==========================================
+      // DOM 元素缓存
+      // ==========================================
+      const els = {
+        introPanel: document.getElementById("introPanel"),
+        testPanel: document.getElementById("testPanel"),
+        statsPanel: document.getElementById("statsPanel"),
+        resultPanel: document.getElementById("resultPanel"),
+        startBtn: document.getElementById("startBtn"),
+        restartBtn: document.getElementById("restartBtn"),
+        againBtn: document.getElementById("againBtn"),
+        choice1: document.getElementById("choice1"),
+        choice2: document.getElementById("choice2"),
+        referenceSwatch: document.getElementById("referenceSwatch"),
+        choiceSwatch1: document.getElementById("choiceSwatch1"),
+        choiceSwatch2: document.getElementById("choiceSwatch2"),
+        timerText: document.getElementById("timerText"),
+        timerBar: document.getElementById("timerBar"),
+        feedback: document.getElementById("feedback"),
+        statN: document.getElementById("statN"),
+        statTheta: document.getElementById("statTheta"),
+        statSE: document.getElementById("statSE"),
+        statThreshold: document.getElementById("statThreshold"),
+        statDeltaE: document.getElementById("statDeltaE"),
+        statThresholdCI: document.getElementById("statThresholdCI"),
+        resultSummary: document.getElementById("resultSummary"),
+        resultTheta: document.getElementById("resultTheta"),
+        resultSE: document.getElementById("resultSE"),
+        resultThreshold: document.getElementById("resultThreshold"),
+        resultThresholdCIEnd: document.getElementById("resultThresholdCIEnd"),
+        resultChart: document.getElementById("resultChart"),
+        resultAbilityExplanation: document.getElementById("resultAbilityExplanation"),
+        resultThresholdExplanation: document.getElementById("resultThresholdExplanation"),
+        resultAccuracyExplanation: document.getElementById("resultAccuracyExplanation")
+      };
+
+      // ==========================================
+      // 数学与工具函数
+      // ==========================================
+      const clamp = (x, lo, hi) => Math.min(hi, Math.max(lo, x));
+      const rand = (lo, hi) => lo + Math.random() * (hi - lo);
+      const randInt = (lo, hi) => Math.floor(rand(lo, hi + 1));
+      const sq = x => x * x;
+      const deg2rad = d => d * Math.PI / 180;
+      const rad2deg = r => r * 180 / Math.PI;
+
+      const formatSigned = (x, digits = 3) => (x < 0 ? "−" : "") + Math.abs(x).toFixed(digits);
+      const formatDE = x => Number.isFinite(x) ? x.toFixed(x < 10 ? 2 : 1) : "—";
+      const rgbCss = rgb => `rgb(${rgb.join(' ')})`;
+
+      // ==========================================
+      // 颜色空间转换 (sRGB <-> CIELab)
+      // ==========================================
+      function srgbChannelToLinear(v255) {
+        const v = v255 / 255;
+        return v <= 0.04045 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+      }
+
+      function linearToSrgbChannel(v) {
+        const s = v <= 0.0031308 ? 12.92 * v : 1.055 * Math.pow(v, 1 / 2.4) - 0.055;
+        return s * 255;
+      }
+
+      function rgbToLab(rgb) {
+        const r = srgbChannelToLinear(rgb[0]);
+        const g = srgbChannelToLinear(rgb[1]);
+        const b = srgbChannelToLinear(rgb[2]);
+
+        const X = (0.4124564 * r + 0.3575761 * g + 0.1804375 * b) * 100;
+        const Y = (0.2126729 * r + 0.7151522 * g + 0.0721750 * b) * 100;
+        const Z = (0.0193339 * r + 0.1191920 * g + 0.9503041 * b) * 100;
+
+        const e = 216 / 24389, k = 24389 / 27;
+        const f = t => t > e ? Math.cbrt(t) : (k * t + 16) / 116;
+
+        return [
+          116 * f(Y / 100.000) - 16,
+          500 * (f(X / 95.047) - f(Y / 100.000)),
+          200 * (f(Y / 100.000) - f(Z / 108.883))
+        ];
+      }
+
+      function labToRgbRaw(lab) {
+        const fy = (lab[0] + 16) / 116;
+        const fx = fy + lab[1] / 500;
+        const fz = fy - lab[2] / 200;
+
+        const e = 216 / 24389, k = 24389 / 27;
+        const finv = t => (t * t * t > e) ? t * t * t : (116 * t - 16) / k;
+
+        const X = 95.047 * finv(fx) / 100;
+        const Y = 100.000 * finv(fy) / 100;
+        const Z = 108.883 * finv(fz) / 100;
+
+        return [
+          linearToSrgbChannel(3.2404542 * X - 1.5371385 * Y - 0.4985314 * Z),
+          linearToSrgbChannel(-0.9692660 * X + 1.8760108 * Y + 0.0415560 * Z),
+          linearToSrgbChannel(0.0556434 * X - 0.2040259 * Y + 1.0572252 * Z)
+        ];
+      }
+
+      function deltaE00(lab1, lab2) {
+        const [L1, a1, b1] = lab1;
+        const [L2, a2, b2] = lab2;
+        const C1 = Math.hypot(a1, b1), C2 = Math.hypot(a2, b2);
+        const Cbar = (C1 + C2) / 2;
+        const G = 0.5 * (1 - Math.sqrt(Math.pow(Cbar, 7) / (Math.pow(Cbar, 7) + Math.pow(25, 7))));
+
+        const a1p = (1 + G) * a1, a2p = (1 + G) * a2;
+        const C1p = Math.hypot(a1p, b1), C2p = Math.hypot(a2p, b2);
+        const hp = (x, y) => (x === 0 && y === 0) ? 0 : (rad2deg(Math.atan2(y, x)) + 360) % 360;
+        const h1p = hp(a1p, b1), h2p = hp(a2p, b2);
+
+        const dLp = L2 - L1, dCp = C2p - C1p;
+        let dhp = 0;
+        if (C1p * C2p !== 0) {
+          const diff = h2p - h1p;
+          if (Math.abs(diff) <= 180) dhp = diff;
+          else dhp = diff + (h2p <= h1p ? 360 : -360);
+        }
+
+        const dHp = 2 * Math.sqrt(C1p * C2p) * Math.sin(deg2rad(dhp / 2));
+        const Lbarp = (L1 + L2) / 2, Cbarp = (C1p + C2p) / 2;
+
+        let hbarp = h1p + h2p;
+        if (C1p * C2p !== 0) {
+          const diff = Math.abs(h1p - h2p);
+          if (diff <= 180) hbarp /= 2;
+          else hbarp = (hbarp + (h1p + h2p < 360 ? 360 : -360)) / 2;
+        }
+
+        const T = 1 - 0.17 * Math.cos(deg2rad(hbarp - 30)) + 0.24 * Math.cos(deg2rad(2 * hbarp))
+                    + 0.32 * Math.cos(deg2rad(3 * hbarp + 6)) - 0.20 * Math.cos(deg2rad(4 * hbarp - 63));
+        const dTheta = 30 * Math.exp(-sq((hbarp - 275) / 25));
+        const Rc = 2 * Math.sqrt(Math.pow(Cbarp, 7) / (Math.pow(Cbarp, 7) + Math.pow(25, 7)));
+        const Sl = 1 + 0.015 * sq(Lbarp - 50) / Math.sqrt(20 + sq(Lbarp - 50));
+        const Sc = 1 + 0.045 * Cbarp;
+        const Sh = 1 + 0.015 * Cbarp * T;
+        const Rt = -Math.sin(deg2rad(2 * dTheta)) * Rc;
+
+        const vL = dLp / Sl, vC = dCp / Sc, vH = dHp / Sh;
+        return Math.sqrt(vL * vL + vC * vC + vH * vH + Rt * vC * vH);
+      }
+
+      function generateColorPair(targetDE) {
+        let best = null;
+        for (let attempt = 0; attempt < 300; attempt++) {
+          const baseRgb = [randInt(50, 205), randInt(50, 205), randInt(50, 205)];
+          const lab1 = rgbToLab(baseRgb);
+
+          let dL = rand(-1, 1), da = rand(-1, 1), db = rand(-1, 1);
+          const norm = Math.hypot(dL, da, db) || 1;
+          dL /= norm; da /= norm; db /= norm;
+
+          let hi = 0.8, lo = 0;
+          for (let grow = 0; grow < 20; grow++) {
+            const tempLab = [lab1[0] + dL * hi, lab1[1] + da * hi, lab1[2] + db * hi];
+            if (!labToRgbRaw(tempLab).every(v => v >= 0 && v <= 255)) break;
+            if (deltaE00(lab1, tempLab) >= targetDE) break;
+            lo = hi; hi *= 1.5;
+          }
+
+          for (let i = 0; i < 20; i++) {
+            const mid = (lo + hi) / 2;
+            const midLab = [lab1[0] + dL * mid, lab1[1] + da * mid, lab1[2] + db * mid];
+            if (deltaE00(lab1, midLab) < targetDE) lo = mid; else hi = mid;
+          }
+
+          const lab2 = [lab1[0] + dL * hi, lab1[1] + da * hi, lab1[2] + db * hi];
+          const raw2 = labToRgbRaw(lab2);
+          if (!raw2.every(v => v >= 0 && v <= 255)) continue;
+
+          const color2 = raw2.map(v => Math.round(v));
+          if (color2.every((v, i) => v === baseRgb[i])) continue;
+
+          const actualDE = deltaE00(rgbToLab(baseRgb), rgbToLab(color2));
+          const error = Math.abs(actualDE - targetDE);
+          
+          if (!best || error < best.error) best = { baseRgb, differentRgb: color2, actualDE, error };
+          if (error <= Math.max(0.05, targetDE * 0.05)) return best;
+        }
+        return best;
+      }
+
+      // ==========================================
+      // IRT 项目反应理论核心 (改进版 4PL + MAP + Hessian SE)
+      // ==========================================
+      const logistic = x => x >= 0 ? 1 / (1 + Math.exp(-x)) : Math.exp(x) / (1 + Math.exp(x));
+      
+      // 【改进】使用 4PL 模型，引入 d 参数防止单个严重失误摧毁能力评估
+      const probabilityCorrect = (theta, b) => {
+        const { discriminationA: a, guessingC: c, lapseD: d } = CONFIG;
+        return c + (d - c) * logistic(a * (theta - b));
+      };
+
+      const logPosterior = theta => {
+        let val = -0.5 * Math.pow(theta / CONFIG.priorSD, 2); // 正态先验对数
+        for (const item of state.responses) {
+          const P = clamp(probabilityCorrect(theta, item.b), 1e-10, 1 - 1e-10);
+          val += item.u ? Math.log(P) : Math.log(1 - P);
+        }
+        return val;
+      };
+
+      function estimateAbility() {
+        const step = 0.05;
+        let bestTheta = 0, bestValue = -Infinity;
+        // 1. 网格搜索寻找全局极值点附近
+        for (let t = CONFIG.thetaSearchMin; t <= CONFIG.thetaSearchMax; t += step) {
+          const v = logPosterior(t);
+          if (v > bestValue) { bestValue = v; bestTheta = t; }
+        }
+
+        // 2. 黄金分割法精确逼近 (MAP 估计)
+        let lo = bestTheta - step, hi = bestTheta + step;
+        const phi = (Math.sqrt(5) - 1) / 2;
+        let x1 = hi - phi * (hi - lo), x2 = lo + phi * (hi - lo);
+        let f1 = logPosterior(x1), f2 = logPosterior(x2);
+
+        for (let i = 0; i < 40; i++) {
+          if (f1 < f2) {
+            lo = x1; x1 = x2; f1 = f2;
+            x2 = lo + phi * (hi - lo); f2 = logPosterior(x2);
+          } else {
+            hi = x2; x2 = x1; f2 = f1;
+            x1 = hi - phi * (hi - lo); f1 = logPosterior(x1);
+          }
+        }
+        state.theta = (lo + hi) / 2;
+
+        // 【改进】3. 利用中心差分法求二阶导数（观测信息量）来计算标准误 SE
+        // 这种方法比费舍尔期望信息量更严谨，能更好地反映后验分布的真实宽度
+        const h = 0.001;
+        const d2 = (logPosterior(state.theta + h) - 2 * logPosterior(state.theta) + logPosterior(state.theta - h)) / (h * h);
+        
+        // 确保信息量为正，防止初期数据不足时的计算异常
+        const observedInfo = Math.max(-d2, 1 / (CONFIG.priorSD * CONFIG.priorSD)); 
+        state.se = 1 / Math.sqrt(observedInfo);
+      }
+
+      function chooseNextDifficulty() {
+        const bMin = Math.log(3 / CONFIG.maxDeltaE);
+        const bMax = Math.log(3 / CONFIG.minDeltaE);
+        
+        // 【改进】废除硬编码的冷启动序列，全过程使用最大信息量准则 (MIC)
+        let bestB = 0, bestInfo = -Infinity;
+        
+        for (let i = 0; i <= 100; i++) {
+          const b = bMin + (bMax - bMin) * (i / 100);
+          
+          // 使用一阶导数平方除以方差来计算该难度的信息量
+          const h = 0.001;
+          const p = probabilityCorrect(state.theta, b);
+          const pPlus = probabilityCorrect(state.theta + h, b);
+          const pMinus = probabilityCorrect(state.theta - h, b);
+          const dp = (pPlus - pMinus) / (2 * h);
+          const info = (dp * dp) / (p * (1 - p));
+
+          if (info > bestInfo) { 
+            bestInfo = info; 
+            bestB = b; 
+          }
+        }
+
+        // 【改进】步长限制 (Step Limiter)：防止初期难度疯狂跳跃
+        if (state.responses.length > 0) {
+          const lastB = state.responses[state.responses.length - 1].b;
+          // 每次难度 b 的变化不超过 0.8（约等于色差变化不超过原本的 2.2 倍）
+          const maxStep = 0.8; 
+          bestB = clamp(bestB, lastB - maxStep, lastB + maxStep);
+        } else {
+           // 第1题根据正态先验均值出题 (b=0, 对应 ΔE00 ≈ 3.0)
+          bestB = 0;
+        }
+
+        return clamp(bestB + rand(-0.05, 0.05), bMin, bMax);
+      }
+
+      const thresholdFromTheta = t => 3 * Math.exp(-t);
+
+      // ==========================================
+      // UI 更新与控制流
+      // ==========================================
+      function updateStats() {
+        const n = state.responses.length;
+        const correct = state.responses.filter(x => x.u).length;
+        
+        const z = CONFIG.zScore90;
+        const tLo = thresholdFromTheta(state.theta + z * state.se);
+        const tHi = thresholdFromTheta(state.theta - z * state.se);
+
+        els.statN.textContent = `${n} / ${n ? Math.round(100 * correct / n) : 0}%`;
+        els.statTheta.textContent = formatSigned(state.theta);
+        els.statSE.textContent = state.se.toFixed(3);
+        els.statThreshold.textContent = formatDE(thresholdFromTheta(state.theta));
+        els.statDeltaE.textContent = state.current ? formatDE(state.current.actualDE) : "—";
+        els.statThresholdCI.textContent = `[${formatDE(tLo)}, ${formatDE(tHi)}]`;
+      }
+
+      function renderQuestion(item) {
+        els.referenceSwatch.style.background = rgbCss(item.baseRgb);
+        els.choiceSwatch1.style.background = rgbCss(item.differentIndex === 1 ? item.differentRgb : item.baseRgb);
+        els.choiceSwatch2.style.background = rgbCss(item.differentIndex === 2 ? item.differentRgb : item.baseRgb);
+        
+        els.feedback.className = "feedback";
+        els.feedback.textContent = "";
+        els.choice1.disabled = false;
+        els.choice2.disabled = false;
+      }
+
+      function startTimer(token) {
+        if (state.timerAnimation) state.timerAnimation.cancel();
+        clearInterval(state.timerInterval);
+        
+        state.deadline = performance.now() + CONFIG.timeLimitMs;
+        els.timerText.textContent = (CONFIG.timeLimitMs / 1000).toFixed(1) + "s";
+        els.timerText.style.color = "var(--accent)";
+
+        if (els.timerBar.animate) {
+          state.timerAnimation = els.timerBar.animate(
+            [{ transform: "scaleX(1)" }, { transform: "scaleX(0)" }],
+            { duration: CONFIG.timeLimitMs, easing: "linear", fill: "forwards" }
+          );
+        }
+
+        state.timerInterval = setInterval(() => {
+          if (!state.running || state.locked || token !== state.sessionToken) return;
+          const remain = Math.max(0, state.deadline - performance.now());
+          els.timerText.textContent = (remain / 1000).toFixed(1) + "s";
+          if (remain < 1000) els.timerText.style.color = "var(--bad)";
+          
+          if (remain === 0) submitAnswer(null, true);
+        }, 100);
+      }
+
+      function presentNextQuestion() {
+        if (!state.running) return;
+        state.locked = false;
+        
+        const targetB = chooseNextDifficulty();
+        const targetDE = clamp(3 * Math.exp(-targetB), CONFIG.minDeltaE, CONFIG.maxDeltaE);
+        const pair = generateColorPair(targetDE);
+        
+        state.current = {
+          ...pair,
+          b: Math.log(3 / pair.actualDE),
+          differentIndex: Math.random() < 0.5 ? 1 : 2
+        };
+
+        renderQuestion(state.current);
+        updateStats();
+        startTimer(state.sessionToken);
+      }
+
+      function submitAnswer(idx, isTimeout = false) {
+        if (!state.running || state.locked || !state.current) return;
+        state.locked = true;
+        
+        if (state.timerAnimation) state.timerAnimation.pause();
+        clearInterval(state.timerInterval);
+        els.choice1.disabled = true;
+        els.choice2.disabled = true;
+
+        const correct = !isTimeout && idx !== state.current.differentIndex;
+        state.responses.push({
+          u: correct ? 1 : 0,
+          b: state.current.b,
+          timeout: isTimeout
+        });
+
+        estimateAbility();
+        // 记录历史用于图表
+        state.history.push({ theta: state.theta, se: state.se });
+        
+        updateStats();
+
+        // 反馈 UI
+        els.feedback.className = `feedback show ${isTimeout ? 'bad' : (correct ? 'ok' : 'bad')}`;
+        els.feedback.innerHTML = isTimeout ? "⏱ 超时计错" : (correct ? "✔ 正确" : "✖ 错误");
+
+        const done = state.responses.length >= CONFIG.minQuestions && state.se <= CONFIG.targetSE;
+        const token = state.sessionToken;
+
+        setTimeout(() => {
+          if (token !== state.sessionToken) return;
+          if (done) finishTest(); else presentNextQuestion();
+        }, CONFIG.feedbackMs);
+      }
+
+      function startTest() {
+        state.sessionToken++;
+        state.running = true;
+        state.responses = [];
+        state.theta = 0;
+        state.se = CONFIG.priorSD;
+        
+        // 初始记录 (0题)
+        state.history = [{ theta: state.theta, se: state.se }];
+
+        els.introPanel.classList.add("hidden");
+        els.resultPanel.classList.add("hidden");
+        els.testPanel.classList.remove("hidden");
+        els.statsPanel.classList.remove("hidden");
+        els.restartBtn.classList.remove("hidden");
+
+        presentNextQuestion();
+      }
+
+      // ==========================================
+      // 图表绘制函数 (Canvas)
+      // ==========================================
+      function drawChart() {
+        const canvas = els.resultChart;
+        const ctx = canvas.getContext('2d');
+        const dpr = window.devicePixelRatio || 1;
+        const rect = canvas.parentElement.getBoundingClientRect();
+        
+        // Canvas 视网膜屏自适应高清渲染
+        canvas.width = (rect.width - 40) * dpr; // 减去 padding
+        canvas.height = 260 * dpr;
+        canvas.style.width = (rect.width - 40) + 'px';
+        canvas.style.height = '260px';
+        ctx.scale(dpr, dpr);
+
+        const w = (rect.width - 40);
+        const h = 260;
+        const padX = 25, padY = 20;
+
+        // 获取主题色
+        const style = getComputedStyle(document.documentElement);
+        const colorAccent = style.getPropertyValue('--accent').trim();
+        const colorMuted = style.getPropertyValue('--muted').trim();
+        const colorLine = style.getPropertyValue('--line').trim();
+        const colorBg = style.getPropertyValue('--bg').trim();
+        
+        // 计算坐标范围
+        const z = CONFIG.zScore90;
+        let minVal = Infinity, maxVal = -Infinity;
+        state.history.forEach(d => {
+          minVal = Math.min(minVal, d.theta - z * d.se);
+          maxVal = Math.max(maxVal, d.theta + z * d.se);
+        });
+        
+        const range = maxVal - minVal;
+        minVal -= range * 0.1; // 上下多留 10% 空间
+        maxVal += range * 0.1;
+
+        const mapX = i => padX + (i / (state.history.length - 1)) * (w - padX * 2);
+        const mapY = v => h - padY - ((v - minVal) / (maxVal - minVal)) * (h - padY * 2);
+
+        ctx.clearRect(0, 0, w, h);
+
+        // 绘制水平基准线和刻度
+        ctx.strokeStyle = colorLine;
+        ctx.fillStyle = colorMuted;
+        ctx.font = '10px system-ui, sans-serif';
+        ctx.textAlign = 'right';
+        ctx.textBaseline = 'middle';
+        ctx.lineWidth = 1;
+        
+        for (let i = Math.ceil(minVal); i <= Math.floor(maxVal); i++) {
+          const y = mapY(i);
+          ctx.beginPath();
+          ctx.moveTo(padX, y);
+          ctx.lineTo(w - padX, y);
+          ctx.stroke();
+          ctx.fillText(i, padX - 8, y);
+        }
+
+        // 绘制 90% 置信区间阴影带
+        ctx.fillStyle = colorAccent;
+        ctx.globalAlpha = 0.15; // 适配旧版浏览器不支持 color-mix 的情况
+        ctx.beginPath();
+        state.history.forEach((d, i) => {
+          const x = mapX(i), y = mapY(d.theta + z * d.se);
+          if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        });
+        for (let i = state.history.length - 1; i >= 0; i--) {
+          const d = state.history[i];
+          ctx.lineTo(mapX(i), mapY(d.theta - z * d.se));
+        }
+        ctx.closePath();
+        ctx.fill();
+        ctx.globalAlpha = 1.0;
+
+        // 绘制主能力值曲线
+        ctx.strokeStyle = colorAccent;
+        ctx.lineWidth = 2.5;
+        ctx.lineJoin = 'round';
+        ctx.beginPath();
+        state.history.forEach((d, i) => {
+          const x = mapX(i), y = mapY(d.theta);
+          if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        });
+        ctx.stroke();
+
+        // 绘制数据点
+        ctx.fillStyle = colorBg;
+        state.history.forEach((d, i) => {
+          ctx.beginPath();
+          ctx.arc(mapX(i), mapY(d.theta), 3, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.stroke();
+        });
+      }
+
+      function finishTest() {
+        state.running = false;
+        els.testPanel.classList.add("hidden");
+        els.statsPanel.classList.add("hidden");
+        els.resultPanel.classList.remove("hidden");
+
+        const n = state.responses.length;
+        const correct = state.responses.filter(x => x.u).length;
+        const timeouts = state.responses.filter(x => x.timeout).length;
+        
+        const z = CONFIG.zScore90;
+        const tLo = thresholdFromTheta(state.theta + z * state.se);
+        const tHi = thresholdFromTheta(state.theta - z * state.se);
+
+        els.resultSummary.innerHTML = `本次测试共完成 <strong>${n}</strong> 题，系统动态评估标准误已收敛 (SE ≤ ${CONFIG.targetSE})。`;
+        els.resultTheta.textContent = formatSigned(state.theta);
+        els.resultSE.textContent = state.se.toFixed(3);
+        els.resultThreshold.textContent = formatDE(thresholdFromTheta(state.theta));
+        els.resultThresholdCIEnd.textContent = `[${formatDE(tLo)}, ${formatDE(tHi)}]`;
+
+        let evalStr = state.theta > 1.2 ? "极其敏锐 (专业级)" : 
+                      state.theta > 0.4 ? "优秀 (高于平均)" : 
+                      state.theta > -0.4 ? "正常 (平均水平)" : "稍弱 (低于平均)";
+                      
+        els.resultAbilityExplanation.innerHTML = `<strong>能力水平评估：${evalStr}</strong><br>你的 IRT 潜在能力值推算为 ${formatSigned(state.theta)}。该数值越高代表辨色能力越强。`;
+        els.resultThresholdExplanation.innerHTML = `<strong>视觉极限预测：ΔE00 ≈ ${formatDE(thresholdFromTheta(state.theta))}</strong><br>在此色差范围内，你的辨识正确率约为 75%。该数值越低代表辨色能力越强，普通人的极限通常在 1.5 - 2.5 之间。`;
+        els.resultAccuracyExplanation.innerHTML = `<strong>作答概况：</strong>共答对 ${correct} 题，正确率 ${Math.round(100*correct/n)}%。${timeouts ? `包含 ${timeouts} 次超时。` : "全程无超时。"}`;
+
+        // 使用 setTimeout 确保 DOM 已经完全展现并具有实际尺寸，再绘制 Canvas
+        setTimeout(drawChart, 50);
+      }
+
+      // ==========================================
+      // 事件绑定
+      // ==========================================
+      els.startBtn.addEventListener("click", startTest);
+      els.againBtn.addEventListener("click", startTest);
+      els.restartBtn.addEventListener("click", startTest);
+      
+      els.choice1.addEventListener("click", () => submitAnswer(1));
+      els.choice2.addEventListener("click", () => submitAnswer(2));
+
+      document.addEventListener("keydown", e => {
+        if (!state.running || state.locked) return;
+        if (e.key === "1") { e.preventDefault(); submitAnswer(1); }
+        if (e.key === "2") { e.preventDefault(); submitAnswer(2); }
+      });
+
+      // 监听屏幕大小变化，重绘画布防止变形拉伸
+      window.addEventListener('resize', () => {
+        if (!els.resultPanel.classList.contains("hidden")) {
+          drawChart();
+        }
+      });
+
+    })();
+  </script>
+</body>
+</html>
