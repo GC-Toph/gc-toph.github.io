@@ -1,0 +1,1158 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CPT 与道德损伤训练助手</title>
+  <style>
+    :root {
+      --bg: #f4f6f8;
+      --panel: #ffffff;
+      --text: #1d2129;
+      --muted: #86909c;
+      --line: #e5e6eb;
+      --brand: #165dff;
+      --brand-hover: #0e42d2;
+      --brand-light: #e8f3ff;
+      --ok: #00b42a;
+      --warn: #ff7d00;
+      --danger: #f53f3f;
+      --radius: 12px;
+      --shadow: 0 4px 10px rgba(0,0,0,0.04);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+    header {
+      position: sticky; top: 0; z-index: 20;
+      background: rgba(255,255,255,0.95); backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--line);
+    }
+    .topbar {
+      max-width: 1200px; margin: 0 auto; padding: 12px 20px;
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    }
+    .brand h1 { font-size: 18px; font-weight: 600; }
+    .brand p { color: var(--muted); font-size: 12px; margin-top: 2px; }
+    .actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    
+    button, .file-label {
+      border: 1px solid var(--line); background: #fff; color: var(--text);
+      border-radius: 8px; padding: 6px 12px; font-size: 14px; line-height: 20px;
+      height: 34px; cursor: pointer; transition: 0.2s;
+      display: inline-flex; align-items: center; justify-content: center; white-space: nowrap;
+      font-family: inherit;
+    }
+    button:hover, .file-label:hover { border-color: var(--brand); color: var(--brand); }
+    button.primary { background: var(--brand); color: #fff; border-color: var(--brand); }
+    button.primary:hover { background: var(--brand-hover); color: #fff; }
+    button.danger { color: var(--danger); border-color: #fcaaaa; }
+    button.danger:hover { background: #fff2f2; }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+    input[type="file"] { display: none; }
+    
+    .layout {
+      max-width: 1200px; margin: 20px auto; padding: 0 20px;
+      display: grid; grid-template-columns: 220px 1fr; gap: 24px;
+    }
+    nav { align-self: start; position: sticky; top: 80px; }
+    .navbtn {
+      width: 100%; text-align: left; border: none; background: transparent;
+      padding: 10px 12px; margin-bottom: 4px; border-radius: 8px; color: #4e5969; font-size: 15px;
+    }
+    .navbtn:hover { background: #f2f3f5; color: var(--text); }
+    .navbtn.active { background: var(--brand-light); color: var(--brand); font-weight: 600; }
+    
+    main { min-width: 0; }
+    section.view { display: none; animation: fadeIn 0.3s ease; }
+    section.view.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+    
+    .card {
+      background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
+      box-shadow: var(--shadow); padding: 24px; margin-bottom: 20px;
+    }
+    .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+    h2 { font-size: 20px; font-weight: 600; }
+    h3 { font-size: 16px; font-weight: 600; margin-bottom: 12px; }
+    .help { color: var(--muted); font-size: 13px; margin-top: 4px; }
+    
+    .grid { display: grid; gap: 16px; }
+    .grid.two { grid-template-columns: repeat(2, 1fr); }
+    .grid.three { grid-template-columns: repeat(3, 1fr); }
+    .grid.four { grid-template-columns: repeat(4, 1fr); }
+    
+    label { font-size: 13px; font-weight: 500; color: #4e5969; display: block; margin-bottom: 6px; }
+    input, textarea, select {
+      width: 100%; border: 1px solid var(--line); border-radius: 8px;
+      padding: 10px; font-size: 14px; background: #fff; color: var(--text); transition: 0.2s;
+    }
+    input:focus, textarea:focus, select:focus { outline: none; border-color: var(--brand); box-shadow: 0 0 0 2px var(--brand-light); }
+    textarea { min-height: 80px; resize: vertical; }
+    
+    .pill {
+      display: inline-flex; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 500;
+    }
+    .pill.ok { background: #e8ffea; color: var(--ok); }
+    .pill.warn { background: #fff7e8; color: var(--warn); }
+    .pill.danger { background: #ffece8; color: var(--danger); }
+    details.record-detail { margin-top: 6px; }
+    details.record-detail summary { color: var(--brand); cursor: pointer; font-size: 13px; }
+    .detail-box { margin-top: 8px; padding: 10px; border-radius: 8px; background: #f7f8fa; color: #4e5969; font-size: 13px; }
+    .detail-box strong { color: var(--text); }
+
+
+    /* Stuck Point Git-log style timeline */
+    .stuck-list { display: grid; gap: 16px; }
+    .stuck-card { border: 1px solid var(--line); border-radius: 12px; background: #fff; overflow: hidden; }
+    .stuck-head { padding: 16px; display: grid; grid-template-columns: 1fr auto; gap: 12px; border-bottom: 1px solid var(--line); }
+    .stuck-title { font-size: 15px; font-weight: 600; white-space: pre-wrap; overflow-wrap: anywhere; }
+    .stuck-meta { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; align-items: center; color: var(--muted); font-size: 12px; }
+    .belief-meter { width: 120px; height: 8px; background: #edf0f5; border-radius: 999px; overflow: hidden; display: inline-flex; vertical-align: middle; }
+    .belief-meter span { display: block; height: 100%; background: linear-gradient(90deg, var(--ok), var(--warn), var(--danger)); }
+    .log-timeline { padding: 14px 16px 16px; }
+    .log-item { position: relative; display: grid; grid-template-columns: 22px 1fr; gap: 10px; padding-bottom: 14px; }
+    .log-item:last-child { padding-bottom: 0; }
+    .log-rail { position: relative; display: flex; justify-content: center; }
+    .log-rail::after { content: ''; position: absolute; top: 20px; bottom: -14px; width: 2px; background: var(--line); }
+    .log-item:last-child .log-rail::after { display: none; }
+    .log-dot { width: 12px; height: 12px; border-radius: 50%; margin-top: 4px; background: var(--brand); box-shadow: 0 0 0 3px var(--brand-light); z-index: 1; }
+    .log-dot.create { background: var(--brand); }
+    .log-dot.explore { background: var(--warn); box-shadow: 0 0 0 3px #fff7e8; }
+    .log-dot.alt, .log-dot.disproved { background: var(--ok); box-shadow: 0 0 0 3px #e8ffea; }
+    .log-dot.confirmed { background: var(--danger); box-shadow: 0 0 0 3px #ffece8; }
+    .log-body { min-width: 0; }
+    .log-top { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 4px; }
+    .log-date { color: var(--muted); font-size: 12px; }
+    .log-text { color: #4e5969; font-size: 13px; white-space: pre-wrap; overflow-wrap: anywhere; }
+    .action-row { display: flex; gap: 6px; flex-wrap: wrap; }
+    .mini { height: 30px; padding: 4px 10px; font-size: 13px; }
+    .mini.ok { color: var(--ok); border-color: #8ee6a1; }
+    .mini.warn { color: var(--warn); border-color: #ffc37a; }
+    
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th, td { border-bottom: 1px solid var(--line); padding: 12px 10px; text-align: left; vertical-align: top; }
+    td { white-space: pre-wrap; overflow-wrap: anywhere; word-break: break-word; }
+    th { color: var(--muted); font-weight: 500; background: #f7f8fa; }
+    .table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; }
+    .empty-state { text-align: center; padding: 30px; color: var(--muted); font-size: 14px; }
+    
+    .metric { background: #f7f8fa; border-radius: 8px; padding: 16px; text-align: center; }
+    .metric span { display: block; font-size: 12px; color: var(--muted); }
+    .metric strong { display: block; font-size: 28px; color: var(--brand); margin: 4px 0; }
+    
+    /* PCL-5 Card UI */
+    .pcl-wizard { display: flex; flex-direction: column; align-items: center; max-width: 600px; margin: 0 auto; }
+    .pcl-progress-bar { width: 100%; height: 6px; background: var(--line); border-radius: 3px; margin-bottom: 24px; overflow: hidden; }
+    .pcl-progress-fill { height: 100%; background: var(--brand); width: 0%; transition: 0.3s; }
+    .pcl-question { font-size: 18px; font-weight: 500; text-align: center; margin-bottom: 24px; min-height: 54px; }
+    .pcl-options { display: grid; grid-template-columns: 1fr; gap: 12px; width: 100%; }
+    .pcl-option {
+      border: 1px solid var(--line); background: #fff; padding: 14px; border-radius: 8px;
+      text-align: center; cursor: pointer; transition: 0.2s; font-size: 15px; font-weight: 500;
+    }
+    .pcl-option:hover { border-color: var(--brand); background: var(--brand-light); }
+    .pcl-option.selected { background: var(--brand); color: #fff; border-color: var(--brand); }
+    .pcl-nav { display: flex; justify-content: space-between; width: 100%; margin-top: 24px; }
+    
+    /* Toast */
+    #toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
+    .toast { background: #1d2129; color: #fff; padding: 10px 20px; border-radius: 8px; font-size: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); animation: toastIn 0.3s, toastOut 0.3s 2.7s forwards; }
+    @keyframes toastIn { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    @keyframes toastOut { from { opacity: 1; } to { opacity: 0; } }
+
+
+
+    /* Moral injury assessment and repair modules */
+    .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px; }
+    .notice { border-radius: 10px; padding: 14px 16px; margin-top: 14px; font-size: 13px; border: 1px solid var(--line); background: #f7f8fa; }
+    .notice.info { border-color: #a9c7ff; background: #f2f7ff; }
+    .notice.warn { border-color: #ffd29b; background: #fff9ef; }
+    .notice.danger { border-color: #ffb3b3; background: #fff4f4; color: #a61d24; }
+    .notice strong { color: var(--text); }
+    .section-kicker { color: var(--brand); font-size: 12px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; margin-bottom: 4px; }
+    .assessment-setup { display: grid; grid-template-columns: 1.4fr 1fr; gap: 18px; }
+    .check-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .check-item { display: flex; gap: 9px; align-items: flex-start; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; background: #fff; font-size: 13px; cursor: pointer; }
+    .check-item input { width: auto; margin-top: 3px; }
+    .check-item span { flex: 1; }
+    .assessment-wizard { max-width: 720px; margin: 0 auto; }
+    .assessment-question { font-size: 18px; font-weight: 600; text-align: center; margin: 18px 0 20px; min-height: 58px; }
+    .assessment-context { text-align: center; color: var(--muted); font-size: 13px; margin-top: 8px; }
+    .assessment-options { display: grid; grid-template-columns: 1fr; gap: 10px; }
+    .assessment-option { border: 1px solid var(--line); background: #fff; border-radius: 8px; padding: 12px 14px; text-align: center; cursor: pointer; font-weight: 500; transition: .2s; }
+    .assessment-option:hover { border-color: var(--brand); background: var(--brand-light); }
+    .assessment-option.selected { background: var(--brand); color: #fff; border-color: var(--brand); }
+    .assessment-nav { display: flex; justify-content: space-between; gap: 12px; margin-top: 20px; }
+    .score-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-top: 16px; }
+    .score-box { border: 1px solid var(--line); border-radius: 10px; padding: 14px; background: #fafbfc; }
+    .score-box span { display: block; font-size: 12px; color: var(--muted); }
+    .score-box strong { display: block; font-size: 24px; margin: 3px 0; }
+    .score-box small { color: #4e5969; }
+    .subtle-divider { height: 1px; background: var(--line); margin: 18px 0; }
+    .responsibility-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+    .responsibility-card { border: 1px solid var(--line); border-radius: 10px; padding: 14px; background: #fafbfc; }
+    .responsibility-card input[type="range"] { padding: 0; }
+    .range-row { display: grid; grid-template-columns: 1fr 54px; gap: 10px; align-items: center; }
+    .range-output { text-align: center; font-weight: 700; color: var(--brand); }
+    .practice-step { border-left: 3px solid var(--brand); padding-left: 16px; margin-bottom: 22px; }
+    .practice-step.trigr { border-left-color: var(--warn); }
+    .practice-step.act { border-left-color: var(--ok); }
+    .practice-step.repair { border-left-color: var(--brand); }
+    .practice-history details summary { cursor: pointer; color: var(--brand); }
+    .warning-list { margin: 8px 0 0 18px; color: #4e5969; }
+    .warning-list li { margin-bottom: 5px; }
+    .source-note { font-size: 12px; color: var(--muted); line-height: 1.55; }
+    .source-note a { color: var(--brand); text-decoration: none; }
+    .source-note a:hover { text-decoration: underline; }
+    .tag-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+    .compact-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .hidden { display: none !important; }
+
+    @media (max-width: 800px) {
+      .layout { grid-template-columns: 1fr; padding: 16px; gap: 16px; }
+      nav { display: flex; overflow-x: auto; position: static; white-space: nowrap; padding-bottom: 8px; }
+      .navbtn { width: auto; margin: 0 8px 0 0; }
+      .grid.two, .grid.three, .grid.four, .assessment-setup, .responsibility-grid, .check-grid { grid-template-columns: 1fr; }
+      .topbar { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+  <div id="toast-container"></div>
+
+  <header>
+    <div class="topbar">
+      <div class="brand">
+        <h1>CPT 与道德损伤训练助手</h1>
+        <p>纯本地离线运行 · CPT、MIOS、MIDS、TrIGR 与 ACT-MI 结构化记录</p>
+      </div>
+      <div class="actions">
+        <button id="exportBtn">导出备份</button>
+        <label class="file-label" for="importFile">导入恢复</label>
+        <input id="importFile" type="file" accept=".json" />
+        <button class="danger" id="resetBtn">清空数据</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="layout">
+    <nav id="nav"></nav>
+    <main>
+      <!-- 总览 -->
+      <section class="view active" data-view="dashboard">
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h2>总览</h2>
+              <p class="help">根据 CPT 流程：确定创伤事件 -> 评估 PCL-5 -> 记录影响陈述 -> 通过 ABC 与卡点 log 跟踪想法证据。</p>
+            </div>
+          </div>
+          <div class="metrics-grid">
+            <div class="metric"><span>最新 PCL-5</span><strong id="mLatestScore">-</strong><div id="mScoreHint">暂无</div></div>
+            <div class="metric"><span>最新 MIOS</span><strong id="mLatestMios">-</strong><div>0–56</div></div>
+            <div class="metric"><span>最新 MIDS</span><strong id="mLatestMids">-</strong><div>0–72；27 为研究筛查点</div></div>
+            <div class="metric"><span>联合趋势指数</span><strong id="mLatestCombined">-</strong><div>0–100，非诊断指标</div></div>
+            <div class="metric"><span>卡点记录</span><strong id="mStuckCount">0</strong><div>跟踪信念变化</div></div>
+            <div class="metric"><span>ABC 练习</span><strong id="mAbcCount">0</strong><div>区分事实、想法、情绪</div></div>
+            <div class="metric"><span>道德修复练习</span><strong id="mPracticeCount">0</strong><div>TrIGR / ACT-MI</div></div>
+            <div class="metric"><span>量表记录</span><strong id="mAssessmentCount">0</strong><div>MIOS + MIDS 联合评估</div></div>
+          </div>
+        </div>
+        <div class="card">
+          <h3>PCL-5 评分趋势</h3>
+          <canvas id="scoreChart" width="800" height="240" style="width:100%; background:#fcfcfd; border-radius:8px; border:1px solid var(--line);"></canvas>
+          <p class="help" style="margin-top:10px;">注：31分以上提示症状显著，低于20分常视为症状明显好转。本工具仅供自我记录，不替代临床诊断。</p>
+        </div>
+        <div class="card">
+          <h3>道德损伤联合趋势</h3>
+          <canvas id="moralChart" width="800" height="240" style="width:100%; background:#fcfcfd; border-radius:8px; border:1px solid var(--line);"></canvas>
+          <p class="help" style="margin-top:10px;">联合指数 = MIOS 标准化分与 MIDS 标准化分的等权平均，仅用于本应用内纵向比较。临床判断应优先查看 MIOS、MIDS、功能受损和专业访谈。</p>
+        </div>
+      </section>
+
+      <!-- 安全计划 -->
+      <section class="view" data-view="safety">
+        <div class="card">
+          <h2>安全计划</h2>
+          <p class="help" style="color:var(--danger)">如遇紧急危机或强烈的自伤意图，请立即停止练习并拨打当地急救电话或联系专业医生。</p>
+        </div>
+        <div class="card grid two">
+          <div><label>当前安全感 (0-10)</label><input type="number" min="0" max="10" data-bind="safety.currentSafety"></div>
+          <div><label>紧急联系人</label><input data-bind="safety.emergencyContact" placeholder="姓名 / 电话"></div>
+          <div><label>让我稳定下来的方法 (Grounding)</label><textarea data-bind="safety.grounding" placeholder="如：深呼吸、冷水洗脸、54321感官法..."></textarea></div>
+          <div><label>本地危机支持资源</label><textarea data-bind="safety.crisisResources" placeholder="心理危机干预热线、附近医院急诊地址..."></textarea></div>
+        </div>
+      </section>
+
+      <!-- Index Event -->
+      <section class="view" data-view="indexEvent">
+        <div class="card">
+          <h2>目标创伤事件 (Index Event)</h2>
+          <p class="help">选择当前最困扰你的创伤事件作为练习焦点。只需写简称，无需详细回忆细节。</p>
+        </div>
+        <div class="card grid two">
+          <div><label>事件简称</label><input data-bind="indexEvent.label" placeholder="如：那次车祸 / 某段关系中的事件"></div>
+          <div><label>大约发生时间</label><input data-bind="indexEvent.when" placeholder="如：3年前 / 2019年"></div>
+          <div><label>最强烈的核心情绪</label><input data-bind="indexEvent.strongestEmotion" placeholder="如：极度羞耻 / 内疚 / 恐惧 / 愤怒"></div>
+          <div><label>当前困扰程度 (0-10)</label><input type="number" min="0" max="10" data-bind="indexEvent.distress"></div>
+        </div>
+      </section>
+
+      <!-- PCL-5 -->
+      <section class="view" data-view="pcl">
+        <div class="card">
+          <div class="card-header">
+            <div><h2>PCL-5 创伤后应激障碍检查单</h2><p class="help">请根据过去一个月（或一周）内，该创伤事件对你的困扰程度进行评分。</p></div>
+            <button class="primary" id="startPclBtn">开始/重新测试</button>
+          </div>
+          
+          <!-- 卡片式测试面板 -->
+          <div id="pclTestPanel" style="display:none; background: #fafbfc; padding: 30px 20px; border-radius: 12px; border: 1px solid var(--line);">
+            <div class="pcl-wizard">
+              <div class="pcl-progress-bar"><div class="pcl-progress-fill" id="pclProgress"></div></div>
+              <div style="font-size:13px; color:var(--muted); margin-bottom:8px;" id="pclCounter">题目 1 / 20</div>
+              <div class="pcl-question" id="pclQuestionText">...</div>
+              <div class="pcl-options">
+                <div class="pcl-option" data-val="0">0 - 完全没有</div>
+                <div class="pcl-option" data-val="1">1 - 有一点</div>
+                <div class="pcl-option" data-val="2">2 - 中等程度</div>
+                <div class="pcl-option" data-val="3">3 - 相当多</div>
+                <div class="pcl-option" data-val="4">4 - 极多</div>
+              </div>
+              <div class="pcl-nav">
+                <button id="pclPrevBtn">上一题</button>
+                <button class="primary" id="pclSaveBtn" style="display:none;">完成并保存评分</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="card">
+          <h3>历史测评记录</h3>
+          <div class="table-wrap"><table id="pclTable"></table></div>
+        </div>
+      </section>
+
+
+
+      <!-- Moral Injury Assessment -->
+      <section class="view" data-view="moralAssessment">
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="section-kicker">MIOS + MIDS</div>
+              <h2>道德损伤联合评估</h2>
+              <p class="help">同时记录道德损伤结果量表（MIOS）、道德损伤与困扰量表（MIDS）及功能影响。题目为非官方中文工作译本。</p>
+            </div>
+            <button class="primary" id="startMoralAssessmentBtn">开始联合评估</button>
+          </div>
+          <div class="notice info">
+            <strong>MIOS 0–56：</strong>初步研究建议 14–28 为轻度、29–42 为中度、43–56 为重度；37 分仅是一个澳大利亚样本中的研究参考点。
+          </div>
+          <div class="notice info">
+            <strong>MIDS 0–72：</strong>27 分是用于识别具有临床意义和功能受损风险的研究筛查点。
+          </div>
+          <div class="notice info">
+            <strong>合并规则：</strong>联合趋势指数将 MIOS 与 MIDS 分别换算为 0–100 后等权平均。
+          </div>
+          <div class="notice warn">
+            <strong>量表不能单独诊断道德损伤：</strong>该指数没有经过心理测量学验证，不作为诊断或治疗决策阈值。
+          </div>
+        </div>
+
+        <div class="card" id="moralSetupCard">
+          <h3>评估焦点</h3>
+          <div class="assessment-setup">
+            <div>
+              <label>事件简称（避免在不稳定时写过多细节）</label>
+              <input id="moralEventLabel" placeholder="如：某次未能救助 / 被组织要求违背专业伦理">
+              <label style="margin-top:12px;">目前最困扰你的经历类型（可多选）</label>
+              <div class="check-grid" id="moralTypeChecks">
+                <label class="check-item"><input type="checkbox" value="实施"><span>我做了违背自身道德或价值的事</span></label>
+                <label class="check-item"><input type="checkbox" value="未能行动"><span>我没有做自己认为应该做的事</span></label>
+                <label class="check-item"><input type="checkbox" value="目睹"><span>我目睹了他人严重违背道德或价值</span></label>
+                <label class="check-item"><input type="checkbox" value="受害或背叛"><span>我受到他人、权威或制度的伤害或背叛</span></label>
+              </div>
+            </div>
+            <div>
+              <label>评估时间范围</label>
+              <select id="moralTimeframe" disabled><option>过去一个月（验证时间范围）</option></select>
+              <label style="margin-top:12px;">当前困扰程度（0–10）</label>
+              <input id="moralCurrentDistress" type="number" min="0" max="10" value="5">
+              <p class="help">若困扰达到 9–10、出现明显解离，或无法保证自身安全，请先停止评估并使用“安全计划”。</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="card hidden" id="moralAssessmentPanel">
+          <div class="assessment-wizard">
+            <div class="pcl-progress-bar"><div class="pcl-progress-fill" id="moralProgress"></div></div>
+            <div class="assessment-context" id="moralGroupLabel">...</div>
+            <div class="assessment-context" id="moralCounter">题目 1</div>
+            <div class="assessment-question" id="moralQuestionText">...</div>
+            <div class="assessment-options" id="moralOptions"></div>
+            <div class="assessment-nav">
+              <button id="moralPrevBtn">上一题</button>
+              <button class="primary hidden" id="moralSaveBtn">完成并保存</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card hidden" id="moralResultCard">
+          <h3>本次评估结果</h3>
+          <div id="moralResultSummary"></div>
+        </div>
+
+        <div class="card">
+          <h3>历史联合评估</h3>
+          <div class="table-wrap"><table id="moralAssessmentTable"></table></div>
+          <p class="source-note" style="margin-top:12px;">量表来源：Moral Injury Outcome Scale Consortium；美国国家 PTSD 中心 Moral Injury and Distress Scale。应用中的中文表述为工作译本，未进行正式跨文化验证。</p>
+        </div>
+      </section>
+
+      <!-- Impact Statement -->
+      <section class="view" data-view="impact">
+        <div class="card">
+          <h2>影响陈述 (Impact Statement)</h2>
+          <p class="help">描述你对“为什么会发生这件事”的理解，以及它如何改变了你对**自己、他人和世界**的看法。</p>
+        </div>
+        <div class="card grid two">
+          <div><label>我认为发生的原因是...</label><textarea data-bind="impact.cause"></textarea></div>
+          <div><label>我认为谁该负责？为什么？</label><textarea data-bind="impact.blame"></textarea></div>
+          <div><label>这件事让我如何看待自己？</label><textarea data-bind="impact.self"></textarea></div>
+          <div><label>这件事让我如何看待他人/世界？</label><textarea data-bind="impact.world"></textarea></div>
+        </div>
+      </section>
+
+
+
+      <!-- TrIGR and ACT-MI Practice -->
+      <section class="view" data-view="moralPractice">
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="section-kicker">TrIGR + ACT-MI</div>
+              <h2>道德损伤修复练习</h2>
+            </div>
+            <button class="primary" id="saveMoralPracticeBtn">保存本次练习</button>
+          </div>
+          <div class="notice danger">
+            这不是自行暴露治疗，若没有进入安全稳定的状态反而可能造成二次创伤。不要强迫自己复述最痛苦细节。若出现自伤、伤人冲动、严重解离或无法保持安全，请停止练习，联系可信任的人、专业人员或当地急救资源。
+          </div>
+          <div class="grid three" style="margin-top:16px;">
+            <div><label>练习日期</label><input id="practiceDate" type="date"></div>
+            <div><label>开始前困扰（0–10）</label><input id="practiceDistressBefore" type="number" min="0" max="10"></div>
+            <div><label>当前安全状态</label><select id="practiceSafety"><option value="safe">没有自伤或伤人冲动，可以保持安全</option><option value="concern">有相关想法，但目前可以保持安全</option><option value="unsafe">无法保证自己或他人的安全</option></select></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="practice-step trigr">
+            <h3>一、事实、感受与想法分离</h3>
+            <p class="help">事实只描述可观察到的事情；感受用情绪词；想法是大脑对事件作出的解释。三者不要混写。</p>
+            <div class="grid three">
+              <div><label>事实：发生了什么？</label><textarea id="practiceFacts" placeholder="只写可观察事实，不评价人格，不作道德结论。"></textarea></div>
+              <div><label>感受：我有什么情绪和身体感受？</label><textarea id="practiceFeelings" placeholder="如：罪疚、羞耻、愤怒、胸口紧、发抖。"></textarea></div>
+              <div><label>想法：我对事件和自己的解释是什么？</label><textarea id="practiceThoughts" placeholder="如：我本应该知道；我不配被原谅。"></textarea></div>
+            </div>
+          </div>
+
+          <div class="practice-step trigr">
+            <h3>二、当时条件与 TrIGR 责任辨析</h3>
+            <p class="help">重点检查后见偏差、可用选择、完整情境和意图。寻找完整事实，不是寻找借口。</p>
+            <div class="grid two">
+              <div><label>当时掌握的信息</label><textarea id="practiceKnowledge" placeholder="当时真正知道什么？哪些结果当时无法知道？"></textarea></div>
+              <div><label>可用时间与时间压力</label><textarea id="practiceTime" placeholder="有多少时间判断和行动？"></textarea></div>
+              <div><label>权力与控制范围</label><textarea id="practicePower" placeholder="我实际能控制什么，不能控制什么？"></textarea></div>
+              <div><label>可选行动及可能后果</label><textarea id="practiceOptions" placeholder="列出当时真正可行的选项；是否存在没有好结果的处境？"></textarea></div>
+              <div><label>身体和心理状态</label><textarea id="practiceState" placeholder="疲劳、受伤、恐惧、冻结反应、训练水平等。"></textarea></div>
+              <div><label>命令、制度和资源限制</label><textarea id="practiceConstraints" placeholder="命令、威胁、人手、设备、信息、组织文化等。"></textarea></div>
+              <div><label>意图</label><textarea id="practiceIntent" placeholder="我是否有意造成实际发生的坏结果？我的原始目的是什么？"></textarea></div>
+              <div><label>结果的可预见性</label><textarea id="practiceForeseeable" placeholder="以当时而非现在的知识，结果在多大程度上可预见？"></textarea></div>
+            </div>
+          </div>
+
+          <div class="practice-step trigr">
+            <h3>三、责任分布</h3>
+            <p class="help">每项都是独立估计，不要求加总为 100%。责任大小也不等于痛苦大小。</p>
+            <div class="responsibility-grid">
+              <div class="responsibility-card"><label>我的责任程度</label><div class="range-row"><input id="respSelf" type="range" min="0" max="100" value="50"><output id="respSelfOut" class="range-output">50%</output></div><textarea id="respSelfWhy" placeholder="具体是哪些行为或遗漏构成责任？"></textarea></div>
+              <div class="responsibility-card"><label>他人的责任程度</label><div class="range-row"><input id="respOthers" type="range" min="0" max="100" value="0"><output id="respOthersOut" class="range-output">0%</output></div><textarea id="respOthersWhy" placeholder="哪些人做了什么，拥有何种选择或权力？"></textarea></div>
+              <div class="responsibility-card"><label>组织或制度的责任程度</label><div class="range-row"><input id="respOrg" type="range" min="0" max="100" value="0"><output id="respOrgOut" class="range-output">0%</output></div><textarea id="respOrgWhy" placeholder="流程、资源、命令、文化或监督出了什么问题？"></textarea></div>
+              <div class="responsibility-card"><label>环境与偶然因素的贡献</label><div class="range-row"><input id="respChance" type="range" min="0" max="100" value="0"><output id="respChanceOut" class="range-output">0%</output></div><textarea id="respChanceWhy" placeholder="天气、时机、不可预测因素、第三方行为等。"></textarea></div>
+            </div>
+            <div style="margin-top:14px;"><label>更完整、平衡的责任陈述</label><textarea id="practiceBalanced" placeholder="承认属于我的责任，同时包含当时信息、选择、权力、意图和其他因素。"></textarea></div>
+          </div>
+
+          <div class="practice-step act">
+            <h3>四、ACT-MI 功能分析：我如何回应道德痛苦？</h3>
+            <p class="help">ACT-MI 不把道德痛苦本身视为必须消除的症状，而是识别回避和控制行为如何阻碍有意义的生活。</p>
+            <div class="grid two">
+              <div><label>触发情境</label><textarea id="actTrigger" placeholder="什么情境、记忆或关系触发了道德痛苦？"></textarea></div>
+              <div><label>道德痛苦</label><textarea id="actPain" placeholder="出现了哪些情绪、身体感受、记忆和判断？"></textarea></div>
+              <div><label>回避或控制行为</label><textarea id="actAvoidance" placeholder="如：孤立、酗酒、过度工作、自我惩罚、争辩、麻木。"></textarea></div>
+              <div><label>短期作用</label><textarea id="actShortRelief" placeholder="这种行为短期帮我躲开什么或得到什么？"></textarea></div>
+              <div><label>长期代价</label><textarea id="actLongCost" placeholder="它怎样损害关系、健康、工作、信仰或价值生活？"></textarea></div>
+              <div><label>认知解离表达</label><textarea id="actDefusion" placeholder="例如：我注意到，我的大脑正在讲述“我不可原谅”的故事。"></textarea></div>
+              <div><label>我愿意为重要价值容纳什么感受？</label><textarea id="actWillingness" placeholder="不是赞同痛苦，而是允许它存在，同时选择行动。"></textarea></div>
+              <div><label>观察者视角</label><textarea id="actSelfContext" placeholder="我正在经历罪疚和羞耻，但这些体验不是我的全部身份。"></textarea></div>
+            </div>
+          </div>
+
+          <div class="practice-step repair">
+            <h3>五、被违反的价值与修复行动</h3>
+            <div class="grid two">
+              <div><label>被违反或受到威胁的价值</label><textarea id="practiceValues" placeholder="保护生命、诚实、忠诚、公正、勇气、照顾家人、专业伦理等。"></textarea></div>
+              <div><label>今天仍然选择的价值</label><textarea id="actChosenValues" placeholder="哪些价值值得继续实践，而不是只通过痛苦证明？"></textarea></div>
+            </div>
+            <label style="margin-top:14px;">可选择的修复行动（可多选）</label>
+            <div class="check-grid" id="repairChecks">
+              <label class="check-item"><input type="checkbox" value="停止持续伤害"><span>停止某种持续伤害</span></label>
+              <label class="check-item"><input type="checkbox" value="寻求专业治疗"><span>寻求专业治疗或伦理督导</span></label>
+              <label class="check-item"><input type="checkbox" value="承认事实"><span>以合适方式承认事实</span></label>
+              <label class="check-item"><input type="checkbox" value="改变工作流程"><span>改变工作流程或推动制度改进</span></label>
+              <label class="check-item"><input type="checkbox" value="建立边界"><span>建立必要边界</span></label>
+              <label class="check-item"><input type="checkbox" value="适当补偿"><span>在不造成二次伤害的前提下适当补偿</span></label>
+              <label class="check-item"><input type="checkbox" value="恢复安全关系"><span>恢复一段安全关系或接受支持</span></label>
+              <label class="check-item"><input type="checkbox" value="每周价值行动"><span>每周做一件符合核心价值的事</span></label>
+            </div>
+            <div class="grid two" style="margin-top:14px;">
+              <div><label>具体、有限、可持续的下一步</label><textarea id="actCommittedAction" placeholder="动作要小到可以执行，并明确何时、何地、持续多久。"></textarea></div>
+              <div><label>支持、边界与风险检查</label><textarea id="actSupport" placeholder="需要谁支持？是否需要治疗师、法律或伦理咨询？哪些联系方式不安全或不合适？"></textarea></div>
+              <div><label>行动时间与地点</label><input id="actWhenWhere" placeholder="如：周三 18:00，在家写 10 分钟反思记录"></div>
+              <div><label>结束时困扰（0–10）</label><input id="practiceDistressAfter" type="number" min="0" max="10"></div>
+            </div>
+            <div style="margin-top:14px;"><label>补充说明</label><textarea id="repairNotes" placeholder="为什么这个行动符合价值？怎样避免冲动联系、公开披露或自我惩罚？"></textarea></div>
+          </div>
+
+          <div class="notice warn">
+            <strong>warn：</strong>
+            <ul class="warning-list">
+              <li>不要强迫自己反复回忆最痛苦的细节；</li>
+              <li>不要在冲动状态下联系受影响者；</li>
+              <li>需要警惕：公开披露可能带来法律、安全或职业风险的信息；</li>
+              <li>不要以自伤、酗酒或危险行为赎罪；</li>
+              <li>不要要求自己立即原谅；</li>
+              <li>不需要接受“你完全没错”或“你必须受罚”这类简单结论。</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="card practice-history">
+          <h3>练习历史</h3>
+          <div class="table-wrap"><table id="moralPracticeTable"></table></div>
+          <p class="source-note" style="margin-top:12px;">本模块是基于公开文献的 AIGC 工具，不等同于完整 TrIGR 六次治疗或 ACT-MI 专业治疗方案。</p>
+        </div>
+      </section>
+
+      <!-- Stuck Points -->
+      <section class="view" data-view="stuck">
+        <div class="card">
+          <div class="card-header">
+            <div><h2>卡点记录 (Stuck Point Log)</h2><p class="help">卡点是你告诉自己的、阻碍恢复的极端想法（例如“全都是我的错”、“没有任何人可以信任”）。</p></div>
+            <button class="primary" id="addStuckBtn">添加卡点</button>
+          </div>
+          <div class="grid three">
+            <div style="grid-column: 1 / span 2;"><label>具体想法 (完整陈述句)</label><input id="spText" placeholder="如：如果我当初不那么做，一切就不会发生。"></div>
+            <div><label>创伤类别</label><select id="spTheme"><option>安全</option><option>信任</option><option>权力/控制</option><option>自尊</option><option>亲密</option><option>其他</option></select></div>
+            <div><label>相信程度 (0-100%)</label><input id="spBelief" type="number" min="0" max="100"></div>
+            <div><label>伴随情绪</label><input id="spEmotion" placeholder="如：极度内疚"></div>
+            <div><label>初始状态</label><select id="spStatus"><option>待处理</option></select><p class="help">后续会在下方 log 中记录证实、证伪和历史变化。</p></div>
+          </div>
+        </div>
+        <div class="card">
+          <div id="stuckLogList" class="stuck-list"></div>
+        </div>
+      </section>
+
+      <!-- ABC -->
+      <section class="view" data-view="abc">
+        <div class="card">
+          <div class="card-header">
+            <div><h2>ABC 情绪日记</h2><p class="help">A=触发事件(仅事实)，B=我的想法(卡点)，C=我的情绪感觉。</p></div>
+            <button class="primary" id="saveAbcBtn">保存 ABC</button>
+          </div>
+          <div class="grid three">
+            <div><label>A：发生了什么客观事实？</label><textarea id="abcA" placeholder="剥离解释，只写发生的事。如：朋友没回微信。"></textarea></div>
+            <div><label>B：我告诉了自己什么想法？</label><textarea id="abcB" placeholder="如：他一定觉得我很烦，没人喜欢我。"></textarea></div>
+            <div><label>C：产生了什么情绪？</label><textarea id="abcC" placeholder="如：羞耻、焦虑。"></textarea></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="table-wrap"><table id="abcTable"></table></div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+<script>
+(function(){
+  'use strict';
+
+  // --- 基础状态与工具（仅支持当前版本） ---
+  const APP_VERSION = 5;
+  const KEY = 'cpt_moral_app_v5';
+  const today = () => new Date().toISOString().slice(0,10);
+  const nowStamp = () => new Date().toISOString().slice(0,19).replace('T',' ');
+  const uid = () => Math.random().toString(36).slice(2, 10);
+
+  function createDefaultState() {
+    return {
+      schemaVersion: APP_VERSION,
+      safety: {}, indexEvent: {}, impact: {},
+      pcl: [], stuckPoints: [], abc: [],
+      moralAssessments: [], moralPractices: []
+    };
+  }
+
+  function isLatestState(data) {
+    if (!data || typeof data !== 'object' || Array.isArray(data)) return false;
+    if (data.schemaVersion !== APP_VERSION) return false;
+    if (!data.safety || typeof data.safety !== 'object' || Array.isArray(data.safety)) return false;
+    if (!data.indexEvent || typeof data.indexEvent !== 'object' || Array.isArray(data.indexEvent)) return false;
+    if (!data.impact || typeof data.impact !== 'object' || Array.isArray(data.impact)) return false;
+    return ['pcl','stuckPoints','abc','moralAssessments','moralPractices'].every(k => Array.isArray(data[k]));
+  }
+
+  function loadState() {
+    const raw = localStorage.getItem(KEY);
+    if (!raw) return createDefaultState();
+    try {
+      const parsed = JSON.parse(raw);
+      return isLatestState(parsed) ? parsed : createDefaultState();
+    } catch (_) {
+      return createDefaultState();
+    }
+  }
+
+  let state = loadState();
+
+  const views = [
+    {id:'dashboard', icon:'📊', name:'总览面板'},
+    {id:'safety', icon:'🛡️', name:'安全计划'},
+    {id:'indexEvent', icon:'🎯', name:'创伤事件'},
+    {id:'pcl', icon:'📝', name:'PCL-5 测评'},
+    {id:'moralAssessment', icon:'⚖️', name:'道德损伤评估'},
+    {id:'impact', icon:'✍️', name:'影响陈述'},
+    {id:'moralPractice', icon:'🧭', name:'TrIGR / ACT-MI'},
+    {id:'stuck', icon:'🛑', name:'卡点日志'},
+    {id:'abc', icon:'🔄', name:'ABC 练习'}
+  ];
+
+  const pclQuestions = [
+    '突然想起创伤事件，出现反复的、令人困扰的、不想要的记忆？',
+    '出现反复的、令人困扰的梦境（与创伤事件有关）？',
+    '突然感觉或表现得好像创伤事件正在再次发生（如闪回）？',
+    '当某些事物让你想起创伤事件时，感到非常强烈的心理痛苦或难受？',
+    '当某些事物让你想起创伤事件时，产生强烈的身体反应（如心跳加速、呼吸困难、出汗）？',
+    '努力回避关于创伤事件的记忆、想法或感受？',
+    '努力回避会让你想起创伤事件的外部提醒（如人、地点、谈话、物品或情境）？',
+    '难以想起来创伤事件的某个重要部分？',
+    '对自己、他人或世界抱有强烈的消极信念或预期（例如“我很糟糕”、“没人可以信任”）？',
+    '因为创伤事件的发生或其后果，强烈地责备自己或他人？',
+    '持续产生强烈的消极情绪（如恐惧、惊恐、愤怒、内疚或羞耻）？',
+    '对过去喜欢的重要活动失去兴趣，或大幅减少参与？',
+    '感觉与他人疏远，或难以与他人亲近？',
+    '难以体验积极的情绪（例如无法感受到快乐或爱意）？',
+    '变得易怒，甚至爆发愤怒，或表现出攻击性行为？',
+    '冒太多风险，或做出可能伤害自己的鲁莽行为？',
+    '变得过度警觉，总是提心吊胆、保持戒备？',
+    '容易受惊吓，反应过度？',
+    '难以集中注意力？',
+    '难以入睡，或容易醒来（睡眠质量差）？'
+  ];
+
+  const eqPrompts = [
+    '有什么事实证据支持这个想法？',
+    '有什么事实证据反对这个想法？',
+    '这个想法是否包含了极端词（如“永远”、“必须”、“全部”）？',
+    '我是不是把情绪感受当成了事实证据？'
+  ];
+
+  const moralExposureItems = [
+    '我曾以某种行为违背自己的道德或价值。',
+    '我目前仍因自己做过的事而困扰。',
+    '我曾因没有采取行动而违背自己的道德或价值。',
+    '我目前仍因自己没有做的事而困扰。',
+    '我目睹过违背自己道德或价值的事情。',
+    '我目前仍因自己目睹的事情而困扰。'
+  ];
+
+  const miosItems = [
+    '我责备自己。',
+    '我已经对人性失去信心。',
+    '如果别人真正了解我，他们会厌恶我。',
+    '我很难看到他人身上的善意。',
+    '我认为人不值得获得第二次机会。',
+    '我对发生的事情感到厌恶。',
+    '我觉得自己不配拥有好的生活。',
+    '我会阻碍自己取得成功。',
+    '我不再相信存在更高力量或超越性的支持。',
+    '我失去了对他人的信任。',
+    '我几乎一直感到愤怒。',
+    '我觉得自己不再是原先以为的那个好人。',
+    '我失去了对自己的自豪感。',
+    '我无法对他人坦诚。'
+  ];
+
+  const midsItems = [
+    '我反复想到自己本应该能够做得更多。',
+    '我比以前更经常疏远他人。',
+    '我感到罪疚。',
+    '我怀疑自己的判断能力。',
+    '我觉得自己不配快乐。',
+    '我更经常破坏自己生活中的好事，例如关系或工作。',
+    '我感到无助。',
+    '我觉得生活的目的和意义减少了。',
+    '我担心坏事会发生在自己或所爱的人身上。',
+    '我惩罚过自己。',
+    '我感到厌恶。',
+    '我因为觉得自己不配获得支持而不去求助。',
+    '我因为担心别人无法理解而不去求助。',
+    '我感到被领导者或机构背叛。',
+    '我感到无力。',
+    '我认为自己不应该被原谅。',
+    '我的信仰或灵性不再能带给我安慰。',
+    '我没有好好照顾自己。'
+  ];
+
+  const functionItems = [
+    '伴侣或亲密关系',
+    '与子女的关系',
+    '与其他家庭成员的关系',
+    '友谊或社交',
+    '工作',
+    '培训或教育',
+    '日常活动，例如家务、办事和健康管理',
+    '宗教信仰或灵性生活'
+  ];
+
+  function save() { localStorage.setItem(KEY, JSON.stringify(state)); }
+  function $(id) { return document.getElementById(id); }
+  function val(id) { const el = $(id); return el ? el.value.trim() : ''; }
+  function numberValue(id, fallback=0) { const el = $(id); if (!el || el.value === '') return fallback; const n = Number(el.value); return Number.isFinite(n) ? n : fallback; }
+  function clamp(v, min, max) { const n = Number(v); return Number.isFinite(n) ? Math.max(min, Math.min(max, n)) : min; }
+  function clampPercent(v) { return Math.round(clamp(v, 0, 100)); }
+  function escapeHtml(s) { return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  function truncate(s, n=55) { s = String(s || ''); return s.length > n ? s.slice(0,n) + '…' : s; }
+  function sum(arr) { return arr.reduce((a,b) => a + (Number.isFinite(Number(b)) ? Number(b) : 0), 0); }
+  function selectedValues(containerId) { return Array.from(document.querySelectorAll(`#${containerId} input[type="checkbox"]:checked`)).map(x => x.value); }
+  function toast(msg, type='ok') {
+    const box = $('toast-container');
+    const el = document.createElement('div');
+    el.className = 'toast';
+    el.style.background = type === 'danger' ? 'var(--danger)' : (type === 'warn' ? 'var(--warn)' : '#1d2129');
+    el.textContent = msg;
+    box.appendChild(el);
+    setTimeout(() => el.remove(), 3000);
+  }
+  function emptyRow(cols, text='暂无记录') { return `<tr><td colspan="${cols}" class="empty-state">${escapeHtml(text)}</td></tr>`; }
+  function delBtn(collection, id) { return `<button onclick="appDelete('${collection}','${id}')">删除</button>`; }
+  function bandPill(text, cls) { return `<span class="pill ${cls}">${escapeHtml(text)}</span>`; }
+
+  function miosBand(total) {
+    if (total >= 43) return {text:'初步重度范围', cls:'danger'};
+    if (total >= 29) return {text:'初步中度范围', cls:'warn'};
+    if (total >= 14) return {text:'初步轻度范围', cls:'warn'};
+    return {text:'低于初步轻度范围', cls:'ok'};
+  }
+  function midsBand(total) {
+    return total >= 27 ? {text:'达到研究筛查点', cls:'danger'} : {text:'低于研究筛查点', cls:'ok'};
+  }
+  function combinedStatus(record) {
+    if (!record.exposureEndorsed && !(record.types || []).includes('受害或背叛')) return {text:'未报告相关暴露', cls:'ok'};
+    if (record.midsTotal >= 27 && record.miosTotal >= 43) return {text:'高负担信号', cls:'danger'};
+    if (record.midsTotal >= 27 && record.miosTotal >= 29) return {text:'双量表显著信号', cls:'danger'};
+    if (record.midsTotal >= 27 || record.miosTotal >= 29 || record.miosTotal >= 37) return {text:'建议专业评估', cls:'warn'};
+    if (record.miosTotal >= 14 || record.combinedIndex >= 25) return {text:'轻度或升高信号', cls:'warn'};
+    return {text:'当前负担较低', cls:'ok'};
+  }
+
+  // --- 导航与通用绑定 ---
+  function showView(viewId) {
+    document.querySelectorAll('.navbtn').forEach(b => b.classList.toggle('active', b.dataset.go === viewId));
+    document.querySelectorAll('section.view').forEach(v => v.classList.toggle('active', v.dataset.view === viewId));
+    if (viewId === 'dashboard') renderDashboard();
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+
+  function initApp() {
+    const nav = $('nav');
+    nav.innerHTML = views.map(v => `<button class="navbtn ${v.id === 'dashboard' ? 'active' : ''}" data-go="${v.id}">${v.icon} ${v.name}</button>`).join('');
+    nav.addEventListener('click', e => {
+      const btn = e.target.closest('[data-go]');
+      if (btn) showView(btn.dataset.go);
+    });
+
+    document.querySelectorAll('[data-bind]').forEach(el => {
+      const [group, key] = el.dataset.bind.split('.');
+      if (!state[group]) state[group] = {};
+      el.value = state[group][key] ?? '';
+      el.addEventListener('input', () => { state[group][key] = el.value; save(); });
+    });
+
+    $('practiceDate').value = today();
+    ['respSelf','respOthers','respOrg','respChance'].forEach(id => {
+      const el = $(id), outEl = $(`${id}Out`);
+      const sync = () => { outEl.textContent = `${el.value}%`; };
+      el.addEventListener('input', sync); sync();
+    });
+  }
+
+  // --- PCL-5 ---
+  let pclAnswers = [];
+  let pclCurrentIndex = 0;
+  $('startPclBtn').addEventListener('click', () => {
+    pclAnswers = new Array(20).fill(null);
+    pclCurrentIndex = 0;
+    $('pclTestPanel').style.display = 'block';
+    renderPclQuestion();
+  });
+
+  function renderPclQuestion() {
+    if (pclCurrentIndex >= 20) {
+      $('pclQuestionText').textContent = '测试完成，请点击下方按钮保存。';
+      document.querySelector('.pcl-options').style.display = 'none';
+      $('pclSaveBtn').style.display = 'block';
+      $('pclPrevBtn').style.display = 'block';
+      $('pclProgress').style.width = '100%';
+      $('pclCounter').textContent = '已完成';
+      return;
+    }
+    document.querySelector('.pcl-options').style.display = 'grid';
+    $('pclSaveBtn').style.display = 'none';
+    $('pclPrevBtn').style.display = pclCurrentIndex === 0 ? 'none' : 'block';
+    $('pclQuestionText').textContent = pclQuestions[pclCurrentIndex];
+    $('pclCounter').textContent = `题目 ${pclCurrentIndex + 1} / 20`;
+    $('pclProgress').style.width = `${(pclCurrentIndex / 20) * 100}%`;
+    document.querySelectorAll('.pcl-option').forEach(el => {
+      el.classList.toggle('selected', pclAnswers[pclCurrentIndex] === Number(el.dataset.val));
+    });
+  }
+
+  document.querySelectorAll('.pcl-option').forEach(btn => {
+    btn.addEventListener('click', () => {
+      pclAnswers[pclCurrentIndex] = Number(btn.dataset.val);
+      setTimeout(() => { pclCurrentIndex++; renderPclQuestion(); }, 180);
+    });
+  });
+  $('pclPrevBtn').addEventListener('click', () => { if (pclCurrentIndex > 0) { pclCurrentIndex--; renderPclQuestion(); } });
+  $('pclSaveBtn').addEventListener('click', () => {
+    if (pclAnswers.some(x => x === null)) return toast('仍有未回答的题目', 'warn');
+    const total = sum(pclAnswers);
+    state.pcl.push({id:uid(), date:today(), scores:pclAnswers.slice(), total});
+    save(); renderAll(); $('pclTestPanel').style.display = 'none'; toast('PCL-5 评分已保存');
+  });
+
+  // --- MIOS + MIDS 联合评估 ---
+  let moralDraft = null;
+  let moralSteps = [];
+  let moralCurrentIndex = 0;
+
+  function buildMoralSteps() {
+    const steps = [];
+    moralExposureItems.forEach((text, index) => steps.push({group:'MIDS 暴露与困扰', scale:'exposure', index, text, max:4, labels:['完全没有','有一点','中等程度','相当多','极其明显']}));
+    miosItems.forEach((text, index) => steps.push({group:'MIOS 道德损伤结果', scale:'mios', index, text, max:4, labels:['完全不同意','不同意','不确定','同意','完全同意']}));
+    midsItems.forEach((text, index) => steps.push({group:'MIDS 过去一个月反应', scale:'mids', index, text, max:4, labels:['完全不符合','有一点符合','中等程度','相当符合','极其符合']}));
+    functionItems.forEach((text, index) => steps.push({group:'功能影响', scale:'function', index, text:`这段经历使以下领域的功能变得困难：${text}`, max:6, labels:['完全没有','1','2','3 - 中等','4','5','6 - 极其严重'], allowNA:true}));
+    return steps;
+  }
+
+  function newMoralDraft() {
+    return {
+      id:uid(), date:today(), eventLabel:val('moralEventLabel'), types:selectedValues('moralTypeChecks'), currentDistress:clamp(numberValue('moralCurrentDistress', 5),0,10),
+      exposure:new Array(moralExposureItems.length).fill(null),
+      mios:new Array(miosItems.length).fill(null),
+      mids:new Array(midsItems.length).fill(null),
+      function:new Array(functionItems.length).fill(null)
+    };
+  }
+
+  $('startMoralAssessmentBtn').addEventListener('click', () => {
+    const types = selectedValues('moralTypeChecks');
+    if (types.length === 0) return toast('请至少选择一种经历类型', 'warn');
+    const distress = clamp(numberValue('moralCurrentDistress',5),0,10);
+    if (distress >= 9 && !confirm('当前困扰很高。建议先使用安全计划或在专业支持下评估。仍要继续吗？')) return;
+    moralDraft = newMoralDraft();
+    moralSteps = buildMoralSteps();
+    moralCurrentIndex = 0;
+    $('moralAssessmentPanel').classList.remove('hidden');
+    $('moralResultCard').classList.add('hidden');
+    renderMoralQuestion();
+    $('moralAssessmentPanel').scrollIntoView({behavior:'smooth', block:'start'});
+  });
+
+  function currentMoralAnswer(step) { return moralDraft[step.scale][step.index]; }
+  function setCurrentMoralAnswer(step, value) { moralDraft[step.scale][step.index] = value; }
+
+  function renderMoralQuestion() {
+    if (moralCurrentIndex >= moralSteps.length) {
+      $('moralGroupLabel').textContent = '全部项目已完成';
+      $('moralCounter').textContent = `${moralSteps.length} / ${moralSteps.length}`;
+      $('moralQuestionText').textContent = '请检查后保存结果。';
+      $('moralOptions').innerHTML = '';
+      $('moralProgress').style.width = '100%';
+      $('moralSaveBtn').classList.remove('hidden');
+      $('moralPrevBtn').style.visibility = 'visible';
+      return;
+    }
+    const step = moralSteps[moralCurrentIndex];
+    $('moralGroupLabel').textContent = step.group;
+    $('moralCounter').textContent = `题目 ${moralCurrentIndex + 1} / ${moralSteps.length}`;
+    $('moralQuestionText').textContent = step.text;
+    $('moralProgress').style.width = `${(moralCurrentIndex / moralSteps.length) * 100}%`;
+    $('moralSaveBtn').classList.add('hidden');
+    $('moralPrevBtn').style.visibility = moralCurrentIndex === 0 ? 'hidden' : 'visible';
+    const selected = currentMoralAnswer(step);
+    const opts = step.labels.map((label, value) => `<button type="button" class="assessment-option ${selected === value ? 'selected' : ''}" data-moral-value="${value}">${value} - ${escapeHtml(label)}</button>`);
+    if (step.allowNA) opts.push(`<button type="button" class="assessment-option ${selected === 'NA' ? 'selected' : ''}" data-moral-value="NA">不适用</button>`);
+    $('moralOptions').innerHTML = opts.join('');
+  }
+
+  $('moralOptions').addEventListener('click', e => {
+    const btn = e.target.closest('[data-moral-value]');
+    if (!btn || !moralDraft) return;
+    const step = moralSteps[moralCurrentIndex];
+    const raw = btn.dataset.moralValue;
+    setCurrentMoralAnswer(step, raw === 'NA' ? 'NA' : Number(raw));
+    setTimeout(() => { moralCurrentIndex++; renderMoralQuestion(); }, 150);
+  });
+  $('moralPrevBtn').addEventListener('click', () => { if (moralCurrentIndex > 0) { moralCurrentIndex--; renderMoralQuestion(); } });
+  $('moralSaveBtn').addEventListener('click', () => {
+    if (!moralDraft) return;
+    const required = [...moralDraft.exposure, ...moralDraft.mios, ...moralDraft.mids];
+    if (required.some(x => x === null)) return toast('仍有未回答的核心题目', 'warn');
+    const exposureEndorsed = moralDraft.exposure.some(x => Number(x) > 0);
+    const miosTotal = sum(moralDraft.mios);
+    const shameItems = [0,2,6,7,11,12,13];
+    const trustItems = [1,3,4,5,8,9,10];
+    const miosShame = sum(shameItems.map(i => moralDraft.mios[i]));
+    const miosTrust = sum(trustItems.map(i => moralDraft.mios[i]));
+    const midsRawTotal = sum(moralDraft.mids);
+    const midsTotal = exposureEndorsed ? midsRawTotal : 0;
+    const applicableFunction = moralDraft.function.filter(x => x !== null && x !== 'NA');
+    const functionIndex = applicableFunction.length ? Math.round((sum(applicableFunction) / (applicableFunction.length * 6)) * 100) : null;
+    const combinedIndex = Math.round((((miosTotal / 56) + (midsTotal / 72)) / 2) * 100);
+    const record = {...moralDraft, exposureEndorsed, miosTotal, miosShame, miosTrust, midsRawTotal, midsTotal, functionIndex, combinedIndex};
+    record.status = combinedStatus(record).text;
+    state.moralAssessments.push(record);
+    save();
+    showMoralResult(record);
+    renderAll();
+    $('moralAssessmentPanel').classList.add('hidden');
+    toast('道德损伤联合评估已保存');
+  });
+
+  function showMoralResult(r) {
+    const mb = miosBand(r.miosTotal), db = midsBand(r.midsTotal), cb = combinedStatus(r);
+    const functionText = r.functionIndex === null ? '未填写' : `${r.functionIndex}/100`;
+    $('moralResultSummary').innerHTML = `
+      <div class="score-summary">
+        <div class="score-box"><span>MIOS 总分</span><strong>${r.miosTotal}/56</strong><small>${bandPill(mb.text, mb.cls)}</small></div>
+        <div class="score-box"><span>羞耻相关分量表</span><strong>${r.miosShame}/28</strong><small>身份、自我价值和坦诚信念</small></div>
+        <div class="score-box"><span>信任违背分量表</span><strong>${r.miosTrust}/28</strong><small>人性、信任、愤怒和精神信念</small></div>
+        <div class="score-box"><span>MIDS 总分</span><strong>${r.midsTotal}/72</strong><small>${bandPill(db.text, db.cls)}</small></div>
+        <div class="score-box"><span>功能影响</span><strong>${functionText}</strong><small>仅对适用项目计算</small></div>
+        <div class="score-box"><span>联合趋势指数</span><strong>${r.combinedIndex}/100</strong><small>${bandPill(cb.text, cb.cls)}</small></div>
+      </div>
+      <div class="notice warn"><strong>解释：</strong>联合状态是应用内规则，不是经验证的临床分类。若 MIDS ≥27、MIOS 达中重度范围、功能受损明显，或存在自伤、自我惩罚和物质使用问题，应安排专业评估。</div>`;
+    $('moralResultCard').classList.remove('hidden');
+    $('moralResultCard').scrollIntoView({behavior:'smooth', block:'start'});
+  }
+
+  // --- 道德修复练习 ---
+  function collectPractice() {
+    return {
+      id:uid(), date:val('practiceDate') || today(), createdAt:nowStamp(),
+      distressBefore:clamp(numberValue('practiceDistressBefore',0),0,10),
+      distressAfter:val('practiceDistressAfter') === '' ? null : clamp(numberValue('practiceDistressAfter',0),0,10),
+      safety:val('practiceSafety'),
+      facts:val('practiceFacts'), feelings:val('practiceFeelings'), thoughts:val('practiceThoughts'),
+      knowledge:val('practiceKnowledge'), time:val('practiceTime'), power:val('practicePower'), options:val('practiceOptions'), state:val('practiceState'), constraints:val('practiceConstraints'), intent:val('practiceIntent'), foreseeable:val('practiceForeseeable'),
+      responsibility:{
+        self:{percent:clampPercent(numberValue('respSelf',0)), why:val('respSelfWhy')},
+        others:{percent:clampPercent(numberValue('respOthers',0)), why:val('respOthersWhy')},
+        organization:{percent:clampPercent(numberValue('respOrg',0)), why:val('respOrgWhy')},
+        chance:{percent:clampPercent(numberValue('respChance',0)), why:val('respChanceWhy')}
+      },
+      balanced:val('practiceBalanced'),
+      act:{trigger:val('actTrigger'), pain:val('actPain'), avoidance:val('actAvoidance'), shortRelief:val('actShortRelief'), longCost:val('actLongCost'), defusion:val('actDefusion'), willingness:val('actWillingness'), selfContext:val('actSelfContext'), chosenValues:val('actChosenValues'), committedAction:val('actCommittedAction'), support:val('actSupport'), whenWhere:val('actWhenWhere')},
+      values:val('practiceValues'), repairActions:selectedValues('repairChecks'), repairNotes:val('repairNotes')
+    };
+  }
+
+  function clearPracticeForm() {
+    const textIds = ['practiceDistressBefore','practiceDistressAfter','practiceFacts','practiceFeelings','practiceThoughts','practiceKnowledge','practiceTime','practicePower','practiceOptions','practiceState','practiceConstraints','practiceIntent','practiceForeseeable','respSelfWhy','respOthersWhy','respOrgWhy','respChanceWhy','practiceBalanced','actTrigger','actPain','actAvoidance','actShortRelief','actLongCost','actDefusion','actWillingness','actSelfContext','practiceValues','actChosenValues','actCommittedAction','actSupport','actWhenWhere','repairNotes'];
+    textIds.forEach(id => { if ($(id)) $(id).value = ''; });
+    document.querySelectorAll('#repairChecks input').forEach(x => x.checked = false);
+    $('practiceSafety').value = 'safe'; $('practiceDate').value = today();
+    [['respSelf',50],['respOthers',0],['respOrg',0],['respChance',0]].forEach(([id,v]) => { $(id).value = v; $(`${id}Out`).textContent = `${v}%`; });
+  }
+
+  $('saveMoralPracticeBtn').addEventListener('click', () => {
+    const safety = val('practiceSafety');
+    if (safety === 'unsafe') {
+      toast('请停止练习并立即使用安全计划或联系急救资源', 'danger');
+      showView('safety');
+      return;
+    }
+    if (safety === 'concern' && !confirm('你报告了安全方面的担忧。建议先联系支持者或专业人员。仍要保存当前记录吗？')) return;
+    const record = collectPractice();
+    if (!record.facts && !record.act.trigger && !record.balanced) return toast('请至少填写事实、触发情境或平衡责任陈述', 'warn');
+    state.moralPractices.push(record);
+    save(); renderAll(); clearPracticeForm(); toast('道德修复练习已保存');
+  });
+
+  // --- 卡点与 ABC ---
+  function normalizeThought(s) { return String(s || '').replace(/\s+/g,'').toLowerCase(); }
+  function isRelatedThought(a,b) { const x=normalizeThought(a), y=normalizeThought(b); return !!x && !!y && (x===y || x.includes(y) || y.includes(x)); }
+  function statusClass(status) { if (status === '已形成替代想法') return 'ok'; if (status === '探索中') return 'warn'; return 'danger'; }
+  function beliefTag(percent) { const p=clampPercent(percent); return p>=70?'danger':(p>=35?'warn':'ok'); }
+  function getStuckLogs(sp) { return Array.isArray(sp.logs) ? sp.logs : []; }
+  function makeCreateLog(sp) { return {id:uid(), date:sp.createdAt || sp.date || nowStamp(), type:'create', label:'创建卡点', pill:'danger', text:`主题：${sp.theme || '未分类'}；初始相信度：${clampPercent(sp.initialBelief ?? sp.belief)}%；情绪：${sp.emotion || '未填写'}`, percent:clampPercent(sp.initialBelief ?? sp.belief)}; }
+  function syncStuckStatus(stuckId) { const sp=state.stuckPoints.find(x=>x.id===stuckId); if(!sp)return; const logs=getStuckLogs(sp); sp.status=logs.some(x=>x.type==='alt')?'已形成替代想法':(logs.some(x=>x.type==='explore')?'探索中':'待处理'); }
+  function syncAllStuckStatus() { state.stuckPoints.forEach(sp => { if (!Array.isArray(sp.logs)) sp.logs=[]; if (!sp.logs.some(l=>l.type==='create')) sp.logs.push(makeCreateLog(sp)); syncStuckStatus(sp.id); }); }
+  function logTimeValue(date) { const t=Date.parse(date); return Number.isFinite(t)?t:0; }
+  function sortNewestFirst(a,b) { return logTimeValue(b.date)-logTimeValue(a.date) || String(b.date||'').localeCompare(String(a.date||'')); }
+  function buildStuckLogs(sp) {
+    const logs=getStuckLogs(sp).slice();
+    state.abc.filter(x=>isRelatedThought(x.B,sp.text)).forEach(x=>{
+      const label=x.verdict||'ABC 提及'; const type=x.verdict==='想法证伪'?'disproved':(x.verdict==='想法证实'?'confirmed':'explore'); const pill=x.verdict==='想法证伪'?'ok':(x.verdict==='想法证实'?'danger':'warn');
+      logs.push({date:x.verdictDate||x.date||'', type, label, pill, text:`A：${x.A||''}\nB：${x.B||''}\nC：${x.C||''}`, percent:x.verdict==='想法证伪'?0:(x.verdict==='想法证实'?100:clampPercent(sp.belief))});
+    });
+    return logs.sort(sortNewestFirst);
+  }
+  function renderStuckCard(sp) {
+    const logs=buildStuckLogs(sp), p=clampPercent(sp.belief);
+    const logHtml=logs.map(l=>`<div class="log-item"><div class="log-rail"><span class="log-dot ${l.type}"></span></div><div class="log-body"><div class="log-top"><span class="pill ${l.pill}">${escapeHtml(l.label)}</span><span class="log-date">${escapeHtml(l.date)}</span><span class="pill ${beliefTag(l.percent)}">${clampPercent(l.percent)}%</span></div><div class="log-text">${escapeHtml(l.text)}</div></div></div>`).join('');
+    const ownLogs=getStuckLogs(sp), exCount=ownLogs.filter(x=>x.type==='explore').length, atCount=ownLogs.filter(x=>x.type==='alt').length, abcCount=state.abc.filter(x=>isRelatedThought(x.B,sp.text)).length;
+    return `<div class="stuck-card"><div class="stuck-head"><div><div class="stuck-title">${escapeHtml(sp.text)}</div><div class="stuck-meta"><span class="pill ${statusClass(sp.status)}">${escapeHtml(sp.status)}</span><span>${escapeHtml(sp.theme||'未分类')}</span><span>情绪：${escapeHtml(sp.emotion||'未填写')}</span><span class="belief-meter"><span style="width:${p}%"></span></span><strong>${p}%</strong><span>log：探索 ${exCount} · 替代 ${atCount} · ABC ${abcCount}</span></div></div><div class="action-row"><button class="mini warn" onclick="appNewExplore('${sp.id}')">新探索</button><button class="mini ok" onclick="appNewAlternative('${sp.id}')">新想法</button>${delBtn('stuckPoints',sp.id)}</div></div><div class="log-timeline">${logHtml}</div></div>`;
+  }
+
+  $('addStuckBtn').addEventListener('click', () => {
+    if (!val('spText')) return toast('请填写卡点想法','warn');
+    const belief=clampPercent(numberValue('spBelief',0));
+    const sp={id:uid(),createdAt:nowStamp(),text:val('spText'),theme:val('spTheme'),belief,initialBelief:belief,emotion:val('spEmotion'),status:'待处理',logs:[]};
+    sp.logs.push(makeCreateLog(sp)); state.stuckPoints.push(sp);
+    ['spText','spBelief','spEmotion'].forEach(id=>$(id).value=''); save(); renderAll(); toast('卡点已添加');
+  });
+  $('saveAbcBtn').addEventListener('click', () => {
+    if (!val('abcA') || !val('abcB')) return toast('请至少填写 A 和 B','warn');
+    state.abc.push({id:uid(),date:today(),A:val('abcA'),B:val('abcB'),C:val('abcC')});
+    ['abcA','abcB','abcC'].forEach(id=>$(id).value=''); save(); renderAll(); toast('ABC 已保存');
+  });
+
+  window.appNewExplore = function(stuckId) {
+    const sp=state.stuckPoints.find(x=>x.id===stuckId); if(!sp)return toast('找不到卡点','danger');
+    const answers=eqPrompts.map(q=>(prompt(`针对卡点：${sp.text}\n\n${q}`)||'').trim());
+    if(!answers.some(Boolean))return toast('未填写探索内容','warn');
+    const text=answers.map((a,i)=>a?`${i+1}. ${eqPrompts[i]}：${a}`:'').filter(Boolean).join('\n');
+    getStuckLogs(sp).push({id:uid(),date:nowStamp(),type:'explore',label:'探索记录',pill:'warn',text,percent:clampPercent(sp.belief)}); syncStuckStatus(stuckId); save(); renderAll(); toast('已添加新探索');
+  };
+  window.appNewAlternative = function(stuckId) {
+    const sp=state.stuckPoints.find(x=>x.id===stuckId); if(!sp)return toast('找不到卡点','danger');
+    const newThought=(prompt(`针对卡点：${sp.text}\n\n请输入一个更完整、平衡的新想法：`)||'').trim(); if(!newThought)return toast('请填写新想法','warn');
+    const old=clampPercent(sp.belief), re=clampPercent(prompt('现在对旧想法的相信程度（0–100）',old)), nb=clampPercent(prompt('对新想法的相信程度（0–100）',50));
+    sp.belief=re; getStuckLogs(sp).push({id:uid(),date:nowStamp(),type:'alt',label:'替代想法',pill:'ok',text:`新想法：${newThought}\n旧想法相信度：${old}% → ${re}%；新想法相信度：${nb}%`,percent:re}); syncStuckStatus(stuckId); save(); renderAll(); toast('已添加新想法');
+  };
+  window.appSetAbcVerdict = function(id, verdict) { const r=state.abc.find(x=>x.id===id); if(!r)return; r.verdict=verdict; r.verdictDate=today(); save(); renderAll(); toast(`已标记为“${verdict}”`); };
+  window.appDelete = function(collection,id) { if(!confirm('确定删除这条记录吗？'))return; if(!Array.isArray(state[collection]))return; state[collection]=state[collection].filter(x=>x.id!==id); syncAllStuckStatus(); save(); renderAll(); toast('已删除'); };
+
+  // --- 表格渲染 ---
+  function renderTables() {
+    const pclRows=state.pcl.length?state.pcl.slice().reverse().map(r=>`<tr><td>${escapeHtml(r.date)}</td><td><strong>${r.total}</strong></td><td>${r.total>=31?bandPill('症状显著','danger'):(r.total<20?bandPill('低于20','ok'):bandPill('中等','warn'))}</td><td>${delBtn('pcl',r.id)}</td></tr>`).join(''):emptyRow(4);
+    $('pclTable').innerHTML=`<tr><th>日期</th><th>总分</th><th>提示</th><th>操作</th></tr>${pclRows}`;
+
+    const moralRows=state.moralAssessments.length?state.moralAssessments.slice().reverse().map(r=>{
+      const mb=miosBand(r.miosTotal), db=midsBand(r.midsTotal), cb=combinedStatus(r);
+      const detail=`<details class="record-detail"><summary>查看分量表与说明</summary><div class="detail-box"><strong>事件：</strong>${escapeHtml(r.eventLabel||'未命名')}<br><strong>类型：</strong>${escapeHtml((r.types||[]).join('、')||'未填')}<br><strong>MIOS：</strong>羞耻 ${r.miosShame}/28；信任违背 ${r.miosTrust}/28；${escapeHtml(mb.text)}<br><strong>MIDS：</strong>${r.midsTotal}/72；${escapeHtml(db.text)}${r.exposureEndorsed?'':'；MIDS 暴露项目均为 0，依规则症状计 0'}<br><strong>功能影响：</strong>${r.functionIndex===null?'未填写':r.functionIndex+'/100'}<br><strong>当前困扰：</strong>${r.currentDistress}/10<br><strong>联合说明：</strong>非验证趋势指标。</div></details>`;
+      return `<tr><td>${escapeHtml(r.date)}</td><td><strong>${r.miosTotal}</strong><div>${bandPill(mb.text,mb.cls)}</div></td><td><strong>${r.midsTotal}</strong><div>${bandPill(db.text,db.cls)}</div></td><td><strong>${r.combinedIndex}</strong><div>${bandPill(cb.text,cb.cls)}</div></td><td>${r.functionIndex===null?'-':r.functionIndex}</td><td>${detail}</td><td>${delBtn('moralAssessments',r.id)}</td></tr>`;
+    }).join(''):emptyRow(7);
+    $('moralAssessmentTable').innerHTML=`<tr><th>日期</th><th>MIOS /56</th><th>MIDS /72</th><th>联合 /100</th><th>功能 /100</th><th>详情</th><th>操作</th></tr>${moralRows}`;
+
+    syncAllStuckStatus();
+    $('stuckLogList').innerHTML=state.stuckPoints.length?state.stuckPoints.slice().sort((a,b)=>logTimeValue(b.createdAt||b.date)-logTimeValue(a.createdAt||a.date)).map(renderStuckCard).join(''):'<div class="empty-state">暂无记录</div>';
+
+    const abcRows=state.abc.length?state.abc.slice().reverse().map(r=>{
+      const verdict=r.verdict?`${bandPill(r.verdict,r.verdict==='想法证伪'?'ok':'danger')}<div class="help">${escapeHtml(r.verdictDate||'')}</div>`:bandPill('未判断','warn');
+      const actions=`<div class="action-row"><button class="mini danger" onclick="appSetAbcVerdict('${r.id}','想法证实')">想法证实</button><button class="mini ok" onclick="appSetAbcVerdict('${r.id}','想法证伪')">想法证伪</button>${delBtn('abc',r.id)}</div>`;
+      return `<tr><td>${escapeHtml(r.date)}</td><td>${escapeHtml(r.A)}</td><td>${escapeHtml(r.B)}</td><td>${escapeHtml(r.C)}</td><td>${verdict}</td><td>${actions}</td></tr>`;
+    }).join(''):emptyRow(6);
+    $('abcTable').innerHTML=`<tr><th>日期</th><th>A 事实</th><th>B 想法</th><th>C 情绪</th><th>判断</th><th>操作</th></tr>${abcRows}`;
+
+    const practiceRows=state.moralPractices.length?state.moralPractices.slice().reverse().map(r=>{
+      const delta=r.distressAfter===null?'未记录':`${r.distressBefore} → ${r.distressAfter}`;
+      const responsibilities=r.responsibility||{};
+      const detail=`<details><summary>查看练习摘要</summary><div class="detail-box"><strong>事实：</strong>${escapeHtml(r.facts||'未填')}<br><strong>感受：</strong>${escapeHtml(r.feelings||'未填')}<br><strong>想法：</strong>${escapeHtml(r.thoughts||'未填')}<br><strong>责任：</strong>自己 ${responsibilities.self?.percent??'-'}%；他人 ${responsibilities.others?.percent??'-'}%；组织 ${responsibilities.organization?.percent??'-'}%；环境/偶然 ${responsibilities.chance?.percent??'-'}%<br><strong>平衡陈述：</strong>${escapeHtml(r.balanced||'未填')}<br><strong>价值：</strong>${escapeHtml(r.values||r.act?.chosenValues||'未填')}<br><strong>承诺行动：</strong>${escapeHtml(r.act?.committedAction||'未填')}<br><strong>修复选项：</strong>${escapeHtml((r.repairActions||[]).join('、')||'未选')}</div></details>`;
+      return `<tr><td>${escapeHtml(r.date)}</td><td>${escapeHtml(truncate(r.facts||r.act?.trigger||r.balanced||'未命名'))}</td><td>${delta}</td><td>${escapeHtml(truncate(r.act?.committedAction||'未填写'))}</td><td>${detail}</td><td>${delBtn('moralPractices',r.id)}</td></tr>`;
+    }).join(''):emptyRow(6);
+    $('moralPracticeTable').innerHTML=`<tr><th>日期</th><th>焦点</th><th>困扰变化</th><th>下一步</th><th>详情</th><th>操作</th></tr>${practiceRows}`;
+  }
+
+  // --- 仪表盘和图表 ---
+  function drawTrend(canvasId, points, maxScore, referenceLines, emptyText, valueKey='value') {
+    const canvas=$(canvasId), ctx=canvas.getContext('2d'), w=canvas.width, h=canvas.height;
+    ctx.clearRect(0,0,w,h);
+    if(!points.length){ ctx.fillStyle='#86909c'; ctx.font='14px sans-serif'; ctx.textAlign='center'; ctx.fillText(emptyText,w/2,h/2); return; }
+    const pad=42; const getY=v=>h-pad-(v/maxScore)*(h-pad*2);
+    ctx.lineWidth=1; ctx.textAlign='left';
+    referenceLines.forEach(line=>{ ctx.strokeStyle=line.color||'#e5e6eb'; ctx.beginPath(); ctx.moveTo(pad,getY(line.value)); ctx.lineTo(w-pad,getY(line.value)); ctx.stroke(); ctx.fillStyle=line.color||'#86909c'; ctx.fillText(line.label||String(line.value),5,getY(line.value)+4); });
+    const step=points.length>1?(w-pad*2)/(points.length-1):0;
+    ctx.strokeStyle='#165dff'; ctx.lineWidth=3; ctx.beginPath();
+    points.forEach((d,i)=>{const x=pad+i*step,y=getY(d[valueKey]); i?ctx.lineTo(x,y):ctx.moveTo(x,y);}); ctx.stroke();
+    points.forEach((d,i)=>{const x=pad+i*step,y=getY(d[valueKey]); ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(x,y,5,0,Math.PI*2); ctx.fill(); ctx.strokeStyle='#165dff'; ctx.stroke(); ctx.fillStyle='#1d2129'; ctx.textAlign='center'; ctx.fillText(d[valueKey],x,y-12);});
+  }
+
+  function renderDashboard() {
+    const latestPcl=state.pcl[state.pcl.length-1], latestMoral=state.moralAssessments[state.moralAssessments.length-1];
+    $('mLatestScore').textContent=latestPcl?latestPcl.total:'-';
+    $('mLatestMios').textContent=latestMoral?latestMoral.miosTotal:'-';
+    $('mLatestMids').textContent=latestMoral?latestMoral.midsTotal:'-';
+    $('mLatestCombined').textContent=latestMoral?latestMoral.combinedIndex:'-';
+    $('mStuckCount').textContent=state.stuckPoints.length;
+    $('mAbcCount').textContent=state.abc.length;
+    $('mPracticeCount').textContent=state.moralPractices.length;
+    $('mAssessmentCount').textContent=state.moralAssessments.length;
+    drawTrend('scoreChart',state.pcl.map(x=>({value:x.total})),80,[{value:20,label:'20分'},{value:31,label:'31分',color:'#f53f3f'},{value:50,label:'50分'}],'暂无 PCL-5 数据');
+    drawTrend('moralChart',state.moralAssessments.map(x=>({value:x.combinedIndex})),100,[{value:25,label:'25'},{value:50,label:'50'},{value:75,label:'75'}],'暂无道德损伤联合评估数据');
+  }
+
+  function renderAll() { renderTables(); renderDashboard(); }
+
+  // --- 导入、导出与清空 ---
+  $('exportBtn').addEventListener('click', () => {
+    save(); const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`CPT_MoralInjury_v${APP_VERSION}_Backup_${today()}.json`; a.click(); URL.revokeObjectURL(a.href); toast('数据已导出');
+  });
+  $('importFile').addEventListener('change', e => {
+    const file=e.target.files[0]; if(!file)return; const reader=new FileReader();
+    reader.onload=()=>{
+      try {
+        const imported=JSON.parse(reader.result);
+        if(!isLatestState(imported)) throw new Error('unsupported-version');
+        if(!confirm('导入将覆盖当前全部数据，确定继续？')) return;
+        state=imported;
+        save();
+        location.reload();
+      } catch(err) {
+        toast(err && err.message === 'unsupported-version' ? `仅支持 v${APP_VERSION} 最新版备份` : '文件格式错误','danger');
+      }
+    };
+    reader.readAsText(file);
+  });
+  $('resetBtn').addEventListener('click', () => { if(confirm('此操作将永久清空浏览器中的当前版本数据。建议先导出备份。是否继续？')){ localStorage.removeItem(KEY); location.reload(); } });
+
+  // --- 启动 ---
+  syncAllStuckStatus();
+  save();
+  initApp();
+  renderAll();
+})();
+</script>
+</body>
+</html>
