@@ -1,0 +1,1042 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>房地产投资分析计算器</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        /* 拟合数学公式公式代码块 */
+        .formula-box {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        }
+        .analysis-table th, .analysis-table td { white-space: nowrap; }
+        .analysis-table th { position: sticky; top: 0; z-index: 2; }
+        .matrix-table th, .matrix-table td { min-width: 92px; text-align: center; }
+        .matrix-table th:first-child { position: sticky; left: 0; z-index: 3; }
+        .matrix-table td:first-child { position: sticky; left: 0; z-index: 1; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans pb-12">
+
+    <!-- Header -->
+    <header class="bg-slate-900 text-white py-6 px-4 shadow-md mb-8 border-b border-slate-800">
+        <div class="max-w-7xl mx-auto">
+            <h1 class="text-2xl md:text-3xl font-bold tracking-tight">房地产投资分析计算器</h1>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-12 gap-8">
+
+        <!-- 左侧：输入参数区 (5 cols) -->
+        <div class="lg:col-span-5 space-y-6">
+
+            <!-- 1. 市场当前价格 -->
+            <div class="bg-amber-50/80 p-5 rounded-xl shadow-sm border border-amber-200">
+                <h2 class="text-base font-bold text-amber-900 mb-3 flex justify-between items-center">
+                    <span>1. 市场当前房产价格</span>
+                    <span class="text-xs bg-amber-200 text-amber-800 px-2 py-0.5 rounded font-normal">实际交易/买入价</span>
+                </h2>
+                
+                <div class="space-y-3 text-sm">
+                    <div>
+                        <label class="block font-medium text-amber-900">当前房屋单价 (元/平米)</label>
+                        <div class="mt-1 flex gap-2">
+                            <input type="number" id="inputMarketPrice" value="8000" min="1" step="500" class="w-full p-2 border border-amber-300 rounded-md focus:ring-2 focus:ring-amber-500 outline-none font-bold text-amber-900 text-base">
+                            <button onclick="syncTheoreticalPrice()" class="whitespace-nowrap px-3 py-1.5 bg-amber-200 hover:bg-amber-300 text-amber-900 text-xs rounded border border-amber-300 font-medium transition">
+                                套用理论估值
+                            </button>
+                        </div>
+                    </div>
+                    <div class="text-xs text-amber-800/80 flex justify-between pt-1">
+                        <span>当前评估总价: <strong id="textMarketTotalPrice" class="text-amber-900">300.00</strong> 万元</span>
+                        <span>暗含 Cap Rate: <strong id="textImpliedCapRate" class="text-amber-900">0.00%</strong></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. 资产端与租金参数 -->
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+                <h2 class="text-base font-bold text-slate-900 mb-4 pb-2 border-b flex justify-between items-center">
+                    <span>2. 基础租金与现金流参数</span>
+                    <span class="text-xs bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded font-normal">NOI 算子</span>
+                </h2>
+                
+                <div class="grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                        <label class="block font-medium text-slate-700">基础月租金 R (元/平米)</label>
+                        <input type="number" id="inputR" value="20" min="0" step="0.5" class="mt-1 w-full p-2 border rounded-md focus:ring-2 focus:ring-indigo-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block font-medium text-slate-700">房屋面积 (平米)</label>
+                        <input type="number" id="inputArea" value="100" min="0.1" step="1" class="mt-1 w-full p-2 border rounded-md focus:ring-2 focus:ring-indigo-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block font-medium text-slate-700">空置率 V (%)</label>
+                        <input type="number" id="inputV" value="5" min="0" max="99.9" step="0.1" class="mt-1 w-full p-2 border rounded-md focus:ring-2 focus:ring-indigo-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block font-medium text-slate-700">运营成本率 M (%)</label>
+                        <input type="number" id="inputM" value="5" min="0" max="99.9" step="0.1" class="mt-1 w-full p-2 border rounded-md focus:ring-2 focus:ring-indigo-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block font-medium text-slate-700">城市标度律系数 k</label>
+                        <input type="number" id="inputK" value="1.25" step="0.05" class="mt-1 w-full p-2 border rounded-md focus:ring-2 focus:ring-indigo-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block font-medium text-slate-700">预期人口增长率 (%)</label>
+                        <input type="number" id="inputPopGrowth" value="0.8" step="0.1" class="mt-1 w-full p-2 border rounded-md focus:ring-2 focus:ring-indigo-500 outline-none">
+                    </div>
+                </div>
+                <div class="mt-3 bg-slate-50 p-2.5 rounded border text-xs text-slate-600">
+                    租金年增长率 g = k × 人口增长率 = <span id="textG" class="font-bold text-indigo-600 text-sm">1.00%</span>
+                </div>
+            </div>
+
+            <!-- 3. 定价模型与融资参数 -->
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+                <h2 class="text-base font-bold text-slate-900 mb-4 pb-2 border-b flex justify-between items-center">
+                    <span>3. 理论定价、DCF 与房贷融资参数</span>
+                    <span class="text-xs bg-slate-100 text-slate-700 px-2 py-0.5 rounded font-normal">折现率/贷款</span>
+                </h2>
+                
+                <div class="grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                        <label class="block font-medium text-slate-700">无风险利率 r_f (%)</label>
+                        <input type="number" id="inputRf" value="2.2" min="-5" max="30" step="0.05" class="mt-1 w-full p-2 border rounded-md focus:ring-2 focus:ring-indigo-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block font-medium text-slate-700">资产风险溢价 RP (%)</label>
+                        <input type="number" id="inputL" value="2.5" min="0" max="30" step="0.1" class="mt-1 w-full p-2 border rounded-md focus:ring-2 focus:ring-indigo-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block font-medium text-slate-700">5年期以上 LPR (%)</label>
+                        <input type="number" id="inputLPR" value="3.50" min="0" max="30" step="0.05" class="mt-1 w-full p-2 border rounded-md focus:ring-2 focus:ring-indigo-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block font-medium text-slate-700">LPR 加点/减点 (BP)</label>
+                        <input type="number" id="inputBP" value="0" step="5" class="mt-1 w-full p-2 border rounded-md focus:ring-2 focus:ring-indigo-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block font-medium text-slate-700">房产税 T (%)</label>
+                        <input type="number" id="inputT" value="0" min="0" max="20" step="0.1" class="mt-1 w-full p-2 border rounded-md focus:ring-2 focus:ring-indigo-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block font-medium text-slate-700">贷款首付比例 (%)</label>
+                        <input type="number" id="inputDownPayment" value="30" min="0" max="100" step="5" class="mt-1 w-full p-2 border rounded-md focus:ring-2 focus:ring-indigo-500 outline-none">
+                    </div>
+                    <div class="col-span-2">
+                        <label class="block font-medium text-slate-700">房贷期限 (年)</label>
+                        <input type="number" id="inputYears" value="30" min="1" max="50" step="1" class="mt-1 w-full p-2 border rounded-md focus:ring-2 focus:ring-indigo-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block font-medium text-slate-700">目标 DSCR (倍)</label>
+                        <input type="number" id="inputTargetDSCR" value="1.20" min="1" max="5" step="0.05" class="mt-1 w-full p-2 border rounded-md focus:ring-2 focus:ring-indigo-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block font-medium text-slate-700">DCF 持有期 (年)</label>
+                        <input type="number" id="inputHoldingYears" value="10" min="1" max="30" step="1" class="mt-1 w-full p-2 border rounded-md focus:ring-2 focus:ring-indigo-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block font-medium text-slate-700">退出 Cap Rate (%)</label>
+                        <input type="number" id="inputExitCap" value="5.0" min="0.1" max="30" step="0.1" class="mt-1 w-full p-2 border rounded-md focus:ring-2 focus:ring-indigo-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block font-medium text-slate-700">出售成本率 (%)</label>
+                        <input type="number" id="inputSellingCost" value="2.0" min="0" max="20" step="0.1" class="mt-1 w-full p-2 border rounded-md focus:ring-2 focus:ring-indigo-500 outline-none">
+                    </div>
+                    <div class="col-span-2">
+                        <label class="block font-medium text-slate-700">股权 NPV 折现率 / 目标收益率 (%)</label>
+                        <input type="number" id="inputEquityDiscount" value="8.0" min="-50" max="100" step="0.25" class="mt-1 w-full p-2 border rounded-md focus:ring-2 focus:ring-indigo-500 outline-none">
+                        <div class="mt-1 text-[11px] text-slate-400">仅用于股权 NPV，不改变资产端 DCF 要求收益率。</div>
+                    </div>
+                </div>
+
+                <!-- REITs 预设快捷按钮 -->
+                <div class="mt-4 pt-3 border-t">
+                    <label class="block text-xs font-semibold text-slate-500 mb-2">资本化率利差快捷设定 (Cap Rate - r_f):</label>
+                    <div class="grid grid-cols-2 gap-2 text-xs">
+                        <button onclick="setReitSpread(1.5)" class="p-1.5 bg-slate-100 hover:bg-indigo-50 text-slate-700 rounded border text-left">一线核心 (1.5%)</button>
+                        <button onclick="setReitSpread(2.0)" class="p-1.5 bg-slate-100 hover:bg-indigo-50 text-slate-700 rounded border text-left">一线一般 (2.0%)</button>
+                        <button onclick="setReitSpread(2.2)" class="p-1.5 bg-slate-100 hover:bg-indigo-50 text-slate-700 rounded border text-left">二线核心 (2.2%)</button>
+                        <button onclick="setReitSpread(3.0)" class="p-1.5 bg-slate-100 hover:bg-indigo-50 text-slate-700 rounded border text-left">二线一般 (3.0%)</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- 右侧：计算结果展示区 (7 cols) -->
+        <div class="lg:col-span-7 space-y-6">
+
+            <!-- 1. 价格对比看板与公式 -->
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+                <h3 class="text-base font-bold text-slate-900 mb-3 flex justify-between items-center">
+                    <span>价格与溢价率看板</span>
+                    <span class="text-xs font-normal text-slate-400">资产估值 / 融资约束 / 市场价格</span>
+                </h3>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3 mb-4">
+                    <div class="p-3 bg-indigo-50/70 rounded-lg border border-indigo-100">
+                        <span class="text-xs font-semibold text-indigo-900 block">永续增长收益法</span>
+                        <div class="mt-2"><span class="text-xl font-extrabold text-indigo-900" id="resPriceCap">—</span><span class="text-xs text-indigo-700"> 元/㎡</span></div>
+                        <div class="text-xs text-indigo-600/80 mt-1">总价: <span id="resTotalPriceCap">—</span> 万</div>
+                    </div>
+                    <div class="p-3 bg-cyan-50/70 rounded-lg border border-cyan-100">
+                        <span class="text-xs font-semibold text-cyan-900 block">DCF 资产估值</span>
+                        <div class="mt-2"><span class="text-xl font-extrabold text-cyan-900" id="resPriceDCF">—</span><span class="text-xs text-cyan-700"> 元/㎡</span></div>
+                        <div class="text-xs text-cyan-700/80 mt-1">总价: <span id="resTotalPriceDCF">—</span> 万</div>
+                    </div>
+                    <div class="p-3 bg-slate-100/70 rounded-lg border border-slate-200">
+                        <span class="text-xs font-semibold text-slate-700 block">DSCR 融资承受价</span>
+                        <div class="mt-2"><span class="text-xl font-extrabold text-slate-800" id="resPriceDebt">—</span><span class="text-xs text-slate-600"> 元/㎡</span></div>
+                        <div class="text-xs text-slate-500 mt-1">目标 DSCR: <span id="resTargetDSCR">—</span></div>
+                    </div>
+                    <div class="p-3 bg-amber-50 rounded-lg border border-amber-200">
+                        <span class="text-xs font-semibold text-amber-900 block">市场当前价格</span>
+                        <div class="mt-2"><span class="text-xl font-extrabold text-amber-900" id="resPriceMarket">—</span><span class="text-xs text-amber-800"> 元/㎡</span></div>
+                        <div class="text-xs text-amber-800 mt-1 flex justify-between"><span>相对永续估值:</span><span class="font-bold" id="resValuationGap">—</span></div>
+                    </div>
+                </div>
+
+                <div id="warningBox" class="hidden mb-4 rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-xs text-rose-800" role="alert"></div>
+
+                <!-- 估值与价格计算公式展示区 -->
+                <div class="border-t pt-3 space-y-2">
+                    <span class="text-xs font-bold text-slate-700 block">三层模型核心公式:</span>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs formula-box">
+                        <div class="p-2 bg-slate-50 rounded border text-slate-600"><div class="font-bold text-slate-800 mb-0.5">资产端：单位面积 NOI</div><code>NOI = R × 12 × (1 - V) × (1 - M)</code></div>
+                        <div class="p-2 bg-slate-50 rounded border text-slate-600"><div class="font-bold text-slate-800 mb-0.5">资产端：永续增长收益法</div><code>P = NOI / (r_f + RP + T - g)</code></div>
+                        <div class="p-2 bg-slate-50 rounded border text-slate-600"><div class="font-bold text-slate-800 mb-0.5">资产端：DCF</div><code>V = Σ NOI_t/(1+r)^t + TV/(1+r)^N</code></div>
+                        <div class="p-2 bg-slate-50 rounded border text-slate-600"><div class="font-bold text-slate-800 mb-0.5">债务端：DSCR 融资约束</div><code>Max Debt Service = NOI / Target DSCR</code></div>
+                        <div class="p-2 bg-slate-50 rounded border text-slate-600"><div class="font-bold text-slate-800 mb-0.5">债务端：贷款价值比</div><code>LTV = Loan / Property Value</code></div>
+                        <div class="p-2 bg-slate-50 rounded border text-slate-600"><div class="font-bold text-slate-800 mb-0.5">股权端：现金回报</div><code>CoC = Annual Equity Cash Flow / Initial Equity</code></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. 杠杆、偿债与股权回报 -->
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+                <div class="flex justify-between items-center mb-1">
+                    <h3 class="text-base font-bold text-slate-900">杠杆、偿债与股权回报</h3>
+                    <span class="text-xs bg-indigo-100 text-indigo-800 px-2 py-0.5 rounded">主口径：等额本息 CPM，第 1 年</span>
+                </div>
+                <p class="text-xs text-slate-500 mb-4">指标基于当前市场价格、当前租金 NOI 与贷款条件；无负债时，债务类指标显示“无负债”。</p>
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                    <div class="p-3 rounded-lg border bg-slate-50"><div class="text-xs text-slate-500">DSCR</div><div id="resDSCR" class="text-lg font-extrabold text-slate-900 mt-1">—</div><div class="text-[11px] text-slate-400">NOI / 年偿债额</div></div>
+                    <div class="p-3 rounded-lg border bg-slate-50"><div class="text-xs text-slate-500">Debt Yield</div><div id="resDebtYield" class="text-lg font-extrabold text-slate-900 mt-1">—</div><div class="text-[11px] text-slate-400">NOI / 贷款额</div></div>
+                    <div class="p-3 rounded-lg border bg-slate-50"><div class="text-xs text-slate-500">LTV</div><div id="resLTV" class="text-lg font-extrabold text-slate-900 mt-1">—</div><div class="text-[11px] text-slate-400">贷款额 / 物业价值</div></div>
+                    <div class="p-3 rounded-lg border bg-slate-50"><div class="text-xs text-slate-500">Cash-on-Cash</div><div id="resCoC" class="text-lg font-extrabold text-slate-900 mt-1">—</div><div class="text-[11px] text-slate-400">首年股权现金流 / 首付</div></div>
+                    <div class="p-3 rounded-lg border bg-slate-50"><div class="text-xs text-slate-500">Break-even Occupancy</div><div id="resBreakEvenOcc" class="text-lg font-extrabold text-slate-900 mt-1">—</div><div class="text-[11px] text-slate-400">覆盖运营成本与债务</div></div>
+                    <div class="p-3 rounded-lg border bg-slate-50"><div class="text-xs text-slate-500">Interest Coverage</div><div id="resInterestCoverage" class="text-lg font-extrabold text-slate-900 mt-1">—</div><div class="text-[11px] text-slate-400">NOI / 首年利息</div></div>
+                    <div class="p-3 rounded-lg border bg-indigo-50 border-indigo-100"><div class="text-xs text-indigo-700">Levered Equity IRR</div><div id="resEquityIRR" class="text-lg font-extrabold text-indigo-900 mt-1">—</div><div class="text-[11px] text-indigo-500">DCF 持有期，CPM 融资</div></div>
+                    <div class="p-3 rounded-lg border bg-indigo-50 border-indigo-100"><div class="text-xs text-indigo-700">Equity NPV</div><div id="resEquityNPV" class="text-lg font-extrabold text-indigo-900 mt-1">—</div><div class="text-[11px] text-indigo-500">按股权目标收益率折现</div></div>
+                    <div class="p-3 rounded-lg border bg-indigo-50 border-indigo-100"><div class="text-xs text-indigo-700">初始股权</div><div id="resInitialEquity" class="text-lg font-extrabold text-indigo-900 mt-1">—</div><div class="text-[11px] text-indigo-500">当前总价 × 首付比例</div></div>
+                </div>
+                <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-2 text-xs formula-box">
+                    <div class="p-2 bg-slate-50 rounded border text-slate-600"><code>Debt Yield = NOI / Loan</code><br><code>ICR = NOI / Interest</code></div>
+                    <div class="p-2 bg-slate-50 rounded border text-slate-600"><code>Break-even Occupancy = Debt Service / [GPR × (1-M)]</code></div>
+                </div>
+            </div>
+
+            <!-- 3. 久期与利率敏感性 -->
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+                <div class="flex flex-wrap justify-between items-center gap-2 mb-1">
+                    <h3 class="text-base font-bold text-slate-900">久期与利率敏感性</h3>
+                    <span class="text-xs bg-amber-100 text-amber-800 px-2 py-0.5 rounded">Duration：局部一阶敏感性指标</span>
+                </div>
+                <p class="text-xs text-slate-500 mb-4">资产久期沿用基于市场暗含 Cap Rate 的永续资产久期代理；房贷久期基于实际月度还款现金流计算。久期与下方 ±25/50bp 情景矩阵并行保留，前者描述局部敏感度，后者用于离散压力测试。</p>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
+                    <div class="p-3 bg-amber-50/60 rounded-lg border border-amber-200">
+                        <div class="text-xs font-bold text-amber-900 mb-1">当前房产资产（暗含 Cap Rate）</div>
+                        <div class="mt-2 space-y-1 text-xs">
+                            <div class="flex justify-between"><span class="text-slate-500">修正久期 ModD:</span><span class="font-bold text-amber-800 text-sm" id="resModDAsset">—</span></div>
+                            <div class="flex justify-between"><span class="text-slate-500">麦考利久期 MacD:</span><span class="font-medium text-slate-700" id="resMacDAsset">—</span></div>
+                        </div>
+                    </div>
+                    <div class="p-3 bg-purple-50/60 rounded-lg border border-purple-100">
+                        <div class="text-xs font-bold text-purple-900 mb-1">房贷（等额本息 CPM）</div>
+                        <div class="mt-2 space-y-1 text-xs">
+                            <div class="flex justify-between"><span class="text-slate-500">修正久期 ModD:</span><span class="font-bold text-purple-700 text-sm" id="resModDCPM">—</span></div>
+                            <div class="flex justify-between"><span class="text-slate-500">麦考利久期 MacD:</span><span class="font-medium text-slate-700" id="resMacDCPM">—</span></div>
+                        </div>
+                    </div>
+                    <div class="p-3 bg-emerald-50/60 rounded-lg border border-emerald-100">
+                        <div class="text-xs font-bold text-emerald-900 mb-1">房贷（等额本金 CAM）</div>
+                        <div class="mt-2 space-y-1 text-xs">
+                            <div class="flex justify-between"><span class="text-slate-500">修正久期 ModD:</span><span class="font-bold text-emerald-700 text-sm" id="resModDCAM">—</span></div>
+                            <div class="flex justify-between"><span class="text-slate-500">麦考利久期 MacD:</span><span class="font-medium text-slate-700" id="resMacDCAM">—</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="border-t pt-3 grid grid-cols-1 md:grid-cols-2 gap-2 text-xs formula-box">
+                    <div class="p-2 bg-amber-50/50 rounded border border-amber-200/80 text-amber-900">
+                        <div class="font-bold mb-0.5">资产久期代理:</div>
+                        <code>ModD_asset = 1 / Implied Cap Rate</code><br>
+                        <code>MacD_asset = ModD × (1 + Implied Cap Rate)</code>
+                    </div>
+                    <div class="p-2 bg-slate-50 rounded border text-slate-600">
+                        <div class="font-bold text-slate-800 mb-0.5">房贷现金流久期:</div>
+                        <code>MacD = Σ[t × PV(CF_t)] / ΣPV(CF_t)</code><br>
+                        <code>ModD = MacD / (1 + r_monthly)</code>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. 基于当前房价的房贷与现金流 -->
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+                <div class="flex justify-between items-center mb-3 pb-2 border-b">
+                    <h3 class="text-base font-bold text-slate-900">房贷还款与现金流对比</h3>
+                    <span class="text-xs text-slate-500">按当前市场总价 × (1 - 首付比例) 计算贷款</span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm mb-4">
+                    <!-- CPM 明细 -->
+                    <div class="p-3.5 rounded-lg border border-slate-200 bg-slate-50/50 space-y-2">
+                        <div class="font-bold text-purple-900 flex justify-between">
+                            <span>等额本息 (CPM)</span>
+                            <span class="text-xs font-normal text-slate-500">固定月供</span>
+                        </div>
+                        <div class="flex justify-between text-xs">
+                            <span class="text-slate-600">每月房贷还款:</span>
+                            <span class="font-bold text-rose-600" id="resCpmPmt">0 元</span>
+                        </div>
+                        <div class="flex justify-between text-xs">
+                            <span class="text-slate-600">每月净现金流 (NOI - 月供):</span>
+                            <span class="font-bold" id="resCpmNetCash">0 元</span>
+                        </div>
+                        <div class="flex justify-between text-xs pt-1 border-t">
+                            <span class="text-slate-500">总贷款额（按当前市场价）:</span>
+                            <span class="font-medium text-slate-700" id="resRealLoanCpm">0 万元</span>
+                        </div>
+                        <div class="flex justify-between text-xs">
+                            <span class="text-slate-500">累计支付总利息:</span>
+                            <span class="font-medium text-slate-700" id="resCpmInterest">0 万元</span>
+                        </div>
+                    </div>
+
+                    <!-- CAM 明细 -->
+                    <div class="p-3.5 rounded-lg border border-slate-200 bg-slate-50/50 space-y-2">
+                        <div class="font-bold text-emerald-900 flex justify-between">
+                            <span>等额本金 (CAM)</span>
+                            <span class="text-xs font-normal text-slate-500">首月最高 / 逐月递减</span>
+                        </div>
+                        <div class="flex justify-between text-xs">
+                            <span class="text-slate-600">首月还款 / 每月递减:</span>
+                            <span class="font-bold text-rose-600" id="resCamPmt">0 / 0 元</span>
+                        </div>
+                        <div class="flex justify-between text-xs">
+                            <span class="text-slate-600">首月净现金流 (NOI - 月供):</span>
+                            <span class="font-bold" id="resCamNetCash">0 元</span>
+                        </div>
+                        <div class="flex justify-between text-xs pt-1 border-t">
+                            <span class="text-slate-500">总贷款额（按当前市场价）:</span>
+                            <span class="font-medium text-slate-700" id="resRealLoanCam">0 万元</span>
+                        </div>
+                        <div class="flex justify-between text-xs">
+                            <span class="text-slate-500">累计支付总利息:</span>
+                            <span class="font-medium text-slate-700" id="resCamInterest">0 万元</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 房贷与现金流公式展示区 -->
+                <div class="border-t pt-3 space-y-2">
+                    <span class="text-xs font-bold text-slate-700 block">房贷月供与现金流公式:</span>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs formula-box">
+                        <div class="p-2 bg-slate-50 rounded border text-slate-600">
+                            <div class="font-bold text-slate-800 mb-0.5">等额本息 (CPM) 每月还款:</div>
+                            <code>PMT = L × [r_m(1+r_m)^N] / [(1+r_m)^N - 1]</code>
+                        </div>
+                        <div class="p-2 bg-slate-50 rounded border text-slate-600">
+                            <div class="font-bold text-slate-800 mb-0.5">等额本金 (CAM) 第 t 月还款:</div>
+                            <code>PMT_t = (L / N) + [L - (t-1)(L/N)] × r_m</code><br>
+                            <code>每月递减量 = (L / N) × r_m</code>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- 5. 年度现金流明细 -->
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+                <div class="flex flex-wrap justify-between items-end gap-2 mb-3 pb-2 border-b">
+                    <div>
+                        <h3 class="text-base font-bold text-slate-900">年度现金流明细表</h3>
+                        <p class="text-xs text-slate-500 mt-1">CPM 融资；租金按 g 逐年增长；持有期末按退出 Cap Rate 出售并偿还剩余贷款。</p>
+                    </div>
+                    <div class="text-xs text-slate-500">股权 NPV 折现率：<strong id="resCashFlowDiscountRate" class="text-slate-800">—</strong></div>
+                </div>
+                <div class="overflow-auto max-h-[440px] rounded-lg border border-slate-200">
+                    <table class="analysis-table min-w-full text-[11px] text-right">
+                        <thead class="bg-slate-100 text-slate-600">
+                            <tr>
+                                <th class="px-2 py-2 text-center">年度</th>
+                                <th class="px-2 py-2">潜在租金</th>
+                                <th class="px-2 py-2">NOI</th>
+                                <th class="px-2 py-2">偿债额</th>
+                                <th class="px-2 py-2">利息</th>
+                                <th class="px-2 py-2">偿还本金</th>
+                                <th class="px-2 py-2">期末贷款</th>
+                                <th class="px-2 py-2">经营后股权CF</th>
+                                <th class="px-2 py-2">出售净回款</th>
+                                <th class="px-2 py-2">出售偿债</th>
+                                <th class="px-2 py-2">总股权CF</th>
+                                <th class="px-2 py-2">折现股权CF</th>
+                            </tr>
+                        </thead>
+                        <tbody id="annualCashFlowBody" class="divide-y divide-slate-100"></tbody>
+                    </table>
+                </div>
+                <div class="mt-3 grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+                    <div class="rounded border bg-slate-50 p-2"><span class="text-slate-500">持有期</span><div id="resCashFlowYears" class="font-bold mt-0.5">—</div></div>
+                    <div class="rounded border bg-slate-50 p-2"><span class="text-slate-500">累计 NOI</span><div id="resCumulativeNOI" class="font-bold mt-0.5">—</div></div>
+                    <div class="rounded border bg-indigo-50 border-indigo-100 p-2"><span class="text-indigo-600">股权 IRR</span><div id="resCashFlowIRR" class="font-bold text-indigo-900 mt-0.5">—</div></div>
+                    <div class="rounded border bg-indigo-50 border-indigo-100 p-2"><span class="text-indigo-600">股权 NPV</span><div id="resCashFlowNPV" class="font-bold text-indigo-900 mt-0.5">—</div></div>
+                </div>
+            </div>
+
+            <!-- 6. 利率 / Cap Rate 敏感度矩阵 -->
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+                <div class="mb-3 pb-2 border-b">
+                    <h3 class="text-base font-bold text-slate-900">±25/50bp 利率 / Cap Rate 敏感度矩阵</h3>
+                    <p class="text-xs text-slate-500 mt-1">行：房贷利率冲击；列：退出 Cap Rate 冲击。单元格为综合可承受总价 = min(DCF 资产价值, DSCR 融资承受价)。</p>
+                </div>
+                <div class="overflow-auto rounded-lg border border-slate-200">
+                    <table class="matrix-table min-w-full text-xs">
+                        <thead id="rateCapSensitivityHead" class="bg-slate-100 text-slate-600"></thead>
+                        <tbody id="rateCapSensitivityBody"></tbody>
+                    </table>
+                </div>
+                <div class="mt-2 text-[11px] text-slate-400">数值单位：万元；中心单元格为基准情景。若首付为 100%，融资约束自动退出，仅保留 DCF 资产价值。</div>
+            </div>
+
+            <!-- 7. IRR / NPV 二维情景分析 -->
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+                <div class="mb-3 pb-2 border-b">
+                    <h3 class="text-base font-bold text-slate-900">IRR / NPV 二维情景分析</h3>
+                    <p class="text-xs text-slate-500 mt-1">行：租金增长率 g 冲击；列：退出 Cap Rate 冲击。每个单元格同时显示 Levered IRR 与 Equity NPV。</p>
+                </div>
+                <div class="overflow-auto rounded-lg border border-slate-200">
+                    <table class="matrix-table min-w-full text-xs">
+                        <thead id="irrNpvScenarioHead" class="bg-slate-100 text-slate-600"></thead>
+                        <tbody id="irrNpvScenarioBody"></tbody>
+                    </table>
+                </div>
+                <div class="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-slate-400">
+                    <span>情景范围：租金增长率 ±50/100bp</span>
+                    <span>退出 Cap Rate ±50/100bp</span>
+                    <span>NPV 折现率：<strong id="resScenarioDiscountRate" class="text-slate-600">—</strong></span>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- JS 业务逻辑：输入层 -> 纯计算层 -> 渲染层 -->
+    <script>
+        const $ = id => document.getElementById(id);
+        const inputIds = [
+            'inputMarketPrice', 'inputR', 'inputArea', 'inputV', 'inputM', 'inputRf',
+            'inputL', 'inputT', 'inputK', 'inputPopGrowth', 'inputLPR', 'inputBP',
+            'inputDownPayment', 'inputYears', 'inputTargetDSCR', 'inputHoldingYears',
+            'inputExitCap', 'inputSellingCost', 'inputEquityDiscount'
+        ];
+        let calculatedPriceCapGlobal = null;
+
+        const finite = (value, fallback = 0) => Number.isFinite(value) ? value : fallback;
+        const pct = value => value / 100;
+        const fmtMoney = value => Number.isFinite(value) ? Math.round(value).toLocaleString() : '—';
+        const fmtWan = value => Number.isFinite(value) ? (value / 10000).toFixed(1) : '—';
+        const fmtPct = value => Number.isFinite(value) ? (value * 100).toFixed(2) + '%' : '—';
+        const fmtRatio = value => Number.isFinite(value) ? value.toFixed(2) + 'x' : '—';
+
+        function readNumber(id) {
+            const value = Number($(id).value);
+            return Number.isFinite(value) ? value : NaN;
+        }
+
+        function readInputs() {
+            return {
+                marketPricePerSqm: readNumber('inputMarketPrice'),
+                rentPerSqmMonth: readNumber('inputR'),
+                area: readNumber('inputArea'),
+                vacancyRate: pct(readNumber('inputV')),
+                operatingCostRate: pct(readNumber('inputM')),
+                riskFreeRate: pct(readNumber('inputRf')),
+                riskPremium: pct(readNumber('inputL')),
+                propertyTaxAdj: pct(readNumber('inputT')),
+                scaleK: readNumber('inputK'),
+                populationGrowth: pct(readNumber('inputPopGrowth')),
+                lpr: pct(readNumber('inputLPR')),
+                bp: readNumber('inputBP'),
+                downPaymentRate: pct(readNumber('inputDownPayment')),
+                mortgageYears: readNumber('inputYears'),
+                targetDSCR: readNumber('inputTargetDSCR'),
+                holdingYears: readNumber('inputHoldingYears'),
+                exitCapRate: pct(readNumber('inputExitCap')),
+                sellingCostRate: pct(readNumber('inputSellingCost')),
+                equityDiscountRate: pct(readNumber('inputEquityDiscount'))
+            };
+        }
+
+        function validateInputs(p) {
+            const errors = [];
+            const checks = [
+                ['市场单价', p.marketPricePerSqm > 0],
+                ['月租金', p.rentPerSqmMonth >= 0],
+                ['房屋面积', p.area > 0],
+                ['空置率', p.vacancyRate >= 0 && p.vacancyRate < 1],
+                ['运营成本率', p.operatingCostRate >= 0 && p.operatingCostRate < 1],
+                ['资产风险溢价', p.riskPremium >= 0],
+                ['房产税/资本化调整', p.propertyTaxAdj >= 0],
+                ['LPR', p.lpr >= 0],
+                ['首付比例', p.downPaymentRate >= 0 && p.downPaymentRate <= 1],
+                ['贷款期限', p.mortgageYears >= 1 && p.mortgageYears <= 50],
+                ['目标 DSCR', p.targetDSCR >= 1],
+                ['DCF 持有期', p.holdingYears >= 1 && p.holdingYears <= 30],
+                ['退出 Cap Rate', p.exitCapRate > 0],
+                ['出售成本率', p.sellingCostRate >= 0 && p.sellingCostRate < 1],
+                ['股权 NPV 折现率', p.equityDiscountRate > -0.99 && p.equityDiscountRate <= 1]
+            ];
+            for (const [label, ok] of checks) if (!ok) errors.push(label + '参数无效');
+            if (Object.values(p).some(v => !Number.isFinite(v))) errors.push('存在空值或非数字输入');
+            return [...new Set(errors)];
+        }
+
+        function calculateNOI(p) {
+            const rentGrowth = p.scaleK * p.populationGrowth;
+            const grossPotentialRentPerSqm = p.rentPerSqmMonth * 12;
+            const annualNOIPerSqm = grossPotentialRentPerSqm * (1 - p.vacancyRate) * (1 - p.operatingCostRate);
+            const annualNOITotal = annualNOIPerSqm * p.area;
+            return {
+                rentGrowth,
+                grossPotentialRentPerSqm,
+                grossPotentialRentTotal: grossPotentialRentPerSqm * p.area,
+                annualNOIPerSqm,
+                annualNOITotal,
+                monthlyNOITotal: annualNOITotal / 12
+            };
+        }
+
+        function calculateValuation(p, noi) {
+            const requiredReturn = p.riskFreeRate + p.riskPremium + p.propertyTaxAdj;
+            const capRate = requiredReturn - noi.rentGrowth;
+            const validPerpetuity = capRate > 0.0001;
+            const pricePerSqm = validPerpetuity ? noi.annualNOIPerSqm / capRate : NaN;
+            const totalValue = validPerpetuity ? pricePerSqm * p.area : NaN;
+            const marketTotalPrice = p.marketPricePerSqm * p.area;
+            const impliedCapRate = p.marketPricePerSqm > 0 ? noi.annualNOIPerSqm / p.marketPricePerSqm : NaN;
+            const valuationGap = validPerpetuity ? (p.marketPricePerSqm - pricePerSqm) / pricePerSqm : NaN;
+            return { requiredReturn, capRate, validPerpetuity, pricePerSqm, totalValue, marketTotalPrice, impliedCapRate, valuationGap };
+        }
+
+        function calculateDCF(p, noi, valuation) {
+            if (!(valuation.requiredReturn > -0.99) || !(p.exitCapRate > 0)) return { valid: false, value: NaN, pricePerSqm: NaN };
+            let pv = 0;
+            for (let year = 1; year <= p.holdingYears; year++) {
+                const yearNOI = noi.annualNOITotal * Math.pow(1 + noi.rentGrowth, year - 1);
+                pv += yearNOI / Math.pow(1 + valuation.requiredReturn, year);
+            }
+            const terminalNOI = noi.annualNOITotal * Math.pow(1 + noi.rentGrowth, p.holdingYears);
+            const grossTerminalValue = terminalNOI / p.exitCapRate;
+            const netTerminalValue = grossTerminalValue * (1 - p.sellingCostRate);
+            pv += netTerminalValue / Math.pow(1 + valuation.requiredReturn, p.holdingYears);
+            return { valid: Number.isFinite(pv) && pv > 0, value: pv, pricePerSqm: pv / p.area, grossTerminalValue, netTerminalValue };
+        }
+
+        function calculateMortgageSchedule(principal, annualRate, years, type = 'CPM') {
+            const months = Math.round(years * 12);
+            if (!(principal >= 0) || !(months > 0) || !(annualRate >= 0)) return { valid: false, payments: [], monthlyPayment: NaN, totalInterest: NaN };
+            if (principal === 0) return { valid: true, payments: [], monthlyPayment: 0, totalInterest: 0, remainingBalance: 0 };
+            const monthlyRate = annualRate / 12;
+            const payments = [];
+            let balance = principal;
+            let totalInterest = 0;
+            let fixedPayment = 0;
+            if (type === 'CPM') {
+                fixedPayment = monthlyRate === 0
+                    ? principal / months
+                    : principal * (monthlyRate * Math.pow(1 + monthlyRate, months)) / (Math.pow(1 + monthlyRate, months) - 1);
+            }
+            const fixedPrincipal = principal / months;
+            for (let t = 1; t <= months; t++) {
+                const interest = balance * monthlyRate;
+                const principalPaid = type === 'CPM'
+                    ? (monthlyRate === 0 ? fixedPayment : Math.min(balance, fixedPayment - interest))
+                    : Math.min(balance, fixedPrincipal);
+                const payment = principalPaid + interest;
+                balance = Math.max(0, balance - principalPaid);
+                totalInterest += interest;
+                payments.push({ month: t, payment, interest, principal: principalPaid, balance });
+            }
+            return {
+                valid: true,
+                payments,
+                monthlyPayment: payments[0]?.payment || 0,
+                monthlyDecrease: type === 'CAM' && payments.length > 1 ? payments[0].payment - payments[1].payment : 0,
+                totalInterest,
+                remainingBalance: balance
+            };
+        }
+
+        function calculateMortgageDuration(schedule, annualRate) {
+            if (!schedule || !schedule.valid || !Array.isArray(schedule.payments) || schedule.payments.length === 0) {
+                return { macDYears: NaN, modDYears: NaN };
+            }
+            const monthlyRate = annualRate / 12;
+            if (!(monthlyRate > -1)) return { macDYears: NaN, modDYears: NaN };
+            let pvSum = 0;
+            let weightedSum = 0;
+            for (const row of schedule.payments) {
+                const discountFactor = Math.pow(1 + monthlyRate, row.month);
+                const pv = row.payment / discountFactor;
+                pvSum += pv;
+                weightedSum += row.month * pv;
+            }
+            if (!(pvSum > 0)) return { macDYears: NaN, modDYears: NaN };
+            const macDMonths = weightedSum / pvSum;
+            const modDMonths = macDMonths / (1 + monthlyRate);
+            return { macDYears: macDMonths / 12, modDYears: modDMonths / 12 };
+        }
+
+        function calculateDurations(valuation, cpmSchedule, camSchedule, mortgageRate) {
+            const impliedCapRate = valuation.impliedCapRate;
+            const asset = impliedCapRate > 0
+                ? { modDYears: 1 / impliedCapRate, macDYears: (1 / impliedCapRate) * (1 + impliedCapRate) }
+                : { modDYears: NaN, macDYears: NaN };
+            return {
+                asset,
+                cpm: calculateMortgageDuration(cpmSchedule, mortgageRate),
+                cam: calculateMortgageDuration(camSchedule, mortgageRate)
+            };
+        }
+
+        function annualSlice(schedule, year) {
+            const start = (year - 1) * 12;
+            const rows = schedule.payments.slice(start, start + 12);
+            return {
+                debtService: rows.reduce((sum, r) => sum + r.payment, 0),
+                interest: rows.reduce((sum, r) => sum + r.interest, 0),
+                principal: rows.reduce((sum, r) => sum + r.principal, 0),
+                endingBalance: rows.length ? rows[rows.length - 1].balance : 0
+            };
+        }
+
+        function paymentFactorPerDollar(annualRate, years) {
+            const schedule = calculateMortgageSchedule(1, annualRate, years, 'CPM');
+            return schedule.valid ? annualSlice(schedule, 1).debtService : NaN;
+        }
+
+        function calculateDebtSupportedPrice(p, noi, mortgageRate) {
+            const annualFactor = paymentFactorPerDollar(mortgageRate, p.mortgageYears);
+            const maxDebtService = noi.annualNOITotal / p.targetDSCR;
+            const maxLoan = annualFactor > 0 ? maxDebtService / annualFactor : NaN;
+            const debtShare = 1 - p.downPaymentRate;
+            const supportedPropertyValue = debtShare > 0 ? maxLoan / debtShare : NaN;
+            return { maxDebtService, maxLoan, supportedPropertyValue, pricePerSqm: supportedPropertyValue / p.area };
+        }
+
+        function calculateDebtMetrics(p, noi, valuation, loanAmount, cpmSchedule) {
+            const firstYear = annualSlice(cpmSchedule, 1);
+            const initialEquity = valuation.marketTotalPrice * p.downPaymentRate;
+            const annualEquityCashFlow = noi.annualNOITotal - firstYear.debtService;
+            const dscr = firstYear.debtService > 0 ? noi.annualNOITotal / firstYear.debtService : Infinity;
+            const debtYield = loanAmount > 0 ? noi.annualNOITotal / loanAmount : Infinity;
+            const ltv = valuation.marketTotalPrice > 0 ? loanAmount / valuation.marketTotalPrice : NaN;
+            const cashOnCash = initialEquity > 0 ? annualEquityCashFlow / initialEquity : NaN;
+            const breakEvenOccupancy = firstYear.debtService > 0 && noi.grossPotentialRentTotal > 0
+                ? firstYear.debtService / (noi.grossPotentialRentTotal * (1 - p.operatingCostRate))
+                : 0;
+            const interestCoverage = firstYear.interest > 0 ? noi.annualNOITotal / firstYear.interest : Infinity;
+            return { firstYear, initialEquity, annualEquityCashFlow, dscr, debtYield, ltv, cashOnCash, breakEvenOccupancy, interestCoverage };
+        }
+
+        function npv(cashFlows, rate) {
+            if (!Array.isArray(cashFlows) || !(rate > -1)) return NaN;
+            return cashFlows.reduce((sum, cf, t) => sum + cf / Math.pow(1 + rate, t), 0);
+        }
+
+        function irr(cashFlows) {
+            if (!cashFlows.length || !cashFlows.some(v => v < 0) || !cashFlows.some(v => v > 0)) return NaN;
+            const calcNpv = rate => npv(cashFlows, rate);
+            let low = -0.9999, high = 10;
+            let lowNpv = calcNpv(low), highNpv = calcNpv(high);
+            if (!Number.isFinite(lowNpv) || !Number.isFinite(highNpv) || lowNpv * highNpv > 0) return NaN;
+            for (let i = 0; i < 200; i++) {
+                const mid = (low + high) / 2;
+                const midNpv = calcNpv(mid);
+                if (Math.abs(midNpv) < 1e-7) return mid;
+                if (lowNpv * midNpv <= 0) {
+                    high = mid;
+                    highNpv = midNpv;
+                } else {
+                    low = mid;
+                    lowNpv = midNpv;
+                }
+            }
+            return (low + high) / 2;
+        }
+
+        function calculateAnnualCashFlows(p, noi, valuation, cpmSchedule, scenario = {}) {
+            const rentGrowth = Number.isFinite(scenario.rentGrowth) ? scenario.rentGrowth : noi.rentGrowth;
+            const exitCapRate = Number.isFinite(scenario.exitCapRate) ? scenario.exitCapRate : p.exitCapRate;
+            const discountRate = Number.isFinite(scenario.equityDiscountRate) ? scenario.equityDiscountRate : p.equityDiscountRate;
+            const initialEquity = valuation.marketTotalPrice * p.downPaymentRate;
+            const initialLoan = valuation.marketTotalPrice - initialEquity;
+            const rows = [{
+                year: 0,
+                grossPotentialRent: 0,
+                noi: 0,
+                debtService: 0,
+                interest: 0,
+                principal: 0,
+                endingBalance: initialLoan,
+                operatingEquityCF: -initialEquity,
+                netSaleProceeds: 0,
+                saleDebtPayoff: 0,
+                totalEquityCF: -initialEquity,
+                discountedEquityCF: -initialEquity
+            }];
+            const cashFlows = [-initialEquity];
+            let cumulativeNOI = 0;
+
+            for (let year = 1; year <= p.holdingYears; year++) {
+                const grossPotentialRent = noi.grossPotentialRentTotal * Math.pow(1 + rentGrowth, year - 1);
+                const effectiveGrossIncome = grossPotentialRent * (1 - p.vacancyRate);
+                const yearNOI = effectiveGrossIncome * (1 - p.operatingCostRate);
+                cumulativeNOI += yearNOI;
+                const debt = annualSlice(cpmSchedule, year);
+                const operatingEquityCF = yearNOI - debt.debtService;
+                let netSaleProceeds = 0;
+                let saleDebtPayoff = 0;
+                let totalEquityCF = operatingEquityCF;
+
+                if (year === p.holdingYears && exitCapRate > 0.0001) {
+                    const nextGrossRent = noi.grossPotentialRentTotal * Math.pow(1 + rentGrowth, year);
+                    const nextNOI = nextGrossRent * (1 - p.vacancyRate) * (1 - p.operatingCostRate);
+                    const grossSalePrice = nextNOI / exitCapRate;
+                    netSaleProceeds = grossSalePrice * (1 - p.sellingCostRate);
+                    saleDebtPayoff = debt.endingBalance;
+                    totalEquityCF += netSaleProceeds - saleDebtPayoff;
+                }
+
+                const discountedEquityCF = totalEquityCF / Math.pow(1 + discountRate, year);
+                cashFlows.push(totalEquityCF);
+                rows.push({
+                    year,
+                    grossPotentialRent,
+                    noi: yearNOI,
+                    debtService: debt.debtService,
+                    interest: debt.interest,
+                    principal: debt.principal,
+                    endingBalance: debt.endingBalance,
+                    operatingEquityCF,
+                    netSaleProceeds,
+                    saleDebtPayoff,
+                    totalEquityCF,
+                    discountedEquityCF
+                });
+            }
+
+            return {
+                rows,
+                cashFlows,
+                irr: irr(cashFlows),
+                npv: npv(cashFlows, discountRate),
+                cumulativeNOI,
+                initialEquity,
+                rentGrowth,
+                exitCapRate,
+                discountRate
+            };
+        }
+
+        function calculateEquityIRR(p, noi, valuation, cpmSchedule) {
+            return calculateAnnualCashFlows(p, noi, valuation, cpmSchedule);
+        }
+
+        function calculateRateCapSensitivity(p, noi, valuation) {
+            const shocksBp = [-50, -25, 0, 25, 50];
+            const baseMortgageRate = p.lpr + p.bp / 10000;
+            return {
+                shocksBp,
+                rows: shocksBp.map(rateShockBp => {
+                    const mortgageRate = baseMortgageRate + rateShockBp / 10000;
+                    const debtSupport = mortgageRate >= 0 ? calculateDebtSupportedPrice(p, noi, mortgageRate) : { supportedPropertyValue: NaN };
+                    return {
+                        rateShockBp,
+                        cells: shocksBp.map(capShockBp => {
+                            const exitCapRate = p.exitCapRate + capShockBp / 10000;
+                            const scenarioDCF = exitCapRate > 0.0001
+                                ? calculateDCF({ ...p, exitCapRate }, noi, valuation)
+                                : { value: NaN };
+                            let feasibleValue = NaN;
+                            if (p.downPaymentRate >= 0.999999) {
+                                feasibleValue = scenarioDCF.value;
+                            } else if (Number.isFinite(scenarioDCF.value) && Number.isFinite(debtSupport.supportedPropertyValue)) {
+                                feasibleValue = Math.min(scenarioDCF.value, debtSupport.supportedPropertyValue);
+                            }
+                            return {
+                                capShockBp,
+                                exitCapRate,
+                                mortgageRate,
+                                dcfValue: scenarioDCF.value,
+                                debtSupportedValue: debtSupport.supportedPropertyValue,
+                                feasibleValue
+                            };
+                        })
+                    };
+                })
+            };
+        }
+
+        function calculateIrrNpvScenario(p, noi, valuation, cpmSchedule) {
+            const shocksBp = [-100, -50, 0, 50, 100];
+            return {
+                shocksBp,
+                rows: shocksBp.map(gShockBp => ({
+                    gShockBp,
+                    cells: shocksBp.map(capShockBp => {
+                        const rentGrowth = noi.rentGrowth + gShockBp / 10000;
+                        const exitCapRate = p.exitCapRate + capShockBp / 10000;
+                        if (!(rentGrowth > -1) || !(exitCapRate > 0.0001)) {
+                            return { gShockBp, capShockBp, rentGrowth, exitCapRate, irr: NaN, npv: NaN };
+                        }
+                        const result = calculateAnnualCashFlows(p, noi, valuation, cpmSchedule, { rentGrowth, exitCapRate });
+                        return { gShockBp, capShockBp, rentGrowth, exitCapRate, irr: result.irr, npv: result.npv };
+                    })
+                }))
+            };
+        }
+
+        function heatStyle(value, center, scale, inverse = false) {
+            if (!Number.isFinite(value)) return 'background-color:#f8fafc;color:#94a3b8;';
+            let z = (value - center) / Math.max(Math.abs(scale), 1e-9);
+            if (inverse) z = -z;
+            z = Math.max(-1, Math.min(1, z));
+            if (z >= 0) {
+                const a = 0.08 + 0.18 * z;
+                return `background-color:rgba(16,185,129,${a});`;
+            }
+            const a = 0.08 + 0.18 * (-z);
+            return `background-color:rgba(244,63,94,${a});`;
+        }
+
+        function setText(id, value) { $(id).innerText = value; }
+
+        function renderWarnings(errors, p, noi, valuation, debtMetrics) {
+            const warnings = [...errors];
+            if (!errors.length && !valuation.validPerpetuity) warnings.push('永续增长模型无效：长期增长率 g 必须显著低于要求收益率 r_f + RP + T；本模型不会把无效估值显示为 0。');
+            if (!errors.length && debtMetrics && Number.isFinite(debtMetrics.dscr) && debtMetrics.dscr < p.targetDSCR) warnings.push(`当前 DSCR ${debtMetrics.dscr.toFixed(2)}x 低于目标 ${p.targetDSCR.toFixed(2)}x，租金现金流对债务覆盖不足。`);
+            if (!errors.length && debtMetrics && debtMetrics.breakEvenOccupancy > 1) warnings.push('盈亏平衡出租率超过 100%，仅靠当前租金无法覆盖运营成本与债务服务。');
+            const box = $('warningBox');
+            if (warnings.length) {
+                box.innerHTML = warnings.map(w => '• ' + w).join('<br>');
+                box.classList.remove('hidden');
+            } else {
+                box.classList.add('hidden');
+                box.innerHTML = '';
+            }
+        }
+
+        function renderValuation(p, noi, valuation, dcf, debtSupport) {
+            calculatedPriceCapGlobal = valuation.validPerpetuity ? valuation.pricePerSqm : null;
+            setText('textG', fmtPct(noi.rentGrowth));
+            setText('resPriceCap', fmtMoney(valuation.pricePerSqm));
+            setText('resTotalPriceCap', fmtWan(valuation.totalValue));
+            setText('resPriceDCF', fmtMoney(dcf.pricePerSqm));
+            setText('resTotalPriceDCF', fmtWan(dcf.value));
+            setText('resPriceDebt', fmtMoney(debtSupport.pricePerSqm));
+            setText('resTargetDSCR', p.targetDSCR.toFixed(2) + 'x');
+            setText('resPriceMarket', fmtMoney(p.marketPricePerSqm));
+            setText('textMarketTotalPrice', (valuation.marketTotalPrice / 10000).toFixed(2));
+            setText('textImpliedCapRate', fmtPct(valuation.impliedCapRate));
+            const gap = $('resValuationGap');
+            if (Number.isFinite(valuation.valuationGap)) {
+                gap.innerText = (valuation.valuationGap > 0 ? '+' : '') + (valuation.valuationGap * 100).toFixed(1) + '%';
+                gap.className = valuation.valuationGap > 0 ? 'font-bold text-rose-600' : 'font-bold text-emerald-600';
+            } else {
+                gap.innerText = '—';
+                gap.className = 'font-bold text-slate-400';
+            }
+        }
+
+        function renderDebtMetrics(metrics, equityResult) {
+            setText('resDSCR', Number.isFinite(metrics.dscr) ? fmtRatio(metrics.dscr) : '无负债');
+            setText('resDebtYield', Number.isFinite(metrics.debtYield) ? fmtPct(metrics.debtYield) : '无负债');
+            setText('resLTV', fmtPct(metrics.ltv));
+            setText('resCoC', fmtPct(metrics.cashOnCash));
+            setText('resBreakEvenOcc', fmtPct(metrics.breakEvenOccupancy));
+            setText('resInterestCoverage', Number.isFinite(metrics.interestCoverage) ? fmtRatio(metrics.interestCoverage) : '无利息');
+            setText('resEquityIRR', fmtPct(equityResult.irr));
+            setText('resEquityNPV', Number.isFinite(equityResult.npv) ? fmtWan(equityResult.npv) + ' 万' : '—');
+            setText('resInitialEquity', fmtWan(metrics.initialEquity) + ' 万');
+        }
+
+        function renderDurations(durations) {
+            const showYears = v => Number.isFinite(v) ? v.toFixed(2) + ' 年' : '—';
+            setText('resModDAsset', showYears(durations.asset.modDYears));
+            setText('resMacDAsset', showYears(durations.asset.macDYears));
+            setText('resModDCPM', showYears(durations.cpm.modDYears));
+            setText('resMacDCPM', showYears(durations.cpm.macDYears));
+            setText('resModDCAM', showYears(durations.cam.modDYears));
+            setText('resMacDCAM', showYears(durations.cam.macDYears));
+        }
+
+        function renderMortgage(noi, loanAmount, cpm, cam) {
+            const cpmFirstYear = annualSlice(cpm, 1);
+            const camFirstYear = annualSlice(cam, 1);
+            setText('resCpmPmt', fmtMoney(cpm.monthlyPayment) + ' 元');
+            const cpmNetCash = noi.monthlyNOITotal - cpm.monthlyPayment;
+            setText('resCpmNetCash', fmtMoney(cpmNetCash) + ' 元');
+            $('resCpmNetCash').className = cpmNetCash >= 0 ? 'font-bold text-emerald-600' : 'font-bold text-rose-600';
+            setText('resRealLoanCpm', fmtWan(loanAmount) + ' 万元');
+            setText('resCpmInterest', fmtWan(cpm.totalInterest) + ' 万元');
+
+            setText('resCamPmt', fmtMoney(cam.monthlyPayment) + ' / -' + fmtMoney(cam.monthlyDecrease) + ' 元');
+            const camNetCash = noi.monthlyNOITotal - cam.monthlyPayment;
+            setText('resCamNetCash', fmtMoney(camNetCash) + ' 元');
+            $('resCamNetCash').className = camNetCash >= 0 ? 'font-bold text-emerald-600' : 'font-bold text-rose-600';
+            setText('resRealLoanCam', fmtWan(loanAmount) + ' 万元');
+            setText('resCamInterest', fmtWan(cam.totalInterest) + ' 万元');
+        }
+
+        function renderAnnualCashFlow(p, projection) {
+            setText('resCashFlowDiscountRate', fmtPct(p.equityDiscountRate));
+            setText('resCashFlowYears', p.holdingYears.toFixed(0) + ' 年');
+            setText('resCumulativeNOI', fmtWan(projection.cumulativeNOI) + ' 万');
+            setText('resCashFlowIRR', fmtPct(projection.irr));
+            setText('resCashFlowNPV', Number.isFinite(projection.npv) ? fmtWan(projection.npv) + ' 万' : '—');
+            const tbody = $('annualCashFlowBody');
+            tbody.innerHTML = projection.rows.map(row => {
+                const isZero = row.year === 0;
+                const totalClass = row.totalEquityCF >= 0 ? 'text-emerald-700' : 'text-rose-700';
+                return `<tr class="${isZero ? 'bg-amber-50/60' : 'bg-white'}">
+                    <td class="px-2 py-2 text-center font-semibold text-slate-700">${isZero ? '0 / 买入' : row.year}</td>
+                    <td class="px-2 py-2">${isZero ? '—' : fmtWan(row.grossPotentialRent)}</td>
+                    <td class="px-2 py-2">${isZero ? '—' : fmtWan(row.noi)}</td>
+                    <td class="px-2 py-2">${isZero ? '—' : fmtWan(row.debtService)}</td>
+                    <td class="px-2 py-2">${isZero ? '—' : fmtWan(row.interest)}</td>
+                    <td class="px-2 py-2">${isZero ? '—' : fmtWan(row.principal)}</td>
+                    <td class="px-2 py-2">${fmtWan(row.endingBalance)}</td>
+                    <td class="px-2 py-2 ${isZero ? 'text-rose-700 font-semibold' : ''}">${fmtWan(row.operatingEquityCF)}</td>
+                    <td class="px-2 py-2">${row.netSaleProceeds ? fmtWan(row.netSaleProceeds) : '—'}</td>
+                    <td class="px-2 py-2">${row.saleDebtPayoff ? fmtWan(row.saleDebtPayoff) : '—'}</td>
+                    <td class="px-2 py-2 font-bold ${totalClass}">${fmtWan(row.totalEquityCF)}</td>
+                    <td class="px-2 py-2 ${row.discountedEquityCF >= 0 ? 'text-slate-700' : 'text-rose-700'}">${fmtWan(row.discountedEquityCF)}</td>
+                </tr>`;
+            }).join('');
+        }
+
+        function renderRateCapSensitivity(matrix) {
+            const head = $('rateCapSensitivityHead');
+            const body = $('rateCapSensitivityBody');
+            const label = bp => `${bp > 0 ? '+' : ''}${bp}bp`;
+            head.innerHTML = `<tr><th class="px-2 py-2 bg-slate-100">利率 \\ Cap</th>${matrix.shocksBp.map(bp => `<th class="px-2 py-2 bg-slate-100">${label(bp)}</th>`).join('')}</tr>`;
+            const baseCell = matrix.rows.find(r => r.rateShockBp === 0)?.cells.find(c => c.capShockBp === 0);
+            const base = baseCell?.feasibleValue || 0;
+            body.innerHTML = matrix.rows.map(row => `<tr>
+                <td class="px-2 py-2 font-semibold bg-slate-50 text-slate-600">${label(row.rateShockBp)}</td>
+                ${row.cells.map(cell => {
+                    const isBase = row.rateShockBp === 0 && cell.capShockBp === 0;
+                    const style = heatStyle(cell.feasibleValue, base, base * 0.12);
+                    return `<td class="px-2 py-2 border-l border-t border-slate-100 ${isBase ? 'ring-2 ring-inset ring-indigo-400 font-bold' : ''}" style="${style}" title="DCF ${fmtWan(cell.dcfValue)}万；DSCR融资承受 ${fmtWan(cell.debtSupportedValue)}万">${Number.isFinite(cell.feasibleValue) ? fmtWan(cell.feasibleValue) : '—'}</td>`;
+                }).join('')}
+            </tr>`).join('');
+        }
+
+        function renderIrrNpvScenario(p, matrix) {
+            const head = $('irrNpvScenarioHead');
+            const body = $('irrNpvScenarioBody');
+            const label = bp => `${bp > 0 ? '+' : ''}${bp}bp`;
+            setText('resScenarioDiscountRate', fmtPct(p.equityDiscountRate));
+            head.innerHTML = `<tr><th class="px-2 py-2 bg-slate-100">g \\ Exit Cap</th>${matrix.shocksBp.map(bp => `<th class="px-2 py-2 bg-slate-100">${label(bp)}</th>`).join('')}</tr>`;
+            const baseCell = matrix.rows.find(r => r.gShockBp === 0)?.cells.find(c => c.capShockBp === 0);
+            const baseIRR = baseCell?.irr || 0;
+            const irrScale = Math.max(Math.abs(baseIRR) * 0.35, 0.03);
+            body.innerHTML = matrix.rows.map(row => `<tr>
+                <td class="px-2 py-2 font-semibold bg-slate-50 text-slate-600">${label(row.gShockBp)}</td>
+                ${row.cells.map(cell => {
+                    const isBase = row.gShockBp === 0 && cell.capShockBp === 0;
+                    const style = heatStyle(cell.irr, baseIRR, irrScale);
+                    return `<td class="px-2 py-2 border-l border-t border-slate-100 ${isBase ? 'ring-2 ring-inset ring-indigo-400' : ''}" style="${style}" title="g=${fmtPct(cell.rentGrowth)}；Exit Cap=${fmtPct(cell.exitCapRate)}">
+                        <div class="font-bold">IRR ${fmtPct(cell.irr)}</div>
+                        <div class="text-[10px] text-slate-500 mt-0.5">NPV ${Number.isFinite(cell.npv) ? fmtWan(cell.npv) + '万' : '—'}</div>
+                    </td>`;
+                }).join('')}
+            </tr>`).join('');
+        }
+
+        function renderInvalid(errors) {
+            const ids = ['resPriceCap','resTotalPriceCap','resPriceDCF','resTotalPriceDCF','resPriceDebt','resTargetDSCR','resPriceMarket','resValuationGap','resDSCR','resDebtYield','resLTV','resCoC','resBreakEvenOcc','resInterestCoverage','resEquityIRR','resEquityNPV','resInitialEquity','resCashFlowDiscountRate','resCashFlowYears','resCumulativeNOI','resCashFlowIRR','resCashFlowNPV','resScenarioDiscountRate','resModDAsset','resMacDAsset','resModDCPM','resMacDCPM','resModDCAM','resMacDCAM'];
+            ids.forEach(id => setText(id, '—'));
+            $('annualCashFlowBody').innerHTML = '<tr><td colspan="12" class="px-3 py-4 text-center text-slate-400">参数无效，无法生成现金流。</td></tr>';
+            $('rateCapSensitivityHead').innerHTML = '';
+            $('rateCapSensitivityBody').innerHTML = '<tr><td class="px-3 py-4 text-center text-slate-400">—</td></tr>';
+            $('irrNpvScenarioHead').innerHTML = '';
+            $('irrNpvScenarioBody').innerHTML = '<tr><td class="px-3 py-4 text-center text-slate-400">—</td></tr>';
+            renderWarnings(errors, {}, {}, { validPerpetuity: false }, null);
+        }
+
+        function calculate() {
+            const p = readInputs();
+            const errors = validateInputs(p);
+            if (errors.length) { renderInvalid(errors); return; }
+
+            const noi = calculateNOI(p);
+            const valuation = calculateValuation(p, noi);
+            const dcf = calculateDCF(p, noi, valuation);
+            const mortgageRate = p.lpr + p.bp / 10000;
+            const loanAmount = valuation.marketTotalPrice * (1 - p.downPaymentRate);
+            const cpm = calculateMortgageSchedule(loanAmount, mortgageRate, p.mortgageYears, 'CPM');
+            const cam = calculateMortgageSchedule(loanAmount, mortgageRate, p.mortgageYears, 'CAM');
+            const durations = calculateDurations(valuation, cpm, cam, mortgageRate);
+            const debtSupport = calculateDebtSupportedPrice(p, noi, mortgageRate);
+            const debtMetrics = calculateDebtMetrics(p, noi, valuation, loanAmount, cpm);
+            const equityProjection = calculateEquityIRR(p, noi, valuation, cpm);
+            const rateCapSensitivity = calculateRateCapSensitivity(p, noi, valuation);
+            const irrNpvScenario = calculateIrrNpvScenario(p, noi, valuation, cpm);
+
+            renderValuation(p, noi, valuation, dcf, debtSupport);
+            renderDebtMetrics(debtMetrics, equityProjection);
+            renderDurations(durations);
+            renderMortgage(noi, loanAmount, cpm, cam);
+            renderAnnualCashFlow(p, equityProjection);
+            renderRateCapSensitivity(rateCapSensitivity);
+            renderIrrNpvScenario(p, irrNpvScenario);
+            renderWarnings([], p, noi, valuation, debtMetrics);
+        }
+
+        function syncTheoreticalPrice() {
+            if (Number.isFinite(calculatedPriceCapGlobal) && calculatedPriceCapGlobal > 0) {
+                $('inputMarketPrice').value = Math.round(calculatedPriceCapGlobal);
+                calculate();
+            }
+        }
+
+        function setReitSpread(spreadPct) {
+            const rfPct = finite(readNumber('inputRf'), 0);
+            const tPct = finite(readNumber('inputT'), 0);
+            const k = finite(readNumber('inputK'), 0);
+            const popGrowthPct = finite(readNumber('inputPopGrowth'), 0);
+            const gPct = k * popGrowthPct;
+            const rpPct = Math.max(0, spreadPct - tPct + gPct);
+            $('inputL').value = rpPct.toFixed(2);
+            calculate();
+        }
+
+        inputIds.forEach(id => $(id).addEventListener('input', calculate));
+        calculate();
+    </script>
+</body>
+</html>
