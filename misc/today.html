@@ -1,0 +1,1063 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>今日日程安排</title>
+    <style>
+        :root {
+            --primary: #4F46E5;
+            --bg: #F3F4F6;
+            --card-bg: #FFFFFF;
+            --text: #1F2937;
+            --hard-color: #EF4444;
+            --medium-color: #F59E0B;
+            --easy-color: #10B981;
+            --rest-bg: #E0E7FF;
+            --break-bg: #FEF3C7;
+            --night-bg: #1E293B;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            display: flex;
+            gap: 20px;
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        @media (max-width: 850px) {
+            .container { flex-direction: column; }
+        }
+
+        .panel {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            flex: 1;
+        }
+
+        h2 { margin-top: 0; font-size: 1.15rem; border-bottom: 2px solid #F3F4F6; padding-bottom: 8px; display: flex; justify-content: space-between; align-items: center;}
+
+        label { display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 3px; }
+        input, select, button {
+            padding: 6px 8px;
+            border: 1px solid #D1D5DB;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 0.85rem;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            padding: 8px;
+        }
+        .btn-primary:hover { opacity: 0.9; }
+
+        /* Settings Card */
+        .settings-card {
+            background: #EFF6FF;
+            border: 1px solid #BFDBFE;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 15px;
+            font-size: 0.82rem;
+        }
+        .settings-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .optimizer-card {
+            background: #F8FAFC;
+            border: 1px solid #CBD5E1;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 15px;
+            font-size: 0.8rem;
+        }
+        .optimizer-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            user-select: none;
+        }
+        .optimizer-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px 10px;
+            margin-top: 10px;
+        }
+        .optimizer-grid input, .optimizer-grid select { width: 100%; }
+        .optimizer-hint { color: #64748B; line-height: 1.45; margin-top: 8px; }
+        .optimizer-stats {
+            display: none;
+            margin: 0 0 12px;
+            padding: 8px 10px;
+            border-radius: 8px;
+            background: #F8FAFC;
+            border: 1px solid #E2E8F0;
+            color: #475569;
+            font-size: 0.78rem;
+            line-height: 1.55;
+        }
+
+        /* Task Cards */
+        .task-card {
+            border: 1px solid #E5E7EB;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            background: #FAFAFA;
+        }
+        .task-header {
+            padding: 8px 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #F3F4F6;
+        }
+        .task-body { padding: 8px 10px; border-top: 1px solid #E5E7EB; }
+
+        .edit-input {
+            border: 1px transparent;
+            background: transparent;
+            font-weight: bold;
+            font-size: 0.88rem;
+        }
+        .edit-input:hover, .edit-input:focus {
+            border: 1px solid #A1A1AA;
+            background: white;
+        }
+
+        .btn-sm {
+            padding: 2px 6px;
+            font-size: 0.75rem;
+            border: 1px solid #D1D5DB;
+            background: white;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .btn-sm:hover { background: #F3F4F6; }
+        .btn-del { background-color: #EF4444; color: white; border: none; }
+
+        .subtask-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 5px;
+            background: white;
+            padding: 4px 6px;
+            border: 1px solid #E5E7EB;
+            border-radius: 4px;
+        }
+
+        /* Timeline styling */
+        .timeline-item {
+            display: flex;
+            margin-bottom: 6px;
+            border-left: 4px solid var(--primary);
+            background: #F9FAFB;
+            padding: 6px 10px;
+            border-radius: 0 6px 6px 0;
+            font-size: 0.85rem;
+        }
+        .time-box { font-weight: bold; min-width: 105px; color: #4B5563; }
+        .slot-peak { border-left-color: var(--hard-color); background: #FEF2F2; }
+        .slot-rest { border-left-color: #8B5CF6; background: var(--rest-bg); }
+        .slot-break { border-left-color: var(--medium-color); background: var(--break-bg); font-size: 0.8rem; }
+        .slot-night { border-left-color: #1E293B; background: var(--night-bg); color: #F3F4F6; }
+        .slot-night .time-box { color: #9CA3AF; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- 左侧：设置与任务录入 -->
+    <div class="panel">
+        <h2>
+            工作时间设置
+            <button class="btn-sm" onclick="resetDefaults()">重置数据</button>
+        </h2>
+        <div class="settings-card">
+            <div style="margin-bottom: 8px;">
+                <label>一日开始时间</label>
+                <input type="time" id="dayStart" onchange="saveSettings()">
+            </div>
+            <div class="settings-grid">
+                <div>
+                    <label>上午黄金期</label>
+                    <input type="time" id="mStart" onchange="saveSettings()"> ~ 
+                    <input type="time" id="mEnd" onchange="saveSettings()">
+                </div>
+                <div>
+                    <label>下午黄金期</label>
+                    <input type="time" id="aStart" onchange="saveSettings()"> ~ 
+                    <input type="time" id="aEnd" onchange="saveSettings()">
+                </div>
+            </div>
+        </div>
+
+        <div class="optimizer-card">
+            <div class="optimizer-head" onclick="toggleOptimizerSettings()">
+                <strong>优化参数</strong>
+                <span id="optimizerToggle">展开 ▾</span>
+            </div>
+            <div id="optimizerBody" style="display:none;">
+                <div class="optimizer-grid">
+                    <div>
+                        <label>大任务最大主动段数</label>
+                        <select id="maxMainRuns" onchange="saveSettings()">
+                            <option value="1">1（强连续，推荐）</option>
+                            <option value="2">2（允许一次拆分）</option>
+                            <option value="3">3（较灵活）</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>主任务分裂惩罚</label>
+                        <input type="number" id="fragmentPenalty" min="0" step="10" onchange="saveSettings()">
+                    </div>
+                    <div>
+                        <label>主任务切换惩罚</label>
+                        <input type="number" id="switchPenalty" min="0" step="5" onchange="saveSettings()">
+                    </div>
+                    <div>
+                        <label>固定长休切割惩罚</label>
+                        <input type="number" id="hardBreakPenalty" min="0" step="10" onchange="saveSettings()">
+                    </div>
+                    <div>
+                        <label>黄金期错配 / 分钟</label>
+                        <input type="number" id="peakPenalty" min="0" step="0.1" onchange="saveSettings()">
+                    </div>
+                    <div>
+                        <label>未完成 / 分钟</label>
+                        <input type="number" id="unfinishedPenalty" min="0" step="0.5" onchange="saveSettings()">
+                    </div>
+                    <div>
+                        <label>固定中断前最小启动窗口</label>
+                        <input type="number" id="minStartWindow" min="0" max="25" step="1" onchange="saveSettings()">
+                    </div>
+                    <div>
+                        <label>退火迭代次数</label>
+                        <input type="number" id="annealIterations" min="500" max="30000" step="500" onchange="saveSettings()">
+                    </div>
+                </div>
+                <div class="optimizer-hint">
+                    “主动段”只统计被其他主任务插入造成的拆分；5/15 分钟生理休息不会增加主动段。午餐、冥想、晚餐属于硬中断，会重置连续工作并单独计入切割成本。
+                </div>
+            </div>
+        </div>
+
+        <h2>添加新任务</h2>
+        <div style="display: flex; gap: 6px; margin-bottom: 15px;">
+            <input type="text" id="newTaskTitle" placeholder="任务名称 (如: 撰写报告)" style="flex: 2;">
+            <input type="number" id="newTaskDur" placeholder="时长(分)" value="45" style="width: 70px;">
+            <select id="newTaskDiff" style="flex: 1;">
+                <option value="high">困难</option>
+                <option value="medium" selected>中等</option>
+                <option value="low">简单</option>
+            </select>
+            <button class="btn-primary" style="flex: 0.8;" onclick="addMainTask()">添加</button>
+        </div>
+
+        <h2>任务列表 (拆分为可选)</h2>
+        <div id="taskList"></div>
+
+        <button class="btn-primary" style="background-color: #10B981; margin-top: 15px; padding: 10px;" onclick="generateSchedule()">🚀 生成智能优化日程</button>
+    </div>
+
+    <!-- 右侧：生成的日程表 -->
+    <div class="panel">
+        <h2>今日高效日程安排</h2>
+        <div id="optimizerStats" class="optimizer-stats"></div>
+        <div id="scheduleTimeline">
+            <p style="color: #9CA3AF; font-size: 0.85rem;">添加任务后点击生成。使用“子任务包 + 主任务连续性约束”的优化：子任务内部不可被其他任务插入；同一主任务默认只允许 1 个主动段，再用模拟退火搜索主任务/子任务包的全局顺序。5/15 分钟休息只暂停，午餐、冥想、晚餐属于硬中断并计入切割成本。</p>
+        </div>
+
+        <!-- 新增：未完成任务区域 -->
+        <div id="unfinishedSection" style="margin-top: 25px; display: none;">
+            <h2 style="color: #EF4444; border-bottom-color: #FCA5A5; font-size: 1rem;">
+                ⚠️ 今日未安排/需延期任务
+            </h2>
+            <div id="unfinishedList"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const defaultState = {
+        settings: {
+            dayStart: "10:00",
+            mStart: "10:00", mEnd: "11:30",
+            aStart: "14:30", aEnd: "17:30",
+            maxMainRuns: 1,
+            fragmentPenalty: 260,
+            switchPenalty: 45,
+            hardBreakPenalty: 110,
+            peakPenalty: 2.2,
+            unfinishedPenalty: 9,
+            minStartWindow: 10,
+            annealIterations: 7000
+        },
+        tasks: []
+    };
+
+    let appData = JSON.parse(localStorage.getItem('daily_app_data_v4')) || defaultState;
+
+    function save() {
+        localStorage.setItem('daily_app_data_v4', JSON.stringify(appData));
+    }
+
+    function resetDefaults() {
+        if(confirm("确定要清空所有数据并恢复默认吗？")) {
+            localStorage.removeItem('daily_app_data_v4');
+            location.reload();
+        }
+    }
+
+    function initSettingsUI() {
+        document.getElementById('dayStart').value = appData.settings.dayStart || "10:00";
+        document.getElementById('mStart').value = appData.settings.mStart;
+        document.getElementById('mEnd').value = appData.settings.mEnd;
+        document.getElementById('aStart').value = appData.settings.aStart;
+        document.getElementById('aEnd').value = appData.settings.aEnd;
+
+        const defaults = defaultState.settings;
+        ['maxMainRuns','fragmentPenalty','switchPenalty','hardBreakPenalty','peakPenalty','unfinishedPenalty','minStartWindow','annealIterations'].forEach(id => {
+            document.getElementById(id).value = appData.settings[id] ?? defaults[id];
+        });
+    }
+
+    function saveSettings() {
+        appData.settings.dayStart = document.getElementById('dayStart').value;
+        appData.settings.mStart = document.getElementById('mStart').value;
+        appData.settings.mEnd = document.getElementById('mEnd').value;
+        appData.settings.aStart = document.getElementById('aStart').value;
+        appData.settings.aEnd = document.getElementById('aEnd').value;
+        appData.settings.maxMainRuns = parseInt(document.getElementById('maxMainRuns').value) || 1;
+        appData.settings.fragmentPenalty = parseFloat(document.getElementById('fragmentPenalty').value) || 0;
+        appData.settings.switchPenalty = parseFloat(document.getElementById('switchPenalty').value) || 0;
+        appData.settings.hardBreakPenalty = parseFloat(document.getElementById('hardBreakPenalty').value) || 0;
+        appData.settings.peakPenalty = parseFloat(document.getElementById('peakPenalty').value) || 0;
+        appData.settings.unfinishedPenalty = parseFloat(document.getElementById('unfinishedPenalty').value) || 0;
+        appData.settings.minStartWindow = Math.max(0, parseInt(document.getElementById('minStartWindow').value) || 0);
+        appData.settings.annealIterations = Math.max(500, parseInt(document.getElementById('annealIterations').value) || 7000);
+        save();
+    }
+
+    function toggleOptimizerSettings() {
+        const body = document.getElementById('optimizerBody');
+        const toggle = document.getElementById('optimizerToggle');
+        const open = body.style.display !== 'none';
+        body.style.display = open ? 'none' : 'block';
+        toggle.textContent = open ? '展开 ▾' : '收起 ▴';
+    }
+
+    // 主任务管理
+    function addMainTask() {
+        const titleEl = document.getElementById('newTaskTitle');
+        const durEl = document.getElementById('newTaskDur');
+        const diffEl = document.getElementById('newTaskDiff');
+
+        if (!titleEl.value.trim()) return;
+
+        appData.tasks.push({
+            id: Date.now(),
+            title: titleEl.value.trim(),
+            duration: parseInt(durEl.value) || 30,
+            difficulty: diffEl.value,
+            showSubtasks: false,
+            subtasks: []
+        });
+
+        titleEl.value = '';
+        save();
+        render();
+    }
+
+    function deleteMainTask(id) {
+        appData.tasks = appData.tasks.filter(t => t.id !== id);
+        save();
+        render();
+    }
+
+    function updateMainTask(id, field, value) {
+        const task = appData.tasks.find(t => t.id === id);
+        if (task) {
+            task[field] = field === 'duration' ? (parseInt(value) || 0) : value;
+            save();
+            render();
+        }
+    }
+
+    // 子任务管理
+    function addSubtask(taskId) {
+        const task = appData.tasks.find(t => t.id === taskId);
+        if (!task) return;
+
+        const titleEl = document.getElementById(`new-sub-title-${taskId}`);
+        const durEl = document.getElementById(`new-sub-dur-${taskId}`);
+        const diffEl = document.getElementById(`new-sub-diff-${taskId}`);
+
+        if (!titleEl.value.trim()) return;
+
+        task.subtasks.push({
+            id: Date.now(),
+            title: titleEl.value.trim(),
+            duration: parseInt(durEl.value) || 15,
+            difficulty: diffEl.value
+        });
+
+        titleEl.value = '';
+        recalcTotalDuration(task);
+        save();
+        render();
+    }
+
+    function updateSubtask(taskId, subId, field, value) {
+        const task = appData.tasks.find(t => t.id === taskId);
+        if (task) {
+            const sub = task.subtasks.find(s => s.id === subId);
+            if (sub) {
+                sub[field] = field === 'duration' ? (parseInt(value) || 0) : value;
+                recalcTotalDuration(task);
+                save();
+                render();
+            }
+        }
+    }
+
+    function moveSubtask(taskId, index, direction) {
+        const task = appData.tasks.find(t => t.id === taskId);
+        if (!task) return;
+
+        const newIndex = index + direction;
+        if (newIndex < 0 || newIndex >= task.subtasks.length) return;
+
+        const temp = task.subtasks[index];
+        task.subtasks[index] = task.subtasks[newIndex];
+        task.subtasks[newIndex] = temp;
+
+        save();
+        render();
+    }
+
+    function deleteSubtask(taskId, subId) {
+        const task = appData.tasks.find(t => t.id === taskId);
+        if (task) {
+            task.subtasks = task.subtasks.filter(s => s.id !== subId);
+            recalcTotalDuration(task);
+            save();
+            render();
+        }
+    }
+
+    function toggleSubtasks(taskId) {
+        const task = appData.tasks.find(t => t.id === taskId);
+        if (task) {
+            task.showSubtasks = !task.showSubtasks;
+            save();
+            render();
+        }
+    }
+
+    // 只有当存在子任务时，主任务时间才由子任务自动求和更新
+    function recalcTotalDuration(task) {
+        if (task.subtasks && task.subtasks.length > 0) {
+            task.duration = task.subtasks.reduce((sum, s) => sum + s.duration, 0);
+        }
+    }
+
+    function render() {
+        const listEl = document.getElementById('taskList');
+        listEl.innerHTML = '';
+
+        appData.tasks.forEach(task => {
+            recalcTotalDuration(task);
+            const card = document.createElement('div');
+            card.className = 'task-card';
+
+            let subtasksHTML = '';
+            if (task.showSubtasks) {
+                const rows = task.subtasks.map((st, idx) => `
+                    <div class="subtask-row">
+                        <span style="font-weight:bold; color:#6B7280; font-size:0.75rem;">${idx+1}.</span>
+                        <input type="text" class="edit-input" style="flex:2;" value="${st.title}" onchange="updateSubtask(${task.id}, ${st.id}, 'title', this.value)">
+                        <input type="number" class="edit-input" style="width:45px;" value="${st.duration}" onchange="updateSubtask(${task.id}, ${st.id}, 'duration', this.value)">分
+                        <select onchange="updateSubtask(${task.id}, ${st.id}, 'difficulty', this.value)">
+                            <option value="high" ${st.difficulty==='high'?'selected':''}>困难</option>
+                            <option value="medium" ${st.difficulty==='medium'?'selected':''}>中等</option>
+                            <option value="low" ${st.difficulty==='low'?'selected':''}>简单</option>
+                        </select>
+                        <button class="btn-sm" onclick="moveSubtask(${task.id}, ${idx}, -1)">↑</button>
+                        <button class="btn-sm" onclick="moveSubtask(${task.id}, ${idx}, 1)">↓</button>
+                        <button class="btn-sm btn-del" onclick="deleteSubtask(${task.id}, ${st.id})">✕</button>
+                    </div>
+                `).join('');
+
+                subtasksHTML = `
+                    <div class="task-body">
+                        <div>${rows || '<div style="font-size:0.75rem; color:#9CA3AF;">无拆解步骤，将按主任务整体排期</div>'}</div>
+                        <div style="display:flex; gap:5px; margin-top:8px;">
+                            <input type="text" id="new-sub-title-${task.id}" placeholder="添加步骤" style="flex:2;">
+                            <input type="number" id="new-sub-dur-${task.id}" placeholder="分钟" value="15" style="width:50px;">
+                            <select id="new-sub-diff-${task.id}">
+                                <option value="low">简单</option>
+                                <option value="medium" selected>中等</option>
+                                <option value="high">困难</option>
+                            </select>
+                            <button class="btn-sm" style="background:#4F46E5; color:white;" onclick="addSubtask(${task.id})">+ 步骤</button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            card.innerHTML = `
+                <div class="task-header">
+                    <input type="text" class="edit-input" style="flex:1;" value="${task.title}" onchange="updateMainTask(${task.id}, 'title', this.value)">
+                    <input type="number" class="edit-input" style="width:50px;" value="${task.duration}" ${task.subtasks.length > 0 ? 'disabled' : ''} onchange="updateMainTask(${task.id}, 'duration', this.value)">分
+                    <select onchange="updateMainTask(${task.id}, 'difficulty', this.value)">
+                        <option value="high" ${task.difficulty==='high'?'selected':''}>困难</option>
+                        <option value="medium" ${task.difficulty==='medium'?'selected':''}>中等</option>
+                        <option value="low" ${task.difficulty==='low'?'selected':''}>简单</option>
+                    </select>
+                    <button class="btn-sm" onclick="toggleSubtasks(${task.id})">${task.showSubtasks?'收起拆解':'拆解步骤'}</button>
+                    <button class="btn-sm btn-del" onclick="deleteMainTask(${task.id})">删除</button>
+                </div>
+                ${subtasksHTML}
+            `;
+            listEl.appendChild(card);
+        });
+    }
+
+    function timeToMin(timeStr) {
+        const [h, m] = timeStr.split(':').map(Number);
+        return h * 60 + m;
+    }
+    function minToTime(mins) {
+        const h = Math.floor(mins / 60).toString().padStart(2, '0');
+        const m = (mins % 60).toString().padStart(2, '0');
+        return `${h}:${m}`;
+    }
+
+    // 核心调度算法
+    //
+    // 建模：
+    // - 决策变量不是“每 25 分钟选一次任务”，而是“子任务包的全局顺序”。
+    // - 一个子任务包内部不可被其他主任务插入；25/5、90/15 只产生生理休息。
+    // - 同一主任务的多个子任务可以相邻形成一个 run；run 数量由 maxMainRuns 约束。
+    // - 午餐 / 冥想 / 晚餐是硬中断：它们重置工作计时，并对跨越它们的未完成包收取 hardBreakPenalty。
+    // - 目标函数同时考虑：主任务分裂、上下文切换、固定中断切割、黄金期错配、未完成工作。
+    function generateSchedule() {
+        const timelineEl = document.getElementById('scheduleTimeline');
+        const statsEl = document.getElementById('optimizerStats');
+        timelineEl.innerHTML = '';
+        statsEl.style.display = 'none';
+
+        saveSettings();
+        const set = appData.settings;
+        const defaults = defaultState.settings;
+        const cfg = {
+            maxMainRuns: Math.max(1, Number(set.maxMainRuns ?? defaults.maxMainRuns)),
+            fragmentPenalty: Math.max(0, Number(set.fragmentPenalty ?? defaults.fragmentPenalty)),
+            switchPenalty: Math.max(0, Number(set.switchPenalty ?? defaults.switchPenalty)),
+            hardBreakPenalty: Math.max(0, Number(set.hardBreakPenalty ?? defaults.hardBreakPenalty)),
+            peakPenalty: Math.max(0, Number(set.peakPenalty ?? defaults.peakPenalty)),
+            unfinishedPenalty: Math.max(0, Number(set.unfinishedPenalty ?? defaults.unfinishedPenalty)),
+            minStartWindow: Math.max(0, Number(set.minStartWindow ?? defaults.minStartWindow)),
+            annealIterations: Math.max(500, Number(set.annealIterations ?? defaults.annealIterations))
+        };
+
+        const mS = timeToMin(set.mStart), mE = timeToMin(set.mEnd);
+        const aS = timeToMin(set.aStart), aE = timeToMin(set.aEnd);
+        const dayStart = timeToMin(set.dayStart || '10:00');
+        const endOfWorkDay = 1200;
+
+        const fixedSlots = [
+            { start: 690, end: 780, name: '🍱 午餐 & 午休', type: 'rest' },
+            { start: 780, end: 810, name: '🧘 冥想 / 正念放松', type: 'rest' },
+            { start: 1050, end: 1140, name: '🥗 晚餐 & 散步休整', type: 'rest' },
+            { start: 1200, end: 1320, name: '🌙 关屏 / 远离光线 / 彻底休息', type: 'night' }
+        ].sort((a, b) => a.start - b.start);
+
+        // 每个主任务转为一组有顺序的“包”。没有子任务时，主任务本身就是一个包。
+        const mainMap = new Map();
+        appData.tasks.forEach((t, mainIndex) => {
+            const source = (t.subtasks && t.subtasks.length > 0)
+                ? t.subtasks
+                : [{ id: t.id, title: '', duration: t.duration || 30, difficulty: t.difficulty }];
+
+            const packages = source
+                .map((st, subIndex) => ({
+                    packageId: `${t.id}:${subIndex}`,
+                    mainId: t.id,
+                    mainTitle: t.title,
+                    mainIndex,
+                    subIndex,
+                    title: st.title || '',
+                    duration: Math.max(0, Number(st.duration) || 0),
+                    difficulty: st.difficulty || t.difficulty || 'medium'
+                }))
+                .filter(p => p.duration > 0);
+
+            if (packages.length) {
+                mainMap.set(t.id, {
+                    mainId: t.id,
+                    mainTitle: t.title,
+                    mainIndex,
+                    packages
+                });
+            }
+        });
+
+        const mains = [...mainMap.values()];
+        if (!mains.length) {
+            timelineEl.innerHTML = '<p style="color:#9CA3AF;font-size:0.85rem;">暂无可排期任务。</p>';
+            document.getElementById('unfinishedSection').style.display = 'none';
+            return;
+        }
+
+        // chromosome 使用 mainId token。某主任务第 k 次出现永远映射到该主任务第 k 个子任务，
+        // 因此任何交换都不会破坏主任务内部步骤顺序。
+        function groupedSequence(mainOrder) {
+            const seq = [];
+            mainOrder.forEach(id => {
+                const m = mainMap.get(id);
+                if (m) for (let i = 0; i < m.packages.length; i++) seq.push(id);
+            });
+            return seq;
+        }
+
+        function materializePackages(sequence) {
+            const seen = new Map();
+            const out = [];
+            for (const mainId of sequence) {
+                const m = mainMap.get(mainId);
+                if (!m) continue;
+                const idx = seen.get(mainId) || 0;
+                if (idx < m.packages.length) {
+                    out.push(m.packages[idx]);
+                    seen.set(mainId, idx + 1);
+                }
+            }
+            return out;
+        }
+
+        function countRuns(sequence) {
+            const runs = new Map();
+            let prev = null;
+            for (const id of sequence) {
+                if (id !== prev) runs.set(id, (runs.get(id) || 0) + 1);
+                prev = id;
+            }
+            return runs;
+        }
+
+        function isPeak(minute) {
+            return (minute >= mS && minute < mE) || (minute >= aS && minute < aE);
+        }
+
+        function activeFixed(minute) {
+            return fixedSlots.find(f => f.type !== 'night' && minute >= f.start && minute < f.end);
+        }
+
+        function nextFixed(minute) {
+            return fixedSlots.find(f => f.type !== 'night' && f.start > minute && f.start < endOfWorkDay);
+        }
+
+        function peakMismatchCost(diff, start, end) {
+            let cost = 0;
+            // 最多一天 600 分钟，按分钟计算足够快，也让权重直观。
+            for (let t = start; t < end; t++) {
+                const peak = isPeak(t);
+                if (diff === 'high' && !peak) cost += cfg.peakPenalty;
+                else if (diff === 'medium' && peak) cost += cfg.peakPenalty * 0.18;
+                else if (diff === 'low' && peak) cost += cfg.peakPenalty * 0.75;
+            }
+            return cost;
+        }
+
+        // 对一个候选顺序进行完整“解码”。render=false 时只算成本，不创建 DOM。
+        function decode(sequence, render = false) {
+            const packages = materializePackages(sequence);
+            const schedule = [];
+            const remaining = new Map(packages.map(p => [p.packageId, p.duration]));
+            let curr = dayStart;
+            let continuous = 0;
+            let session = 0;
+            let cost = 0;
+            let hardSplits = 0;
+            let tinyBuffers = 0;
+            let activePackageId = null;
+            let hardInterruptionOpen = false;
+
+            const push = (start, end, title, type, meta = {}) => {
+                if (end <= start) return;
+                if (render) schedule.push({ start, end, time: `${minToTime(start)}-${minToTime(end)}`, title, type, ...meta });
+            };
+
+            // 结构成本：主动切换 + 主任务被拆成多个 run。
+            const runs = countRuns(sequence);
+            let switches = 0;
+            for (let i = 1; i < sequence.length; i++) {
+                if (sequence[i] !== sequence[i - 1]) switches++;
+            }
+            cost += switches * cfg.switchPenalty;
+
+            let extraRuns = 0;
+            let runViolations = 0;
+            for (const [, r] of runs) {
+                extraRuns += Math.max(0, r - 1);
+                runViolations += Math.max(0, r - cfg.maxMainRuns);
+            }
+            cost += extraRuns * cfg.fragmentPenalty;
+            // maxMainRuns 是硬约束：违反一次远比任何软收益都昂贵。
+            cost += runViolations * 1000000;
+
+            let pkgIndex = 0;
+            while (pkgIndex < packages.length && curr < endOfWorkDay) {
+                const pkg = packages[pkgIndex];
+                let rem = remaining.get(pkg.packageId) || 0;
+                if (rem <= 0) { pkgIndex++; continue; }
+                activePackageId = pkg.packageId;
+                let pkgWorkedBefore = false;
+
+                while (rem > 0 && curr < endOfWorkDay) {
+                    const fixed = activeFixed(curr);
+                    if (fixed) {
+                        const end = Math.min(fixed.end, endOfWorkDay);
+                        if (!hardInterruptionOpen && pkgWorkedBefore && rem > 0) {
+                            hardSplits++;
+                            cost += cfg.hardBreakPenalty;
+                            hardInterruptionOpen = true;
+                        }
+                        push(curr, end, fixed.name, fixed.type);
+                        curr = end;
+                        continuous = 0;
+                        session = 0;
+                        continue;
+                    }
+                    hardInterruptionOpen = false;
+
+                    const nf = nextFixed(curr);
+                    const hardBoundary = nf ? nf.start : endOfWorkDay;
+
+                    if (session >= 90) {
+                        const end = Math.min(curr + 15, hardBoundary, endOfWorkDay);
+                        if (end > curr) {
+                            const truncated = end - curr < 15;
+                            push(curr, end, truncated ? '🧩 固定中断前缓冲 / 提前放松' : '🌿 深度放松 / 远眺活动 (90→15 大休)', truncated ? 'free' : 'break');
+                            curr = end;
+                            continuous = 0;
+                            if (!truncated) session = 0;
+                            continue;
+                        }
+                    }
+
+                    if (continuous >= 25) {
+                        const end = Math.min(curr + 5, hardBoundary, endOfWorkDay);
+                        if (end > curr) {
+                            const truncated = end - curr < 5;
+                            push(curr, end, truncated ? '🧩 固定中断前缓冲 / 收尾' : '☕ 喝水 / 伸展放松 (25→5 短休)', truncated ? 'free' : 'break');
+                            curr = end;
+                            continuous = 0;
+                            continue;
+                        }
+                    }
+
+                    const toHard = hardBoundary - curr;
+                    // 不在长固定中断前启动一个“只能做几分钟、且明显做不完”的新碎片。
+                    // 已经做了一部分的包也遵守该规则，防止 11:27-11:30 这类微碎片。
+                    if (nf && toHard > 0 && toHard < cfg.minStartWindow && rem > toHard) {
+                        push(curr, hardBoundary, '🧩 固定中断前缓冲 / 收尾整理', 'free');
+                        tinyBuffers++;
+                        curr = hardBoundary;
+                        continuous = 0;
+                        session = 0;
+                        continue;
+                    }
+
+                    const maxChunk = Math.min(
+                        rem,
+                        Math.max(0, 25 - continuous),
+                        Math.max(0, 90 - session),
+                        Math.max(0, toHard),
+                        endOfWorkDay - curr
+                    );
+                    if (maxChunk <= 0) break;
+
+                    const start = curr;
+                    const end = curr + maxChunk;
+                    cost += peakMismatchCost(pkg.difficulty, start, end);
+                    const title = pkg.title ? `${pkg.mainTitle}：${pkg.title}` : pkg.mainTitle;
+                    push(start, end, title, isPeak(start) ? 'peak' : 'normal', { mainId: pkg.mainId, packageId: pkg.packageId });
+
+                    curr = end;
+                    rem -= maxChunk;
+                    pkgWorkedBefore = true;
+                    remaining.set(pkg.packageId, rem);
+                    continuous += maxChunk;
+                    session += maxChunk;
+                }
+
+                if (rem <= 0) pkgIndex++;
+                else break;
+            }
+
+            // 未完成成本按分钟计；高难任务额外提高 20%，避免把最重要的工作全部推迟到明天。
+            let unfinishedMins = 0;
+            for (const pkg of packages) {
+                const rem = remaining.get(pkg.packageId) || 0;
+                if (rem > 0) {
+                    unfinishedMins += rem;
+                    const mult = pkg.difficulty === 'high' ? 1.2 : (pkg.difficulty === 'medium' ? 1.05 : 1.0);
+                    cost += rem * cfg.unfinishedPenalty * mult;
+                }
+            }
+
+            // 很小的稳定性/FIFO 项，只负责完全同分时更可预测。
+            packages.forEach((p, i) => { cost += Math.abs(i - p.mainIndex) * 0.03; });
+
+            return {
+                cost,
+                schedule,
+                remaining,
+                packages,
+                switches,
+                extraRuns,
+                runViolations,
+                hardSplits,
+                unfinishedMins,
+                tinyBuffers,
+                runs
+            };
+        }
+
+        // 稳定伪随机：同一组任务/参数重复点击，结果基本一致，便于调参比较。
+        let seed = 2166136261 >>> 0;
+        const seedText = JSON.stringify(appData.tasks.map(t => [t.id, t.duration, t.difficulty, (t.subtasks || []).map(s => [s.duration, s.difficulty])])) + JSON.stringify(cfg);
+        for (let i = 0; i < seedText.length; i++) {
+            seed ^= seedText.charCodeAt(i);
+            seed = Math.imul(seed, 16777619) >>> 0;
+        }
+        function rnd() {
+            seed ^= seed << 13; seed >>>= 0;
+            seed ^= seed >>> 17; seed >>>= 0;
+            seed ^= seed << 5; seed >>>= 0;
+            return (seed >>> 0) / 4294967296;
+        }
+        function randInt(n) { return Math.floor(rnd() * n); }
+
+        function splitIntoRuns(seq) {
+            const runs = [];
+            let i = 0;
+            while (i < seq.length) {
+                let j = i + 1;
+                while (j < seq.length && seq[j] === seq[i]) j++;
+                runs.push(seq.slice(i, j));
+                i = j;
+            }
+            return runs;
+        }
+
+        function mutate(seq) {
+            // maxMainRuns=1 时只移动/交换完整主任务块，保证搜索空间始终满足强连续约束。
+            if (cfg.maxMainRuns === 1) {
+                const runs = splitIntoRuns(seq);
+                if (runs.length <= 1) return seq.slice();
+                const outRuns = runs.map(r => r.slice());
+                if (rnd() < 0.55) {
+                    let a = randInt(outRuns.length), b = randInt(outRuns.length);
+                    if (a === b) b = (b + 1) % outRuns.length;
+                    [outRuns[a], outRuns[b]] = [outRuns[b], outRuns[a]];
+                } else {
+                    const from = randInt(outRuns.length);
+                    const [block] = outRuns.splice(from, 1);
+                    const to = randInt(outRuns.length + 1);
+                    outRuns.splice(to, 0, block);
+                }
+                return outRuns.flat();
+            }
+
+            // 允许拆成 2/3 段时，用 token swap/move 探索交错方案；硬约束由 objective 保证。
+            const out = seq.slice();
+            if (out.length <= 1) return out;
+            if (rnd() < 0.6) {
+                let a = randInt(out.length), b = randInt(out.length);
+                if (a === b) b = (b + 1) % out.length;
+                [out[a], out[b]] = [out[b], out[a]];
+            } else {
+                const from = randInt(out.length);
+                const [token] = out.splice(from, 1);
+                const to = randInt(out.length + 1);
+                out.splice(to, 0, token);
+            }
+            return out;
+        }
+
+        function anneal(initial) {
+            let current = initial.slice();
+            let curEval = decode(current, false);
+            let best = current.slice();
+            let bestEval = curEval;
+
+            const iterations = Math.floor(cfg.annealIterations);
+            const t0 = 180;
+            const tEnd = 0.35;
+            for (let i = 0; i < iterations; i++) {
+                const progress = i / Math.max(1, iterations - 1);
+                const temp = t0 * Math.pow(tEnd / t0, progress);
+                const next = mutate(current);
+                const nextEval = decode(next, false);
+                const delta = nextEval.cost - curEval.cost;
+
+                if (delta <= 0 || rnd() < Math.exp(-delta / temp)) {
+                    current = next;
+                    curEval = nextEval;
+                }
+                if (curEval.cost < bestEval.cost) {
+                    best = current.slice();
+                    bestEval = curEval;
+                }
+            }
+            return { sequence: best, evaluation: bestEval };
+        }
+
+        // 多起点：输入顺序、难度顺序、时长顺序 + 随机主任务顺序。
+        const inputOrder = mains.map(m => m.mainId);
+        const difficultyRank = { high: 3, medium: 2, low: 1 };
+        const mainSummary = mains.map(m => ({
+            id: m.mainId,
+            avgDiff: m.packages.reduce((s, p) => s + difficultyRank[p.difficulty], 0) / m.packages.length,
+            total: m.packages.reduce((s, p) => s + p.duration, 0)
+        }));
+
+        const startOrders = [
+            inputOrder.slice(),
+            mainSummary.slice().sort((a, b) => b.avgDiff - a.avgDiff || a.total - b.total).map(x => x.id),
+            mainSummary.slice().sort((a, b) => a.total - b.total).map(x => x.id)
+        ];
+        for (let r = 0; r < 3; r++) {
+            const arr = inputOrder.slice();
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = randInt(i + 1);
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            startOrders.push(arr);
+        }
+
+        let globalBest = null;
+        for (const order of startOrders) {
+            const result = anneal(groupedSequence(order));
+            if (!globalBest || result.evaluation.cost < globalBest.evaluation.cost) globalBest = result;
+        }
+
+        // maxMainRuns>1 的场景，额外从当前最优继续做一轮细粒度退火。
+        if (cfg.maxMainRuns > 1 && globalBest) {
+            const refined = anneal(globalBest.sequence);
+            if (refined.evaluation.cost < globalBest.evaluation.cost) globalBest = refined;
+        }
+
+        const best = decode(globalBest.sequence, true);
+
+        // 合并相邻同任务、同类型工作块（不会跨越任何休息块），让展示更清晰。
+        const displaySchedule = [];
+        for (const item of best.schedule) {
+            const prev = displaySchedule[displaySchedule.length - 1];
+            if (prev && item.mainId && prev.mainId === item.mainId && prev.title === item.title && prev.end === item.start && prev.type === item.type) {
+                prev.end = item.end;
+                prev.time = `${minToTime(prev.start)}-${minToTime(prev.end)}`;
+            } else {
+                displaySchedule.push({ ...item });
+            }
+        }
+
+        const nightBlock = fixedSlots.find(f => f.type === 'night');
+        if (nightBlock && nightBlock.start >= endOfWorkDay) {
+            displaySchedule.push({
+                start: nightBlock.start,
+                end: nightBlock.end,
+                time: `${minToTime(nightBlock.start)}-${minToTime(nightBlock.end)}`,
+                title: nightBlock.name,
+                type: 'night'
+            });
+        }
+
+        displaySchedule.forEach(item => {
+            const div = document.createElement('div');
+            let cls = '';
+            if (item.type === 'peak') cls = 'slot-peak';
+            if (item.type === 'rest') cls = 'slot-rest';
+            if (item.type === 'break') cls = 'slot-break';
+            if (item.type === 'night') cls = 'slot-night';
+            div.className = `timeline-item ${cls}`;
+            div.innerHTML = `<div class="time-box">${item.time}</div><div><strong>${item.title}</strong></div>`;
+            timelineEl.appendChild(div);
+        });
+
+        statsEl.style.display = 'block';
+        const runText = [...best.runs.entries()]
+            .map(([id, r]) => `${mainMap.get(id)?.mainTitle || id}:${r}段`)
+            .join(' · ');
+        statsEl.innerHTML = `
+            <strong>优化结果</strong>　成本 ${best.cost.toFixed(1)} · 主任务切换 ${best.switches} 次 · 主动分裂 ${best.extraRuns} 次 · 固定长休切割 ${best.hardSplits} 次 · 未完成 ${best.unfinishedMins} 分钟<br>
+            <span style="color:#64748B;">${runText}</span>
+        `;
+
+        // 未完成任务：基于最优解的 package remaining，而不是被 mutate 的临时池。
+        const unfinishedContainer = document.getElementById('unfinishedSection');
+        const unfinishedList = document.getElementById('unfinishedList');
+        unfinishedList.innerHTML = '';
+
+        const unfinishedTasks = [];
+        best.packages.forEach(pkg => {
+            const rem = best.remaining.get(pkg.packageId) || 0;
+            if (rem > 0) {
+                unfinishedTasks.push({
+                    title: pkg.title ? `${pkg.mainTitle}：${pkg.title}` : pkg.mainTitle,
+                    duration: rem
+                });
+            }
+        });
+
+        if (unfinishedTasks.length > 0) {
+            unfinishedContainer.style.display = 'block';
+            unfinishedTasks.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'timeline-item';
+                div.style.borderLeftColor = '#EF4444';
+                div.style.background = '#FEF2F2';
+                div.innerHTML = `
+                    <div class="time-box" style="color:#EF4444;">剩余 ${item.duration} 分钟</div>
+                    <div><strong>${item.title}</strong></div>
+                `;
+                unfinishedList.appendChild(div);
+            });
+        } else {
+            unfinishedContainer.style.display = 'none';
+        }
+    }
+
+    initSettingsUI();
+    render();
+</script>
+
+</body>
+</html>
