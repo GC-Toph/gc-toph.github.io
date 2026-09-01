@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>长期相处问卷 · 校验与观察者评估</title>
+<style>
+:root{--bg:#f6f7f9;--card:#fff;--text:#171717;--muted:#6b7280;--line:#e5e7eb;--accent:#111827;--soft:#f3f4f6;--warn:#92400e;--bad:#991b1b;--good:#166534}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px/1.55 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}.wrap{max-width:980px;margin:auto;padding:24px 14px 64px}.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;margin:12px 0;box-shadow:0 1px 2px rgba(0,0,0,.03)}h1{font-size:27px;margin:0 0 8px}h2{font-size:21px;margin:0 0 10px}h3{font-size:17px;margin:0 0 8px}p{margin:7px 0}.muted{color:var(--muted)}.small{font-size:13px}.hidden{display:none!important}.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}.tabs button{background:white;color:#111827;border:1px solid var(--line)}.tabs button.active{background:#111827;color:white}.toolbar{display:flex;gap:9px;flex-wrap:wrap;margin-top:14px}button{border:0;border-radius:10px;padding:10px 15px;background:var(--accent);color:white;font-weight:650;cursor:pointer}button.secondary{background:#e5e7eb;color:#111827}button.ghost{background:white;color:#111827;border:1px solid var(--line)}.field{margin:13px 0}.field label{font-weight:650;display:block;margin-bottom:6px}input[type=file],input[type=text],select,textarea{width:100%;padding:10px;border:1px solid var(--line);border-radius:10px;background:white;color:#111827}textarea{min-height:110px;resize:vertical}.metricGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.metric{border:1px solid var(--line);border-radius:12px;padding:13px;background:white}.metric strong{display:block;font-size:25px;margin-top:4px}.bar{height:8px;background:#e5e7eb;border-radius:999px;overflow:hidden;margin-top:8px}.bar>div{height:100%;background:#111827}.flag{border-left:4px solid #d97706;background:#fffbeb;border-radius:8px;padding:9px 11px;margin:8px 0}.flag.bad{border-left-color:#dc2626;background:#fef2f2}.flag.good{border-left-color:#16a34a;background:#f0fdf4}.scoreTable{width:100%;border-collapse:collapse;font-size:13px}.scoreTable th,.scoreTable td{padding:8px;border-bottom:1px solid var(--line);text-align:left}.obsItem{border-top:1px solid var(--line);padding:13px 0}.obsItem:first-child{border-top:0}.scale{display:grid;grid-template-columns:repeat(8,1fr);gap:6px;margin-top:9px}.scale label{cursor:pointer;text-align:center;border:1px solid var(--line);border-radius:9px;padding:7px 2px;background:white;font-size:12px}.scale input{display:none}.scale input:checked+span{display:block;background:#111827;color:white;border-radius:6px;padding:4px 0;margin:-4px 0}.pill{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:3px 8px;margin:2px 4px 2px 0;font-size:12px;background:white}.compareDiff{font-weight:700}.code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;word-break:break-all}.sectionNote{background:var(--soft);border-radius:10px;padding:10px}.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}@media(max-width:720px){.metricGrid{grid-template-columns:1fr 1fr}.two{grid-template-columns:1fr}.scale{grid-template-columns:repeat(4,1fr)}}@media(max-width:480px){.metricGrid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <h1>长期相处问卷 · 校验与观察者评估</h1>
+    <p class="muted small">自评与他评不一致不等于“撒谎”。可能来自印象管理、自我认知偏差、情境差异，或你观察到的样本不足。结果应作为进一步沟通的线索。</p>
+  </div>
+  <div class="tabs">
+    <button id="tabSelf" class="active">① 解析自评结果</button>
+    <button id="tabObserver">② 观察者评估</button>
+    <button id="tabCompare">③ 自评 × 他评</button>
+  </div>
+
+  <section id="selfSection">
+    <div class="card">
+      <h2>导入受测者结果</h2>
+      <div class="field"><label>选择 .ltmb64 / .txt 文件</label><input id="fileInput" type="file" accept=".ltmb64,.txt,text/plain"></div>
+      <div class="field"><label>或粘贴结果文本</label><textarea id="pasteInput" placeholder="LTM1:..."></textarea></div>
+      <div class="toolbar"><button id="parseBtn">解析结果</button><button id="clearSelf" class="secondary">清除</button></div>
+    </div>
+    <div id="selfOutput"></div>
+  </section>
+
+  <section id="observerSection" class="hidden">
+    <div class="card">
+      <h2>观察者行为评估</h2>
+      <p class="muted">只评价你实际观察过的行为。没有足够信息时请选择“无法判断”，不要用想象补全。</p>
+      <div class="two">
+        <div class="field"><label>你与对方实际接触多久？</label><select id="obsDuration"><option value="">请选择</option><option>少于 1 个月</option><option>1–3 个月</option><option>3–6 个月</option><option>6–12 个月</option><option>1 年以上</option></select></div>
+        <div class="field"><label>你对自己观察准确性的总体信心</label><select id="obsConfidence"><option value="">请选择</option><option value="1">1 很有限</option><option value="2">2 偏低</option><option value="3">3 一般</option><option value="4">4 较高</option><option value="5">5 很高</option></select></div>
+      </div>
+      <div id="observerItems"></div>
+      <div class="toolbar"><button id="scoreObserver">生成观察者评分</button><button id="resetObserver" class="secondary">清空观察者问卷</button></div>
+    </div>
+    <div id="observerOutput"></div>
+  </section>
+
+  <section id="compareSection" class="hidden">
+    <div id="compareOutput" class="card"><h2>自评 × 他评</h2><p class="muted">需要先解析受测者结果，并完成观察者评估。</p></div>
+  </section>
+</div>
+<script>
+const VERSION='2.0.0';
+const OBS_STORAGE='ltm-observer-v2';
+const dimLabels={anx:'依恋焦虑',avo:'依恋回避',rel:'沟通与修复',con:'尽责性',neu:'负性情绪敏感',agr:'宜人性'};
+const dimNotes={anx:'越高表示越容易在关系不确定、联系减少或竞争性线索下被激活。',avo:'越高表示越倾向通过距离、独立或降温来调节亲密压力。',rel:'越高表示越能直接表达、承接情绪、讨论冲突并完成修复。',con:'越高表示承诺、计划和执行更稳定。',neu:'越高表示更容易焦虑、反刍并受压力影响。',agr:'越高表示更合作、温和、愿意倾听并较少敌意解释。'};
+
+const selfKey={
+q01:{d:'anx'},q02:{d:'anx',rev:true},q03:{d:'anx'},q04:{d:'anx'},
+q05:{d:'avo'},q06:{d:'avo',rev:true},q07:{d:'avo'},q08:{d:'avo'},
+q09:{d:'rel'},q10:{d:'rel'},q11:{d:'rel'},q12:{d:'rel'},
+q13:{d:'con'},q14:{d:'con',rev:true},q15:{d:'con'},q16:{d:'con',rev:true},
+q17:{d:'neu'},q18:{d:'neu',rev:true},q19:{d:'neu'},q20:{d:'neu'},
+q21:{d:'agr'},q22:{d:'agr',rev:true},q23:{d:'agr'},q24:{d:'agr'},
+q25:{d:'life_health'},q26:{d:'life_career'},q27:{d:'life_finance'},q28:{d:'life_family'},q29:{d:'life_romance'},q30:{d:'life_growth'},q31:{d:'life_leisure'},q32:{d:'life_environment'},
+q33:{d:'impression'},q34:{d:'impression'},q35:{d:'attention'}
+};
+const pairDefs=[['q01','q02',true],['q05','q06',true],['q13','q14',true],['q17','q18',true],['q21','q22',true]];
+const lifeLabels={life_health:'健康与体能',life_career:'事业与工作',life_finance:'财务与金钱',life_family:'家庭与朋友',life_romance:'爱情与伴侣',life_growth:'个人成长',life_leisure:'娱乐与休闲',life_environment:'物理环境'};
+const valueLabels={v1:'竞争与成功',v2:'金钱与消费',v3:'生育',v4:'父母边界',v5:'工作与生活',v6:'社会责任',v7:'居住城市',v8:'学术/事业追求',v9:'平等与分工',v10:'忠诚与承诺'};
+
+const scenarioKey={
+s1:{a:{anx:2,rel:6},b:{anx:3,rel:7},c:{anx:7,rel:2},d:{anx:5,avo:4,rel:2}},
+s2:{a:{anx:6,rel:3},b:{anx:2,avo:1,rel:7},c:{avo:5,rel:3},d:{avo:7,rel:1}},
+s3:{a:{avo:1,rel:7},b:{avo:2,rel:6},c:{avo:4,rel:3},d:{avo:6,rel:2}},
+s4:{a:{avo:1,rel:6},b:{anx:5,rel:4},c:{avo:5,rel:3},d:{avo:7,rel:2}},
+s5:{a:{anx:2,rel:7},b:{anx:7,rel:2},c:{anx:6,rel:1},d:{avo:7,rel:2}}
+};
+
+const observerItems=[
+{id:'o01',d:'anx',text:'联系频率下降或回复变慢时，对方会明显反复确认、揣测关系是否发生变化。'},
+{id:'o02',d:'anx',text:'我把较多注意力放在其他人或其他事情上时，对方容易把它体验成被冷落或被替代。'},
+{id:'o03',d:'anx',text:'冲突尚未解决时，对方很难先做自己的事情，会持续想要立即确认或解决。'},
+{id:'o04',d:'avo',text:'对方遇到困难时更常把我挡在外面，倾向独自处理，不太愿意接受支持。'},
+{id:'o05',d:'avo',text:'关系明显变得稳定或更亲密后，对方有过降温、后退或重新拉开距离的表现。'},
+{id:'o06',d:'avo',text:'当我表达较强的情绪需要时，对方容易表现出被束缚、烦躁、抽离或想结束谈话。'},
+{id:'o07',d:'rel',text:'对方能够直接说出需要和边界，而不是主要依靠暗示、试探、吃醋或让我猜。'},
+{id:'o08',d:'rel',text:'发生冲突时，对方通常不会突然消失、长期冷处理或用分手威胁，而是能回来继续讨论。'},
+{id:'o09',d:'rel',text:'如果对方确实做错了事情，通常能够具体承认自己的部分，并采取实际修复。'},
+{id:'o10',d:'con',text:'约定时间、重要承诺和已经答应的事情，对方总体上比较可靠。'},
+{id:'o11',d:'con',text:'对方的计划、生活节奏和责任履行总体稳定，不太依赖别人不断提醒。'},
+{id:'o12',d:'con',text:'做会明显影响双方的决定前，对方通常会考虑后果，而不是经常让我收拾临时变化的残局。'},
+{id:'o13',d:'neu',text:'面对结果不确定的事情，对方容易持续担忧，很难停止反复想。'},
+{id:'o14',d:'neu',text:'一次小挫折、评价或关系波动，可能明显影响对方之后较长时间的情绪。'},
+{id:'o15',d:'neu',text:'压力增大时，对方的睡眠、注意力、身体状态或日常功能容易明显下降。'},
+{id:'o16',d:'agr',text:'即使意见强烈不同，对方通常也能避免故意羞辱、讽刺、贬低或轻蔑。'},
+{id:'o17',d:'agr',text:'我难受时，对方通常愿意认真听，而不是立刻否定、嘲笑或把话题转回自己。'},
+{id:'o18',d:'agr',text:'发生分歧时，对方总体更倾向找双方都能接受的方案，而不是压服我。'}
+];
+
+let selfData=null,selfAnalysis=null;
+let observerState={duration:'',confidence:'',answers:{}};
+let observerAnalysis=null;
+
+function b64ToUtf8(b64){const bin=atob(b64),bytes=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)bytes[i]=bin.charCodeAt(i);return new TextDecoder().decode(bytes)}
+function parseEncoded(text){text=(text||'').trim();if(text.startsWith('LTM1:'))text=text.slice(5);const json=b64ToUtf8(text.replace(/\s+/g,''));const obj=JSON.parse(json);if(obj.schema!=='LTM_SELF_V2')throw new Error('不是受支持的 LTM_SELF_V2 数据。');return obj}
+function mean(a){return a.length?a.reduce((x,y)=>x+y,0)/a.length:null}
+function sd(a){if(a.length<2)return 0;const m=mean(a);return Math.sqrt(a.reduce((s,x)=>s+(x-m)**2,0)/a.length)}
+function to100(avg){return avg==null?null:Math.round((avg-1)/6*100)}
+function clamp(n,a,b){return Math.max(a,Math.min(b,n))}
+function interp(score,d){if(score==null)return '数据不足';if(d==='anx'||d==='avo'||d==='neu'){if(score<33)return '较低';if(score<67)return '中等';return '较高'}else{if(score<33)return '较低';if(score<67)return '中等';return '较高'}}
+function selfDimAverages(data){const out={};for(const d of ['anx','avo','rel','con','neu','agr']){const vals=[];for(const [id,k] of Object.entries(selfKey)){if(k.d!==d)continue;let v=Number(data.answers[id]);if(k.rev)v=8-v;vals.push(v)}out[d]=mean(vals)}return out}
+function scenarioAverages(data){const bag={anx:[],avo:[],rel:[]};for(const [sid,opt] of Object.entries(data.scenarios||{})){const map=scenarioKey[sid]?.[opt];if(!map)continue;for(const [d,v] of Object.entries(map))bag[d]?.push(v)}return Object.fromEntries(Object.entries(bag).map(([d,a])=>[d,mean(a)]))}
+function analyzeSelf(data){
+ const avg=selfDimAverages(data),scores=Object.fromEntries(Object.entries(avg).map(([d,v])=>[d,to100(v)]));
+ const life={};for(const [id,k] of Object.entries(selfKey)){if(!k.d.startsWith('life_'))continue;life[k.d]=to100(Number(data.answers[id]))}
+ const scen=scenarioAverages(data);
+ let quality=100;const flags=[];
+ if(Number(data.answers.q35)!==2){quality-=28;flags.push({level:'bad',text:'注意力检查未通过。'})}else flags.push({level:'good',text:'注意力检查通过。'});
+ const impression=[Number(data.answers.q33),Number(data.answers.q34)].filter(x=>x>=6).length;if(impression){quality-=impression*10;flags.push({level:'warn',text:`${impression} 道“几乎完美人格”项目选择很高，存在社会赞许性作答的可能。`})}
+ let pairBad=0;for(const [a,b] of pairDefs){const va=Number(data.answers[a]),vb=8-Number(data.answers[b]);if(Math.abs(va-vb)>=4)pairBad++}if(pairBad){quality-=pairBad*8;flags.push({level:'warn',text:`发现 ${pairBad} 组相距较远的同义/反向项目差异较大。`})}
+ const normalVals=Object.entries(data.answers).filter(([id])=>/^q(0[1-9]|1\d|2\d|3[0-4])$/.test(id)).map(([,v])=>Number(v));const straight=sd(normalVals);if(straight<0.5){quality-=15;flags.push({level:'warn',text:'整体作答变化非常小，存在直线作答或过度使用同一分值的可能。'})}
+ const secs=Number(data.durationSec||0);if(secs&&secs<180){quality-=16;flags.push({level:'warn',text:`完成速度非常快（约 ${Math.round(secs/60)} 分钟）。`})}else if(secs&&secs<300){quality-=8;flags.push({level:'warn',text:`完成速度偏快（约 ${Math.round(secs/60)} 分钟）。`})}
+ for(const d of ['anx','avo','rel']){if(scen[d]!=null&&avg[d]!=null&&Math.abs(scen[d]-avg[d])>=2.2){quality-=7;flags.push({level:'warn',text:`${dimLabels[d]}：直接自评与情境选择差异较大。`})}}
+ quality=clamp(Math.round(quality),0,100);return {avg,scores,life,scenario:scen,quality,flags,straight}
+}
+function metricCard(name,score,note){return `<div class="metric"><span>${name}</span><strong>${score==null?'—':score}</strong><div class="bar"><div style="width:${score||0}%"></div></div><div class="muted small">${note||''}</div></div>`}
+function qualityLabel(q){return q>=85?'较高':q>=65?'可用，但应结合细项':q>=45?'偏低，谨慎解释':'很低，不建议据此做重要判断'}
+function renderSelf(){const o=document.getElementById('selfOutput');if(!selfData||!selfAnalysis){o.innerHTML='';return}const a=selfAnalysis;let h=`<div class="card"><h2>${selfData.alias?selfData.alias+' · ':''}自评结果</h2><p class="muted small">完成时间：${new Date(selfData.completedAt).toLocaleString()}；用时约 ${Math.round(selfData.durationSec/60)} 分钟。</p><div class="metricGrid">`;for(const d of ['anx','avo','rel','con','neu','agr'])h+=metricCard(dimLabels[d],a.scores[d],`${interp(a.scores[d],d)} · ${dimNotes[d]}`);h+='</div></div>';
+ h+=`<div class="card"><h2>数据可解释性</h2>${metricCard('可解释性',a.quality,qualityLabel(a.quality))}<p class="muted small">这不是“诚实度”或测谎分数。</p>${a.flags.map(f=>`<div class="flag ${f.level==='bad'?'bad':f.level==='good'?'good':''}">${f.text}</div>`).join('')}</div>`;
+ h+='<div class="card"><h2>生活状态快照</h2><div class="metricGrid">';for(const [d,label] of Object.entries(lifeLabels))h+=metricCard(label,a.life[d],'单题快照，仅用于发现需要进一步了解的领域。');h+='</div></div>';
+ h+='<div class="card"><h2>核心价值观</h2><table class="scoreTable"><thead><tr><th>领域</th><th>立场 1–7</th><th>重要性 0–3</th></tr></thead><tbody>';for(const [id,label] of Object.entries(valueLabels)){const v=selfData.values?.[id]||{};h+=`<tr><td>${label}</td><td>${v.stance??'—'}</td><td>${v.importance??'—'}</td></tr>`}h+='</tbody></table></div>';
+ h+='<div class="card"><h2>关键条件</h2>';for(const [id,val] of Object.entries(selfData.hard||{}))h+=`<span class="pill">${id.toUpperCase()}：${val}</span>`;h+='</div>';o.innerHTML=h
+}
+
+function loadObserver(){try{const x=JSON.parse(localStorage.getItem(OBS_STORAGE));if(x)observerState=x}catch(e){}}
+function saveObserver(){observerState.duration=document.getElementById('obsDuration').value;observerState.confidence=document.getElementById('obsConfidence').value;localStorage.setItem(OBS_STORAGE,JSON.stringify(observerState))}
+function renderObserverForm(){document.getElementById('obsDuration').value=observerState.duration||'';document.getElementById('obsConfidence').value=observerState.confidence||'';const box=document.getElementById('observerItems');box.innerHTML='';observerItems.forEach((q,i)=>{const v=observerState.answers[q.id];const d=document.createElement('div');d.className='obsItem';let scale='<div class="scale">';for(let n=1;n<=7;n++)scale+=`<label><input type="radio" name="${q.id}" value="${n}" ${Number(v)===n?'checked':''}><span>${n}</span></label>`;scale+=`<label><input type="radio" name="${q.id}" value="x" ${v==='x'?'checked':''}><span>无法判断</span></label></div>`;d.innerHTML=`<div class="qnum">${i+1} / ${observerItems.length}</div><div><b>${q.text}</b></div>${scale}`;box.appendChild(d)});box.querySelectorAll('input').forEach(x=>x.addEventListener('change',e=>{observerState.answers[e.target.name]=e.target.value==='x'?'x':Number(e.target.value);saveObserver()}));document.getElementById('obsDuration').onchange=saveObserver;document.getElementById('obsConfidence').onchange=saveObserver}
+function analyzeObserver(){const avg={},counts={},scores={};for(const d of Object.keys(dimLabels)){const vals=observerItems.filter(x=>x.d===d).map(x=>observerState.answers[x.id]).filter(v=>typeof v==='number');counts[d]=vals.length;avg[d]=vals.length>=2?mean(vals):null;scores[d]=to100(avg[d])}const answered=Object.values(observerState.answers).filter(v=>typeof v==='number').length;return {avg,counts,scores,answered,confidence:Number(observerState.confidence||0),duration:observerState.duration||''}}
+function renderObserverResult(){const o=document.getElementById('observerOutput');if(!observerAnalysis){o.innerHTML='';return}let h=`<div class="card"><h2>观察者评分</h2><p class="muted small">可评分行为项目 ${observerAnalysis.answered}/${observerItems.length}；接触时长：${observerAnalysis.duration||'未填写'}；观察信心：${observerAnalysis.confidence||'未填写'}/5。</p><div class="metricGrid">`;for(const d of ['anx','avo','rel','con','neu','agr'])h+=metricCard(dimLabels[d],observerAnalysis.scores[d],observerAnalysis.counts[d]<2?'有效观察不足':`${interp(observerAnalysis.scores[d],d)} · 基于 ${observerAnalysis.counts[d]} 项可观察行为`);h+='</div><p class="muted small">观察者评分描述的是“你实际看到的行为”，不是对方完整的人格。接触场景越单一，越应谨慎。</p></div>';o.innerHTML=h}
+function renderCompare(){const o=document.getElementById('compareOutput');if(!selfAnalysis||!observerAnalysis){o.innerHTML='<h2>自评 × 他评</h2><p class="muted">需要先解析受测者结果，并完成观察者评估。</p>';return}let h='<h2>自评 × 他评</h2><p class="muted">差异较大表示值得进一步核实，不自动意味着任何一方“错了”。</p><table class="scoreTable"><thead><tr><th>维度</th><th>自评</th><th>观察者</th><th>差异</th><th>提示</th></tr></thead><tbody>';for(const d of ['anx','avo','rel','con','neu','agr']){const s=selfAnalysis.scores[d],v=observerAnalysis.scores[d],diff=s!=null&&v!=null?Math.abs(s-v):null;let tip='';if(v==null)tip='观察数据不足';else if(diff>=30)tip='差异很大，优先核实具体行为实例';else if(diff>=18)tip='存在明显差异';else tip='大致一致';h+=`<tr><td>${dimLabels[d]}</td><td>${s??'—'}</td><td>${v??'—'}</td><td class="compareDiff">${diff==null?'—':diff}</td><td>${tip}</td></tr>`}h+='</tbody></table>';
+ const big=['anx','avo','rel','con','neu','agr'].filter(d=>selfAnalysis.scores[d]!=null&&observerAnalysis.scores[d]!=null&&Math.abs(selfAnalysis.scores[d]-observerAnalysis.scores[d])>=25);if(big.length)h+=`<div class="flag">优先讨论：${big.map(d=>dimLabels[d]).join('、')}。建议不要问“你为什么测出来这样”，而是要求双方各举 2–3 个近半年真实事件。</div>`;else h+='<div class="flag good">目前没有出现特别大的自评—他评分歧；仍需结合价值观、硬条件和真实互动判断。</div>';
+ h+=`<div class="sectionNote small">建议解释顺序：① 硬性条件是否冲突；② 忠诚/生育/父母边界/金钱等高重要性价值观；③ 沟通与修复；④ 焦虑/回避互动模式；⑤ C/N/A。不要把总分压成一个“匹配率”。</div>`;o.innerHTML=h}
+
+function switchTab(name){for(const [n,id] of [['self','selfSection'],['observer','observerSection'],['compare','compareSection']]){document.getElementById(id).classList.toggle('hidden',n!==name);document.getElementById('tab'+n[0].toUpperCase()+n.slice(1)).classList.toggle('active',n===name)}if(name==='compare')renderCompare()}
+document.getElementById('tabSelf').onclick=()=>switchTab('self');document.getElementById('tabObserver').onclick=()=>switchTab('observer');document.getElementById('tabCompare').onclick=()=>switchTab('compare');
+
+document.getElementById('fileInput').addEventListener('change',async e=>{const f=e.target.files[0];if(!f)return;document.getElementById('pasteInput').value=await f.text()});
+document.getElementById('parseBtn').onclick=()=>{try{selfData=parseEncoded(document.getElementById('pasteInput').value);selfAnalysis=analyzeSelf(selfData);renderSelf();renderCompare()}catch(e){alert('解析失败：'+e.message)}};
+document.getElementById('clearSelf').onclick=()=>{selfData=selfAnalysis=null;document.getElementById('pasteInput').value='';document.getElementById('fileInput').value='';renderSelf();renderCompare()};
+
+document.getElementById('scoreObserver').onclick=()=>{saveObserver();observerAnalysis=analyzeObserver();if(observerAnalysis.answered<10)alert('当前可评分的观察项目较少，结果只能低置信度解释。');renderObserverResult();renderCompare()};
+document.getElementById('resetObserver').onclick=()=>{if(confirm('确定清空观察者问卷？')){observerState={duration:'',confidence:'',answers:{}};observerAnalysis=null;localStorage.removeItem(OBS_STORAGE);renderObserverForm();renderObserverResult();renderCompare()}};
+
+loadObserver();renderObserverForm();
+</script>
+</body>
+</html>
