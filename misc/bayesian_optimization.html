@@ -1,0 +1,819 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>自适应黑盒实验贝叶斯优化器</title>
+  <style>
+    :root{
+      --bg:#0b1020; --panel:#121a2f; --panel2:#17213b; --text:#e8edf8;
+      --muted:#9ba8c7; --accent:#7aa2ff; --good:#66d9a3; --warn:#ffca6a;
+      --danger:#ff7c8b; --line:#293754;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      background:linear-gradient(180deg,#090e1b,#10172a);color:var(--text)
+    }
+    .app{max-width:1320px;margin:0 auto;padding:22px}
+    h1{margin:0 0 6px;font-size:28px}
+    .sub{color:var(--muted);margin-bottom:18px;line-height:1.55}
+    .grid{display:grid;grid-template-columns:410px 1fr;gap:16px}
+    .card{background:rgba(18,26,47,.96);border:1px solid var(--line);border-radius:14px;padding:16px}
+    .section-title{font-weight:700;margin:0 0 12px}
+    label{display:block;color:var(--muted);font-size:13px;margin:11px 0 6px}
+    input,select,textarea,button{
+      width:100%;border:1px solid var(--line);border-radius:9px;background:#0e1527;
+      color:var(--text);padding:9px 10px;font:inherit
+    }
+    textarea{resize:vertical;min-height:76px;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:13px}
+    button{cursor:pointer;background:#20345f;font-weight:700}
+    button:hover{filter:brightness(1.08)}
+    button.secondary{background:#18233e}
+    button.good{background:#174b3a}
+    button.danger{background:#542536}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+    .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px}
+    .buttons{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:14px}
+    .metrics{display:grid;grid-template-columns:repeat(4,minmax(120px,1fr));gap:10px;margin-bottom:14px}
+    .metric{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:11px}
+    .metric .k{color:var(--muted);font-size:12px}
+    .metric .v{font-size:19px;font-weight:800;margin-top:3px;word-break:break-all}
+    .auto-box{margin-top:16px;background:#0e1629;border:1px solid #314260;border-radius:12px;padding:12px}
+    .auto-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    .auto-item{background:#121c33;border:1px solid var(--line);border-radius:9px;padding:9px}
+    .auto-item .k{font-size:11px;color:var(--muted)}
+    .auto-item .v{font-size:14px;font-weight:700;margin-top:3px;word-break:break-word}
+    .check{display:flex;gap:8px;align-items:center;margin-top:10px;color:var(--muted);font-size:13px}
+    .check input{width:auto}
+    canvas{width:100%;height:440px;background:#0d1425;border:1px solid var(--line);border-radius:12px}
+    table{width:100%;border-collapse:collapse;font-size:13px}
+    th,td{padding:8px 7px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+    th{color:var(--muted);position:sticky;top:0;background:var(--panel)}
+    .table-wrap{max-height:360px;overflow:auto;border:1px solid var(--line);border-radius:10px}
+    .status{margin-top:10px;padding:10px;border-radius:9px;background:#0d1425;color:var(--muted);white-space:pre-wrap;line-height:1.45}
+    .note{font-size:12px;color:var(--muted);line-height:1.55;margin-top:12px}
+    code{color:#bcd0ff}
+    .hidden{display:none}
+    .proposal{
+      margin-top:16px;padding:14px;border-radius:12px;border:1px solid #35508b;background:#101a31
+    }
+    .proposal .x{margin-top:6px;font-size:20px;font-weight:800;color:#dfe8ff;word-break:break-word}
+    .proposal .hint{color:var(--muted);font-size:12px;margin-top:5px;line-height:1.45}
+    .manual{border:1px dashed #40557f;border-radius:11px;padding:12px;margin-top:14px}
+    details{margin-top:14px;border-top:1px solid var(--line);padding-top:12px}
+    summary{cursor:pointer;color:#cbd7f2;font-weight:700}
+    @media(max-width:920px){.grid{grid-template-columns:1fr}.metrics{grid-template-columns:1fr 1fr}}
+  </style>
+</head>
+<body>
+<div class="app">
+  <h1>自适应黑盒实验贝叶斯优化器</h1>
+  <div class="sub">
+    用于黑盒实验：系统推荐下一组参数，请你做完实验后回填实测结果。<br>
+  </div>
+
+  <div class="grid">
+    <section class="card">
+      <div class="section-title">问题设置</div>
+
+      <div class="row">
+        <div>
+          <label>维度</label>
+          <input id="dim" type="number" min="1" max="20" value="2">
+        </div>
+        <div>
+          <label>优化方向</label>
+          <select id="goal">
+            <option value="min">最小化</option>
+            <option value="max">最大化</option>
+          </select>
+        </div>
+      </div>
+
+      <label>搜索边界（JSON，每维一个 [min,max]）</label>
+      <textarea id="bounds">[[100, 300], [1, 10]]</textarea>
+
+      <div class="row">
+        <div>
+          <label>初始实验点数</label>
+          <input id="nInit" type="number" min="2" value="3">
+        </div>
+        <div>
+          <label>探索强度</label>
+          <select id="exploreLevel">
+            <option value="low">低</option>
+            <option value="mid" selected>中</option>
+            <option value="high">高</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="auto-box">
+        <div class="section-title" style="margin-bottom:9px">当前自动参数</div>
+        <div class="auto-grid">
+          <div class="auto-item"><div class="k">候选点数量</div><div class="v" id="autoCand">—</div></div>
+          <div class="auto-item"><div class="k">EI 探索系数 ξ</div><div class="v" id="autoXi">—</div></div>
+          <div class="auto-item"><div class="k">GP 长度尺度 ℓ（归一化）</div><div class="v" id="autoLs">—</div></div>
+          <div class="auto-item"><div class="k">GP 噪声方差</div><div class="v" id="autoNoise">—</div></div>
+        </div>
+        <label>按原始单位换算的有效长度尺度</label>
+        <div class="status" id="effectiveLs" style="margin-top:0">—</div>
+      </div>
+
+      <details>
+        <summary>高级设置</summary>
+
+        <label class="check"><input id="autoGP" type="checkbox" checked> 自动优化 GP 超参数（推荐）</label>
+        <label class="check"><input id="autoCandidates" type="checkbox" checked> 根据维度自动设置候选点数量</label>
+
+        <div class="row">
+          <div>
+            <label>手动候选数</label>
+            <input id="manualCand" type="number" min="100" value="3000">
+          </div>
+          <div>
+            <label>手动 ξ（标准化 y 空间）</label>
+            <input id="manualXi" type="number" min="0" step="0.005" value="0.02">
+          </div>
+        </div>
+
+        <div class="row3">
+          <div>
+            <label>手动 ℓ</label>
+            <input id="manualLs" type="number" min="0.01" step="0.01" value="0.25">
+          </div>
+          <div>
+            <label>手动 σ²</label>
+            <input id="manualSig" type="number" min="0.01" step="0.05" value="1">
+          </div>
+          <div>
+            <label>手动噪声方差</label>
+            <input id="manualNoise" type="number" min="0" step="0.0001" value="0.001">
+          </div>
+        </div>
+      </details>
+
+      <div class="buttons">
+        <button id="initBtn">生成初始实验点</button>
+        <button id="nextBtn">推荐下一点</button>
+        <button id="exportBtn" class="secondary">导出 CSV</button>
+        <button id="clearBtn" class="danger">清空</button>
+      </div>
+
+      <div class="proposal">
+        <div class="section-title" style="margin-bottom:0">当前待做实验</div>
+        <div class="x" id="proposalX">—</div>
+        <div class="hint" id="proposalHint">先生成初始实验点，或录入已有实验数据。</div>
+
+        <label>实验完成后，填写实测 y</label>
+        <input id="measuredY" type="number" step="any" placeholder="输入实测结果">
+        <button id="submitYBtn" class="good" style="margin-top:9px">提交本次实验结果</button>
+      </div>
+
+      <div class="manual">
+        <div class="section-title" style="margin-bottom:5px">录入已有实验数据</div>
+        <label>x（JSON 数组）</label>
+        <input id="manualX" value="[200, 5]">
+        <label>实测 y</label>
+        <input id="manualY" type="number" step="any">
+        <button id="addManualBtn" class="secondary" style="margin-top:9px">添加历史数据</button>
+      </div>
+
+      <div id="status" class="status">尚未开始。</div>
+
+      <div class="note">
+        自适应逻辑：<br>
+        • 每一维按 <code>(x-lower)/(upper-lower)</code> 归一化到 [0,1]。<br>
+        • GP 在归一化空间拟合，所以不同量纲不会互相压制。<br>
+        • 局部候选搜索的扰动幅度按每一维区间长度自动缩放。<br>
+        • EI 在标准化后的 y 空间计算，ξ 不再依赖 y 的绝对数量级。<br>
+        • 自动 GP 模式通过对数边际似然在一组候选超参数中选择 ℓ、σ²、噪声方差。
+      </div>
+    </section>
+
+    <main>
+      <div class="metrics">
+        <div class="metric"><div class="k">已完成实验</div><div class="v" id="mCount">0</div></div>
+        <div class="metric"><div class="k">当前最优 y</div><div class="v" id="mBestY">—</div></div>
+        <div class="metric"><div class="k">当前最优 x</div><div class="v" id="mBestX">—</div></div>
+        <div class="metric"><div class="k">当前推荐 EI</div><div class="v" id="mEI">—</div></div>
+      </div>
+
+      <section id="plotCard" class="card hidden">
+        <div class="section-title">1D GP 可视化</div>
+        <canvas id="plot" width="1000" height="440"></canvas>
+      </section>
+
+      <section class="card">
+        <div class="section-title">实验历史</div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>#</th><th>x</th><th>y</th><th>来源</th></tr></thead>
+            <tbody id="history"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<script>
+(() => {
+  "use strict";
+  const $ = id => document.getElementById(id);
+
+  const state = {
+    X: [], y: [], source: [],
+    bounds: [], dim: 2,
+    pendingQueue: [],
+    currentProposal: null,
+    currentEI: null,
+    lastGPParams: null
+  };
+
+  const dot=(a,b)=>a.reduce((s,v,i)=>s+v*b[i],0);
+  const mean=a=>a.reduce((s,v)=>s+v,0)/a.length;
+
+  function std(a){
+    if(a.length<2) return 1;
+    const m=mean(a);
+    const s=Math.sqrt(a.reduce((q,v)=>q+(v-m)*(v-m),0)/(a.length-1));
+    return s || 1;
+  }
+
+  function parseSettings(){
+    const dim=parseInt($("dim").value,10);
+    const bounds=JSON.parse($("bounds").value);
+    if(!Number.isInteger(dim)||dim<1) throw new Error("维度必须是正整数。");
+    if(!Array.isArray(bounds)||bounds.length!==dim) throw new Error("bounds 数量必须与维度一致。");
+    bounds.forEach((b,i)=>{
+      if(!Array.isArray(b)||b.length!==2||!Number.isFinite(+b[0])||!Number.isFinite(+b[1])||!(+b[0]<+b[1]))
+        throw new Error(`第 ${i+1} 维边界非法。`);
+    });
+    state.dim=dim;
+    state.bounds=bounds.map(b=>[+b[0],+b[1]]);
+    $("plotCard").classList.toggle("hidden",dim!==1);
+    updateAutoPanel();
+  }
+
+  function normalizeX(x){
+    return x.map((v,j)=>{
+      const [lo,hi]=state.bounds[j];
+      return (v-lo)/(hi-lo);
+    });
+  }
+
+  function denormalizeX(z){
+    return z.map((v,j)=>{
+      const [lo,hi]=state.bounds[j];
+      return lo+v*(hi-lo);
+    });
+  }
+
+  function randomPoint(){
+    return state.bounds.map(([lo,hi])=>lo+Math.random()*(hi-lo));
+  }
+
+  function latinHypercube(n){
+    const d=state.dim;
+    const z=Array.from({length:n},()=>Array(d).fill(0));
+    for(let j=0;j<d;j++){
+      const perm=[...Array(n).keys()];
+      for(let i=n-1;i>0;i--){
+        const k=Math.floor(Math.random()*(i+1));
+        [perm[i],perm[k]]=[perm[k],perm[i]];
+      }
+      for(let i=0;i<n;i++) z[i][j]=(perm[i]+Math.random())/n;
+    }
+    return z.map(denormalizeX);
+  }
+
+  function cholesky(A){
+    const n=A.length,L=Array.from({length:n},()=>Array(n).fill(0));
+    for(let i=0;i<n;i++){
+      for(let j=0;j<=i;j++){
+        let s=0;
+        for(let k=0;k<j;k++) s+=L[i][k]*L[j][k];
+        if(i===j){
+          const val=A[i][i]-s;
+          if(!(val>0) || !Number.isFinite(val)) throw new Error("协方差矩阵非正定。");
+          L[i][j]=Math.sqrt(val);
+        }else{
+          L[i][j]=(A[i][j]-s)/L[j][j];
+        }
+      }
+    }
+    return L;
+  }
+
+  function forwardSolve(L,b){
+    const n=b.length,x=Array(n).fill(0);
+    for(let i=0;i<n;i++){
+      let s=0;
+      for(let j=0;j<i;j++) s+=L[i][j]*x[j];
+      x[i]=(b[i]-s)/L[i][i];
+    }
+    return x;
+  }
+
+  function backSolveFromLowerTranspose(L,b){
+    const n=b.length,x=Array(n).fill(0);
+    for(let i=n-1;i>=0;i--){
+      let s=0;
+      for(let j=i+1;j<n;j++) s+=L[j][i]*x[j];
+      x[i]=(b[i]-s)/L[i][i];
+    }
+    return x;
+  }
+
+  function sqDist(a,b){
+    let s=0;
+    for(let i=0;i<a.length;i++){
+      const d=a[i]-b[i];
+      s+=d*d;
+    }
+    return s;
+  }
+
+  function kernel(a,b,ls,sigVar){
+    return sigVar*Math.exp(-0.5*sqDist(a,b)/(ls*ls));
+  }
+
+  function buildGP(params){
+    if(!state.X.length) return null;
+    const Xn=state.X.map(normalizeX);
+    const yMean=mean(state.y), yStd=std(state.y);
+    const yz=state.y.map(v=>(v-yMean)/yStd);
+    const n=Xn.length;
+
+    const K=Array.from({length:n},()=>Array(n).fill(0));
+    for(let i=0;i<n;i++){
+      for(let j=0;j<n;j++) K[i][j]=kernel(Xn[i],Xn[j],params.ls,params.sigVar);
+      K[i][i]+=params.noise+1e-10;
+    }
+
+    const L=cholesky(K);
+    const alpha=backSolveFromLowerTranspose(L,forwardSolve(L,yz));
+
+    return {Xn,yMean,yStd,yz,L,alpha,...params};
+  }
+
+  function logMarginalLikelihood(gp){
+    const n=gp.yz.length;
+    const quad=dot(gp.yz,gp.alpha);
+    const logdetHalf=gp.L.reduce((s,row,i)=>s+Math.log(row[i]),0);
+    return -0.5*quad-logdetHalf-0.5*n*Math.log(2*Math.PI);
+  }
+
+  function automaticGPParams(){
+    if(state.X.length<3){
+      return {ls:0.28,sigVar:1,noise:0.001};
+    }
+
+    const lsGrid=[0.05,0.08,0.12,0.18,0.25,0.35,0.5,0.7,1.0,1.4];
+    const sigGrid=[0.5,1.0,2.0];
+    const noiseGrid=[1e-6,1e-4,1e-3,0.01,0.03,0.08];
+
+    let best={score:-Infinity,ls:0.25,sigVar:1,noise:0.001};
+    for(const ls of lsGrid){
+      for(const sigVar of sigGrid){
+        for(const noise of noiseGrid){
+          try{
+            const gp=buildGP({ls,sigVar,noise});
+            const score=logMarginalLikelihood(gp);
+            if(score>best.score) best={score,ls,sigVar,noise};
+          }catch(e){}
+        }
+      }
+    }
+    return {ls:best.ls,sigVar:best.sigVar,noise:best.noise};
+  }
+
+  function selectedGPParams(){
+    if($("autoGP").checked) return automaticGPParams();
+    return {
+      ls:Math.max(0.01,Number($("manualLs").value)||0.25),
+      sigVar:Math.max(0.01,Number($("manualSig").value)||1),
+      noise:Math.max(0,Number($("manualNoise").value)||0)
+    };
+  }
+
+  function fitGP(){
+    const params=selectedGPParams();
+    const gp=buildGP(params);
+    state.lastGPParams=params;
+    return gp;
+  }
+
+  function gpPredictNormalized(gp,z){
+    const k=gp.Xn.map(xi=>kernel(xi,z,gp.ls,gp.sigVar));
+    const muZ=dot(k,gp.alpha);
+    const v=forwardSolve(gp.L,k);
+    const varZ=Math.max(1e-12,kernel(z,z,gp.ls,gp.sigVar)-dot(v,v));
+    return {meanZ:muZ,stdZ:Math.sqrt(varZ)};
+  }
+
+  function gpPredict(gp,x){
+    const p=gpPredictNormalized(gp,normalizeX(x));
+    return {
+      mean:gp.yMean+gp.yStd*p.meanZ,
+      std:gp.yStd*p.stdZ,
+      meanZ:p.meanZ,
+      stdZ:p.stdZ
+    };
+  }
+
+  function erf(x){
+    const sign=x>=0?1:-1;
+    x=Math.abs(x);
+    const a1=0.254829592,a2=-0.284496736,a3=1.421413741,a4=-1.453152027,a5=1.061405429,p=0.3275911;
+    const t=1/(1+p*x);
+    const y=1-(((((a5*t+a4)*t)+a3)*t+a2)*t+a1)*t*Math.exp(-x*x);
+    return sign*y;
+  }
+  const normalPDF=z=>Math.exp(-0.5*z*z)/Math.sqrt(2*Math.PI);
+  const normalCDF=z=>0.5*(1+erf(z/Math.sqrt(2)));
+
+  function adaptiveXi(){
+    const level=$("exploreLevel").value;
+    const n=state.y.length;
+
+    const base = level==="low" ? 0.005 : level==="high" ? 0.08 : 0.02;
+    // 前期更探索，随着实验数增加逐渐衰减，但保持下限。
+    const decay=Math.max(0.45,1/Math.sqrt(Math.max(1,n/4)));
+    return base*decay;
+  }
+
+  function selectedXi(){
+    // 只有自动 GP 时，默认使用无量纲的自适应 ξ。
+    // 用户可在高级设置中直接输入 manualXi 并关闭 autoGP 以进行完全手调。
+    return $("autoGP").checked ? adaptiveXi() : Math.max(0,Number($("manualXi").value)||0);
+  }
+
+  function adaptiveCandidateCount(){
+    const d=state.dim;
+    const n=Math.round(1800*Math.pow(d,1.45));
+    return Math.max(1800,Math.min(50000,n));
+  }
+
+  function selectedCandidateCount(){
+    return $("autoCandidates").checked
+      ? adaptiveCandidateCount()
+      : Math.max(100,parseInt($("manualCand").value,10)||3000);
+  }
+
+  function expectedImprovementZ(muZ,sigmaZ,bestZ,goal,xi){
+    if(sigmaZ<=1e-12) return 0;
+    const imp=goal==="min" ? bestZ-muZ-xi : muZ-bestZ-xi;
+    const z=imp/sigmaZ;
+    return Math.max(0,imp*normalCDF(z)+sigmaZ*normalPDF(z));
+  }
+
+  function bestIndex(){
+    if(!state.y.length) return -1;
+    const goal=$("goal").value;
+    let bi=0;
+    for(let i=1;i<state.y.length;i++){
+      if((goal==="min"&&state.y[i]<state.y[bi])||(goal==="max"&&state.y[i]>state.y[bi])) bi=i;
+    }
+    return bi;
+  }
+
+  function nearestNormalizedDistance(z){
+    if(!state.X.length) return Infinity;
+    let best=Infinity;
+    for(const x of state.X){
+      const d=Math.sqrt(sqDist(z,normalizeX(x)));
+      if(d<best) best=d;
+    }
+    return best;
+  }
+
+  function proposeBO(){
+    if(state.X.length<2) throw new Error("至少需要 2 个已完成实验点。");
+    const gp=fitGP();
+    const nCand=selectedCandidateCount();
+    const xi=selectedXi();
+    const goal=$("goal").value;
+    const bi=bestIndex();
+    const bestZ=(state.y[bi]-gp.yMean)/gp.yStd;
+
+    let bestX=null,bestEI=-Infinity;
+    const bestRaw=state.X[bi];
+
+    for(let i=0;i<nCand;i++){
+      let x=randomPoint();
+
+      // 30% 候选在当前最优附近搜索；步长按每一维实际区间长度缩放。
+      if(i<Math.floor(nCand*0.30)){
+        x=bestRaw.map((v,j)=>{
+          const [lo,hi]=state.bounds[j];
+          const span=hi-lo;
+          let u1=Math.random(),u2=Math.random();
+          if(u1<1e-12) u1=1e-12;
+          const z=Math.sqrt(-2*Math.log(u1))*Math.cos(2*Math.PI*u2);
+          const stepFrac=0.10 + 0.04/Math.sqrt(Math.max(1,state.y.length));
+          return Math.min(hi,Math.max(lo,v+z*stepFrac*span));
+        });
+      }
+
+      const zn=normalizeX(x);
+      // 避免推荐几乎完全重复的点。
+      if(nearestNormalizedDistance(zn)<1e-5) continue;
+
+      const p=gpPredictNormalized(gp,zn);
+      const ei=expectedImprovementZ(p.meanZ,p.stdZ,bestZ,goal,xi);
+      if(ei>bestEI){bestEI=ei;bestX=x;}
+    }
+
+    if(!bestX) bestX=randomPoint();
+    return {x:bestX,ei:Math.max(0,bestEI),gp};
+  }
+
+  function addObservation(x,y,source){
+    state.X.push(x.slice());
+    state.y.push(y);
+    state.source.push(source);
+  }
+
+  function setCurrentProposal(x,ei=null,kind="BO"){
+    state.currentProposal={x:x.slice(),kind};
+    state.currentEI=ei;
+    $("proposalX").textContent=formatX(x);
+    $("proposalHint").textContent=
+      kind==="init"
+        ? `初始实验点。完成后填写实测 y。剩余初始点：${state.pendingQueue.length}`
+        : "贝叶斯优化推荐点。完成实验后填写实测 y，再继续推荐下一点。";
+    $("measuredY").value="";
+    renderAll();
+  }
+
+  function generateInitialPoints(){
+    parseSettings();
+    if(state.X.length>0||state.currentProposal||state.pendingQueue.length)
+      throw new Error("当前已有数据或待实验点。若要重新初始化，请先清空。");
+
+    const n=Math.max(2,parseInt($("nInit").value,10)||2);
+    state.pendingQueue=latinHypercube(n);
+    setCurrentProposal(state.pendingQueue.shift(),null,"init");
+    setStatus(`已按各维区间生成 ${n} 个 Latin Hypercube 初始实验点。`);
+  }
+
+  function submitMeasuredY(){
+    if(!state.currentProposal) throw new Error("当前没有待做实验点。");
+    const y=Number($("measuredY").value);
+    if(!Number.isFinite(y)) throw new Error("请输入有效的实测 y。");
+
+    const done=state.currentProposal;
+    addObservation(done.x,y,done.kind==="init"?"initial":"BO");
+    state.currentProposal=null;
+    state.currentEI=null;
+
+    if(state.pendingQueue.length){
+      setCurrentProposal(state.pendingQueue.shift(),null,"init");
+      setStatus(`结果已录入。请继续初始实验。剩余 ${state.pendingQueue.length} 个。`);
+    }else{
+      $("proposalX").textContent="—";
+      $("proposalHint").textContent="点击“推荐下一点”生成下一组实验参数。";
+      renderAll();
+      setStatus("结果已录入。GP 参数已根据现有数据自动更新。");
+    }
+  }
+
+  function recommendNext(){
+    parseSettings();
+    if(state.currentProposal) throw new Error("请先完成当前待实验点。");
+    if(state.pendingQueue.length) throw new Error("初始实验还没有完成。");
+
+    const p=proposeBO();
+    setCurrentProposal(p.x,p.ei,"BO");
+    setStatus(
+      `已推荐下一组参数。\n`+
+      `候选数=${selectedCandidateCount()}，ξ=${fmt(selectedXi())}，`+
+      `ℓ=${fmt(state.lastGPParams.ls)}，σ²=${fmt(state.lastGPParams.sigVar)}，noise=${fmt(state.lastGPParams.noise)}。`
+    );
+  }
+
+  function addManual(){
+    parseSettings();
+    if(state.currentProposal) throw new Error("请先完成当前待实验点。");
+    const x=JSON.parse($("manualX").value);
+    const y=Number($("manualY").value);
+
+    if(!Array.isArray(x)||x.length!==state.dim||x.some(v=>!Number.isFinite(Number(v))))
+      throw new Error("x 必须是与维度一致的数值数组。");
+
+    const xx=x.map(Number);
+    xx.forEach((v,j)=>{
+      const [lo,hi]=state.bounds[j];
+      if(v<lo||v>hi) throw new Error(`第 ${j+1} 维超出边界。`);
+    });
+    if(!Number.isFinite(y)) throw new Error("请输入有效的 y。");
+
+    addObservation(xx,y,"manual");
+    $("manualY").value="";
+    renderAll();
+    setStatus("已添加历史实验数据；自动参数已重新估计。");
+  }
+
+  function exportCSV(){
+    if(!state.X.length) throw new Error("暂无实验数据可导出。");
+    const header=[...Array(state.dim).keys()].map(i=>`x${i+1}`).concat(["y","source"]);
+    const rows=[header];
+    state.X.forEach((x,i)=>rows.push([...x,state.y[i],state.source[i]]));
+
+    const csv=rows.map(r=>r.map(v=>{
+      const s=String(v);
+      return /[",\n]/.test(s)?`"${s.replace(/"/g,'""')}"`:s;
+    }).join(",")).join("\n");
+
+    const blob=new Blob([csv],{type:"text/csv;charset=utf-8"});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement("a");
+    a.href=url;a.download="adaptive_bayesian_optimization_experiments.csv";
+    document.body.appendChild(a);a.click();a.remove();
+    URL.revokeObjectURL(url);
+    setStatus("实验历史已导出为 CSV。");
+  }
+
+  function updateAutoPanel(){
+    try{
+      const cand=selectedCandidateCount();
+      const xi=selectedXi();
+      let params=state.lastGPParams;
+      if(!params){
+        params=$("autoGP").checked
+          ? (state.X.length?automaticGPParams():{ls:0.28,sigVar:1,noise:0.001})
+          : selectedGPParams();
+      }
+
+      $("autoCand").textContent=String(cand);
+      $("autoXi").textContent=fmt(xi);
+      $("autoLs").textContent=fmt(params.ls);
+      $("autoNoise").textContent=fmt(params.noise);
+
+      if(state.bounds.length===state.dim){
+        const eff=state.bounds.map(([lo,hi],j)=>{
+          const span=hi-lo;
+          return `维度 ${j+1}: ${fmt(params.ls*span)}（区间长度 ${fmt(span)}）`;
+        }).join("\n");
+        $("effectiveLs").textContent=eff;
+      }else{
+        $("effectiveLs").textContent="—";
+      }
+    }catch(e){}
+  }
+
+  function plot1D(){
+    if(state.dim!==1) return;
+    const canvas=$("plot"),ctx=canvas.getContext("2d");
+    const W=canvas.width,H=canvas.height;
+    ctx.clearRect(0,0,W,H);
+
+    const [lo,hi]=state.bounds.length?state.bounds[0]:[-1,1];
+    const m={l:64,r:20,t:24,b:48};
+    ctx.fillStyle="#8fa0c4";ctx.font="13px system-ui";
+
+    if(!state.X.length){
+      ctx.fillText("完成至少一个实验后，这里显示 Gaussian Process 后验。",40,50);
+      return;
+    }
+
+    let gp=null;
+    try{gp=fitGP();}catch(e){}
+
+    const N=300,xs=[],mus=[],lows=[],highs=[];
+    if(gp){
+      for(let i=0;i<N;i++){
+        const x=lo+(hi-lo)*i/(N-1);
+        const p=gpPredict(gp,[x]);
+        xs.push(x);mus.push(p.mean);lows.push(p.mean-1.96*p.std);highs.push(p.mean+1.96*p.std);
+      }
+    }
+
+    const yvals=[...state.y,...lows,...highs].filter(Number.isFinite);
+    let ymin=Math.min(...yvals),ymax=Math.max(...yvals);
+    if(ymin===ymax){ymin-=1;ymax+=1;}
+    const pad=(ymax-ymin)*0.12;ymin-=pad;ymax+=pad;
+
+    const px=x=>m.l+(x-lo)/(hi-lo)*(W-m.l-m.r);
+    const py=y=>H-m.b-(y-ymin)/(ymax-ymin)*(H-m.t-m.b);
+
+    ctx.strokeStyle="#263552";ctx.lineWidth=1;
+    ctx.fillStyle="#8fa0c4";ctx.font="12px system-ui";
+    for(let i=0;i<=5;i++){
+      const x=lo+(hi-lo)*i/5,X=px(x);
+      ctx.beginPath();ctx.moveTo(X,m.t);ctx.lineTo(X,H-m.b);ctx.stroke();
+      ctx.fillText(fmt(x),X-18,H-20);
+    }
+    for(let i=0;i<=5;i++){
+      const y=ymin+(ymax-ymin)*i/5,Y=py(y);
+      ctx.beginPath();ctx.moveTo(m.l,Y);ctx.lineTo(W-m.r,Y);ctx.stroke();
+      ctx.fillText(fmt(y),8,Y+4);
+    }
+
+    if(gp){
+      ctx.fillStyle="rgba(122,162,255,.16)";
+      ctx.beginPath();
+      for(let i=0;i<N;i++){
+        const X=px(xs[i]),Y=py(highs[i]);
+        i===0?ctx.moveTo(X,Y):ctx.lineTo(X,Y);
+      }
+      for(let i=N-1;i>=0;i--) ctx.lineTo(px(xs[i]),py(lows[i]));
+      ctx.closePath();ctx.fill();
+
+      ctx.strokeStyle="#7aa2ff";ctx.lineWidth=2.5;ctx.beginPath();
+      mus.forEach((y,i)=>i?ctx.lineTo(px(xs[i]),py(y)):ctx.moveTo(px(xs[i]),py(y)));
+      ctx.stroke();
+    }
+
+    const bi=bestIndex();
+    state.X.forEach((x,i)=>{
+      ctx.beginPath();ctx.arc(px(x[0]),py(state.y[i]),i===bi?6:4,0,Math.PI*2);
+      ctx.fillStyle=i===bi?"#ffca6a":"#f4f7ff";ctx.fill();
+    });
+
+    if(state.currentProposal){
+      const x=state.currentProposal.x[0];
+      ctx.strokeStyle="#ff7c8b";ctx.lineWidth=2;ctx.setLineDash([6,5]);
+      ctx.beginPath();ctx.moveTo(px(x),m.t);ctx.lineTo(px(x),H-m.b);ctx.stroke();ctx.setLineDash([]);
+    }
+
+    ctx.fillStyle="#7aa2ff";ctx.fillText("GP 均值 / 95% CI",m.l+6,18);
+    ctx.fillStyle="#ffca6a";ctx.fillText("当前最优",m.l+145,18);
+    ctx.fillStyle="#ff7c8b";ctx.fillText("待实验 x",m.l+245,18);
+  }
+
+  function fmt(v){
+    if(!Number.isFinite(v)) return "—";
+    if(Math.abs(v)>=1e4||(Math.abs(v)>0&&Math.abs(v)<1e-4)) return v.toExponential(4);
+    return Number(v.toFixed(6)).toString();
+  }
+
+  function formatX(x){return "["+x.map(fmt).join(", ")+"]";}
+  function setStatus(s){$("status").textContent=s;}
+  function handleError(e){console.error(e);setStatus("错误："+(e?.message||String(e)));}
+
+  function renderAll(){
+    const bi=bestIndex();
+    $("mCount").textContent=state.y.length;
+    $("mBestY").textContent=bi>=0?fmt(state.y[bi]):"—";
+    $("mBestX").textContent=bi>=0?formatX(state.X[bi]):"—";
+    $("mEI").textContent=state.currentEI==null?"—":fmt(state.currentEI);
+
+    const tbody=$("history");tbody.innerHTML="";
+    for(let i=state.y.length-1;i>=0;i--){
+      const tr=document.createElement("tr");
+      tr.innerHTML=`<td>${i+1}</td><td>${formatX(state.X[i])}</td><td>${fmt(state.y[i])}</td><td>${state.source[i]}</td>`;
+      tbody.appendChild(tr);
+    }
+
+    try{
+      if(state.X.length && $("autoGP").checked) state.lastGPParams=automaticGPParams();
+      else if(!$("autoGP").checked) state.lastGPParams=selectedGPParams();
+    }catch(e){}
+
+    updateAutoPanel();
+    plot1D();
+  }
+
+  $("initBtn").onclick=()=>{try{generateInitialPoints()}catch(e){handleError(e)}};
+  $("submitYBtn").onclick=()=>{try{submitMeasuredY()}catch(e){handleError(e)}};
+  $("nextBtn").onclick=()=>{try{recommendNext()}catch(e){handleError(e)}};
+  $("addManualBtn").onclick=()=>{try{addManual()}catch(e){handleError(e)}};
+  $("exportBtn").onclick=()=>{try{exportCSV()}catch(e){handleError(e)}};
+
+  $("clearBtn").onclick=()=>{
+    state.X=[];state.y=[];state.source=[];
+    state.pendingQueue=[];state.currentProposal=null;state.currentEI=null;state.lastGPParams=null;
+    $("proposalX").textContent="—";
+    $("proposalHint").textContent="先生成初始实验点，或录入已有实验数据。";
+    $("measuredY").value="";
+    renderAll();
+    setStatus("已清空。");
+  };
+
+  $("dim").addEventListener("change",()=>{
+    const d=Math.max(1,parseInt($("dim").value,10)||1);
+    try{
+      let b=JSON.parse($("bounds").value);
+      if(!Array.isArray(b)) b=[];
+      while(b.length<d) b.push([0,1]);
+      if(b.length>d) b=b.slice(0,d);
+      $("bounds").value=JSON.stringify(b);
+      $("manualX").value=JSON.stringify(b.map(v=>(Number(v[0])+Number(v[1]))/2));
+    }catch(e){}
+    try{parseSettings();renderAll();}catch(e){handleError(e);}
+  });
+
+  ["bounds","exploreLevel","autoGP","autoCandidates","manualCand","manualXi","manualLs","manualSig","manualNoise"]
+    .forEach(id=>$(id).addEventListener("change",()=>{
+      try{parseSettings();renderAll();}catch(e){handleError(e);}
+    }));
+
+  try{parseSettings();renderAll();}catch(e){handleError(e);}
+})();
+</script>
+</body>
+</html>
