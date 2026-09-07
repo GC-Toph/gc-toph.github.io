@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>社会坐标评估问卷</title>
+<style>
+:root{
+  --bg:#f5f5f2; --card:#fff; --ink:#191919; --muted:#676761; --line:#deded8;
+  --accent:#1f5b4a; --accent-soft:#e8f1ed; --warn:#8a5a12; --shadow:0 10px 30px rgba(0,0,0,.06);
+}
+*{box-sizing:border-box} body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--ink);line-height:1.58}
+button,input,textarea{font:inherit}.shell{max-width:980px;margin:0 auto;padding:28px 18px 80px}.hero{padding:26px 4px 16px}.eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:700}.hero h1{font-size:clamp(28px,4vw,44px);line-height:1.12;margin:8px 0 14px;letter-spacing:-.03em}.hero p{max-width:780px;margin:0;color:var(--muted)}
+.notice{margin:16px 0 20px;padding:14px 16px;border:1px solid #e7dcc8;background:#fffaf0;border-radius:14px;color:#624a24;font-size:14px}.toolbar{position:sticky;top:0;z-index:10;background:rgba(245,245,242,.92);backdrop-filter:blur(12px);padding:10px 0 12px}.toolbar-inner{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.progress-wrap{flex:1;min-width:220px}.progress-line{height:8px;border-radius:99px;background:#dfdfd9;overflow:hidden}.progress-fill{height:100%;width:0;background:var(--accent);transition:width .2s}.progress-text{font-size:12px;color:var(--muted);margin-top:5px}.btn{border:1px solid var(--line);background:#fff;border-radius:10px;padding:9px 12px;cursor:pointer;color:var(--ink)}.btn:hover{border-color:#aaa}.btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+.question{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;margin:14px 0;box-shadow:0 1px 0 rgba(0,0,0,.02)}.qtop{display:flex;gap:12px;align-items:flex-start}.qno{flex:none;width:32px;height:32px;border-radius:10px;background:#f0f0ec;display:grid;place-items:center;font-size:13px;font-weight:700;color:var(--muted)}.qtext{font-size:17px;font-weight:650;letter-spacing:-.01em}.choices{display:grid;grid-template-columns:repeat(6,1fr);gap:7px;margin-top:15px}.choices.four{grid-template-columns:repeat(4,1fr)}.choice input{position:absolute;opacity:0;pointer-events:none}.choice label{display:flex;align-items:center;justify-content:center;text-align:center;min-height:46px;border:1px solid var(--line);border-radius:10px;background:#fff;padding:7px 5px;font-size:13px;cursor:pointer;user-select:none}.choice input:checked+label{border-color:var(--accent);background:var(--accent-soft);box-shadow:inset 0 0 0 1px var(--accent);font-weight:700}.choice label:hover{border-color:#aaa}
+.section-title{margin:36px 0 10px;font-size:22px}.result-panel{display:none;margin-top:28px}.result-panel.visible{display:block}.result-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.result-card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:20px;box-shadow:var(--shadow)}.result-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px}.result-name{font-size:18px;font-weight:800}.score{font-size:30px;font-weight:850;letter-spacing:-.04em;font-variant-numeric:tabular-nums}.axis{display:flex;justify-content:space-between;gap:16px;font-size:12px;color:var(--muted);margin:18px 0 9px}.axis span:last-child{text-align:right}.scale-wrap{margin-top:4px}.track{height:28px;background:#eeeee9;border:1px solid #deded8;border-radius:10px;position:relative;overflow:visible}.track:before,.track:after{content:"";position:absolute;top:0;bottom:0;width:50%;pointer-events:none}.track:before{left:0;background:rgba(35,73,110,.035);border-radius:9px 0 0 9px}.track:after{right:0;background:rgba(113,79,43,.035);border-radius:0 9px 9px 0}.ci-band{position:absolute;top:6px;height:14px;border-radius:7px;background:rgba(31,91,74,.22);border:1px solid rgba(31,91,74,.30);min-width:2px;z-index:2}.zero-line{position:absolute;left:50%;top:-6px;bottom:-6px;width:2px;background:#7c7c76;transform:translateX(-1px);z-index:3}.zero-line:after{content:"";position:absolute;top:-1px;left:50%;width:7px;height:7px;border-radius:50%;background:#7c7c76;transform:translate(-50%,-50%)}.mean-marker{position:absolute;top:50%;width:18px;height:18px;border-radius:50%;background:var(--accent);border:3px solid #fff;transform:translate(-50%,-50%);box-shadow:0 0 0 2px var(--accent),0 2px 7px rgba(0,0,0,.18);z-index:5}.ticks{position:relative;height:24px;margin-top:5px;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}.ticks span{position:absolute;transform:translateX(-50%)}.ticks .tneg{left:0;transform:none}.ticks .tzero{left:50%;font-weight:800;color:#555}.ticks .tpos{right:0;transform:none}.legend{display:flex;gap:15px;align-items:center;flex-wrap:wrap;margin-top:7px;font-size:11px;color:var(--muted)}.legend-item{display:inline-flex;gap:6px;align-items:center}.legend-dot{width:9px;height:9px;border-radius:50%;background:var(--accent)}.legend-band{width:22px;height:9px;border-radius:5px;background:rgba(31,91,74,.22);border:1px solid rgba(31,91,74,.30)}.legend-zero{width:2px;height:13px;background:#7c7c76}.stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 12px;margin-top:16px;font-size:13px;color:#5a5a55}.stat{padding-top:9px;border-top:1px solid #ecece7}.stat span{display:block;font-size:11px;color:var(--muted);margin-bottom:1px}.stat b{color:var(--ink);font-size:14px;font-variant-numeric:tabular-nums}.ci-stat{grid-column:1/-1}.ci-stat b{font-size:15px}
+.footnote{font-size:13px;color:var(--muted);margin-top:16px}.tag{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:99px;padding:3px 8px;font-size:11px;color:var(--muted);margin-left:8px;vertical-align:middle}
+@media(max-width:760px){.choices,.choices.four{grid-template-columns:repeat(2,1fr)}.result-grid{grid-template-columns:1fr}.question{padding:15px}.qtext{font-size:16px}.shell{padding-left:12px;padding-right:12px}.result-card{padding:17px}.stats{grid-template-columns:1fr 1fr}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="shell" id="app">
+  <header class="hero">
+    <h1>社会坐标评估问卷</h1>
+    <p>题目来源于韩剧《思想验证区域》第一季，并进行了中文语境下的本土化适配。</p>
+  </header>
+  <div class="toolbar">
+    <div class="toolbar-inner">
+      <div class="progress-wrap">
+        <div class="progress-line"><div class="progress-fill" id="progressFill"></div></div>
+        <div class="progress-text" id="progressText">已回答 0 / 87</div>
+      </div>
+      <button class="btn primary" id="calcBtn" type="button">计算结果</button>
+    </div>
+  </div>
+
+  <main id="questionList"></main>
+
+  <section class="result-panel" id="resultPanel">
+    <h2 class="section-title">结果</h2>
+    <div class="result-grid" id="resultGrid"></div>
+    <div class="footnote">分数范围为 <b>-3 到 +3</b>，0 表示两端倾向的中点。图中实心点为均值，阴影为均值的近似 95% CI（<b>μ ± 1.96σ/√n</b>）。若 CI 超出量表范围，图上会截断在边界，数字仍保留实际计算值。</div>
+  </section>
+
+
+</div>
+
+<script>
+const QUESTIONS = [{"key":"s1-class-15","dim":"class","text":"小时候，家里曾长期雇有住家保姆或固定家政人员。","agreeHigh":true},{"key":"s1-gender-07","dim":"gender","text":"亲属称谓因性别不同而不同（例如父系、母系亲属使用不同称呼），主要只是传统习惯，不能算性别歧视。","agreeHigh":true},{"key":"s1-politics-01","dim":"politics","text":"我不应该为自己几乎不会直接受益的公共项目缴税。","agreeHigh":true},{"key":"s1-gender-04","dim":"gender","text":"相比男性，女性如果长期没有稳定亲密关系，更难获得幸福。","agreeHigh":true},{"key":"s1-openness-20","dim":"openness","text":"仅凭某个地区、民族或外来人口身份，就认为其犯罪概率更高，通常属于缺乏证据的偏见。","agreeHigh":false},{"key":"s1-class-09","dim":"class","text":"学生时代，我曾因为家庭经济困难而减免餐费、学费或获得困难补助。","agreeHigh":false},{"key":"s1-gender-19","dim":"gender","text":"在没有得到对方明确同意的情况下发生性行为，应高度怀疑是否构成性侵。","agreeHigh":false},{"key":"s1-politics-12","dim":"politics","text":"对明显超出普通家庭承受能力的高价校外培训或教育服务，应进行价格或经营监管。","agreeHigh":false},{"key":"s1-politics-09","dim":"politics","text":"政府应该比现在更积极地通过税收和公共支出缩小贫富差距。","agreeHigh":false},{"key":"s1-openness-12","dim":"openness","text":"同性伴侣应享有与异性伴侣相同的结婚、共同生活和收养等法律权利。","agreeHigh":false},{"key":"s1-openness-05","dim":"openness","text":"所有餐厅为素食主义者至少保留一道素食选项，是合理的公共友好做法。","agreeHigh":false},{"key":"s1-politics-16","dim":"politics","text":"只要付出了劳动，即使绩效不理想，也应保障基本收入。","agreeHigh":false},{"key":"s1-class-13","dim":"class","text":"小时候，我接受过一对一家教或需要额外付费的课外辅导。","agreeHigh":true},{"key":"s1-gender-01","dim":"gender","text":"当今主流的约会和性文化，在相当程度上仍以男性需求为中心，并受父权结构影响。","agreeHigh":false},{"key":"s1-politics-18","dim":"politics","text":"总体来说，资本主义市场经济优于其他经济制度。","agreeHigh":true},{"key":"s1-openness-19","dim":"openness","text":"一个人只有先尽到自己的义务，才有资格主张相应的权利。","agreeHigh":true},{"key":"s1-politics-14","dim":"politics","text":"对部分进口商品征收关税，是保护本国就业和产业的有效办法。","agreeHigh":true},{"key":"s1-gender-20","dim":"gender","text":"如果男性平均工资高于女性，主要原因通常是男性平均工作表现更好。","agreeHigh":true},{"key":"s1-gender-17","dim":"gender","text":"由于男性通常承担更多兵役登记、石油煤气勘探、高空工作等高风险岗位和赚钱养家等社会义务，整体而言社会对男性更不利。","agreeHigh":true},{"key":"s1-gender-05","dim":"gender","text":"以女性身体性感化为卖点的内衣、泳装写真，会削弱女性权益方面已经取得的进步。","agreeHigh":false},{"key":"s1-class-07","dim":"class","text":"我的符合年龄的兄弟姐妹和近亲中，大多数人都接受过四年制本科或以上教育。","agreeHigh":true},{"key":"s1-class-08","dim":"class","text":"在经济上，我基本没有得到过父母或家庭的实际支持。","agreeHigh":false},{"key":"s1-class-01","dim":"class","text":"买东西时，我通常把“性价比高不高”当作最重要的判断标准之一。","agreeHigh":false},{"key":"s1-openness-21","dim":"openness","text":"“如果不喜欢这里的规则，就应该自己离开，而不是要求环境改变”这句话在大多数情况下是对的。","agreeHigh":true},{"key":"s1-politics-06","dim":"politics","text":"法定最低工资带来的副作用通常大于好处。","agreeHigh":true},{"key":"s1-class-17","dim":"class","text":"我或家人曾因为拿不出医疗费而感到非常窘迫，甚至影响是否就医。","agreeHigh":false},{"key":"s1-openness-10","dim":"openness","text":"民主的核心就是少数服从多数，即使少数群体因此需要牺牲一些利益。","agreeHigh":true},{"key":"s1-openness-01","dim":"openness","text":"对极其严重的暴力犯罪，社会保留并少量实际适用死刑是有必要的。","agreeHigh":true},{"key":"s1-politics-02","dim":"politics","text":"道路、电网、自来水等基础公共服务，应主要由国家或公共机构运营，而非私人企业。","agreeHigh":false},{"key":"s1-openness-04","dim":"openness","text":"对守法且没有违法行为可隐瞒的人来说，政府或公共机构的监控更多是一种保护，而不是威胁和隐私侵犯。","agreeHigh":true},{"key":"s1-politics-21","dim":"politics","text":"通过父母或亲属继承财产而获得财富，是正当的。","agreeHigh":true},{"key":"s1-openness-17","dim":"openness","text":"残障人士通过占用公共交通或道路等影响通勤的方式来抗议表达自身的处境以获得社会关注和支持，是不合理的。","agreeHigh":true},{"key":"s1-openness-11","dim":"openness","text":"即使没有财富收益，维护传统婚姻和家庭制度本身也有价值。","agreeHigh":true},{"key":"s1-class-03","dim":"class","text":"父母平时会把高尔夫当作比较固定的休闲爱好。","agreeHigh":true},{"key":"s1-class-05","dim":"class","text":"成年以前，我有过较多海外留学、交换或长期学习经历。","agreeHigh":true},{"key":"s1-class-20","dim":"class","text":"压力很大时，我比较常用购物消费来让自己放松。","agreeHigh":true},{"key":"s1-openness-03","dim":"openness","text":"即使是在反抗专制统治时，也不应该容忍以暴力作为政治手段。","agreeHigh":true},{"key":"s1-gender-21","dim":"gender","text":"如果历史上更多国家由女性长期掌权，战争和暴力会明显更少。","agreeHigh":false},{"key":"s1-openness-14","dim":"openness","text":"“政治正确”或“照顾少数群体感受”的主张，经常会走得太远太过分。","agreeHigh":true},{"key":"s1-politics-11","dim":"politics","text":"优先促进经济增长比改善福利分配更能帮助低收入群体摆脱贫困。","agreeHigh":true},{"key":"s1-openness-02","dim":"openness","text":"影视和大众媒体中经常出现正面的同性恋、双性恋或跨性别角色，有助于减少偏见、让少数群体被看见。","agreeHigh":false},{"key":"s1-gender-16","dim":"gender","text":"在当前市场环境中，同等条件下男性的能力往往更容易被高估、女性更容易被低估。","agreeHigh":false},{"key":"s1-gender-11","dim":"gender","text":"在今天的中国社会，做女性总体上比做男性有更多便利和优势。","agreeHigh":true},{"key":"s1-openness-06","dim":"openness","text":"对长期移居中国的外国人，整体数量应尽可能控制在较低水平。","agreeHigh":true},{"key":"s1-politics-04","dim":"politics","text":"一个人长期贫困，主要责任通常在个人自身而非社会政策。","agreeHigh":true},{"key":"s1-gender-10","dim":"gender","text":"在公务员、公共机构或政治代表中，可以为女性设置独立录取通道，保留至少一定比例的名额，以改善性别失衡。","agreeHigh":false},{"key":"s1-gender-08","dim":"gender","text":"女性说自己患有抑郁症等心理疾病时，很多时候是在夸大问题。","agreeHigh":true},{"key":"s1-openness-16","dim":"openness","text":"为了团队凝聚力，即使个人不愿意，也应该参加单位组织的集体聚餐或团建。","agreeHigh":true},{"key":"s1-class-19","dim":"class","text":"我小时候住过的房子里曾经出现过老鼠。","agreeHigh":false},{"key":"s1-politics-15","dim":"politics","text":"靠劳动获得的收入，在道德上比靠股票、资本增值获得的收入更正当。","agreeHigh":false},{"key":"s1-gender-15","dim":"gender","text":"对企业高管等男性长期占多数的高收入岗位，可以为女性设置独立录取通道，保留至少一定比例的名额，以改善性别失衡。","agreeHigh":false},{"key":"s1-class-11","dim":"class","text":"我或我的家庭曾领取过面向低收入家庭的补助、救助金或类似支持。","agreeHigh":false},{"key":"s1-class-23","dim":"class","text":"我小时候住过的房子曾长期因为潮湿出现明显霉斑。","agreeHigh":false},{"key":"s1-politics-17","dim":"politics","text":"与制定更多政府政策相比，把资源配置交给自由市场通常更有效。","agreeHigh":true},{"key":"s1-politics-05","dim":"politics","text":"政府应该限制大型企业最高管理层（如 CEO）的薪酬上限。","agreeHigh":false},{"key":"s1-openness-22","dim":"openness","text":"在穆斯林人口较多的地区，地方政府有必要支持清真食品认证和相关公共信息服务。","agreeHigh":false},{"key":"s1-class-21","dim":"class","text":"父母现在仍会比较经常地出境出国度假或旅行。","agreeHigh":true},{"key":"s1-class-14","dim":"class","text":"成年以前，我经常跟家人出境出国旅游。","agreeHigh":true},{"key":"s1-openness-18","dim":"openness","text":"基于种族或民族身份对人进行差别对待，在某些情况下有一定合理依据，而非歧视。","agreeHigh":true},{"key":"s1-class-22","dim":"class","text":"成年以后，父母在经济上更多成为我的负担，而不是我的支持来源。","agreeHigh":false},{"key":"s1-gender-03","dim":"gender","text":"在职业名称前特意加“女”字（如“女作家”“女记者”），常常会弱化这个职业的专业感。","agreeHigh":false},{"key":"s1-class-10","dim":"class","text":"我小时候家里的书架上，父母自己会读的书至少有二十本。","agreeHigh":true},{"key":"s1-class-12","dim":"class","text":"工作后，我工资的一项重要用途曾是偿还助学贷款或教育借款。","agreeHigh":false},{"key":"s1-openness-09","dim":"openness","text":"普通大众经常会在重大公共问题上做出错误判断。","agreeHigh":true},{"key":"s1-class-02","dim":"class","text":"大学阶段，我有一部分记忆是靠兼职打工赚生活费或学费。","agreeHigh":false},{"key":"s1-class-06","dim":"class","text":"大学学费基本一直由父母或家庭承担。","agreeHigh":true},{"key":"s1-openness-07","dim":"openness","text":"长期生活在中国的外国移民，应尽量适应并融入中国主流文化，而不是保留与主流明显冲突的生活方式。","agreeHigh":true},{"key":"s1-politics-07","dim":"politics","text":"相比政府，规模庞大的企业更有可能对社会造成严重伤害。","agreeHigh":false},{"key":"s1-politics-20","dim":"politics","text":"无论病情轻重，有钱人都有权通过付费获得更好更便利的医疗待遇。","agreeHigh":true},{"key":"s1-gender-18","dim":"gender","text":"女性依法使用经期或产假等休假，属于正常权利，不应因此被企业差别对待。","agreeHigh":false},{"key":"s1-openness-08","dim":"openness","text":"影视改编为了增加族裔代表性而改变经典角色的族裔设定，会背叛原作粉丝的情感和记忆。（例如《小美人鱼》的黑人版本）","agreeHigh":true},{"key":"s1-class-18","dim":"class","text":"为了尽量把东西买便宜，我愿意花很多时间找优惠券、比价、拼单或买二手。","agreeHigh":false},{"key":"s1-politics-13","dim":"politics","text":"政府介入民营企业经营，很多时候会把原本能运行的事情搞砸。","agreeHigh":true},{"key":"s1-openness-13","dim":"openness","text":"相比于目前的情况，电视、网络视频等节目中的手语窗口和无障碍服务应该覆盖更多节目。","agreeHigh":false},{"key":"s1-class-04","dim":"class","text":"小时候，父母曾带我去美术馆、艺术展或类似文化活动。","agreeHigh":true},{"key":"s1-class-16","dim":"class","text":"我长期有一种压力：只要走错一步，学业、工作或生活就可能彻底失去退路。","agreeHigh":false},{"key":"s1-politics-08","dim":"politics","text":"充分竞争的市场通常会让商品、服务和社会整体变得更好。","agreeHigh":true},{"key":"s1-gender-14","dim":"gender","text":"男女在能力和特征上存在明显差异，因此分别承担不同社会角色、彼此互补，是更理想的状态。","agreeHigh":true},{"key":"s1-politics-10","dim":"politics","text":"以短期炒作获利为主要目的的多套住房或房产购买，应受到更严格限制。","agreeHigh":false},{"key":"s1-politics-03","dim":"politics","text":"政府不应使用纳税人的钱资助纯艺术、艺术展览等文化项目。","agreeHigh":true},{"key":"s1-openness-15","dim":"openness","text":"总体而言，社会正在明显朝更坏的方向变化。","agreeHigh":true},{"key":"s1-gender-06","dim":"gender","text":"影视作品中女性主要角色明显偏少，是一个值得认真解决的问题。","agreeHigh":false},{"key":"s1-gender-12","dim":"gender","text":"如果同一岗位上男女拿到相同薪资，女性往往意味着付出了更多努力或能力更强。","agreeHigh":false},{"key":"s1-gender-02","dim":"gender","text":"支持女性主义的男性，往往会显得不够“有男子气概”。","agreeHigh":true},{"key":"s1-gender-09","dim":"gender","text":"对选择不结婚不生育的女性征收单身税，是比较好的社会政策。","agreeHigh":true},{"key":"s1-politics-19","dim":"politics","text":"我不愿意生活在一个几乎所有人所有职业收入都差不多的社会里。","agreeHigh":true},{"key":"s1-gender-13","dim":"gender","text":"“男女工资差距”基本是被夸大的伪问题；同工同酬在现实中已经大体实现。女性工资水平偏低是因为男女各自发挥分工优势，女性投入更多时间在家庭而非工作，男性投入更多时间在工作而非家庭。","agreeHigh":true}];
+const DIM = {"politics":{"name":"经济政策","low":"左派 / 公共干预","high":"右派 / 市场自主","max":6},"gender":{"name":"性别观念","low":"女权 / 结构视角","high":"平权 / 性别对称","max":6},"openness":{"name":"社会文化","low":"开放","high":"保守","max":6},"class":{"name":"家庭出身","low":"平民 / 资源紧张","high":"富裕 / 资源充足","max":4}};
+const CHOICES6 = ["非常反对","反对","稍微反对","稍微同意","同意","非常同意"];
+const CHOICES4 = ["从不符合","偶尔符合","经常符合","总是符合"];
+const answers = {};
+
+function esc(s){return String(s).replace(/[&<>\"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'\"':"&quot;","'":"&#39;"}[c]));}
+
+function renderQuestions(){
+  const root=document.getElementById('questionList');
+  root.innerHTML=QUESTIONS.map((q,i)=>{
+    const isClass=q.dim==='class';
+    const labels=isClass?CHOICES4:CHOICES6;
+    return `<article class="question" data-key="${q.key}">
+      <div class="qtop"><div class="qno">${i+1}</div><div><div class="qtext">${esc(q.text)}</div></div></div>
+      <div class="choices ${isClass?'four':''}">${labels.map((lab,j)=>{
+        const v=j+1, id=`${q.key}-${v}`;
+        return `<div class="choice"><input type="radio" name="${q.key}" id="${id}" value="${v}"><label for="${id}">${lab}</label></div>`;
+      }).join('')}</div>
+    </article>`;
+  }).join('');
+  root.addEventListener('change',e=>{
+    if(e.target.matches('input[type=radio]')){
+      answers[e.target.name]=Number(e.target.value);
+      updateProgress(); saveLocal();
+    }
+  });
+}
+
+function updateProgress(){
+  const n=Object.keys(answers).length,total=QUESTIONS.length,pct=n/total*100;
+  document.getElementById('progressFill').style.width=pct+'%';
+  document.getElementById('progressText').textContent=`已回答 ${n} / ${total}`;
+}
+
+function directionScore(q, raw){
+  // 六级题：-3,-2,-1,+1,+2,+3；四级家庭题：-3,-1,+1,+3。
+  // agreeHigh=false 的题目反向计分，使负值始终指向左侧标签、正值指向右侧标签。
+  const base = q.dim === 'class'
+    ? [-3,-1,1,3][raw-1]
+    : [-3,-2,-1,1,2,3][raw-1];
+  return q.agreeHigh ? base : -base;
+}
+function mean(a){return a.reduce((x,y)=>x+y,0)/a.length;}
+function sampleStd(a,m){return a.length>1 ? Math.sqrt(a.reduce((s,x)=>s+(x-m)**2,0)/(a.length-1)) : 0;}
+function fmt(x){return Number.isFinite(x)?x.toFixed(2):'—';}
+function signedFmt(x){
+  if(!Number.isFinite(x)) return '—';
+  if(Math.abs(x)<0.005) return '0.00';
+  return (x>0?'+':'')+x.toFixed(2);
+}
+function scalePct(x){return Math.max(0,Math.min(100,(x+3)/6*100));}
+
+function calculate(scroll=true){
+  const missing=QUESTIONS.filter(q=>answers[q.key]==null);
+  if(missing.length){
+    alert(`还有 ${missing.length} 题未回答。请先完成全部题目。`);
+    const el=document.querySelector(`[data-key="${missing[0].key}"]`); if(el) el.scrollIntoView({behavior:'smooth',block:'center'});
+    return;
+  }
+  const by={politics:[],gender:[],openness:[],class:[]};
+  QUESTIONS.forEach(q=>by[q.dim].push(directionScore(q,answers[q.key])));
+  const cards=Object.keys(DIM).map(dim=>{
+    const vals=by[dim], cfg=DIM[dim], mu=mean(vals), sigma=sampleStd(vals,mu);
+    const se=sigma/Math.sqrt(vals.length), lo=mu-1.96*se, hi=mu+1.96*se;
+    const plotLo=Math.max(-3,lo), plotHi=Math.min(3,hi);
+    const meanPct=scalePct(mu), loPct=scalePct(plotLo), hiPct=scalePct(plotHi);
+    return `<div class="result-card">
+      <div class="result-head">
+        <div class="result-name">${cfg.name}<span class="tag">n=${vals.length}</span></div>
+        <div class="score">${signedFmt(mu)}</div>
+      </div>
+      <div class="axis"><span>${cfg.low}</span><span>${cfg.high}</span></div>
+      <div class="scale-wrap" aria-label="${cfg.name}：均值 ${signedFmt(mu)}，95% CI ${signedFmt(lo)} 到 ${signedFmt(hi)}">
+        <div class="track">
+          <div class="ci-band" style="left:${loPct.toFixed(2)}%;width:${Math.max(0,hiPct-loPct).toFixed(2)}%"></div>
+          <div class="zero-line" aria-hidden="true"></div>
+          <div class="mean-marker" style="left:${meanPct.toFixed(2)}%" title="均值 ${signedFmt(mu)}"></div>
+        </div>
+        <div class="ticks"><span class="tneg">-3</span><span class="tzero">0</span><span class="tpos">+3</span></div>
+        <div class="legend">
+          <span class="legend-item"><i class="legend-dot"></i>均值</span>
+          <span class="legend-item"><i class="legend-band"></i>95% CI</span>
+          <span class="legend-item"><i class="legend-zero"></i>零点</span>
+        </div>
+      </div>
+      <div class="stats">
+        <div class="stat"><span>均值 μ</span><b>${signedFmt(mu)}</b></div>
+        <div class="stat"><span>标准差 σ</span><b>${fmt(sigma)}</b></div>
+        <div class="stat"><span>标准误 σ/√n</span><b>${fmt(se)}</b></div>
+        <div class="stat"><span>题数 n</span><b>${vals.length}</b></div>
+        <div class="stat ci-stat"><span>均值的近似 95% CI</span><b>[${signedFmt(lo)}, ${signedFmt(hi)}]</b></div>
+      </div>
+    </div>`;
+  }).join('');
+  document.getElementById('resultGrid').innerHTML=cards;
+  document.getElementById('resultPanel').classList.add('visible');
+  if(scroll) document.getElementById('resultPanel').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function applyAnswers(obj, doCalc=true){
+  let used=0;
+  QUESTIONS.forEach(q=>{
+    if(Object.prototype.hasOwnProperty.call(obj,q.key)){
+      const max=DIM[q.dim].max, v=Number(obj[q.key]);
+      if(Number.isInteger(v)&&v>=1&&v<=max){
+        answers[q.key]=v; used++;
+        const radio=document.querySelector(`input[name="${q.key}"][value="${v}"]`); if(radio) radio.checked=true;
+      }
+    }
+  });
+  updateProgress(); saveLocal();
+  if(doCalc && used===QUESTIONS.length) calculate(false);
+  return used;
+}
+
+function saveLocal(){try{localStorage.setItem('community-cn-survey-v2',JSON.stringify(answers));}catch(e){}}
+function loadLocal(){try{const s=localStorage.getItem('community-cn-survey-v2');if(s) applyAnswers(JSON.parse(s),false);}catch(e){}}
+renderQuestions(); loadLocal(); updateProgress();
+document.getElementById('calcBtn').addEventListener('click',()=>calculate(true));
+</script>
+</body>
+</html>
