@@ -3,17 +3,17 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>长期相处问卷 · 校验与观察者评估</title>
+<title>生活习惯契合度问卷 · 校验与观察者评估</title>
 <style>
 :root{--bg:#f6f7f9;--card:#fff;--text:#171717;--muted:#6b7280;--line:#e5e7eb;--accent:#111827;--soft:#f3f4f6;--warn:#92400e;--bad:#991b1b;--good:#166534}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px/1.55 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}.wrap{max-width:980px;margin:auto;padding:24px 14px 64px}.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;margin:12px 0;box-shadow:0 1px 2px rgba(0,0,0,.03)}h1{font-size:27px;margin:0 0 8px}h2{font-size:21px;margin:0 0 10px}h3{font-size:17px;margin:0 0 8px}p{margin:7px 0}.muted{color:var(--muted)}.small{font-size:13px}.hidden{display:none!important}.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}.tabs button{background:white;color:#111827;border:1px solid var(--line)}.tabs button.active{background:#111827;color:white}.toolbar{display:flex;gap:9px;flex-wrap:wrap;margin-top:14px}button{border:0;border-radius:10px;padding:10px 15px;background:var(--accent);color:white;font-weight:650;cursor:pointer}button.secondary{background:#e5e7eb;color:#111827}button.ghost{background:white;color:#111827;border:1px solid var(--line)}.field{margin:13px 0}.field label{font-weight:650;display:block;margin-bottom:6px}input[type=file],input[type=text],select,textarea{width:100%;padding:10px;border:1px solid var(--line);border-radius:10px;background:white;color:#111827}textarea{min-height:110px;resize:vertical}.metricGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.metric{border:1px solid var(--line);border-radius:12px;padding:13px;background:white}.metric strong{display:block;font-size:25px;margin-top:4px}.bar{height:8px;background:#e5e7eb;border-radius:999px;overflow:hidden;margin-top:8px}.bar>div{height:100%;background:#111827}.flag{border-left:4px solid #d97706;background:#fffbeb;border-radius:8px;padding:9px 11px;margin:8px 0}.flag.bad{border-left-color:#dc2626;background:#fef2f2}.flag.good{border-left-color:#16a34a;background:#f0fdf4}.scoreTable{width:100%;border-collapse:collapse;font-size:13px}.scoreTable th,.scoreTable td{padding:8px;border-bottom:1px solid var(--line);text-align:left}.obsItem{border-top:1px solid var(--line);padding:13px 0}.obsItem:first-child{border-top:0}.scale{display:grid;grid-template-columns:repeat(8,1fr);gap:6px;margin-top:9px}.scale label{cursor:pointer;text-align:center;border:1px solid var(--line);border-radius:9px;padding:7px 2px;background:white;font-size:12px}.scale input{display:none}.scale input:checked+span{display:block;background:#111827;color:white;border-radius:6px;padding:4px 0;margin:-4px 0}.pill{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:3px 8px;margin:2px 4px 2px 0;font-size:12px;background:white}.compareDiff{font-weight:700}.code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;word-break:break-all}.sectionNote{background:var(--soft);border-radius:10px;padding:10px}.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}@media(max-width:720px){.metricGrid{grid-template-columns:1fr 1fr}.two{grid-template-columns:1fr}.scale{grid-template-columns:repeat(4,1fr)}}@media(max-width:480px){.metricGrid{grid-template-columns:1fr}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px/1.55 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}.wrap{max-width:1040px;margin:auto;padding:24px 14px 64px}.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;margin:12px 0;box-shadow:0 1px 2px rgba(0,0,0,.03)}h1{font-size:27px;margin:0 0 8px}h2{font-size:21px;margin:0 0 10px}h3{font-size:17px;margin:14px 0 8px}p{margin:7px 0}.muted{color:var(--muted)}.small{font-size:13px}.hidden{display:none!important}.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}.tabs button{background:white;color:#111827;border:1px solid var(--line)}.tabs button.active{background:#111827;color:white}.toolbar{display:flex;gap:9px;flex-wrap:wrap;margin-top:14px}button{border:0;border-radius:10px;padding:10px 15px;background:var(--accent);color:white;font-weight:650;cursor:pointer}button.secondary{background:#e5e7eb;color:#111827}button.ghost{background:white;color:#111827;border:1px solid var(--line)}.field{margin:13px 0}.field label{font-weight:650;display:block;margin-bottom:6px}input[type=file],input[type=text],input[type=number],select,textarea{width:100%;padding:10px;border:1px solid var(--line);border-radius:10px;background:white;color:#111827}textarea{min-height:110px;resize:vertical}.metricGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.metric{border:1px solid var(--line);border-radius:12px;padding:13px;background:white;min-width:0}.metric strong{display:block;font-size:25px;margin-top:4px}.metric .ci{display:block;font-size:12px;font-weight:650;margin-top:2px}.metricBar{position:relative;height:24px;margin-top:7px}.metricBar .track{position:absolute;left:0;right:0;top:8px;height:8px;background:#e5e7eb;border-radius:999px;overflow:hidden}.metricBar .fill{height:100%;background:#9ca3af}.metricBar .ciBracket{position:absolute;top:3px;height:18px;border-top:2px solid #111827;border-left:2px solid #111827;border-right:2px solid #111827;pointer-events:none}.metricBar .point{position:absolute;top:1px;width:2px;height:22px;background:#111827;transform:translateX(-1px);pointer-events:none}.flag{border-left:4px solid #d97706;background:#fffbeb;border-radius:8px;padding:9px 11px;margin:8px 0}.flag.bad{border-left-color:#dc2626;background:#fef2f2}.flag.good{border-left-color:#16a34a;background:#f0fdf4}.scoreTable{width:100%;border-collapse:collapse;font-size:13px}.scoreTable th,.scoreTable td{padding:8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}.obsItem{border-top:1px solid var(--line);padding:13px 0}.obsItem:first-child{border-top:0}.scale{display:grid;grid-template-columns:repeat(8,1fr);gap:6px;margin-top:9px}.scale label{cursor:pointer;text-align:center;border:1px solid var(--line);border-radius:9px;padding:7px 2px;background:white;font-size:12px}.scale input{display:none}.scale input:checked+span{display:block;background:#111827;color:white;border-radius:6px;padding:4px 0;margin:-4px 0}.compareDiff{font-weight:700}.sectionNote{background:var(--soft);border-radius:10px;padding:10px}.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}.detailItem{border:1px solid var(--line);border-radius:12px;padding:14px;margin:10px 0;background:#fff}.answerLine{padding:7px 9px;border-radius:8px;background:var(--soft);margin:6px 0}.optionList{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.option{border:1px solid var(--line);border-radius:999px;padding:4px 8px;font-size:12px;background:white}.option.selected{background:#111827;color:white;border-color:#111827}.weightRow{display:grid;grid-template-columns:150px 1fr 64px;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}.weightRow:last-child{border-bottom:0}.weightRow input[type=range]{width:100%}.formula{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;white-space:normal;overflow-wrap:anywhere}.scoreHero{display:grid;grid-template-columns:minmax(220px,320px) 1fr;gap:14px;align-items:start}.selectedAnswer{font-weight:700}.methodList{margin:8px 0 0 20px;padding:0}.methodList li{margin:8px 0}.nowrap{white-space:nowrap}@media(max-width:760px){.metricGrid{grid-template-columns:1fr 1fr}.two,.scoreHero{grid-template-columns:1fr}.scale{grid-template-columns:repeat(4,1fr)}.weightRow{grid-template-columns:120px 1fr 56px}.scoreTable{display:block;overflow-x:auto}}@media(max-width:480px){.metricGrid{grid-template-columns:1fr}.weightRow{grid-template-columns:1fr}.weightRow output{justify-self:start}}
 </style>
 </head>
 <body>
 <div class="wrap">
   <div class="card">
-    <h1>长期相处问卷 · 校验与观察者评估</h1>
-    <p class="muted small">自评与他评不一致不等于“撒谎”。可能来自印象管理、自我认知偏差、情境差异，或你观察到的样本不足。结果应作为进一步沟通的线索。</p>
+    <h1>生活习惯契合度问卷 · 校验与观察者评估</h1>
+    <p class="muted small">自评与他评不一致不等于“撒谎”。可能来自自我认知偏差、情境差异或观察样本不足。所有分数的 95% CI 均由同一套随机变量模型传播得到。</p>
   </div>
   <div class="tabs">
     <button id="tabSelf" class="active">① 解析自评结果</button>
@@ -24,8 +24,9 @@
   <section id="selfSection">
     <div class="card">
       <h2>导入受测者结果</h2>
-      <div class="field"><label>选择 .ltmb64 / .txt 文件</label><input id="fileInput" type="file" accept=".ltmb64,.txt,text/plain"></div>
-      <div class="field"><label>或粘贴结果文本</label><textarea id="pasteInput" placeholder="LTM1:..."></textarea></div>
+      <p class="muted small">仅支持最终版 3.0.0 问卷生成的结果。</p>
+      <div class="field"><label>选择结果文件（.ltmdata / .txt）</label><input id="fileInput" type="file" accept=".ltmdata,.txt,text/plain"></div>
+      <div class="field"><label>或粘贴结果文本</label><textarea id="pasteInput" placeholder="把受测者复制给你的结果文本粘贴到这里"></textarea></div>
       <div class="toolbar"><button id="parseBtn">解析结果</button><button id="clearSelf" class="secondary">清除</button></div>
     </div>
     <div id="selfOutput"></div>
@@ -34,7 +35,7 @@
   <section id="observerSection" class="hidden">
     <div class="card">
       <h2>观察者行为评估</h2>
-      <p class="muted">只评价你实际观察过的行为。没有足够信息时请选择“无法判断”，不要用想象补全。</p>
+      <p class="muted">只评价实际观察过的行为。没有足够信息时请选择“无法判断”。观察时长与观察信心会进入观察者评分的不确定性模型。</p>
       <div class="two">
         <div class="field"><label>你与对方实际接触多久？</label><select id="obsDuration"><option value="">请选择</option><option>少于 1 个月</option><option>1–3 个月</option><option>3–6 个月</option><option>6–12 个月</option><option>1 年以上</option></select></div>
         <div class="field"><label>你对自己观察准确性的总体信心</label><select id="obsConfidence"><option value="">请选择</option><option value="1">1 很有限</option><option value="2">2 偏低</option><option value="3">3 一般</option><option value="4">4 较高</option><option value="5">5 很高</option></select></div>
@@ -50,8 +51,13 @@
   </section>
 </div>
 <script>
-const VERSION='2.0.0';
-const OBS_STORAGE='ltm-observer-v2';
+const VERSION='3.0.0';
+const SCHEMA='LTM_SELF_V3';
+const OBS_STORAGE='ltm-observer-v3';
+const SCORE_STORAGE='ltm-score-weights-v3';
+const MC_N=12000;
+const SELF_SIGMA=0.55;
+
 const dimLabels={anx:'依恋焦虑',avo:'依恋回避',rel:'沟通与修复',con:'尽责性',neu:'负性情绪敏感',agr:'宜人性'};
 const dimNotes={anx:'越高表示越容易在关系不确定、联系减少或竞争性线索下被激活。',avo:'越高表示越倾向通过距离、独立或降温来调节亲密压力。',rel:'越高表示越能直接表达、承接情绪、讨论冲突并完成修复。',con:'越高表示承诺、计划和执行更稳定。',neu:'越高表示更容易焦虑、反刍并受压力影响。',agr:'越高表示更合作、温和、愿意倾听并较少敌意解释。'};
 
@@ -65,10 +71,40 @@ q21:{d:'agr'},q22:{d:'agr',rev:true},q23:{d:'agr'},q24:{d:'agr'},
 q25:{d:'life_health'},q26:{d:'life_career'},q27:{d:'life_finance'},q28:{d:'life_family'},q29:{d:'life_romance'},q30:{d:'life_growth'},q31:{d:'life_leisure'},q32:{d:'life_environment'},
 q33:{d:'impression'},q34:{d:'impression'},q35:{d:'attention'}
 };
-const pairDefs=[['q01','q02',true],['q05','q06',true],['q13','q14',true],['q17','q18',true],['q21','q22',true]];
-const lifeLabels={life_health:'健康与体能',life_career:'事业与工作',life_finance:'财务与金钱',life_family:'家庭与朋友',life_romance:'爱情与伴侣',life_growth:'个人成长',life_leisure:'娱乐与休闲',life_environment:'物理环境'};
-const valueLabels={v1:'竞争与成功',v2:'金钱与消费',v3:'生育',v4:'父母边界',v5:'工作与生活',v6:'社会责任',v7:'居住城市',v8:'学术/事业追求',v9:'平等与分工',v10:'忠诚与承诺'};
-
+const pairDefs=[['q01','q02'],['q05','q06'],['q13','q14'],['q17','q18'],['q21','q22']];
+const lifeDefs=[
+{id:'q25',d:'life_health',label:'健康与体能'},
+{id:'q26',d:'life_career',label:'事业与工作'},
+{id:'q27',d:'life_finance',label:'财务与金钱'},
+{id:'q28',d:'life_family',label:'家庭与朋友'},
+{id:'q29',d:'life_romance',label:'爱情与伴侣'},
+{id:'q30',d:'life_growth',label:'个人成长'},
+{id:'q31',d:'life_leisure',label:'娱乐与休闲'},
+{id:'q32',d:'life_environment',label:'物理环境'}
+];
+const valueDefs=[
+{id:'v1',name:'竞争与成功',text:'即使需要牺牲相当一部分舒适和闲暇，取得明显的事业或学业成就对我仍然非常重要。'},
+{id:'v2',name:'金钱与消费',text:'相比提高当下消费水平，我更看重长期储蓄、应急资金和财务可预测性。'},
+{id:'v3',name:'生育',text:'如果条件允许，我希望未来拥有孩子并投入相当时间参与养育。'},
+{id:'v4',name:'父母边界',text:'建立长期伴侣关系后，重大决定应由伴侣双方共同决定，父母可以建议但不应拥有否决权。'},
+{id:'v5',name:'工作与生活',text:'事业机会再重要，我也希望给健康、伴侣和私人生活保留明确底线。'},
+{id:'v6',name:'社会责任',text:'即使会牺牲一点个人收益，我仍希望自己的工作和生活能对他人或社会产生积极价值。'},
+{id:'v7',name:'居住城市',text:'为了更好的职业与生活机会，我愿意长期迁往大城市或离家较远的地区。'},
+{id:'v8',name:'学术/事业追求',text:'如果机会值得，我可以接受读研、读博、创业或转行带来的几年不确定性。'},
+{id:'v9',name:'平等与分工',text:'家务、照护和事业牺牲应根据双方时间与能力协商，而不应主要由性别或收入决定。'},
+{id:'v10',name:'忠诚与承诺',text:'长期承诺意味着遇到困难时双方应优先尝试沟通和修复，而不是通过冷处理、暧昧或分手威胁解决问题。'},
+{id:'v11',name:'善意的谎言',text:'恋人之间是否有必要使用“善意的谎言”？',special:true}
+];
+const hardDefs=[
+{id:'h1',label:'目前寻找的关系',opts:['以结婚为明确目标','长期稳定关系，未来可能结婚','长期关系，但暂不计划结婚','目前不确定']},
+{id:'h2',label:'是否希望有孩子',opts:['明确希望','比较希望','不确定','比较不希望','明确不要']},
+{id:'h3',label:'对关系排他性的要求',opts:['只接受双方排他的单偶关系','倾向单偶，但可以讨论边界','可以接受其他关系模式','不确定']},
+{id:'h4',label:'为了伴侣或事业迁居',opts:['可以主动考虑迁居','根据双方机会协商','更希望对方迁来','原则上不愿迁居']},
+{id:'h5',label:'与一方父母长期同住',opts:['可以接受','短期可以，长期不接受','原则上不接受','视照护需求和住房条件而定']},
+{id:'h6',label:'伴侣吸烟',opts:['都可以','偶尔可以','希望基本不吸烟','必须不吸烟']},
+{id:'h7',label:'较大的消费性债务',opts:['可以共同处理','需要了解原因和明确偿还计划','很难接受','无法接受']},
+{id:'h8',label:'伴侣饮酒',opts:['都可以','偶尔饮酒可以','希望基本不饮酒','必须不饮酒']}
+];
 const scenarioKey={
 s1:{a:{anx:2,rel:6},b:{anx:3,rel:7},c:{anx:7,rel:2},d:{anx:5,avo:4,rel:2}},
 s2:{a:{anx:6,rel:3},b:{anx:2,avo:1,rel:7},c:{avo:5,rel:3},d:{avo:7,rel:1}},
@@ -76,7 +112,6 @@ s3:{a:{avo:1,rel:7},b:{avo:2,rel:6},c:{avo:4,rel:3},d:{avo:6,rel:2}},
 s4:{a:{avo:1,rel:6},b:{anx:5,rel:4},c:{avo:5,rel:3},d:{avo:7,rel:2}},
 s5:{a:{anx:2,rel:7},b:{anx:7,rel:2},c:{anx:6,rel:1},d:{avo:7,rel:2}}
 };
-
 const observerItems=[
 {id:'o01',d:'anx',text:'联系频率下降或回复变慢时，对方会明显反复确认、揣测关系是否发生变化。'},
 {id:'o02',d:'anx',text:'我把较多注意力放在其他人或其他事情上时，对方容易把它体验成被冷落或被替代。'},
@@ -98,61 +133,327 @@ const observerItems=[
 {id:'o18',d:'agr',text:'发生分歧时，对方总体更倾向找双方都能接受的方案，而不是压服我。'}
 ];
 
+const scoreDefs=[
+{id:'con',label:'尽责性',direction:'positive',min:0,max:1,def:0.8},
+{id:'agr',label:'宜人性',direction:'positive',min:0,max:1,def:0.5},
+{id:'rel',label:'沟通与修复',direction:'positive',min:0,max:1,def:0.75},
+{id:'anx',label:'依恋焦虑',direction:'negative',min:-1,max:0,def:-0.2},
+{id:'avo',label:'依恋回避',direction:'negative',min:-1,max:0,def:-0.8},
+{id:'neu',label:'负性情绪敏感',direction:'negative',min:-1,max:0,def:-0.2},
+{id:'lifeBalance',label:'生活状态均衡度',direction:'positive',min:0,max:1,def:0.3}
+];
+const defaultWeights=Object.fromEntries(scoreDefs.map(x=>[x.id,x.def]));
+let scoreWeights={...defaultWeights};
 let selfData=null,selfAnalysis=null;
 let observerState={duration:'',confidence:'',answers:{}};
 let observerAnalysis=null;
+let scoreRenderFrame=0;
 
-function b64ToUtf8(b64){const bin=atob(b64),bytes=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)bytes[i]=bin.charCodeAt(i);return new TextDecoder().decode(bytes)}
-function parseEncoded(text){text=(text||'').trim();if(text.startsWith('LTM1:'))text=text.slice(5);const json=b64ToUtf8(text.replace(/\s+/g,''));const obj=JSON.parse(json);if(obj.schema!=='LTM_SELF_V2')throw new Error('不是受支持的 LTM_SELF_V2 数据。');return obj}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function clamp(n,a,b){return Math.max(a,Math.min(b,n))}
 function mean(a){return a.length?a.reduce((x,y)=>x+y,0)/a.length:null}
 function sd(a){if(a.length<2)return 0;const m=mean(a);return Math.sqrt(a.reduce((s,x)=>s+(x-m)**2,0)/a.length)}
-function to100(avg){return avg==null?null:Math.round((avg-1)/6*100)}
-function clamp(n,a,b){return Math.max(a,Math.min(b,n))}
-function interp(score,d){if(score==null)return '数据不足';if(d==='anx'||d==='avo'||d==='neu'){if(score<33)return '较低';if(score<67)return '中等';return '较高'}else{if(score<33)return '较低';if(score<67)return '中等';return '较高'}}
-function selfDimAverages(data){const out={};for(const d of ['anx','avo','rel','con','neu','agr']){const vals=[];for(const [id,k] of Object.entries(selfKey)){if(k.d!==d)continue;let v=Number(data.answers[id]);if(k.rev)v=8-v;vals.push(v)}out[d]=mean(vals)}return out}
-function scenarioAverages(data){const bag={anx:[],avo:[],rel:[]};for(const [sid,opt] of Object.entries(data.scenarios||{})){const map=scenarioKey[sid]?.[opt];if(!map)continue;for(const [d,v] of Object.entries(map))bag[d]?.push(v)}return Object.fromEntries(Object.entries(bag).map(([d,a])=>[d,mean(a)]))}
-function analyzeSelf(data){
- const avg=selfDimAverages(data),scores=Object.fromEntries(Object.entries(avg).map(([d,v])=>[d,to100(v)]));
- const life={};for(const [id,k] of Object.entries(selfKey)){if(!k.d.startsWith('life_'))continue;life[k.d]=to100(Number(data.answers[id]))}
- const scen=scenarioAverages(data);
- let quality=100;const flags=[];
- if(Number(data.answers.q35)!==2){quality-=28;flags.push({level:'bad',text:'注意力检查未通过。'})}else flags.push({level:'good',text:'注意力检查通过。'});
- const impression=[Number(data.answers.q33),Number(data.answers.q34)].filter(x=>x>=6).length;if(impression){quality-=impression*10;flags.push({level:'warn',text:`${impression} 道“几乎完美人格”项目选择很高，存在社会赞许性作答的可能。`})}
- let pairBad=0;for(const [a,b] of pairDefs){const va=Number(data.answers[a]),vb=8-Number(data.answers[b]);if(Math.abs(va-vb)>=4)pairBad++}if(pairBad){quality-=pairBad*8;flags.push({level:'warn',text:`发现 ${pairBad} 组相距较远的同义/反向项目差异较大。`})}
- const normalVals=Object.entries(data.answers).filter(([id])=>/^q(0[1-9]|1\d|2\d|3[0-4])$/.test(id)).map(([,v])=>Number(v));const straight=sd(normalVals);if(straight<0.5){quality-=15;flags.push({level:'warn',text:'整体作答变化非常小，存在直线作答或过度使用同一分值的可能。'})}
- const secs=Number(data.durationSec||0);if(secs&&secs<180){quality-=16;flags.push({level:'warn',text:`完成速度非常快（约 ${Math.round(secs/60)} 分钟）。`})}else if(secs&&secs<300){quality-=8;flags.push({level:'warn',text:`完成速度偏快（约 ${Math.round(secs/60)} 分钟）。`})}
- for(const d of ['anx','avo','rel']){if(scen[d]!=null&&avg[d]!=null&&Math.abs(scen[d]-avg[d])>=2.2){quality-=7;flags.push({level:'warn',text:`${dimLabels[d]}：直接自评与情境选择差异较大。`})}}
- quality=clamp(Math.round(quality),0,100);return {avg,scores,life,scenario:scen,quality,flags,straight}
+function percentile(arr,p){if(!arr.length)return null;const a=[...arr].sort((x,y)=>x-y),i=(a.length-1)*p,lo=Math.floor(i),hi=Math.ceil(i);return lo===hi?a[lo]:a[lo]+(a[hi]-a[lo])*(i-lo)}
+function summary(samples,{clamp01=false,digits=0}={}){const vals=(samples||[]).filter(Number.isFinite);if(!vals.length)return {score:null,ci:null};let med=percentile(vals,.5),lo=percentile(vals,.025),hi=percentile(vals,.975);if(clamp01){med=clamp(med,0,100);lo=clamp(lo,0,100);hi=clamp(hi,0,100)}const f=x=>Number(x.toFixed(digits));return {score:f(med),ci:[f(lo),f(hi)]}}
+function formatCI(ci,digits=0){if(!ci)return '95% CI —';return `95% CI ${Number(ci[0]).toFixed(digits)}–${Number(ci[1]).toFixed(digits)}`}
+function to100Likert(v){return (v-1)/6*100}
+function hashString(s){let h=2166136261>>>0;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0}
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=a;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296}}
+function makeNormal(rng){let spare=null;return function(){if(spare!==null){const z=spare;spare=null;return z}let u,v,s;do{u=rng()*2-1;v=rng()*2-1;s=u*u+v*v}while(s===0||s>=1);const m=Math.sqrt(-2*Math.log(s)/s);spare=v*m;return u*m}}
+function sampleLikert(r,sigma,z){return clamp(Number(r)+sigma*z(),1,7)}
+function utf8FromB64(b64){const bin=atob(b64),bytes=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)bytes[i]=bin.charCodeAt(i);return new TextDecoder().decode(bytes)}
+function parseEncoded(text){
+  text=(text||'').trim();
+  if(!text.startsWith('LTM3:'))throw new Error('结果格式不匹配。请使用最终版 3.0.0 问卷重新导出。');
+  const obj=JSON.parse(utf8FromB64(text.slice(5).replace(/\s+/g,'')));
+  if(obj.schema!==SCHEMA||obj.version!==VERSION)throw new Error('仅支持最终版 3.0.0 结果，不兼容旧版本数据。');
+  validatePayload(obj);
+  return obj;
 }
-function metricCard(name,score,note){return `<div class="metric"><span>${name}</span><strong>${score==null?'—':score}</strong><div class="bar"><div style="width:${score||0}%"></div></div><div class="muted small">${note||''}</div></div>`}
+function validatePayload(obj){
+  for(let n=1;n<=35;n++){const id='q'+String(n).padStart(2,'0'),v=Number(obj.answers?.[id]);if(!Number.isFinite(v)||v<1||v>7)throw new Error(`结果缺少或损坏：${id}`)}
+  for(let n=1;n<=5;n++){const id='s'+n,opt=obj.scenarios?.[id];if(!scenarioKey[id]?.[opt])throw new Error(`结果缺少或损坏：${id}`)}
+  for(let n=1;n<=11;n++){const id='v'+n,x=obj.values?.[id],s=Number(x?.stance),imp=Number(x?.importance);if(!Number.isFinite(s)||s<1||s>7||!Number.isFinite(imp)||imp<0||imp>3)throw new Error(`结果缺少或损坏：${id}`)}
+  for(const h of hardDefs){if(!obj.hard?.[h.id]||!h.opts.includes(obj.hard[h.id]))throw new Error(`结果缺少或损坏：${h.id}`)}
+  if(!Number.isFinite(Number(obj.durationSec))||Number(obj.durationSec)<=0)throw new Error('结果缺少有效作答时间。');
+}
+function durationPenalty(sec){
+  const m=Number(sec)/60;
+  if(m<6)return clamp((6-m)*3,0,18);
+  if(m<=15)return 0;
+  return 5;
+}
+function entropyFromLikert(vals){
+  const sm=vals.map(v=>v+1),total=sm.reduce((a,b)=>a+b,0),p=sm.map(v=>v/total);
+  return 100*(-p.reduce((s,x)=>s+x*Math.log(x),0))/Math.log(vals.length);
+}
+function interp(score){if(score==null)return '数据不足';if(score<33)return '较低';if(score<67)return '中等';return '较高'}
 function qualityLabel(q){return q>=85?'较高':q>=65?'可用，但应结合细项':q>=45?'偏低，谨慎解释':'很低，不建议据此做重要判断'}
-function renderSelf(){const o=document.getElementById('selfOutput');if(!selfData||!selfAnalysis){o.innerHTML='';return}const a=selfAnalysis;let h=`<div class="card"><h2>${selfData.alias?selfData.alias+' · ':''}自评结果</h2><p class="muted small">完成时间：${new Date(selfData.completedAt).toLocaleString()}；用时约 ${Math.round(selfData.durationSec/60)} 分钟。</p><div class="metricGrid">`;for(const d of ['anx','avo','rel','con','neu','agr'])h+=metricCard(dimLabels[d],a.scores[d],`${interp(a.scores[d],d)} · ${dimNotes[d]}`);h+='</div></div>';
- h+=`<div class="card"><h2>数据可解释性</h2>${metricCard('可解释性',a.quality,qualityLabel(a.quality))}<p class="muted small">这不是“诚实度”或测谎分数。</p>${a.flags.map(f=>`<div class="flag ${f.level==='bad'?'bad':f.level==='good'?'good':''}">${f.text}</div>`).join('')}</div>`;
- h+='<div class="card"><h2>生活状态快照</h2><div class="metricGrid">';for(const [d,label] of Object.entries(lifeLabels))h+=metricCard(label,a.life[d],'单题快照，仅用于发现需要进一步了解的领域。');h+='</div></div>';
- h+='<div class="card"><h2>核心价值观</h2><table class="scoreTable"><thead><tr><th>领域</th><th>立场 1–7</th><th>重要性 0–3</th></tr></thead><tbody>';for(const [id,label] of Object.entries(valueLabels)){const v=selfData.values?.[id]||{};h+=`<tr><td>${label}</td><td>${v.stance??'—'}</td><td>${v.importance??'—'}</td></tr>`}h+='</tbody></table></div>';
- h+='<div class="card"><h2>关键条件</h2>';for(const [id,val] of Object.entries(selfData.hard||{}))h+=`<span class="pill">${id.toUpperCase()}：${val}</span>`;h+='</div>';o.innerHTML=h
+function barHtml(score,ci){
+  if(score==null)return '<div class="metricBar"><div class="track"></div></div>';
+  const s=clamp(Number(score),0,100),lo=clamp(Number(ci?.[0]??s),0,100),hi=clamp(Number(ci?.[1]??s),0,100);
+  const left=Math.min(lo,hi),right=Math.max(lo,hi),width=Math.max(.45,right-left);
+  return `<div class="metricBar" aria-label="点估计 ${s}，95% CI ${left} 到 ${right}"><div class="track"><div class="fill" style="width:${s}%"></div></div><div class="ciBracket" style="left:${left}%;width:${width}%"></div><div class="point" style="left:${s}%"></div></div>`;
+}
+function metricCard(name,score,ci,note){return `<div class="metric"><span>${esc(name)}</span><strong>${score==null?'—':score}</strong><span class="ci">${formatCI(ci)}</span>${barHtml(score,ci)}<div class="muted small">${note||''}</div></div>`}
+
+function analyzeSelf(data){
+  const dims=Object.fromEntries(Object.keys(dimLabels).map(d=>[d,[]]));
+  const life=Object.fromEntries(lifeDefs.map(x=>[x.d,[]]));
+  const quality=[],consistency=[],lifeBalance=[];
+  const penalties={attention:[],impression:[],pairs:[],straight:[],time:[],scenario:[]};
+  const seed=hashString(JSON.stringify({answers:data.answers,scenarios:data.scenarios,durationSec:data.durationSec,version:data.version}));
+  const rng=mulberry32(seed),z=makeNormal(rng);
+  const timeP=durationPenalty(data.durationSec);
+  const dimItemDefs=Object.fromEntries(Object.keys(dimLabels).map(d=>[d,Object.entries(selfKey).filter(([,k])=>k.d===d)]));
+  const normalIds=Array.from({length:34},(_,i)=>'q'+String(i+1).padStart(2,'0'));
+  for(let k=0;k<MC_N;k++){
+    const y={};
+    for(const id of normalIds)y[id]=sampleLikert(data.answers[id],SELF_SIGMA,z);
+    const dimLikert={};
+    for(const d of Object.keys(dimLabels)){
+      const vals=dimItemDefs[d].map(([id,def])=>def.rev?8-y[id]:y[id]);
+      dimLikert[d]=mean(vals);
+      dims[d].push(to100Likert(dimLikert[d]));
+    }
+    const lv=lifeDefs.map(x=>y[x.id]);
+    for(const x of lifeDefs)life[x.d].push(to100Likert(y[x.id]));
+    lifeBalance.push(entropyFromLikert(lv));
+
+    const pairComponents=[];
+    let pairP=0;
+    for(const [a,b] of pairDefs){
+      const diff=Math.abs(y[a]-(8-y[b]));
+      pairComponents.push(clamp(100-diff/6*100,0,100));
+      if(diff>=4)pairP+=8;
+    }
+    consistency.push(mean(pairComponents));
+
+    const attentionP=Number(data.answers.q35)===2?0:28;
+    const impressionP=(y.q33>=5.5?10:0)+(y.q34>=5.5?10:0);
+    const straightP=sd(normalIds.slice(0,34).map(id=>y[id]))<0.5?15:0;
+
+    const scenBag={anx:[],avo:[],rel:[]};
+    for(const [sid,opt] of Object.entries(data.scenarios)){
+      const map=scenarioKey[sid][opt];
+      for(const [d,v] of Object.entries(map))scenBag[d].push(sampleLikert(v,SELF_SIGMA,z));
+    }
+    let scenarioP=0;
+    for(const d of ['anx','avo','rel']){
+      const sv=mean(scenBag[d]);
+      if(sv!=null&&Math.abs(sv-dimLikert[d])>=2.2)scenarioP+=7;
+    }
+    const q=clamp(100-attentionP-impressionP-pairP-straightP-timeP-scenarioP,0,100);
+    quality.push(q);
+    penalties.attention.push(attentionP);
+    penalties.impression.push(impressionP);
+    penalties.pairs.push(pairP);
+    penalties.straight.push(straightP);
+    penalties.time.push(timeP);
+    penalties.scenario.push(scenarioP);
+  }
+  const summaries={dims:{},life:{},quality:summary(quality,{clamp01:true}),consistency:summary(consistency,{clamp01:true}),lifeBalance:summary(lifeBalance,{clamp01:true}),penalties:{}};
+  for(const d of Object.keys(dimLabels))summaries.dims[d]=summary(dims[d],{clamp01:true});
+  for(const x of lifeDefs)summaries.life[x.d]=summary(life[x.d],{clamp01:true});
+  for(const [k,v] of Object.entries(penalties))summaries.penalties[k]=summary(v,{digits:1});
+  const flags=[];
+  if(Number(data.answers.q35)!==2)flags.push({level:'bad',text:'注意力检查未通过。'});
+  else flags.push({level:'good',text:'注意力检查通过。'});
+  if(summaries.penalties.impression.score>0)flags.push({level:'warn',text:'社会赞许性项目产生了模型化扣分；可解释性区间已反映该不确定性。'});
+  if(summaries.penalties.pairs.score>0)flags.push({level:'warn',text:'部分反向题对存在较大差异；可解释性与一致性区间已同时反映。'});
+  if(timeP>0){
+    const mins=Number(data.durationSec)/60;
+    flags.push({level:'warn',text:mins<6?`作答约 ${mins.toFixed(1)} 分钟，低于 6 分钟；按每少 1 分钟扣 3 分计入可解释性。`:`作答约 ${mins.toFixed(1)} 分钟，超过 15 分钟；固定扣 5 分计入可解释性。`});
+  }else flags.push({level:'good',text:'作答时间位于 6–15 分钟区间，不扣分。'});
+  return {N:MC_N,sim:{dims,life,quality,consistency,lifeBalance,penalties},summaries,flags,timePenalty:timeP};
 }
 
+function observerSigma(){
+  const c=Number(observerState.confidence||0);
+  const cf=({1:1.45,2:1.25,3:1.10,4:.95,5:.85})[c]||1.25;
+  const df=({'少于 1 个月':1.35,'1–3 个月':1.20,'3–6 个月':1.08,'6–12 个月':1.00,'1 年以上':.90})[observerState.duration]||1.15;
+  return .70*cf*df;
+}
+function analyzeObserver(){
+  const sigma=observerSigma(),seed=hashString(JSON.stringify(observerState)),rng=mulberry32(seed),z=makeNormal(rng);
+  const dims={},summaries={},counts={};
+  for(const d of Object.keys(dimLabels)){
+    const rows=observerItems.filter(x=>x.d===d).map(x=>observerState.answers[x.id]).filter(v=>typeof v==='number'&&Number.isFinite(v));
+    counts[d]=rows.length;
+    if(rows.length<2){dims[d]=null;summaries[d]={score:null,ci:null};continue}
+    const arr=[];
+    for(let k=0;k<MC_N;k++)arr.push(to100Likert(mean(rows.map(v=>sampleLikert(v,sigma,z)))));
+    dims[d]=arr;summaries[d]=summary(arr,{clamp01:true});
+  }
+  return {N:MC_N,dims,summaries,counts,answered:Object.values(observerState.answers).filter(v=>typeof v==='number').length,confidence:Number(observerState.confidence||0),duration:observerState.duration||'',sigma};
+}
+
+function stanceLabel(v,n){
+  if(v.special)return ({1:'完全没必要',2:'比较没必要',3:'略偏没必要',4:'视情况而定',5:'略偏有必要',6:'比较有必要',7:'非常有必要'})[n]||'未填写';
+  return ({1:'完全不符合',2:'比较不符合',3:'略不符合',4:'中间/视情况',5:'略符合',6:'比较符合',7:'非常符合'})[n]||'未填写';
+}
+function importanceLabel(n){return ({0:'不重要',1:'略重要',2:'很重要',3:'核心条件'})[n]||'未填写'}
+function valueDetailsHtml(data){
+  let h='<div class="card"><h2>核心价值观</h2><p class="muted small">完整显示题意、选择与重要程度。</p>';
+  for(const v of valueDefs){
+    const x=data.values[v.id],s=Number(x.stance),imp=Number(x.importance);
+    const scale=v.special?'1 完全没必要 · 2 比较没必要 · 3 略偏没必要 · 4 视情况而定 · 5 略偏有必要 · 6 比较有必要 · 7 非常有必要':'1 完全不符合 · 2 比较不符合 · 3 略不符合 · 4 中间/视情况 · 5 略符合 · 6 比较符合 · 7 非常符合';
+    h+=`<div class="detailItem"><h3>${esc(v.name)}</h3><p>${esc(v.text)}</p><div class="answerLine"><b>立场：</b>${s}/7（${stanceLabel(v,s)}）</div><div class="answerLine"><b>我认为这一点对双方关系的重要程度：</b>${imp}/3（${importanceLabel(imp)}）</div><div class="muted small">立场标尺：${scale}。重要性：0 不重要 · 1 略重要 · 2 很重要 · 3 核心条件。</div></div>`;
+  }
+  return h+'</div>';
+}
+function hardDetailsHtml(data){
+  let h='<div class="card"><h2>关键条件</h2><p class="muted small">每项显示完整问题、当前选择以及全部可选范围。</p>';
+  for(const d of hardDefs){
+    const val=data.hard[d.id];
+    h+=`<div class="detailItem"><h3>${esc(d.label)}</h3><div class="answerLine selectedAnswer">已选择：${esc(val)}</div><div class="optionList">${d.opts.map(o=>`<span class="option ${val===o?'selected':''}">${esc(o)}</span>`).join('')}</div></div>`;
+  }
+  return h+'</div>';
+}
+function loadWeights(){try{const x=JSON.parse(localStorage.getItem(SCORE_STORAGE));if(x&&typeof x==='object'){for(const d of scoreDefs){const v=Number(x[d.id]);if(Number.isFinite(v))scoreWeights[d.id]=clamp(v,d.min,d.max)}}}catch(e){}}
+function saveWeights(){localStorage.setItem(SCORE_STORAGE,JSON.stringify(scoreWeights))}
+
+function calcComposite(a){
+  const N=a.N,total=[],rows=Object.fromEntries(scoreDefs.map(d=>[d.id,{adjusted:[],contribution:[]}]));
+  let theoreticalMin=0,theoreticalMax=0;
+  for(const d of scoreDefs){const w=Number(scoreWeights[d.id]??d.def);if(w>0)theoreticalMax+=w;if(w<0)theoreticalMin+=w}
+  const span=theoreticalMax-theoreticalMin;
+  if(span<=0)return {summary:{score:null,ci:null},rows:[],discount:{score:null,ci:null}};
+  const discountSamples=[];
+  for(let k=0;k<N;k++){
+    const i=clamp(a.sim.quality[k]/100,0,1),discount=i*i;
+    discountSamples.push(discount);
+    let raw=0;
+    for(const d of scoreDefs){
+      const w=Number(scoreWeights[d.id]??d.def);
+      const source=d.id==='lifeBalance'?a.sim.lifeBalance[k]:a.sim.dims[d.id][k];
+      const s=clamp(source/100,0,1);
+      const adjusted=d.direction==='positive'?s*discount:s;
+      const contribution=w*adjusted;
+      rows[d.id].adjusted.push(adjusted*100);
+      rows[d.id].contribution.push(contribution);
+      raw+=contribution;
+    }
+    total.push(clamp((raw-theoreticalMin)/span*100,0,100));
+  }
+  const rowOut=scoreDefs.map(d=>{
+    const sourceSummary=d.id==='lifeBalance'?a.summaries.lifeBalance:a.summaries.dims[d.id];
+    return {d,w:Number(scoreWeights[d.id]??d.def),source:sourceSummary,adjusted:summary(rows[d.id].adjusted,{clamp01:true,digits:1}),contribution:summary(rows[d.id].contribution,{digits:3})};
+  });
+  return {summary:summary(total,{clamp01:true}),rows:rowOut,discount:summary(discountSamples.map(x=>x*100),{clamp01:true,digits:1})};
+}
+function scheduleScoreRender(){if(scoreRenderFrame)cancelAnimationFrame(scoreRenderFrame);scoreRenderFrame=requestAnimationFrame(()=>{scoreRenderFrame=0;renderScorePanel()})}
+function renderScorePanel(){
+  const box=document.getElementById('scorePanel');if(!box||!selfAnalysis)return;
+  const r=calcComposite(selfAnalysis),q=selfAnalysis.summaries.quality;
+  let h=`<div class="card"><h2>可调权重综合评分</h2><div class="scoreHero"><div>${metricCard('综合参考分',r.summary.score,r.summary.ci,'点估计为模拟分布中位数；区间为同一批随机变量联合传播后的 2.5%–97.5% 分位数。')}</div><div class="sectionNote"><b>计算规则</b><div class="formula">正向贡献 = 正权重 × 指标 × i²；负向贡献 = 负权重 × 指标。i 为随机的可解释性变量。每次模拟都先计算该次 i，再计算该次所有贡献与总分，因此保留指标之间由共同题目和 i 引入的相关性。</div><p class="small">当前可解释性 i：${q.score}%（${formatCI(q.ci)}）；i² 折扣的模型中位数为 ${r.discount.score}%（${formatCI(r.discount.ci,1)}）。作答时间只通过 i 进入综合分，不再重复扣分。</p><p class="small">生活状态均衡度：对 8 个生活状态潜在分分别 +1 做拉普拉斯平滑，再计算标准化 Shannon 熵；名称中不再显示“熵”。</p></div></div>`;
+  h+='<h3>权重</h3><div>';
+  for(const d of scoreDefs){
+    const w=Number(scoreWeights[d.id]??d.def);
+    h+=`<div class="weightRow"><label for="w_${d.id}">${esc(d.label)}</label><input id="w_${d.id}" data-weight="${d.id}" type="range" min="${d.min}" max="${d.max}" step="0.05" value="${w}"><output>${w.toFixed(2)}</output></div>`;
+  }
+  h+='</div><div class="toolbar"><button id="resetWeights" class="secondary">恢复默认权重</button></div>';
+  h+='<h3>分项贡献</h3><table class="scoreTable"><thead><tr><th>指标</th><th>原始分</th><th>权重</th><th>计分值</th><th>加权贡献</th></tr></thead><tbody>';
+  for(const x of r.rows){
+    h+=`<tr><td>${esc(x.d.label)}</td><td>${x.source.score}<br><span class="muted small">${formatCI(x.source.ci)}</span></td><td>${x.w.toFixed(2)}</td><td>${x.adjusted.score.toFixed(1)}<br><span class="muted small">${formatCI(x.adjusted.ci,1)}</span></td><td>${x.contribution.score.toFixed(3)}<br><span class="muted small">${formatCI(x.contribution.ci,3)}</span></td></tr>`;
+  }
+  h+='</tbody></table></div>';
+  box.innerHTML=h;
+  box.querySelectorAll('input[data-weight]').forEach(el=>el.addEventListener('input',e=>{const d=scoreDefs.find(x=>x.id===e.target.dataset.weight);scoreWeights[d.id]=clamp(Number(e.target.value),d.min,d.max);saveWeights();scheduleScoreRender()}));
+  document.getElementById('resetWeights').onclick=()=>{scoreWeights={...defaultWeights};saveWeights();renderScorePanel()};
+}
+function methodologyHtml(){
+  return `<div class="card"><h2>随机变量模型与 95% CI 计算</h2><p class="muted small">这些区间是“模型不确定性区间”，不是基于常模样本的心理测量学置信区间。模型假设在页面中完全公开，便于之后替换为有实证校准的数据模型。</p><ol class="methodList"><li><b>单个 1–7 题：</b>观察值为 r，潜在作答 Y = clip(r + ε, 1, 7)，其中 ε ~ N(0, 0.55²)。因此 Y 是两端带点质量的删失正态分布；1&lt;y&lt;7 时 F(y)=Φ((y-r)/0.55)，P(Y=1)=Φ((1-r)/0.55)，P(Y=7)=1-Φ((7-r)/0.55)。标准分 Z=100×(Y-1)/6。</li><li><b>人格/互动维度：</b>D = n⁻¹ΣZⱼ；反向题先用 Y′=8-Y。删失正态之和的卷积没有方便的闭式分位数，因此使用数值模拟。</li><li><b>作答一致性：</b>每组 Cₖ=100×[1-|Yₐ-(8-Yᵦ)|/6]，总一致性 C=mean(Cₖ)。</li><li><b>生活状态均衡度：</b>对 8 项潜在 Likert 值做 +1 平滑，pₖ=(Yₖ+1)/Σ(Yⱼ+1)，B=100×[-Σpₖln(pₖ)]/ln(8)。这是多个随机变量的非线性函数。</li><li><b>可解释性：</b>I=clip(100-P注意力-P社会赞许-P反向差异-P直线作答-P时间-P情境差异,0,100)。阈值型扣分由每次模拟的潜在题目决定；注意力检查与系统记录时间按退化随机变量处理。时间扣分：t&lt;6 时 P时间=3(6-t)，6≤t≤15 时为 0，t&gt;15 时固定为 5，t 单位为分钟。</li><li><b>总分：</b>正向项 Aⱼ=(Dⱼ/100)(I/100)²；负向项 Aⱼ=Dⱼ/100。原始加权和 R=ΣwⱼAⱼ，再用当前权重的理论最差/最好值线性映射到 0–100。由于 I²、阈值函数、均衡度以及共享题目造成相关性，总分无实用闭式分布。</li><li><b>数值区间：</b>使用固定种子的 ${MC_N.toLocaleString()} 次 Monte Carlo 联合抽样；每个显示分数取模拟分布中位数，95% CI 取经验 2.5% 与 97.5% 分位数。权重变化时沿用同一批潜在抽样，只重新组合贡献，避免区间因随机种子改变而跳动。</li></ol></div>`;
+}
+function renderQualityBreakdown(a){
+  const defs=[
+    ['attention','注意力检查','未通过时固定扣 28 分；通过扣 0。'],
+    ['impression','社会赞许性','q33/q34 的潜在值达到高区间时，每题扣 10 分。'],
+    ['pairs','反向题差异','每组潜在差异 ≥4 时扣 8 分。'],
+    ['straight','直线作答','q01–q34 潜在回答标准差 <0.5 时扣 15 分。'],
+    ['time','作答时间','<6 分钟每少 1 分钟扣 3；6–15 不扣；>15 固定扣 5。'],
+    ['scenario','自评—情境差异','焦虑/回避/沟通中每个维度差异 ≥2.2 时扣 7 分。']
+  ];
+  let h='<table class="scoreTable"><thead><tr><th>可解释性扣分来源</th><th>扣分中位数</th><th>95% CI</th><th>规则</th></tr></thead><tbody>';
+  for(const [id,label,rule] of defs){const s=a.summaries.penalties[id];h+=`<tr><td>${label}</td><td>${s.score.toFixed(1)}</td><td>${formatCI(s.ci,1)}</td><td>${rule}</td></tr>`}
+  return h+'</tbody></table>';
+}
+function renderSelf(){
+  const o=document.getElementById('selfOutput');if(!selfData||!selfAnalysis){o.innerHTML='';return}
+  const a=selfAnalysis,s=a.summaries;
+  let h=`<div class="card"><h2>${selfData.alias?esc(selfData.alias)+' · ':''}自评结果</h2><p class="muted small">问卷版本：${VERSION}；完成时间：${new Date(selfData.completedAt).toLocaleString()}；用时约 ${(Number(selfData.durationSec)/60).toFixed(1)} 分钟。</p><div class="metricGrid">`;
+  for(const d of ['anx','avo','rel','con','neu','agr'])h+=metricCard(dimLabels[d],s.dims[d].score,s.dims[d].ci,`${interp(s.dims[d].score)} · ${dimNotes[d]}`);
+  h+='</div></div>';
+  h+=`<div class="card"><h2>数据可解释性与一致性</h2><div class="metricGrid">${metricCard('可解释性',s.quality.score,s.quality.ci,qualityLabel(s.quality.score))}${metricCard('作答一致性',s.consistency.score,s.consistency.ci,'由 5 组反向题对计算')}</div>${renderQualityBreakdown(a)}<p class="muted small">可解释性不是“诚实度”或测谎分数。作答时间扣分已经进入可解释性，并通过 i² 影响综合分。</p>${a.flags.map(f=>`<div class="flag ${f.level==='bad'?'bad':f.level==='good'?'good':''}">${esc(f.text)}</div>`).join('')}</div>`;
+  h+='<div class="card"><h2>生活状态快照</h2><div class="metricGrid">';
+  for(const x of lifeDefs){const z=s.life[x.d];h+=metricCard(x.label,z.score,z.ci,'单题潜在分的模型区间。')}
+  h+=metricCard('生活状态均衡度',s.lifeBalance.score,s.lifeBalance.ci,'8 项分别 +1 平滑后计算标准化均衡度；越均衡越高。');
+  h+='</div></div>';
+  h+='<div id="scorePanel"></div>'+methodologyHtml()+valueDetailsHtml(selfData)+hardDetailsHtml(selfData);
+  o.innerHTML=h;renderScorePanel();
+}
 function loadObserver(){try{const x=JSON.parse(localStorage.getItem(OBS_STORAGE));if(x)observerState=x}catch(e){}}
 function saveObserver(){observerState.duration=document.getElementById('obsDuration').value;observerState.confidence=document.getElementById('obsConfidence').value;localStorage.setItem(OBS_STORAGE,JSON.stringify(observerState))}
-function renderObserverForm(){document.getElementById('obsDuration').value=observerState.duration||'';document.getElementById('obsConfidence').value=observerState.confidence||'';const box=document.getElementById('observerItems');box.innerHTML='';observerItems.forEach((q,i)=>{const v=observerState.answers[q.id];const d=document.createElement('div');d.className='obsItem';let scale='<div class="scale">';for(let n=1;n<=7;n++)scale+=`<label><input type="radio" name="${q.id}" value="${n}" ${Number(v)===n?'checked':''}><span>${n}</span></label>`;scale+=`<label><input type="radio" name="${q.id}" value="x" ${v==='x'?'checked':''}><span>无法判断</span></label></div>`;d.innerHTML=`<div class="qnum">${i+1} / ${observerItems.length}</div><div><b>${q.text}</b></div>${scale}`;box.appendChild(d)});box.querySelectorAll('input').forEach(x=>x.addEventListener('change',e=>{observerState.answers[e.target.name]=e.target.value==='x'?'x':Number(e.target.value);saveObserver()}));document.getElementById('obsDuration').onchange=saveObserver;document.getElementById('obsConfidence').onchange=saveObserver}
-function analyzeObserver(){const avg={},counts={},scores={};for(const d of Object.keys(dimLabels)){const vals=observerItems.filter(x=>x.d===d).map(x=>observerState.answers[x.id]).filter(v=>typeof v==='number');counts[d]=vals.length;avg[d]=vals.length>=2?mean(vals):null;scores[d]=to100(avg[d])}const answered=Object.values(observerState.answers).filter(v=>typeof v==='number').length;return {avg,counts,scores,answered,confidence:Number(observerState.confidence||0),duration:observerState.duration||''}}
-function renderObserverResult(){const o=document.getElementById('observerOutput');if(!observerAnalysis){o.innerHTML='';return}let h=`<div class="card"><h2>观察者评分</h2><p class="muted small">可评分行为项目 ${observerAnalysis.answered}/${observerItems.length}；接触时长：${observerAnalysis.duration||'未填写'}；观察信心：${observerAnalysis.confidence||'未填写'}/5。</p><div class="metricGrid">`;for(const d of ['anx','avo','rel','con','neu','agr'])h+=metricCard(dimLabels[d],observerAnalysis.scores[d],observerAnalysis.counts[d]<2?'有效观察不足':`${interp(observerAnalysis.scores[d],d)} · 基于 ${observerAnalysis.counts[d]} 项可观察行为`);h+='</div><p class="muted small">观察者评分描述的是“你实际看到的行为”，不是对方完整的人格。接触场景越单一，越应谨慎。</p></div>';o.innerHTML=h}
-function renderCompare(){const o=document.getElementById('compareOutput');if(!selfAnalysis||!observerAnalysis){o.innerHTML='<h2>自评 × 他评</h2><p class="muted">需要先解析受测者结果，并完成观察者评估。</p>';return}let h='<h2>自评 × 他评</h2><p class="muted">差异较大表示值得进一步核实，不自动意味着任何一方“错了”。</p><table class="scoreTable"><thead><tr><th>维度</th><th>自评</th><th>观察者</th><th>差异</th><th>提示</th></tr></thead><tbody>';for(const d of ['anx','avo','rel','con','neu','agr']){const s=selfAnalysis.scores[d],v=observerAnalysis.scores[d],diff=s!=null&&v!=null?Math.abs(s-v):null;let tip='';if(v==null)tip='观察数据不足';else if(diff>=30)tip='差异很大，优先核实具体行为实例';else if(diff>=18)tip='存在明显差异';else tip='大致一致';h+=`<tr><td>${dimLabels[d]}</td><td>${s??'—'}</td><td>${v??'—'}</td><td class="compareDiff">${diff==null?'—':diff}</td><td>${tip}</td></tr>`}h+='</tbody></table>';
- const big=['anx','avo','rel','con','neu','agr'].filter(d=>selfAnalysis.scores[d]!=null&&observerAnalysis.scores[d]!=null&&Math.abs(selfAnalysis.scores[d]-observerAnalysis.scores[d])>=25);if(big.length)h+=`<div class="flag">优先讨论：${big.map(d=>dimLabels[d]).join('、')}。建议不要问“你为什么测出来这样”，而是要求双方各举 2–3 个近半年真实事件。</div>`;else h+='<div class="flag good">目前没有出现特别大的自评—他评分歧；仍需结合价值观、硬条件和真实互动判断。</div>';
- h+=`<div class="sectionNote small">建议解释顺序：① 硬性条件是否冲突；② 忠诚/生育/父母边界/金钱等高重要性价值观；③ 沟通与修复；④ 焦虑/回避互动模式；⑤ C/N/A。不要把总分压成一个“匹配率”。</div>`;o.innerHTML=h}
-
-function switchTab(name){for(const [n,id] of [['self','selfSection'],['observer','observerSection'],['compare','compareSection']]){document.getElementById(id).classList.toggle('hidden',n!==name);document.getElementById('tab'+n[0].toUpperCase()+n.slice(1)).classList.toggle('active',n===name)}if(name==='compare')renderCompare()}
-document.getElementById('tabSelf').onclick=()=>switchTab('self');document.getElementById('tabObserver').onclick=()=>switchTab('observer');document.getElementById('tabCompare').onclick=()=>switchTab('compare');
-
+function renderObserverForm(){
+  document.getElementById('obsDuration').value=observerState.duration||'';
+  document.getElementById('obsConfidence').value=observerState.confidence||'';
+  const box=document.getElementById('observerItems');box.innerHTML='';
+  observerItems.forEach((q,i)=>{
+    const v=observerState.answers[q.id],d=document.createElement('div');d.className='obsItem';
+    let scale='<div class="scale">';
+    for(let n=1;n<=7;n++)scale+=`<label><input type="radio" name="${q.id}" value="${n}" ${Number(v)===n?'checked':''}><span>${n}</span></label>`;
+    scale+=`<label><input type="radio" name="${q.id}" value="x" ${v==='x'?'checked':''}><span>无法判断</span></label></div>`;
+    d.innerHTML=`<div class="small muted">${i+1} / ${observerItems.length}</div><div><b>${q.text}</b></div>${scale}`;box.appendChild(d);
+  });
+  box.querySelectorAll('input').forEach(x=>x.addEventListener('change',e=>{observerState.answers[e.target.name]=e.target.value==='x'?'x':Number(e.target.value);saveObserver()}));
+  document.getElementById('obsDuration').onchange=saveObserver;document.getElementById('obsConfidence').onchange=saveObserver;
+}
+function renderObserverResult(){
+  const o=document.getElementById('observerOutput');if(!observerAnalysis){o.innerHTML='';return}
+  let h=`<div class="card"><h2>观察者评分</h2><p class="muted small">可评分行为项目 ${observerAnalysis.answered}/${observerItems.length}；接触时长：${esc(observerAnalysis.duration||'未填写')}；观察信心：${observerAnalysis.confidence||'未填写'}/5；当前观察误差 σ=${observerAnalysis.sigma.toFixed(2)} 个 Likert 点。</p><div class="metricGrid">`;
+  for(const d of ['anx','avo','rel','con','neu','agr']){const s=observerAnalysis.summaries[d];h+=metricCard(dimLabels[d],s.score,s.ci,observerAnalysis.counts[d]<2?'有效观察不足':`${interp(s.score)} · 基于 ${observerAnalysis.counts[d]} 项行为`)}
+  h+='</div><p class="muted small">观察者题同样使用删失正态潜在变量；基础 σ=0.70，再由接触时长和观察信心乘以预设不确定性系数。信心低、接触短会得到更宽的区间。</p></div>';
+  o.innerHTML=h;
+}
+function renderCompare(){
+  const o=document.getElementById('compareOutput');
+  if(!selfAnalysis||!observerAnalysis){o.innerHTML='<h2>自评 × 他评</h2><p class="muted">需要先解析受测者结果，并完成观察者评估。</p>';return}
+  let h='<h2>自评 × 他评</h2><p class="muted">绝对差异也作为随机变量：每次联合模拟计算 |自评−他评|，95% CI 取其经验分位数。</p><table class="scoreTable"><thead><tr><th>维度</th><th>自评</th><th>观察者</th><th>绝对差异</th><th>提示</th></tr></thead><tbody>';
+  const big=[];
+  for(const d of ['anx','avo','rel','con','neu','agr']){
+    const ss=selfAnalysis.summaries.dims[d],os=observerAnalysis.summaries[d];
+    let ds={score:null,ci:null};
+    if(selfAnalysis.sim.dims[d]&&observerAnalysis.dims[d]){
+      const n=Math.min(selfAnalysis.sim.dims[d].length,observerAnalysis.dims[d].length),arr=[];
+      for(let k=0;k<n;k++)arr.push(Math.abs(selfAnalysis.sim.dims[d][k]-observerAnalysis.dims[d][k]));
+      ds=summary(arr,{clamp01:true});
+    }
+    let tip='观察数据不足';
+    if(ds.score!=null){if(ds.score>=30)tip='差异很大，优先核实具体行为实例';else if(ds.score>=18)tip='存在明显差异';else tip='大致一致';if(ds.score>=25)big.push(d)}
+    h+=`<tr><td>${dimLabels[d]}</td><td>${ss.score}<br><span class="muted small">${formatCI(ss.ci)}</span></td><td>${os.score??'—'}<br><span class="muted small">${formatCI(os.ci)}</span></td><td class="compareDiff">${ds.score??'—'}<br><span class="muted small">${formatCI(ds.ci)}</span></td><td>${tip}</td></tr>`;
+  }
+  h+='</tbody></table>';
+  if(big.length)h+=`<div class="flag">优先讨论：${big.map(d=>dimLabels[d]).join('、')}。建议双方各举 2–3 个近半年真实事件，而不是把分数当作事实判决。</div>`;
+  else h+='<div class="flag good">当前模型下没有出现特别大的自评—他评分歧；仍需结合价值观、关键条件和真实互动判断。</div>';
+  h+='<div class="sectionNote small">建议解释顺序：① 关键条件是否冲突；② 高重要性核心价值观；③ 沟通与修复；④ 焦虑/回避互动模式；⑤ 其他人格与生活状态指标。综合参考分只是显式化你设定的权重。</div>';
+  o.innerHTML=h;
+}
+function switchTab(name){
+  for(const [n,id] of [['self','selfSection'],['observer','observerSection'],['compare','compareSection']]){
+    document.getElementById(id).classList.toggle('hidden',n!==name);
+    document.getElementById('tab'+n[0].toUpperCase()+n.slice(1)).classList.toggle('active',n===name);
+  }
+  if(name==='compare')renderCompare();
+}
+document.getElementById('tabSelf').onclick=()=>switchTab('self');
+document.getElementById('tabObserver').onclick=()=>switchTab('observer');
+document.getElementById('tabCompare').onclick=()=>switchTab('compare');
 document.getElementById('fileInput').addEventListener('change',async e=>{const f=e.target.files[0];if(!f)return;document.getElementById('pasteInput').value=await f.text()});
 document.getElementById('parseBtn').onclick=()=>{try{selfData=parseEncoded(document.getElementById('pasteInput').value);selfAnalysis=analyzeSelf(selfData);renderSelf();renderCompare()}catch(e){alert('解析失败：'+e.message)}};
 document.getElementById('clearSelf').onclick=()=>{selfData=selfAnalysis=null;document.getElementById('pasteInput').value='';document.getElementById('fileInput').value='';renderSelf();renderCompare()};
-
-document.getElementById('scoreObserver').onclick=()=>{saveObserver();observerAnalysis=analyzeObserver();if(observerAnalysis.answered<10)alert('当前可评分的观察项目较少，结果只能低置信度解释。');renderObserverResult();renderCompare()};
+document.getElementById('scoreObserver').onclick=()=>{saveObserver();observerAnalysis=analyzeObserver();if(observerAnalysis.answered<10)alert('当前可评分的观察项目较少，区间会较宽。');renderObserverResult();renderCompare()};
 document.getElementById('resetObserver').onclick=()=>{if(confirm('确定清空观察者问卷？')){observerState={duration:'',confidence:'',answers:{}};observerAnalysis=null;localStorage.removeItem(OBS_STORAGE);renderObserverForm();renderObserverResult();renderCompare()}};
-
-loadObserver();renderObserverForm();
+loadWeights();loadObserver();renderObserverForm();
 </script>
 </body>
 </html>

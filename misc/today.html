@@ -185,6 +185,110 @@
         .slot-break { border-left-color: var(--medium-color); background: var(--break-bg); font-size: 0.8rem; }
         .slot-night { border-left-color: #1E293B; background: var(--night-bg); color: #F3F4F6; }
         .slot-night .time-box { color: #9CA3AF; }
+
+
+        /* Eisenhower + completion workflow */
+        .new-task-grid {
+            display: grid;
+            grid-template-columns: minmax(150px, 2fr) 78px 100px minmax(155px, 1.2fr) 82px;
+            gap: 6px;
+            margin-bottom: 8px;
+            align-items: center;
+        }
+        .eisenhower-hint {
+            margin: 0 0 15px;
+            color: #64748B;
+            font-size: 0.76rem;
+            line-height: 1.45;
+        }
+        .priority-badge {
+            display: inline-flex;
+            align-items: center;
+            border-radius: 999px;
+            padding: 2px 7px;
+            font-size: 0.68rem;
+            font-weight: 700;
+            white-space: nowrap;
+            border: 1px solid transparent;
+        }
+        .priority-badge.q1 { background: #FEE2E2; color: #991B1B; border-color: #FCA5A5; }
+        .priority-badge.q2 { background: #DBEAFE; color: #1E40AF; border-color: #93C5FD; }
+        .priority-badge.q3 { background: #FEF3C7; color: #92400E; border-color: #FCD34D; }
+        .priority-badge.q4 { background: #F3F4F6; color: #4B5563; border-color: #D1D5DB; }
+        .quadrant-select { max-width: 150px; }
+        .done-count {
+            color: #047857;
+            background: #D1FAE5;
+            border-radius: 999px;
+            padding: 2px 6px;
+            font-size: 0.68rem;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+        .task-all-done { opacity: 0.72; }
+        .subtask-done { opacity: 0.62; }
+        .mini-done { color: #047857; font-size: 0.7rem; font-weight: 700; white-space: nowrap; }
+        .timeline-content { flex: 1; min-width: 0; }
+        .schedule-meta, .completed-meta {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-top: 4px;
+            color: #64748B;
+            font-size: 0.7rem;
+        }
+        .schedule-check {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            margin-left: 10px;
+            padding: 4px 7px;
+            border-radius: 6px;
+            background: #FFFFFF;
+            border: 1px solid #D1D5DB;
+            cursor: pointer;
+            font-size: 0.72rem;
+            font-weight: 700;
+            white-space: nowrap;
+            align-self: center;
+        }
+        .schedule-check input { margin: 0; width: 15px; height: 15px; cursor: pointer; }
+        .completed-section {
+            margin: 14px 0 18px;
+            padding: 10px;
+            border: 1px solid #A7F3D0;
+            background: #ECFDF5;
+            border-radius: 10px;
+        }
+        .completed-section h3 { margin: 0 0 8px; color: #047857; font-size: 0.95rem; }
+        .completed-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 7px 8px;
+            margin-bottom: 6px;
+            border-radius: 7px;
+            background: white;
+            border: 1px solid #D1FAE5;
+        }
+        .completed-item:last-child { margin-bottom: 0; }
+        .completed-main { flex: 1; min-width: 0; }
+        .empty-state { color: #64748B; font-size: 0.85rem; background: #F8FAFC; border: 1px dashed #CBD5E1; padding: 12px; border-radius: 8px; }
+
+        @media (max-width: 1050px) {
+            .new-task-grid { grid-template-columns: 1fr 80px 100px; }
+            .new-task-grid .wide-select { grid-column: span 2; }
+        }
+        @media (max-width: 600px) {
+            .new-task-grid { grid-template-columns: 1fr 80px; }
+            .new-task-grid .wide-select { grid-column: 1 / -1; }
+            .task-header { flex-wrap: wrap; }
+            .quadrant-select { max-width: none; }
+            .timeline-item { flex-wrap: wrap; }
+            .schedule-check { margin: 7px 0 0 auto; }
+        }
+
     </style>
 </head>
 <body>
@@ -266,15 +370,21 @@
         </div>
 
         <h2>添加新任务</h2>
-        <div style="display: flex; gap: 6px; margin-bottom: 15px;">
-            <input type="text" id="newTaskTitle" placeholder="任务名称 (如: 撰写报告)" style="flex: 2;">
-            <input type="number" id="newTaskDur" placeholder="时长(分)" value="45" style="width: 70px;">
-            <select id="newTaskDiff" style="flex: 1;">
+        <div class="new-task-grid">
+            <input type="text" id="newTaskTitle" placeholder="任务名称 (如: 撰写报告)">
+            <input type="number" id="newTaskDur" placeholder="时长(分)" value="45">
+            <select id="newTaskDiff">
                 <option value="high">困难</option>
                 <option value="medium" selected>中等</option>
                 <option value="low">简单</option>
             </select>
-            <button class="btn-primary" style="flex: 0.8;" onclick="addMainTask()">添加</button>
+            <select id="newTaskQuadrant" class="wide-select">
+                <option value="q1">Q1 重要且紧急｜立即做</option>
+                <option value="q2" selected>Q2 重要不紧急｜计划做</option>
+                <option value="q3">Q3 紧急不重要｜尽量委派</option>
+                <option value="q4">Q4 不重要不紧急｜减少/删除</option>
+            </select>
+            <button class="btn-primary" onclick="addMainTask()">添加</button>
         </div>
 
         <h2>任务列表 (拆分为可选)</h2>
@@ -287,6 +397,10 @@
     <div class="panel">
         <h2>今日高效日程安排</h2>
         <div id="optimizerStats" class="optimizer-stats"></div>
+        <div id="completedSection" class="completed-section" style="display:none;">
+            <h3>✅ 已完成</h3>
+            <div id="completedList"></div>
+        </div>
         <div id="scheduleTimeline">
             <p style="color: #9CA3AF; font-size: 0.85rem;">添加任务后点击生成。使用“子任务包 + 主任务连续性约束”的优化：子任务内部不可被其他任务插入；同一主任务默认只允许 1 个主动段，再用模拟退火搜索主任务/子任务包的全局顺序。5/15 分钟休息只暂停，午餐、冥想、晚餐属于硬中断并计入切割成本。</p>
         </div>
@@ -302,11 +416,21 @@
 </div>
 
 <script>
+    const STORAGE_KEY = 'daily_app_data_v5';
+    const LEGACY_STORAGE_KEY = 'daily_app_data_v4';
+
+    const EISENHOWER = {
+        q1: { label: '重要且紧急', action: '立即做', base: 100, multiplier: 2.00, className: 'q1' },
+        q2: { label: '重要不紧急', action: '计划做', base: 85, multiplier: 1.55, className: 'q2' },
+        q3: { label: '紧急不重要', action: '尽量委派', base: 60, multiplier: 1.05, className: 'q3' },
+        q4: { label: '不重要不紧急', action: '减少/删除', base: 20, multiplier: 0.65, className: 'q4' }
+    };
+
     const defaultState = {
         settings: {
-            dayStart: "10:00",
-            mStart: "10:00", mEnd: "11:30",
-            aStart: "14:30", aEnd: "17:30",
+            dayStart: '10:00',
+            mStart: '10:00', mEnd: '11:30',
+            aStart: '14:30', aEnd: '17:30',
             maxMainRuns: 1,
             fragmentPenalty: 260,
             switchPenalty: 45,
@@ -316,24 +440,164 @@
             minStartWindow: 10,
             annealIterations: 7000
         },
-        tasks: []
+        tasks: [],
+        completed: []
     };
 
-    let appData = JSON.parse(localStorage.getItem('daily_app_data_v4')) || defaultState;
+    function cloneDefaultState() {
+        return JSON.parse(JSON.stringify(defaultState));
+    }
+
+    function normalizeAppData(raw) {
+        const base = cloneDefaultState();
+        const data = raw && typeof raw === 'object' ? raw : {};
+        base.settings = { ...base.settings, ...(data.settings || {}) };
+        base.tasks = Array.isArray(data.tasks) ? data.tasks.map(task => ({
+            ...task,
+            quadrant: EISENHOWER[task.quadrant] ? task.quadrant : 'q2',
+            showSubtasks: Boolean(task.showSubtasks),
+            subtasks: Array.isArray(task.subtasks) ? task.subtasks : []
+        })) : [];
+        base.completed = Array.isArray(data.completed) ? data.completed : [];
+        return base;
+    }
+
+    const stored = localStorage.getItem(STORAGE_KEY) || localStorage.getItem(LEGACY_STORAGE_KEY);
+    let appData = normalizeAppData(stored ? JSON.parse(stored) : null);
 
     function save() {
-        localStorage.setItem('daily_app_data_v4', JSON.stringify(appData));
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
     }
 
     function resetDefaults() {
-        if(confirm("确定要清空所有数据并恢复默认吗？")) {
-            localStorage.removeItem('daily_app_data_v4');
+        if (confirm('确定要清空所有数据并恢复默认吗？')) {
+            localStorage.removeItem(STORAGE_KEY);
+            localStorage.removeItem(LEGACY_STORAGE_KEY);
             location.reload();
         }
     }
 
+    function escapeHtml(value) {
+        return String(value ?? '')
+            .replaceAll('&', '&amp;')
+            .replaceAll('<', '&lt;')
+            .replaceAll('>', '&gt;')
+            .replaceAll('"', '&quot;')
+            .replaceAll("'", '&#039;');
+    }
+
+    function difficultyBonus(diff) {
+        return diff === 'high' ? 10 : (diff === 'medium' ? 5 : 0);
+    }
+
+    function priorityScore(quadrant, difficulty) {
+        const meta = EISENHOWER[quadrant] || EISENHOWER.q2;
+        return meta.base + difficultyBonus(difficulty);
+    }
+
+    function packageIdFor(task, subtask = null) {
+        return `${task.id}:${subtask ? subtask.id : 'main'}`;
+    }
+
+    function getTaskPackages(task) {
+        if (task.subtasks && task.subtasks.length > 0) {
+            return task.subtasks.map(st => ({
+                packageId: packageIdFor(task, st),
+                mainId: task.id,
+                mainTitle: task.title,
+                title: st.title ? `${task.title}：${st.title}` : task.title,
+                duration: Math.max(0, Number(st.duration) || 0),
+                difficulty: st.difficulty || task.difficulty || 'medium',
+                quadrant: task.quadrant || 'q2'
+            }));
+        }
+        return [{
+            packageId: packageIdFor(task),
+            mainId: task.id,
+            mainTitle: task.title,
+            title: task.title,
+            duration: Math.max(0, Number(task.duration) || 0),
+            difficulty: task.difficulty || 'medium',
+            quadrant: task.quadrant || 'q2'
+        }];
+    }
+
+    function completedSet() {
+        return new Set((appData.completed || []).map(item => item.packageId));
+    }
+
+    function findPackageDescriptor(packageId) {
+        for (const task of appData.tasks) {
+            const found = getTaskPackages(task).find(pkg => pkg.packageId === packageId);
+            if (found) return found;
+        }
+        return null;
+    }
+
+    function completePackage(packageId) {
+        if (completedSet().has(packageId)) return;
+        const pkg = findPackageDescriptor(packageId);
+        if (!pkg) return;
+
+        appData.completed.push({
+            packageId: pkg.packageId,
+            mainId: pkg.mainId,
+            title: pkg.title,
+            duration: pkg.duration,
+            difficulty: pkg.difficulty,
+            quadrant: pkg.quadrant,
+            priority: priorityScore(pkg.quadrant, pkg.difficulty),
+            completedAt: new Date().toISOString()
+        });
+        save();
+        render();
+        renderCompleted();
+        generateSchedule({ fromNow: true, reason: '完成后自动重排' });
+    }
+
+    function undoComplete(packageId) {
+        appData.completed = (appData.completed || []).filter(item => item.packageId !== packageId);
+        save();
+        render();
+        renderCompleted();
+        generateSchedule({ fromNow: true, reason: '撤销完成后重排' });
+    }
+
+    function renderCompleted() {
+        const section = document.getElementById('completedSection');
+        const list = document.getElementById('completedList');
+        const records = [...(appData.completed || [])].sort((a, b) => String(b.completedAt).localeCompare(String(a.completedAt)));
+        list.innerHTML = '';
+
+        if (!records.length) {
+            section.style.display = 'none';
+            return;
+        }
+
+        section.style.display = 'block';
+        records.forEach(item => {
+            const meta = EISENHOWER[item.quadrant] || EISENHOWER.q2;
+            const div = document.createElement('div');
+            div.className = 'completed-item';
+            const timeText = item.completedAt ? new Date(item.completedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
+            div.innerHTML = `
+                <div class="completed-main">
+                    <div><strong>${escapeHtml(item.title)}</strong></div>
+                    <div class="completed-meta">
+                        <span class="priority-badge ${meta.className}">${meta.label} · ${meta.action}</span>
+                        <span>优先级 ${Number(item.priority || priorityScore(item.quadrant, item.difficulty))}</span>
+                        <span>${Number(item.duration) || 0} 分钟</span>
+                        ${timeText ? `<span>${escapeHtml(timeText)} 完成</span>` : ''}
+                    </div>
+                </div>
+                <button class="btn-sm" onclick="undoComplete('${item.packageId}')">撤销</button>
+            `;
+            list.appendChild(div);
+        });
+    }
+
     function initSettingsUI() {
-        document.getElementById('dayStart').value = appData.settings.dayStart || "10:00";
+        document.getElementById('dayStart').value = appData.settings.dayStart || '10:00';
         document.getElementById('mStart').value = appData.settings.mStart;
         document.getElementById('mEnd').value = appData.settings.mEnd;
         document.getElementById('aStart').value = appData.settings.aStart;
@@ -370,12 +634,11 @@
         toggle.textContent = open ? '展开 ▾' : '收起 ▴';
     }
 
-    // 主任务管理
     function addMainTask() {
         const titleEl = document.getElementById('newTaskTitle');
         const durEl = document.getElementById('newTaskDur');
         const diffEl = document.getElementById('newTaskDiff');
-
+        const quadrantEl = document.getElementById('newTaskQuadrant');
         if (!titleEl.value.trim()) return;
 
         appData.tasks.push({
@@ -383,6 +646,7 @@
             title: titleEl.value.trim(),
             duration: parseInt(durEl.value) || 30,
             difficulty: diffEl.value,
+            quadrant: EISENHOWER[quadrantEl.value] ? quadrantEl.value : 'q2',
             showSubtasks: false,
             subtasks: []
         });
@@ -394,20 +658,20 @@
 
     function deleteMainTask(id) {
         appData.tasks = appData.tasks.filter(t => t.id !== id);
+        appData.completed = (appData.completed || []).filter(item => item.mainId !== id);
         save();
         render();
+        renderCompleted();
     }
 
     function updateMainTask(id, field, value) {
         const task = appData.tasks.find(t => t.id === id);
-        if (task) {
-            task[field] = field === 'duration' ? (parseInt(value) || 0) : value;
-            save();
-            render();
-        }
+        if (!task) return;
+        task[field] = field === 'duration' ? (parseInt(value) || 0) : value;
+        save();
+        render();
     }
 
-    // 子任务管理
     function addSubtask(taskId) {
         const task = appData.tasks.find(t => t.id === taskId);
         if (!task) return;
@@ -415,8 +679,12 @@
         const titleEl = document.getElementById(`new-sub-title-${taskId}`);
         const durEl = document.getElementById(`new-sub-dur-${taskId}`);
         const diffEl = document.getElementById(`new-sub-diff-${taskId}`);
-
         if (!titleEl.value.trim()) return;
+
+        if (!task.subtasks || task.subtasks.length === 0) {
+            const oldMainId = packageIdFor(task);
+            appData.completed = (appData.completed || []).filter(item => item.packageId !== oldMainId);
+        }
 
         task.subtasks.push({
             id: Date.now(),
@@ -429,95 +697,99 @@
         recalcTotalDuration(task);
         save();
         render();
+        renderCompleted();
     }
 
     function updateSubtask(taskId, subId, field, value) {
         const task = appData.tasks.find(t => t.id === taskId);
-        if (task) {
-            const sub = task.subtasks.find(s => s.id === subId);
-            if (sub) {
-                sub[field] = field === 'duration' ? (parseInt(value) || 0) : value;
-                recalcTotalDuration(task);
-                save();
-                render();
-            }
-        }
+        if (!task) return;
+        const sub = task.subtasks.find(s => s.id === subId);
+        if (!sub) return;
+        sub[field] = field === 'duration' ? (parseInt(value) || 0) : value;
+        recalcTotalDuration(task);
+        save();
+        render();
     }
 
     function moveSubtask(taskId, index, direction) {
         const task = appData.tasks.find(t => t.id === taskId);
         if (!task) return;
-
         const newIndex = index + direction;
         if (newIndex < 0 || newIndex >= task.subtasks.length) return;
-
-        const temp = task.subtasks[index];
-        task.subtasks[index] = task.subtasks[newIndex];
-        task.subtasks[newIndex] = temp;
-
+        [task.subtasks[index], task.subtasks[newIndex]] = [task.subtasks[newIndex], task.subtasks[index]];
         save();
         render();
     }
 
     function deleteSubtask(taskId, subId) {
         const task = appData.tasks.find(t => t.id === taskId);
-        if (task) {
-            task.subtasks = task.subtasks.filter(s => s.id !== subId);
-            recalcTotalDuration(task);
-            save();
-            render();
-        }
+        if (!task) return;
+        appData.completed = (appData.completed || []).filter(item => item.packageId !== packageIdFor(task, { id: subId }));
+        task.subtasks = task.subtasks.filter(s => s.id !== subId);
+        recalcTotalDuration(task);
+        save();
+        render();
+        renderCompleted();
     }
 
     function toggleSubtasks(taskId) {
         const task = appData.tasks.find(t => t.id === taskId);
-        if (task) {
-            task.showSubtasks = !task.showSubtasks;
-            save();
-            render();
-        }
+        if (!task) return;
+        task.showSubtasks = !task.showSubtasks;
+        save();
+        render();
     }
 
-    // 只有当存在子任务时，主任务时间才由子任务自动求和更新
     function recalcTotalDuration(task) {
         if (task.subtasks && task.subtasks.length > 0) {
-            task.duration = task.subtasks.reduce((sum, s) => sum + s.duration, 0);
+            task.duration = task.subtasks.reduce((sum, s) => sum + (Number(s.duration) || 0), 0);
         }
     }
 
     function render() {
         const listEl = document.getElementById('taskList');
         listEl.innerHTML = '';
+        const done = completedSet();
 
         appData.tasks.forEach(task => {
+            task.quadrant = EISENHOWER[task.quadrant] ? task.quadrant : 'q2';
             recalcTotalDuration(task);
+            const meta = EISENHOWER[task.quadrant];
+            const packages = getTaskPackages(task);
+            const doneCount = packages.filter(pkg => done.has(pkg.packageId)).length;
+            const score = priorityScore(task.quadrant, task.difficulty);
             const card = document.createElement('div');
-            card.className = 'task-card';
+            card.className = `task-card ${doneCount === packages.length && packages.length ? 'task-all-done' : ''}`;
 
             let subtasksHTML = '';
             if (task.showSubtasks) {
-                const rows = task.subtasks.map((st, idx) => `
-                    <div class="subtask-row">
-                        <span style="font-weight:bold; color:#6B7280; font-size:0.75rem;">${idx+1}.</span>
-                        <input type="text" class="edit-input" style="flex:2;" value="${st.title}" onchange="updateSubtask(${task.id}, ${st.id}, 'title', this.value)">
-                        <input type="number" class="edit-input" style="width:45px;" value="${st.duration}" onchange="updateSubtask(${task.id}, ${st.id}, 'duration', this.value)">分
-                        <select onchange="updateSubtask(${task.id}, ${st.id}, 'difficulty', this.value)">
-                            <option value="high" ${st.difficulty==='high'?'selected':''}>困难</option>
-                            <option value="medium" ${st.difficulty==='medium'?'selected':''}>中等</option>
-                            <option value="low" ${st.difficulty==='low'?'selected':''}>简单</option>
-                        </select>
-                        <button class="btn-sm" onclick="moveSubtask(${task.id}, ${idx}, -1)">↑</button>
-                        <button class="btn-sm" onclick="moveSubtask(${task.id}, ${idx}, 1)">↓</button>
-                        <button class="btn-sm btn-del" onclick="deleteSubtask(${task.id}, ${st.id})">✕</button>
-                    </div>
-                `).join('');
+                const rows = task.subtasks.map((st, idx) => {
+                    const pid = packageIdFor(task, st);
+                    const isDone = done.has(pid);
+                    return `
+                        <div class="subtask-row ${isDone ? 'subtask-done' : ''}">
+                            <span style="font-weight:bold; color:#6B7280; font-size:0.75rem;">${idx + 1}.</span>
+                            <input type="text" class="edit-input" style="flex:2;" value="${escapeHtml(st.title)}" onchange="updateSubtask(${task.id}, ${st.id}, 'title', this.value)">
+                            <input type="number" class="edit-input" style="width:45px;" value="${Number(st.duration) || 0}" onchange="updateSubtask(${task.id}, ${st.id}, 'duration', this.value)">分钟
+                            <select onchange="updateSubtask(${task.id}, ${st.id}, 'difficulty', this.value)">
+                                <option value="high" ${st.difficulty === 'high' ? 'selected' : ''}>困难</option>
+                                <option value="medium" ${st.difficulty === 'medium' ? 'selected' : ''}>中等</option>
+                                <option value="low" ${st.difficulty === 'low' ? 'selected' : ''}>简单</option>
+                            </select>
+                            ${isDone ? '<span class="mini-done">已完成</span>' : ''}
+                            <button class="btn-sm" onclick="moveSubtask(${task.id}, ${idx}, -1)">↑</button>
+                            <button class="btn-sm" onclick="moveSubtask(${task.id}, ${idx}, 1)">↓</button>
+                            <button class="btn-sm btn-del" onclick="deleteSubtask(${task.id}, ${st.id})">✕</button>
+                        </div>
+                    `;
+                }).join('');
 
                 subtasksHTML = `
                     <div class="task-body">
                         <div>${rows || '<div style="font-size:0.75rem; color:#9CA3AF;">无拆解步骤，将按主任务整体排期</div>'}</div>
-                        <div style="display:flex; gap:5px; margin-top:8px;">
-                            <input type="text" id="new-sub-title-${task.id}" placeholder="添加步骤" style="flex:2;">
-                            <input type="number" id="new-sub-dur-${task.id}" placeholder="分钟" value="15" style="width:50px;">
+                        <div style="display:flex; gap:5px; margin-top:8px; flex-wrap:wrap;">
+                            <input type="text" id="new-sub-title-${task.id}" placeholder="添加步骤" style="flex:2; min-width:120px;">
+                            <input type="number" id="new-sub-dur-${task.id}" placeholder="分钟" value="15" style="width:58px;">
                             <select id="new-sub-diff-${task.id}">
                                 <option value="low">简单</option>
                                 <option value="medium" selected>中等</option>
@@ -531,14 +803,22 @@
 
             card.innerHTML = `
                 <div class="task-header">
-                    <input type="text" class="edit-input" style="flex:1;" value="${task.title}" onchange="updateMainTask(${task.id}, 'title', this.value)">
-                    <input type="number" class="edit-input" style="width:50px;" value="${task.duration}" ${task.subtasks.length > 0 ? 'disabled' : ''} onchange="updateMainTask(${task.id}, 'duration', this.value)">分
+                    <input type="text" class="edit-input" style="flex:1; min-width:110px;" value="${escapeHtml(task.title)}" onchange="updateMainTask(${task.id}, 'title', this.value)">
+                    <input type="number" class="edit-input" style="width:80px;" value="${Number(task.duration) || 0}" ${task.subtasks.length > 0 ? 'disabled' : ''} onchange="updateMainTask(${task.id}, 'duration', this.value)">分钟
                     <select onchange="updateMainTask(${task.id}, 'difficulty', this.value)">
-                        <option value="high" ${task.difficulty==='high'?'selected':''}>困难</option>
-                        <option value="medium" ${task.difficulty==='medium'?'selected':''}>中等</option>
-                        <option value="low" ${task.difficulty==='low'?'selected':''}>简单</option>
+                        <option value="high" ${task.difficulty === 'high' ? 'selected' : ''}>困难</option>
+                        <option value="medium" ${task.difficulty === 'medium' ? 'selected' : ''}>中等</option>
+                        <option value="low" ${task.difficulty === 'low' ? 'selected' : ''}>简单</option>
                     </select>
-                    <button class="btn-sm" onclick="toggleSubtasks(${task.id})">${task.showSubtasks?'收起拆解':'拆解步骤'}</button>
+                    <select class="quadrant-select" onchange="updateMainTask(${task.id}, 'quadrant', this.value)">
+                        <option value="q1" ${task.quadrant === 'q1' ? 'selected' : ''}>Q1 重要且紧急</option>
+                        <option value="q2" ${task.quadrant === 'q2' ? 'selected' : ''}>Q2 重要不紧急</option>
+                        <option value="q3" ${task.quadrant === 'q3' ? 'selected' : ''}>Q3 紧急不重要</option>
+                        <option value="q4" ${task.quadrant === 'q4' ? 'selected' : ''}>Q4 不重要不紧急</option>
+                    </select>
+                    <span class="priority-badge ${meta.className}" title="Eisenhower 基础分 ${meta.base} + 难度加分 ${difficultyBonus(task.difficulty)}">P${score}</span>
+                    ${packages.length ? `<span class="done-count">${doneCount}/${packages.length}</span>` : ''}
+                    <button class="btn-sm" onclick="toggleSubtasks(${task.id})">${task.showSubtasks ? '收起拆解' : '拆解步骤'}</button>
                     <button class="btn-sm btn-del" onclick="deleteMainTask(${task.id})">删除</button>
                 </div>
                 ${subtasksHTML}
@@ -548,24 +828,20 @@
     }
 
     function timeToMin(timeStr) {
-        const [h, m] = timeStr.split(':').map(Number);
+        const [h, m] = String(timeStr || '00:00').split(':').map(Number);
         return h * 60 + m;
     }
+
     function minToTime(mins) {
         const h = Math.floor(mins / 60).toString().padStart(2, '0');
         const m = (mins % 60).toString().padStart(2, '0');
         return `${h}:${m}`;
     }
 
-    // 核心调度算法
-    //
-    // 建模：
-    // - 决策变量不是“每 25 分钟选一次任务”，而是“子任务包的全局顺序”。
-    // - 一个子任务包内部不可被其他主任务插入；25/5、90/15 只产生生理休息。
-    // - 同一主任务的多个子任务可以相邻形成一个 run；run 数量由 maxMainRuns 约束。
-    // - 午餐 / 冥想 / 晚餐是硬中断：它们重置工作计时，并对跨越它们的未完成包收取 hardBreakPenalty。
-    // - 目标函数同时考虑：主任务分裂、上下文切换、固定中断切割、黄金期错配、未完成工作。
-    function generateSchedule() {
+    // 核心调度：子任务包顺序 + 模拟退火。
+    // Eisenhower 通过两条路径进入成本：
+    // 1) 高优先级任务越晚首次启动，成本越高；2) 高优先级任务未完成的成本更高。
+    function generateSchedule(options = {}) {
         const timelineEl = document.getElementById('scheduleTimeline');
         const statsEl = document.getElementById('optimizerStats');
         timelineEl.innerHTML = '';
@@ -587,7 +863,11 @@
 
         const mS = timeToMin(set.mStart), mE = timeToMin(set.mEnd);
         const aS = timeToMin(set.aStart), aE = timeToMin(set.aEnd);
-        const dayStart = timeToMin(set.dayStart || '10:00');
+        const configuredStart = timeToMin(set.dayStart || '10:00');
+        const now = new Date();
+        const nowMinute = now.getHours() * 60 + now.getMinutes();
+        const useNow = options.fromNow !== false;
+        const dayStart = Math.max(configuredStart, useNow ? nowMinute : configuredStart);
         const endOfWorkDay = 1200;
 
         const fixedSlots = [
@@ -597,45 +877,49 @@
             { start: 1200, end: 1320, name: '🌙 关屏 / 远离光线 / 彻底休息', type: 'night' }
         ].sort((a, b) => a.start - b.start);
 
-        // 每个主任务转为一组有顺序的“包”。没有子任务时，主任务本身就是一个包。
+        const done = completedSet();
         const mainMap = new Map();
         appData.tasks.forEach((t, mainIndex) => {
             const source = (t.subtasks && t.subtasks.length > 0)
-                ? t.subtasks
-                : [{ id: t.id, title: '', duration: t.duration || 30, difficulty: t.difficulty }];
+                ? t.subtasks.map(st => ({ ...st, packageId: packageIdFor(t, st), displayTitle: st.title || '' }))
+                : [{ id: 'main', packageId: packageIdFor(t), displayTitle: '', duration: t.duration || 30, difficulty: t.difficulty }];
 
             const packages = source
-                .map((st, subIndex) => ({
-                    packageId: `${t.id}:${subIndex}`,
-                    mainId: t.id,
-                    mainTitle: t.title,
-                    mainIndex,
-                    subIndex,
-                    title: st.title || '',
-                    duration: Math.max(0, Number(st.duration) || 0),
-                    difficulty: st.difficulty || t.difficulty || 'medium'
-                }))
+                .filter(st => !done.has(st.packageId))
+                .map((st, subIndex) => {
+                    const quadrant = t.quadrant || 'q2';
+                    const diff = st.difficulty || t.difficulty || 'medium';
+                    return {
+                        packageId: st.packageId,
+                        mainId: t.id,
+                        mainTitle: t.title,
+                        mainIndex,
+                        subIndex,
+                        title: st.displayTitle || '',
+                        duration: Math.max(0, Number(st.duration) || 0),
+                        difficulty: diff,
+                        quadrant,
+                        priorityScore: priorityScore(quadrant, diff),
+                        priorityMultiplier: (EISENHOWER[quadrant] || EISENHOWER.q2).multiplier
+                    };
+                })
                 .filter(p => p.duration > 0);
 
             if (packages.length) {
-                mainMap.set(t.id, {
-                    mainId: t.id,
-                    mainTitle: t.title,
-                    mainIndex,
-                    packages
-                });
+                mainMap.set(t.id, { mainId: t.id, mainTitle: t.title, mainIndex, packages });
             }
         });
 
         const mains = [...mainMap.values()];
         if (!mains.length) {
-            timelineEl.innerHTML = '<p style="color:#9CA3AF;font-size:0.85rem;">暂无可排期任务。</p>';
+            timelineEl.innerHTML = '<p class="empty-state">所有任务包都已完成，当前没有需要重新安排的内容。</p>';
             document.getElementById('unfinishedSection').style.display = 'none';
+            statsEl.style.display = 'block';
+            statsEl.innerHTML = `<strong>今日进度</strong>　已完成 ${(appData.completed || []).length} 项 · 当前无待排任务`;
+            renderCompleted();
             return;
         }
 
-        // chromosome 使用 mainId token。某主任务第 k 次出现永远映射到该主任务第 k 个子任务，
-        // 因此任何交换都不会破坏主任务内部步骤顺序。
         function groupedSequence(mainOrder) {
             const seq = [];
             mainOrder.forEach(id => {
@@ -684,7 +968,6 @@
 
         function peakMismatchCost(diff, start, end) {
             let cost = 0;
-            // 最多一天 600 分钟，按分钟计算足够快，也让权重直观。
             for (let t = start; t < end; t++) {
                 const peak = isPeak(t);
                 if (diff === 'high' && !peak) cost += cfg.peakPenalty;
@@ -694,26 +977,24 @@
             return cost;
         }
 
-        // 对一个候选顺序进行完整“解码”。render=false 时只算成本，不创建 DOM。
-        function decode(sequence, render = false) {
+        function decode(sequence, renderSchedule = false) {
             const packages = materializePackages(sequence);
             const schedule = [];
             const remaining = new Map(packages.map(p => [p.packageId, p.duration]));
+            const started = new Set();
             let curr = dayStart;
             let continuous = 0;
             let session = 0;
             let cost = 0;
             let hardSplits = 0;
             let tinyBuffers = 0;
-            let activePackageId = null;
             let hardInterruptionOpen = false;
 
             const push = (start, end, title, type, meta = {}) => {
                 if (end <= start) return;
-                if (render) schedule.push({ start, end, time: `${minToTime(start)}-${minToTime(end)}`, title, type, ...meta });
+                if (renderSchedule) schedule.push({ start, end, time: `${minToTime(start)}-${minToTime(end)}`, title, type, ...meta });
             };
 
-            // 结构成本：主动切换 + 主任务被拆成多个 run。
             const runs = countRuns(sequence);
             let switches = 0;
             for (let i = 1; i < sequence.length; i++) {
@@ -728,7 +1009,6 @@
                 runViolations += Math.max(0, r - cfg.maxMainRuns);
             }
             cost += extraRuns * cfg.fragmentPenalty;
-            // maxMainRuns 是硬约束：违反一次远比任何软收益都昂贵。
             cost += runViolations * 1000000;
 
             let pkgIndex = 0;
@@ -736,7 +1016,6 @@
                 const pkg = packages[pkgIndex];
                 let rem = remaining.get(pkg.packageId) || 0;
                 if (rem <= 0) { pkgIndex++; continue; }
-                activePackageId = pkg.packageId;
                 let pkgWorkedBefore = false;
 
                 while (rem > 0 && curr < endOfWorkDay) {
@@ -783,8 +1062,6 @@
                     }
 
                     const toHard = hardBoundary - curr;
-                    // 不在长固定中断前启动一个“只能做几分钟、且明显做不完”的新碎片。
-                    // 已经做了一部分的包也遵守该规则，防止 11:27-11:30 这类微碎片。
                     if (nf && toHard > 0 && toHard < cfg.minStartWindow && rem > toHard) {
                         push(curr, hardBoundary, '🧩 固定中断前缓冲 / 收尾整理', 'free');
                         tinyBuffers++;
@@ -806,8 +1083,20 @@
                     const start = curr;
                     const end = curr + maxChunk;
                     cost += peakMismatchCost(pkg.difficulty, start, end);
+
+                    if (!started.has(pkg.packageId)) {
+                        const delay = Math.max(0, start - dayStart);
+                        cost += delay * pkg.priorityScore * 0.05;
+                        started.add(pkg.packageId);
+                    }
+
                     const title = pkg.title ? `${pkg.mainTitle}：${pkg.title}` : pkg.mainTitle;
-                    push(start, end, title, isPeak(start) ? 'peak' : 'normal', { mainId: pkg.mainId, packageId: pkg.packageId });
+                    push(start, end, title, isPeak(start) ? 'peak' : 'normal', {
+                        mainId: pkg.mainId,
+                        packageId: pkg.packageId,
+                        quadrant: pkg.quadrant,
+                        priorityScore: pkg.priorityScore
+                    });
 
                     curr = end;
                     rem -= maxChunk;
@@ -821,38 +1110,25 @@
                 else break;
             }
 
-            // 未完成成本按分钟计；高难任务额外提高 20%，避免把最重要的工作全部推迟到明天。
             let unfinishedMins = 0;
             for (const pkg of packages) {
                 const rem = remaining.get(pkg.packageId) || 0;
                 if (rem > 0) {
                     unfinishedMins += rem;
-                    const mult = pkg.difficulty === 'high' ? 1.2 : (pkg.difficulty === 'medium' ? 1.05 : 1.0);
-                    cost += rem * cfg.unfinishedPenalty * mult;
+                    const diffMult = pkg.difficulty === 'high' ? 1.2 : (pkg.difficulty === 'medium' ? 1.05 : 1.0);
+                    cost += rem * cfg.unfinishedPenalty * diffMult * pkg.priorityMultiplier;
                 }
             }
 
-            // 很小的稳定性/FIFO 项，只负责完全同分时更可预测。
             packages.forEach((p, i) => { cost += Math.abs(i - p.mainIndex) * 0.03; });
-
-            return {
-                cost,
-                schedule,
-                remaining,
-                packages,
-                switches,
-                extraRuns,
-                runViolations,
-                hardSplits,
-                unfinishedMins,
-                tinyBuffers,
-                runs
-            };
+            return { cost, schedule, remaining, packages, switches, extraRuns, runViolations, hardSplits, unfinishedMins, tinyBuffers, runs };
         }
 
-        // 稳定伪随机：同一组任务/参数重复点击，结果基本一致，便于调参比较。
         let seed = 2166136261 >>> 0;
-        const seedText = JSON.stringify(appData.tasks.map(t => [t.id, t.duration, t.difficulty, (t.subtasks || []).map(s => [s.duration, s.difficulty])])) + JSON.stringify(cfg);
+        const seedText = JSON.stringify(appData.tasks.map(t => [
+            t.id, t.duration, t.difficulty, t.quadrant,
+            (t.subtasks || []).map(s => [s.id, s.duration, s.difficulty])
+        ])) + JSON.stringify(cfg) + JSON.stringify([...done].sort()) + dayStart;
         for (let i = 0; i < seedText.length; i++) {
             seed ^= seedText.charCodeAt(i);
             seed = Math.imul(seed, 16777619) >>> 0;
@@ -878,7 +1154,6 @@
         }
 
         function mutate(seq) {
-            // maxMainRuns=1 时只移动/交换完整主任务块，保证搜索空间始终满足强连续约束。
             if (cfg.maxMainRuns === 1) {
                 const runs = splitIntoRuns(seq);
                 if (runs.length <= 1) return seq.slice();
@@ -896,7 +1171,6 @@
                 return outRuns.flat();
             }
 
-            // 允许拆成 2/3 段时，用 token swap/move 探索交错方案；硬约束由 objective 保证。
             const out = seq.slice();
             if (out.length <= 1) return out;
             if (rnd() < 0.6) {
@@ -917,17 +1191,16 @@
             let curEval = decode(current, false);
             let best = current.slice();
             let bestEval = curEval;
-
             const iterations = Math.floor(cfg.annealIterations);
             const t0 = 180;
             const tEnd = 0.35;
+
             for (let i = 0; i < iterations; i++) {
                 const progress = i / Math.max(1, iterations - 1);
                 const temp = t0 * Math.pow(tEnd / t0, progress);
                 const next = mutate(current);
                 const nextEval = decode(next, false);
                 const delta = nextEval.cost - curEval.cost;
-
                 if (delta <= 0 || rnd() < Math.exp(-delta / temp)) {
                     current = next;
                     curEval = nextEval;
@@ -940,17 +1213,18 @@
             return { sequence: best, evaluation: bestEval };
         }
 
-        // 多起点：输入顺序、难度顺序、时长顺序 + 随机主任务顺序。
         const inputOrder = mains.map(m => m.mainId);
         const difficultyRank = { high: 3, medium: 2, low: 1 };
         const mainSummary = mains.map(m => ({
             id: m.mainId,
             avgDiff: m.packages.reduce((s, p) => s + difficultyRank[p.difficulty], 0) / m.packages.length,
+            avgPriority: m.packages.reduce((s, p) => s + p.priorityScore, 0) / m.packages.length,
             total: m.packages.reduce((s, p) => s + p.duration, 0)
         }));
 
         const startOrders = [
             inputOrder.slice(),
+            mainSummary.slice().sort((a, b) => b.avgPriority - a.avgPriority || b.avgDiff - a.avgDiff).map(x => x.id),
             mainSummary.slice().sort((a, b) => b.avgDiff - a.avgDiff || a.total - b.total).map(x => x.id),
             mainSummary.slice().sort((a, b) => a.total - b.total).map(x => x.id)
         ];
@@ -968,20 +1242,16 @@
             const result = anneal(groupedSequence(order));
             if (!globalBest || result.evaluation.cost < globalBest.evaluation.cost) globalBest = result;
         }
-
-        // maxMainRuns>1 的场景，额外从当前最优继续做一轮细粒度退火。
         if (cfg.maxMainRuns > 1 && globalBest) {
             const refined = anneal(globalBest.sequence);
             if (refined.evaluation.cost < globalBest.evaluation.cost) globalBest = refined;
         }
 
         const best = decode(globalBest.sequence, true);
-
-        // 合并相邻同任务、同类型工作块（不会跨越任何休息块），让展示更清晰。
         const displaySchedule = [];
         for (const item of best.schedule) {
             const prev = displaySchedule[displaySchedule.length - 1];
-            if (prev && item.mainId && prev.mainId === item.mainId && prev.title === item.title && prev.end === item.start && prev.type === item.type) {
+            if (prev && item.packageId && prev.packageId === item.packageId && prev.title === item.title && prev.end === item.start && prev.type === item.type) {
                 prev.end = item.end;
                 prev.time = `${minToTime(prev.start)}-${minToTime(prev.end)}`;
             } else {
@@ -1008,56 +1278,90 @@
             if (item.type === 'break') cls = 'slot-break';
             if (item.type === 'night') cls = 'slot-night';
             div.className = `timeline-item ${cls}`;
-            div.innerHTML = `<div class="time-box">${item.time}</div><div><strong>${item.title}</strong></div>`;
+
+            if (item.packageId) {
+                const meta = EISENHOWER[item.quadrant] || EISENHOWER.q2;
+                div.innerHTML = `
+                    <div class="time-box">${item.time}</div>
+                    <div class="timeline-content">
+                        <strong>${escapeHtml(item.title)}</strong>
+                        <div class="schedule-meta">
+                            <span class="priority-badge ${meta.className}">${meta.label}</span>
+                            <span>优先级 ${Number(item.priorityScore) || 0}</span>
+                        </div>
+                    </div>
+                    <label class="schedule-check" title="不需要严格按时间顺序；完成了就直接勾选">
+                        <input type="checkbox" onchange="completePackage('${item.packageId}')">
+                        <span>完成</span>
+                    </label>
+                `;
+            } else {
+                div.innerHTML = `<div class="time-box">${item.time}</div><div class="timeline-content"><strong>${escapeHtml(item.title)}</strong></div>`;
+            }
             timelineEl.appendChild(div);
         });
 
         statsEl.style.display = 'block';
         const runText = [...best.runs.entries()]
-            .map(([id, r]) => `${mainMap.get(id)?.mainTitle || id}:${r}段`)
+            .map(([id, r]) => `${escapeHtml(mainMap.get(id)?.mainTitle || id)}:${r}段`)
             .join(' · ');
+        const reasonText = options.reason ? ` · ${escapeHtml(options.reason)}` : '';
         statsEl.innerHTML = `
-            <strong>优化结果</strong>　成本 ${best.cost.toFixed(1)} · 主任务切换 ${best.switches} 次 · 主动分裂 ${best.extraRuns} 次 · 固定长休切割 ${best.hardSplits} 次 · 未完成 ${best.unfinishedMins} 分钟<br>
-            <span style="color:#64748B;">${runText}</span>
+            <strong>优化结果</strong>　从 ${minToTime(dayStart)} 起${reasonText} · 成本 ${best.cost.toFixed(1)} · 主任务切换 ${best.switches} 次 · 主动分裂 ${best.extraRuns} 次 · 固定长休切割 ${best.hardSplits} 次 · 未完成 ${best.unfinishedMins} 分钟<br>
+            <span style="color:#64748B;">Eisenhower 优先级已计入“首次启动延迟”和“未完成惩罚”。${runText ? ` ${runText}` : ''}</span>
         `;
 
-        // 未完成任务：基于最优解的 package remaining，而不是被 mutate 的临时池。
         const unfinishedContainer = document.getElementById('unfinishedSection');
         const unfinishedList = document.getElementById('unfinishedList');
         unfinishedList.innerHTML = '';
-
         const unfinishedTasks = [];
         best.packages.forEach(pkg => {
             const rem = best.remaining.get(pkg.packageId) || 0;
             if (rem > 0) {
                 unfinishedTasks.push({
+                    packageId: pkg.packageId,
                     title: pkg.title ? `${pkg.mainTitle}：${pkg.title}` : pkg.mainTitle,
-                    duration: rem
+                    duration: rem,
+                    quadrant: pkg.quadrant,
+                    priorityScore: pkg.priorityScore
                 });
             }
         });
 
         if (unfinishedTasks.length > 0) {
             unfinishedContainer.style.display = 'block';
+            unfinishedTasks.sort((a, b) => b.priorityScore - a.priorityScore);
             unfinishedTasks.forEach(item => {
+                const meta = EISENHOWER[item.quadrant] || EISENHOWER.q2;
                 const div = document.createElement('div');
                 div.className = 'timeline-item';
                 div.style.borderLeftColor = '#EF4444';
                 div.style.background = '#FEF2F2';
                 div.innerHTML = `
                     <div class="time-box" style="color:#EF4444;">剩余 ${item.duration} 分钟</div>
-                    <div><strong>${item.title}</strong></div>
+                    <div class="timeline-content">
+                        <strong>${escapeHtml(item.title)}</strong>
+                        <div class="schedule-meta"><span class="priority-badge ${meta.className}">${meta.label}</span><span>优先级 ${item.priorityScore}</span></div>
+                    </div>
+                    <label class="schedule-check" title="即使未排进今天，也可以在实际完成后直接勾选">
+                        <input type="checkbox" onchange="completePackage('${item.packageId}')">
+                        <span>完成</span>
+                    </label>
                 `;
                 unfinishedList.appendChild(div);
             });
         } else {
             unfinishedContainer.style.display = 'none';
         }
+
+        renderCompleted();
     }
 
     initSettingsUI();
     render();
+    renderCompleted();
 </script>
+
 
 </body>
 </html>
