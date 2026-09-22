@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Values Mapping｜价值观卡牌漏斗</title>
+<style>
+  :root{
+    --ink:#102638; --muted:#65727d; --paper:#f5f2eb; --card:#fffdf8;
+    --line:#d9d5cc; --blue:#163f5f; --blue2:#0f5f78; --accent:#c45b39;
+    --good:#2d6f5d; --warn:#986b12; --soft:#e8eef2; --shadow:0 10px 28px rgba(16,38,56,.08);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;font-family:Inter,"PingFang SC","Microsoft YaHei",system-ui,-apple-system,sans-serif;background:var(--paper);color:var(--ink);line-height:1.55}
+  a{color:var(--blue2);text-decoration-thickness:1px;text-underline-offset:3px}
+  button,input,textarea{font:inherit}
+  .wrap{max-width:1180px;margin:0 auto;padding:28px 22px 70px}
+  .hero{background:linear-gradient(130deg,#102f48 0%,#0b2133 68%,#133f52 100%);color:#fff;border-radius:28px;padding:38px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+  .hero:after{content:"";position:absolute;right:-90px;top:-90px;width:310px;height:310px;border:1px solid rgba(255,255,255,.14);border-radius:50%;box-shadow:0 0 0 48px rgba(255,255,255,.035),0 0 0 98px rgba(255,255,255,.022)}
+  .eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;font-weight:750;opacity:.78}
+  h1{font-size:clamp(34px,5vw,66px);line-height:1.04;margin:10px 0 14px;letter-spacing:-.045em;max-width:850px}
+  .lead{font-size:18px;max-width:800px;color:#d7e2ea;margin:0 0 24px}
+  .badges{display:flex;flex-wrap:wrap;gap:9px;position:relative;z-index:2}
+  .badge{border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);border-radius:999px;padding:7px 11px;font-size:12px;color:#eef6fb}
+  .badge strong{color:#fff}
+  .funnel{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:22px;position:relative;z-index:2}
+  .funnel .node{border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.075);padding:17px;border-radius:16px;min-height:100px}
+  .node .n{font-size:34px;font-weight:850;line-height:1}.node b{display:block;margin-top:8px}.node span{font-size:12px;color:#c9d7e0}
+  .section{margin-top:24px;background:rgba(255,255,255,.64);border:1px solid var(--line);border-radius:24px;padding:28px;box-shadow:0 8px 24px rgba(16,38,56,.035)}
+  .section h2{font-size:24px;margin:0 0 6px;letter-spacing:-.02em}.section p.top{margin:0;color:var(--muted)}
+  .research-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:18px}
+  .evidence{padding:18px;border-radius:16px;background:var(--card);border:1px solid var(--line)}
+  .evidence h3{margin:0 0 8px;font-size:15px}.evidence ul{margin:8px 0 0;padding-left:19px;color:#3d4b56}.evidence li{margin:6px 0}
+  .tag{display:inline-block;border-radius:999px;padding:3px 8px;font-size:11px;font-weight:750;margin-right:6px}
+  .tag.ok{background:#dfeee8;color:#1f604e}.tag.mid{background:#f2ead5;color:#7c5d12}.tag.no{background:#f1e3de;color:#914528}
+  .workspace-head{display:flex;gap:14px;align-items:flex-start;justify-content:space-between;margin-bottom:16px}
+  .counter{font-variant-numeric:tabular-nums;background:var(--ink);color:#fff;border-radius:999px;padding:8px 12px;font-weight:750;font-size:13px;white-space:nowrap}
+  .instruction{border-left:4px solid var(--accent);padding:10px 14px;background:#fff7f0;border-radius:0 12px 12px 0;color:#5a4037;margin:12px 0 18px}
+  .cards{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
+  .value-card{border:1px solid var(--line);border-radius:15px;background:var(--card);padding:13px;cursor:pointer;min-height:105px;transition:.15s ease;box-shadow:0 2px 8px rgba(16,38,56,.025);text-align:left;color:var(--ink)}
+  .value-card:hover{transform:translateY(-1px);border-color:#9aa9b3}
+  .value-card.selected{background:#153d5a;color:#fff;border-color:#153d5a;box-shadow:0 8px 18px rgba(21,61,90,.18)}
+  .value-card.disabled{opacity:.42;cursor:not-allowed;transform:none}
+  .value-card .en{font-weight:800;font-size:14px}.value-card .zh{font-size:13px;margin-top:2px}.value-card .desc{font-size:11px;color:#73808a;margin-top:8px;line-height:1.35}.value-card.selected .desc{color:#cad8e1}
+  .actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:18px;align-items:center}
+  .btn{border:0;border-radius:12px;padding:10px 15px;font-weight:750;cursor:pointer;background:var(--blue);color:#fff}
+  .btn:hover{filter:brightness(1.06)}.btn:disabled{opacity:.35;cursor:not-allowed;filter:none}
+  .btn.secondary{background:#e7edf1;color:#17364c}.btn.ghost{background:transparent;border:1px solid var(--line);color:#304550}.btn.danger{background:#803f31}
+  .status{font-size:13px;color:var(--muted)}
+  .rank-list{display:grid;gap:10px;margin-top:14px}
+  .rank-item{display:grid;grid-template-columns:42px 1fr auto;gap:12px;align-items:center;padding:13px 14px;border:1px solid var(--line);background:var(--card);border-radius:14px}
+  .rank-num{width:34px;height:34px;border-radius:50%;background:var(--ink);color:#fff;display:grid;place-items:center;font-weight:850}
+  .rank-main b{display:block}.rank-main small{color:var(--muted)}
+  .rank-controls{display:flex;gap:6px}.iconbtn{border:1px solid var(--line);background:#fff;border-radius:9px;padding:6px 9px;cursor:pointer}.iconbtn:disabled{opacity:.3}
+  .reflection{display:grid;gap:12px;margin-top:16px}.reflection-card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px}
+  .reflection-card h4{margin:0 0 11px}.form-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}.field label{display:block;font-size:11px;font-weight:750;color:#60717e;margin-bottom:5px}.field input,.field textarea{width:100%;border:1px solid #cfd5d8;background:#fff;border-radius:10px;padding:10px;color:var(--ink)}.field textarea{min-height:78px;resize:vertical}
+  .meta-grid{display:grid;grid-template-columns:1fr 2fr;gap:10px;margin-top:14px}
+  .result-box{margin-top:16px;background:#102f48;color:#fff;border-radius:18px;padding:18px}.result-box h3{margin:0 0 10px}.result-top5{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}.result-v{border:1px solid rgba(255,255,255,.18);border-radius:12px;padding:11px;background:rgba(255,255,255,.06)}.result-v b{font-size:13px}.result-v small{display:block;color:#bed0db;margin-top:4px}
+  .history{margin-top:16px;overflow:auto}.history table{width:100%;border-collapse:collapse;font-size:13px;background:#fff}.history th,.history td{padding:10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}.history th{background:#edf2f5;color:#425564}
+  .compare{margin-top:14px;padding:15px;border:1px solid #bfd8cf;background:#eef7f3;border-radius:14px;color:#275447}
+  .source-list{display:grid;gap:9px;margin-top:15px}.source{padding:13px 14px;border:1px solid var(--line);background:var(--card);border-radius:13px;font-size:13px}.source b{display:block}.source span{color:var(--muted)}
+  .fine{font-size:12px;color:var(--muted);margin-top:12px}
+  .hidden{display:none!important}
+  .toast{position:fixed;right:18px;bottom:18px;background:#0d2d43;color:white;border-radius:12px;padding:11px 14px;box-shadow:var(--shadow);opacity:0;transform:translateY(8px);pointer-events:none;transition:.2s}.toast.show{opacity:1;transform:translateY(0)}
+  @media(max-width:960px){.cards{grid-template-columns:repeat(3,1fr)}.research-grid{grid-template-columns:1fr}.form-grid{grid-template-columns:1fr}.result-top5{grid-template-columns:1fr 1fr}.funnel{grid-template-columns:1fr 1fr}}
+  @media(max-width:620px){.wrap{padding:14px 12px 50px}.hero,.section{border-radius:19px;padding:20px}.cards{grid-template-columns:1fr 1fr}.meta-grid{grid-template-columns:1fr}.workspace-head{display:block}.counter{display:inline-block;margin-top:10px}.rank-item{grid-template-columns:38px 1fr}.rank-controls{grid-column:2}.result-top5{grid-template-columns:1fr}.funnel{grid-template-columns:1fr 1fr}.node .n{font-size:28px}}
+  @media print{body{background:white}.actions,.toast,#practice .cards{display:none!important}.hero,.section{box-shadow:none}.wrap{max-width:none}.hero{background:#fff;color:#111;border:1px solid #bbb}.lead,.node span{color:#555}.funnel .node{border-color:#bbb;background:#fff}.badge{color:#111;border-color:#bbb;background:#fff}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hero">
+    <div class="eyebrow">VALUES MAPPING</div>
+    <h1>50张价值观卡牌 → Top 5</h1>
+    <p class="lead">50 → 25 → 10 → 5</p>
+  </header>
+
+  <section class="section" id="practice">
+    <div class="workspace-head">
+      <div>
+        <h2>实操区</h2>
+        <p class="top" id="phaseTitle">Step 1｜初筛：50 → 25</p>
+      </div>
+      <div class="counter" id="counter">已选 0 / 25</div>
+    </div>
+    <div class="instruction" id="instruction">问题：<strong>这个词现在会不会让我有明显的“是，这对我重要”反应？</strong> 不用深入思考。</div>
+    <div class="cards" id="cards"></div>
+    <div id="ranking" class="hidden"></div>
+    <div id="reflection" class="hidden"></div>
+    <div class="actions" id="actions"></div>
+  </section>
+
+  <section class="section" id="historySection">
+    <h2>归档与复测</h2>
+    <div class="compare hidden" id="compareBox"></div>
+    <div class="history" id="history"></div>
+    <div class="actions">
+      <button class="btn ghost" id="exportAllBtn">导出全部历史 JSON</button>
+      <button class="btn ghost" id="clearHistoryBtn">清空本机历史</button>
+    </div>
+    <div class="fine">记录仅保存在当前浏览器。</div>
+  </section>
+
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const VALUES = [
+  {en:'Family',zh:'家庭',desc:'把家人关系、照顾与共同生活放在重要位置'},
+  {en:'Friendship',zh:'友情',desc:'维持真诚、可靠、彼此支持的朋友关系'},
+  {en:'Love',zh:'爱',desc:'给予并接受深厚的亲密、关怀与情感连接'},
+  {en:'Belonging',zh:'归属',desc:'感到被接纳，并与重要的人群真正连结'},
+  {en:'Compassion',zh:'慈悲 / 关怀',desc:'理解他人的痛苦，并愿意给予支持'},
+  {en:'Service',zh:'服务',desc:'主动帮助他人，解决真实需要'},
+  {en:'Generosity',zh:'慷慨',desc:'愿意分享时间、资源、机会与善意'},
+  {en:'Trust',zh:'信任',desc:'建立可以坦诚、托付并相互依赖的关系'},
+  {en:'Loyalty',zh:'忠诚',desc:'对重要的人、关系或承诺保持坚定'},
+  {en:'Respect',zh:'尊重',desc:'认真对待自己与他人的边界、尊严和选择'},
+  {en:'Integrity',zh:'正直',desc:'即使有代价，也让行为符合自己的原则'},
+  {en:'Authenticity',zh:'真实',desc:'不靠迎合维持形象，按真实自我表达和行动'},
+  {en:'Responsibility',zh:'责任',desc:'对承诺、选择、影响与后果负责'},
+  {en:'Justice',zh:'公正',desc:'重视权利、机会与规则层面的公平对待'},
+  {en:'Humility',zh:'谦逊',desc:'不过度抬高自己，愿意承认局限并向他人学习'},
+  {en:'Gratitude',zh:'感恩',desc:'持续看见并珍惜已经拥有的人与事'},
+  {en:'Forgiveness',zh:'宽恕',desc:'愿意放下长期怨恨，为关系或自己腾出空间'},
+  {en:'Courage',zh:'勇气',desc:'面对风险、冲突或不确定仍选择行动'},
+  {en:'Discipline',zh:'自律',desc:'为了长期重要的事持续执行必要行动'},
+  {en:'Patience',zh:'耐心',desc:'允许成长和结果需要时间，不被即时回报牵引'},
+  {en:'Freedom',zh:'自由',desc:'拥有选择生活方向、表达与行动方式的空间'},
+  {en:'Curiosity',zh:'好奇',desc:'主动提问、探索未知并理解不同观点'},
+  {en:'Learning',zh:'学习',desc:'持续获得新的知识、技能与理解'},
+  {en:'Growth',zh:'成长',desc:'不断拓展自己的能力、成熟度与可能性'},
+  {en:'Creativity',zh:'创造',desc:'产生原创想法，并把新的可能变成现实'},
+  {en:'Adventure',zh:'冒险',desc:'主动接触新鲜、未知、刺激或有挑战的体验'},
+  {en:'Nature',zh:'自然',desc:'珍视与自然环境、生命和生态世界的连接'},
+  {en:'Achievement',zh:'成就',desc:'完成有挑战的目标，并取得清晰可见的成果'},
+  {en:'Excellence',zh:'卓越',desc:'追求高标准和高质量，而非只求完成'},
+  {en:'Mastery',zh:'精通',desc:'在重要领域形成深度能力与专业水准'},
+  {en:'Ambition',zh:'进取 / 雄心',desc:'主动争取更大的目标、舞台和发展空间'},
+  {en:'Leadership',zh:'领导',desc:'承担方向与责任，组织并带动他人前进'},
+  {en:'Influence',zh:'影响力',desc:'能够改变他人的理解、选择或行动'},
+  {en:'Recognition',zh:'认可',desc:'希望重要的贡献与能力被看见和肯定'},
+  {en:'Money',zh:'财富 / 金钱',desc:'拥有充足的经济资源、购买力与财务选择权'},
+  {en:'Security',zh:'安全',desc:'拥有稳定、受保护、可预期的生活基础'},
+  {en:'Health',zh:'健康',desc:'维护身体、睡眠、精力与长期生命状态'},
+  {en:'Balance',zh:'平衡',desc:'让工作、关系、休息与个人空间保持可持续节奏'},
+  {en:'Inner Peace',zh:'内在平静',desc:'保持稳定、清醒、少内耗的内在状态'},
+  {en:'Happiness',zh:'幸福',desc:'追求整体上的满足、愉悦与生活满意感'},
+  {en:'Fun',zh:'乐趣',desc:'让玩乐、轻松和即时的享受成为生活的一部分'},
+  {en:'Beauty',zh:'美',desc:'欣赏或创造审美、和谐、设计与美感'},
+  {en:'Faith',zh:'信仰',desc:'相信并遵循超越即时利益的信念或宗教信仰'},
+  {en:'Purpose',zh:'意义 / 使命',desc:'让人生有值得投入的方向、理由与意义'},
+  {en:'Wisdom',zh:'智慧',desc:'追求成熟判断、洞察与对复杂性的理解'},
+  {en:'Tradition',zh:'传统',desc:'珍视文化、家庭或仪式中值得延续的部分'},
+  {en:'Order',zh:'秩序',desc:'偏好清晰、结构、规则和井然有序'},
+  {en:'Simplicity',zh:'简约',desc:'减少不必要的复杂、占有与干扰'},
+  {en:'Hope',zh:'希望',desc:'相信未来存在改善的可能，并愿意继续投入'},
+  {en:'Legacy',zh:'传承',desc:'希望留下能在自己之后继续产生作用的影响'}
+];
+
+const app = {
+  phase:1,
+  s1:new Set(), s2:new Set(), s3:new Set(), ranking:[],
+  savedCurrent:null, draftNotes:{}, draftDate:'', draftLifeStage:''
+};
+
+const $ = s => document.querySelector(s);
+const cardsEl = $('#cards'), counterEl=$('#counter'), titleEl=$('#phaseTitle'), instEl=$('#instruction'), actionsEl=$('#actions');
+const rankEl=$('#ranking'), reflEl=$('#reflection'), toastEl=$('#toast');
+
+function toast(msg){ toastEl.textContent=msg; toastEl.classList.add('show'); setTimeout(()=>toastEl.classList.remove('show'),1500); }
+function target(){ return app.phase===1?25:app.phase===2?10:app.phase===3?5:5; }
+function sourceValues(){
+  if(app.phase===1) return VALUES;
+  const set = app.phase===2?app.s1:app.s2;
+  return VALUES.filter(v=>set.has(v.en));
+}
+function selectedSet(){ return app.phase===1?app.s1:app.phase===2?app.s2:app.s3; }
+
+function renderCards(){
+  rankEl.classList.add('hidden'); reflEl.classList.add('hidden'); cardsEl.classList.remove('hidden');
+  const src=sourceValues(), sel=selectedSet(), max=target();
+  cardsEl.innerHTML='';
+  src.forEach(v=>{
+    const b=document.createElement('button'); b.type='button'; b.className='value-card'+(sel.has(v.en)?' selected':'')+(sel.size>=max&&!sel.has(v.en)?' disabled':'');
+    b.innerHTML=`<div class="en">${v.en}</div><div class="zh">${v.zh}</div><div class="desc">${v.desc}</div>`;
+    b.addEventListener('click',()=>{
+      if(sel.has(v.en)) sel.delete(v.en); else if(sel.size<max) sel.add(v.en); else return toast(`本轮只能保留 ${max} 张`);
+      if(app.phase===1){app.s2.clear();app.s3.clear();app.ranking=[];}
+      if(app.phase===2){app.s3.clear();app.ranking=[];}
+      render();
+    });
+    cardsEl.appendChild(b);
+  });
+}
+
+function renderActions(){
+  actionsEl.innerHTML='';
+  if(app.phase<=3){
+    if(app.phase>1){ const back=btn('返回上一步','secondary',()=>{ app.phase--; render(); }); actionsEl.appendChild(back); }
+    const sel=selectedSet(); const n=target();
+    const next=btn(app.phase===3?'进入 Top 5 排序':'进入下一轮','',()=>{ app.phase++; if(app.phase===4) app.ranking=VALUES.filter(v=>app.s3.has(v.en)).map(v=>v.en); render(); });
+    next.disabled=sel.size!==n; actionsEl.appendChild(next);
+    const reset=btn('清空本轮','ghost',()=>{sel.clear();render();}); actionsEl.appendChild(reset);
+    const s=document.createElement('span'); s.className='status'; s.textContent=sel.size===n?'已达到本轮目标，可以继续。':`还需选择 ${n-sel.size} 张。`; actionsEl.appendChild(s);
+  } else if(app.phase===4){
+    actionsEl.appendChild(btn('返回 Top 5 选择','secondary',()=>{app.phase=3;render();}));
+    actionsEl.appendChild(btn('确认排序，进入反思','',()=>{app.phase=5;render();}));
+  } else if(app.phase===5){
+    actionsEl.appendChild(btn('返回排序','secondary',()=>{captureDraft();app.phase=4;render();}));
+    actionsEl.appendChild(btn('保存本次 Mapping','',saveSession));
+    actionsEl.appendChild(btn('下载本次 JSON','ghost',exportCurrent));
+    actionsEl.appendChild(btn('复制 Markdown 摘要','ghost',copySummary));
+    actionsEl.appendChild(btn('重新开始','danger',resetAll));
+  }
+}
+function btn(label,kind,fn){const b=document.createElement('button');b.type='button';b.className='btn '+(kind||'');b.textContent=label;b.addEventListener('click',fn);return b;}
+
+function renderRanking(){
+  cardsEl.classList.add('hidden'); reflEl.classList.add('hidden'); rankEl.classList.remove('hidden');
+  rankEl.innerHTML='<div class="instruction">排序规则：<strong>不允许并列。</strong>如果只能保留其中一个，你会留下谁？用上下箭头完成强制排序。</div><div class="rank-list" id="rankList"></div>';
+  const list=rankEl.querySelector('#rankList');
+  app.ranking.forEach((en,i)=>{
+    const v=VALUES.find(x=>x.en===en); const row=document.createElement('div'); row.className='rank-item';
+    row.innerHTML=`<div class="rank-num">${i+1}</div><div class="rank-main"><b>${v.en} · ${v.zh}</b><small>${v.desc}</small></div><div class="rank-controls"><button class="iconbtn up" ${i===0?'disabled':''}>↑</button><button class="iconbtn down" ${i===app.ranking.length-1?'disabled':''}>↓</button></div>`;
+    row.querySelector('.up').addEventListener('click',()=>moveRank(i,-1)); row.querySelector('.down').addEventListener('click',()=>moveRank(i,1)); list.appendChild(row);
+  });
+}
+function moveRank(i,d){const j=i+d;if(j<0||j>=app.ranking.length)return;[app.ranking[i],app.ranking[j]]=[app.ranking[j],app.ranking[i]];render();}
+
+function captureDraft(){
+  document.querySelectorAll('[data-note]').forEach(el=>app.draftNotes[el.dataset.note]=el.value);
+  if($('#recordDate')) app.draftDate=$('#recordDate').value;
+  if($('#lifeStage')) app.draftLifeStage=$('#lifeStage').value;
+}
+function renderReflection(){
+  cardsEl.classList.add('hidden'); rankEl.classList.add('hidden'); reflEl.classList.remove('hidden');
+  const old={...app.draftNotes}; document.querySelectorAll('[data-note]').forEach(el=>old[el.dataset.note]=el.value);
+  reflEl.innerHTML=`<div class="instruction"><strong>把价值观变成行为。</strong>对每个 Top 5 写三项：为什么重要、最近一次行为证据、未来 30 天一个可观察承诺。</div>
+    <div class="meta-grid"><div class="field"><label>记录日期</label><input id="recordDate" type="date"></div><div class="field"><label>现阶段 / 人生情境（可选）</label><input id="lifeStage" placeholder="例如：刚换工作 / 新婚 / 创业第2年 / 研究生阶段"></div></div>
+    <div class="reflection" id="reflectionCards"></div><div class="result-box"><h3>你的当前 Top 5</h3><div class="result-top5">${app.ranking.map((en,i)=>{const v=VALUES.find(x=>x.en===en);return `<div class="result-v"><b>#${i+1} ${v.en}</b><small>${v.zh}</small></div>`}).join('')}</div></div>`;
+  const rc=$('#reflectionCards');
+  app.ranking.forEach((en,i)=>{const v=VALUES.find(x=>x.en===en);const box=document.createElement('div');box.className='reflection-card';box.innerHTML=`<h4>#${i+1} ${v.en} · ${v.zh}</h4><div class="form-grid"><div class="field"><label>为什么现在重要？</label><textarea data-note="${en}|why" placeholder="用你自己的定义写，不要写标准答案"></textarea></div><div class="field"><label>最近一次行为证据</label><textarea data-note="${en}|evidence" placeholder="最近30天，哪件事说明你真的重视它？"></textarea></div><div class="field"><label>未来30天承诺</label><textarea data-note="${en}|commitment" placeholder="一个可观察、可完成的行动"></textarea></div></div>`;rc.appendChild(box);});
+  $('#recordDate').value=app.draftDate||(app.savedCurrent&&app.savedCurrent.date)||new Date().toISOString().slice(0,10);
+  $('#lifeStage').value=app.draftLifeStage||(app.savedCurrent&&app.savedCurrent.lifeStage)||'';
+  document.querySelectorAll('[data-note]').forEach(el=>{if(old[el.dataset.note]!=null)el.value=old[el.dataset.note]; else if(app.savedCurrent?.notes?.[el.dataset.note])el.value=app.savedCurrent.notes[el.dataset.note];});
+}
+
+function render(){
+  if(app.phase===1){titleEl.textContent='Step 1｜初筛：50 → 25';instEl.innerHTML='问题：<strong>这个词现在会不会让我有明显的“是，这对我重要”反应？</strong> 不用深入思考。';}
+  if(app.phase===2){titleEl.textContent='Step 2｜复筛：25 → 10';instEl.innerHTML='取舍：<strong>如果只能保留其中一部分，哪些是“没有它就不像我”的？</strong> 选满 10 张。';}
+  if(app.phase===3){titleEl.textContent='Step 3A｜决赛圈：10 → 5';instEl.innerHTML='从 10 张里只留 5 张。<strong>选你真实愿意付出代价去维护的。</strong>';}
+  if(app.phase===4){titleEl.textContent='Step 3B｜Top 5 强制排序';instEl.innerHTML='';}
+  if(app.phase===5){titleEl.textContent='Step 4｜定义、证据与承诺';instEl.innerHTML='';}
+  counterEl.textContent=app.phase<=3?`已选 ${selectedSet().size} / ${target()}`:app.phase===4?'Top 5 排序中':'Top 5 已形成';
+  if(app.phase<=3) renderCards(); else if(app.phase===4) renderRanking(); else renderReflection();
+  renderActions(); renderHistory();
+}
+
+function collectCurrent(){
+  const notes={}; document.querySelectorAll('[data-note]').forEach(el=>notes[el.dataset.note]=el.value.trim());
+  return {id:'vm_'+Date.now(),createdAt:new Date().toISOString(),date:$('#recordDate')?.value||new Date().toISOString().slice(0,10),lifeStage:$('#lifeStage')?.value.trim()||'',method:'50-25-10-5 Values Mapping',top5:[...app.ranking],notes};
+}
+function getHistory(){try{return JSON.parse(localStorage.getItem('valuesMappingSessions')||'[]')}catch(e){return []}}
+function setHistory(x){localStorage.setItem('valuesMappingSessions',JSON.stringify(x));}
+function saveSession(){
+  captureDraft(); const s=collectCurrent(), h=getHistory(); h.push(s); setHistory(h); app.savedCurrent=s; toast('已保存在本机浏览器'); renderHistory();
+}
+function resetAll(){app.phase=1;app.s1.clear();app.s2.clear();app.s3.clear();app.ranking=[];app.savedCurrent=null;app.draftNotes={};app.draftDate='';app.draftLifeStage='';render();window.scrollTo({top:document.querySelector('#practice').offsetTop-12,behavior:'smooth'});}
+function download(obj,name){const blob=new Blob([JSON.stringify(obj,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},0)}
+function exportCurrent(){captureDraft();const s=collectCurrent();download(s,`values-mapping-${s.date}.json`);}
+function summaryText(s){return `# Values Mapping — ${s.date}\n${s.lifeStage?`情境：${s.lifeStage}\n`:''}\n${s.top5.map((en,i)=>{const v=VALUES.find(x=>x.en===en);return `${i+1}. ${v.en} / ${v.zh}\n   - Why: ${s.notes[en+'|why']||''}\n   - Evidence: ${s.notes[en+'|evidence']||''}\n   - 30-day commitment: ${s.notes[en+'|commitment']||''}`}).join('\n')}`}
+async function copySummary(){captureDraft();const s=collectCurrent();try{await navigator.clipboard.writeText(summaryText(s));toast('Markdown 摘要已复制');}catch(e){toast('浏览器未允许剪贴板权限');}}
+
+function compareSessions(a,b){
+  if(!a||!b)return''; const A=new Set(a.top5),B=new Set(b.top5),common=b.top5.filter(x=>A.has(x)),added=b.top5.filter(x=>!A.has(x)),dropped=a.top5.filter(x=>!B.has(x));
+  const moves=common.map(x=>{const d=(a.top5.indexOf(x)+1)-(b.top5.indexOf(x)+1);return d===0?`${x} 不变`:d>0?`${x} ↑${d}`:`${x} ↓${Math.abs(d)}`});
+  return `<strong>与上一份记录相比：</strong> Top 5 成员重合 ${common.length}/5。${added.length?`新增：${added.join('、')}。`:''}${dropped.length?`退出：${dropped.join('、')}。`:''}<br>顺序变化：${moves.join('；')||'无可比成员'}。`;
+}
+function renderHistory(){
+  const h=getHistory(), box=$('#history'), cb=$('#compareBox');
+  if(!h.length){box.innerHTML='<p class="fine">还没有本机历史记录。完成本次 Top 5 后点击“保存本次 Mapping”。</p>';cb.classList.add('hidden');return;}
+  const rows=[...h].reverse().map(s=>`<tr><td>${s.date}</td><td>${s.lifeStage||'—'}</td><td>${s.top5.map((x,i)=>`${i+1}.${x}`).join(' · ')}</td></tr>`).join('');
+  box.innerHTML=`<table><thead><tr><th>日期</th><th>人生情境</th><th>Top 5（有序）</th></tr></thead><tbody>${rows}</tbody></table>`;
+  if(h.length>=2){cb.innerHTML=compareSessions(h[h.length-2],h[h.length-1]);cb.classList.remove('hidden');}else cb.classList.add('hidden');
+}
+$('#exportAllBtn').addEventListener('click',()=>{const h=getHistory();if(!h.length)return toast('暂无历史可导出');download(h,'values-mapping-history.json');});
+$('#clearHistoryBtn').addEventListener('click',()=>{if(confirm('仅清空此浏览器中的 Values Mapping 历史。确定？')){localStorage.removeItem('valuesMappingSessions');renderHistory();toast('本机历史已清空');}});
+
+render();
+</script>
+</body>
+</html>
