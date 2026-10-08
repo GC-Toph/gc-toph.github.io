@@ -19,6 +19,8 @@
     @media(max-width:650px){.topbar{padding:18px 18px 10px}.top-meta .offline-label{display:none}.brand{font-size:16px;gap:9px}.brand-icon{width:32px;height:32px}.container{padding:14px 16px 34px}.setup-grid{grid-template-columns:1fr;gap:26px;padding-top:8px}.hero{padding-top:12px}.hero h1{font-size:41px;margin:14px 0 15px}.hero h1 br{display:none}.hero p{font-size:13px}.hero-stats{gap:26px;margin-top:20px}.hero-stats strong{font-size:24px}.table-illustration{display:none}.setup-card{padding:22px}.name-grid{max-height:250px}details.rules{padding:16px}.rule-columns{grid-template-columns:1fr!important;gap:0!important}.round-heading{align-items:flex-start;margin-bottom:18px}.round-heading h1{font-size:25px}.round-heading .round-total{font-size:14px}.round-heading p{font-size:11px}.round-heading .heading-actions{justify-content:flex-end;max-width:145px;gap:6px}.heading-actions .btn{padding:7px 9px;font-size:11px}.steps{gap:5px;margin-bottom:20px}.step{font-size:10px;gap:5px;align-items:flex-start}.step .step-number{width:18px;height:18px;font-size:9px;flex-shrink:0}.project-head{align-items:flex-start}.project-head h2{font-size:17px}.project-head .small{font-size:10px;max-width:150px;text-align:right}.project-grid{gap:10px}.project-tile{padding:16px}.tile-value{font-size:23px}.tile-value.interval{font-size:17px}.tile-label{font-size:11px}.tile-note{font-size:10px}.raw-interval{font-size:10px}.prep-grid{grid-template-columns:1fr;gap:12px;margin-top:16px}.alliance-selects{grid-template-columns:1fr 20px 1fr;gap:6px}.alliance-selects span{display:block}.prep-card{padding:19px}.prep-bottom{flex-direction:column;align-items:stretch;padding:18px}.prep-bottom .btn{width:100%}.section-row{margin-top:23px;align-items:flex-start}.section-row h2{font-size:20px}.section-row .muted{font-size:11px;text-align:right;max-width:160px}.players-grid{grid-template-columns:1fr 1fr;gap:11px}.player-card{padding:16px 13px}.player-head{gap:5px;flex-wrap:wrap;margin-bottom:13px}.player-head .avatar{width:26px;height:26px;font-size:10px;border-radius:8px}.player-identity{gap:7px}.player-name{font-size:12px}.ally-name{font-size:10px}.player-wealth{font-size:23px}.player-ratios{gap:4px;font-size:10px;margin-top:14px}.player-ratios strong{font-size:15px}.investment-label{font-size:10px;gap:4px;flex-wrap:wrap}.amount-input-wrap input{font-size:16px;padding:9px 8px 9px 26px}.amount-input-wrap span{left:10px;top:9px}.presets{gap:3px}.preset{padding:4px 1px;font-size:9px}.funding-bar{padding:16px;grid-template-columns:1fr;gap:12px;bottom:6px;border-radius:16px}.funding-title strong{font-size:20px}.funding-bar .btn{width:100%;padding:12px}.funding-note{font-size:10px}.result-banner{padding:20px;flex-direction:column;align-items:flex-start;gap:14px}.result-banner h2{font-size:26px}.result-value{text-align:left}.result-value strong{font-size:26px}.finish-heading{align-items:flex-start;flex-direction:column}.finish-heading h1{font-size:32px}.summary-grid{gap:8px}.summary-card{padding:15px 12px}.summary-card strong{font-size:21px}.summary-card span{font-size:10px}.chart-card{padding:18px 14px}.chart-heading{display:block}.chart-heading h2{font-size:21px}th,td{padding:12px}.dialog-inner{padding:18px}.history-row{font-size:11px}.history-row .muted{display:none}.copyright{font-size:10px}}
     @media(max-width:365px){.players-grid{grid-template-columns:1fr}.project-grid{grid-template-columns:1fr}.project-tile.cost{grid-column:auto}.hero h1{font-size:35px}.summary-grid{grid-template-columns:1fr}.summary-card{display:flex;align-items:center;justify-content:space-between;gap:15px}.name-grid{grid-template-columns:1fr}}
     @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}@media print{.topbar,.heading-actions,.finish-actions,.legend,.copyright,.rules,.event-details,.next-row{display:none!important}body{background:white}.container{max-width:none;padding:0}.card{box-shadow:none;break-inside:avoid}.chart-scroll svg{min-width:0}.table-wrap{overflow:visible}table{font-size:10px}th,td{padding:8px}.chart-card{break-before:page}}
+
+    .steps{grid-template-columns:repeat(4,minmax(0,1fr))}.focus-panel{padding:clamp(20px,4vw,38px);max-width:900px;margin:0 auto;display:grid;gap:17px}.focus-panel>h2{font-size:clamp(23px,3vw,32px)}.focus-panel>.muted{font-size:13px}.focus-footer{border-top:1px solid var(--line);padding-top:20px;display:flex;align-items:center;justify-content:space-between;gap:20px;margin-top:12px}.focus-footer>span{max-width:450px}.focus-panel .project-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.focus-panel .project-tile{padding:16px}.focus-panel .tile-value{font-size:20px}.animation-ledger{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px}.ledger-person{border:1px solid var(--line);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:6px;position:relative;overflow:hidden}.ledger-person strong{font-size:21px}.event-stage{border-radius:13px;background:#e8efe3;padding:17px;min-height:57px;font-size:14px;transition:background .2s}.risk-flash{background:#f9d8cd;animation:risk-shake 1.05s ease}.aid-flash{background:#dbf4df;animation:aid-glow 1.25s ease}.money-float{position:absolute;right:14px;top:5px;font-size:22px;font-weight:800;pointer-events:none;animation:float-up 1.55s forwards}.money-float.loss{color:#b44c32}.money-float.gain{color:#1a8754}.bank-controls{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:11px;font-size:12px}.bank-controls label{display:flex;align-items:center;gap:7px;cursor:pointer}.bank-controls input{accent-color:var(--green)}.draw-panel{text-align:center;padding:64px 20px;min-height:380px;display:grid;justify-items:center;gap:12px;align-content:center}.draw-panel>strong{font-size:55px}.draw-orbit{height:80px;width:120px;position:relative;font-size:37px;animation:orbit-spin 2s linear infinite}.draw-orbit span{position:absolute;left:43px;top:18px}.draw-orbit span:nth-child(2){transform:translate(40px,14px);opacity:.6}.draw-orbit span:nth-child(3){transform:translate(-36px,9px);opacity:.7}.draw-success{background:#dff4e6;animation:celebrate .7s ease}.draw-failure{background:#f9e2de;animation:risk-shake .5s ease}.result-symbol{font-size:82px;line-height:1;color:var(--green);animation:pop-in .6s ease}.draw-failure .result-symbol{color:var(--orange)}@keyframes float-up{0%{opacity:0;transform:translateY(18px) scale(.8)}22%{opacity:1}100%{opacity:0;transform:translateY(-43px) scale(1.1)}}@keyframes risk-shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-5px)}40%,80%{transform:translateX(5px)}}@keyframes aid-glow{50%{box-shadow:0 0 0 8px #a1dcb84d}}@keyframes orbit-spin{to{transform:rotate(360deg)}}@keyframes celebrate{50%{box-shadow:0 0 0 16px #74b68b33}}@keyframes pop-in{0%{transform:scale(.2);opacity:0}70%{transform:scale(1.25)}100%{transform:scale(1);opacity:1}}@media(max-width:650px){.steps{gap:2px}.step{font-size:9px;flex-direction:column;gap:3px}.focus-footer{flex-direction:column;align-items:stretch}.focus-footer .btn{width:100%}.focus-panel .project-grid{grid-template-columns:1fr}.focus-panel .project-tile.cost{grid-column:auto;display:block}.focus-panel .project-tile.cost .tile-value{text-align:left}.animation-ledger{grid-template-columns:repeat(2,minmax(0,1fr))}.ledger-person strong{font-size:17px}}@media(prefers-reduced-motion:reduce){.money-float,.draw-orbit,.draw-success,.draw-failure,.result-symbol,.risk-flash,.aid-flash{animation:none!important}}
   </style>
 </head>
 <body>
@@ -59,6 +61,7 @@
     const living = g => g.players.filter(p => !p.bankrupt);
     const totalWealth = g => sum(g.players.map(p => p.wealth));
     const totalDraft = g => sum(g.players.map(p => p.bankrupt ? 0n : g.drafts[p.id] || 0n));
+    const totalFunding = g => totalDraft(g) + (g.bankDraft || 0n);
     function generateProject(total, round, rng = random) {
       const ratio = uniform(.05,.5,rng);
       const cost = max(1n, rounded(total * fixed(ratio), SCALE));
@@ -93,13 +96,14 @@
       g.phase = 'preparation';
       g.project = generateProject(totalWealth(g),g.round,rng);
       g.drafts = Object.fromEntries(g.players.map(p => [p.id,0n]));
+      g.bankDraft = 0n;
       g.roundState = {opening:g.players.map(p => p.wealth),events:[]};
       g.lastNotice = '';
     }
     function createGame(names, rounds, rng = random) {
       if (!Array.isArray(names) || names.length < 1) throw new Error('至少需要一名玩家');
-      if (!Number.isInteger(rounds) || rounds < 10 || rounds > 20) throw new Error('轮数须为 10–20');
-      const g = {version:1,round:1,rounds,phase:'preparation',records:[],endReason:'',lastNotice:'',
+      if (!Number.isSafeInteger(rounds) || rounds < 10) throw new Error('轮数至少为 10');
+      const g = {version:3,round:1,rounds,phase:'preparation',records:[],endReason:'',lastNotice:'',
         players:names.map((name,i) => ({id:i+1,name:String(name).trim().slice(0,30) || `玩家 ${i+1}`,
           wealth:1000n,allyId:null,bankrupt:false,bankruptRound:null,history:[1000n],
           stats:Object.fromEntries(STAT_KEYS.map(k => [k,0n]))})),drafts:{},project:null,roundState:null};
@@ -173,11 +177,18 @@
       if (!p || p.bankrupt || typeof amount !== 'bigint') return;
       g.drafts[id] = max(0n,min(amount,p.wealth));
     }
+    function setBankDraft(g, amount) {
+      if (g.phase !== 'investment') throw new Error('目前不能申请银行融资');
+      if (typeof amount !== 'bigint' || amount < 0n) throw new Error('银行融资额无效');
+      const gap = max(0n,g.project.cost-totalDraft(g));
+      g.bankDraft = min(amount,gap);
+    }
     function settleRound(g,start,rng = random) {
       if (g.phase !== 'investment') throw new Error('本轮已经结算或尚未准备');
-      if (start && totalDraft(g) < g.project.cost) throw new Error('筹资不足');
+      if (start && totalFunding(g) < g.project.cost) throw new Error('筹资不足');
       const contributions = g.players.map(p => start && !p.bankrupt ? g.drafts[p.id] || 0n : 0n);
-      const raised = sum(contributions);
+      const bankContribution = start ? g.bankDraft : 0n;
+      const raised = sum(contributions) + bankContribution;
       let probability = null, status = 'skipped', value = 0n;
       if (start) {
         for (let i=0;i<g.players.length;i++) g.players[i].wealth -= contributions[i];
@@ -186,7 +197,9 @@
         status = rng() < probability ? 'success' : 'failure';
         if (status === 'success') value = sampleValue(g.project,rng);
       }
-      const proceeds = allocate(value,contributions);
+      const allProceeds = allocate(value,[...contributions,bankContribution]);
+      const proceeds = allProceeds.slice(0,-1);
+      const bankProceeds = allProceeds.at(-1);
       const interest = [];
       for (let i=0;i<g.players.length;i++) {
         const p = g.players[i];
@@ -197,7 +210,7 @@
         interest.push(earned);
       }
       for (const p of g.players) bankrupt(g,p,'项目结算');
-      const record = {round:g.round,project:{...g.project},status,probability,value,raised,
+      const record = {round:g.round,project:{...g.project},status,probability,value,raised,bankContribution,bankProceeds,
         contributions,proceeds,interest,opening:[...g.roundState.opening],
         closing:g.players.map(p => p.wealth),events:[...g.roundState.events]};
       g.records.push(record);
@@ -216,8 +229,8 @@
     function validState(g) {
       try {
         const money = v => typeof v === 'bigint' && v >= 0n;
-        if (!g || g.version !== 1 || !['preparation','investment','result','finished'].includes(g.phase)) return false;
-        if (!Number.isInteger(g.rounds) || g.rounds < 10 || g.rounds > 20 || !Number.isInteger(g.round) || g.round < 1 || g.round > g.rounds) return false;
+        if (!g || g.version !== 3 || !['preparation','investment','result','finished'].includes(g.phase)) return false;
+        if (!Number.isSafeInteger(g.rounds) || g.rounds < 10 || !Number.isInteger(g.round) || g.round < 1 || g.round > g.rounds) return false;
         if (!Array.isArray(g.players) || !g.players.length || !Array.isArray(g.records) || g.records.length > g.rounds) return false;
         const pids = new Set();
         for (const p of g.players) {
@@ -229,13 +242,13 @@
         }
         for (const p of g.players) if (p.allyId !== null && (p.bankrupt || player(g,p.allyId)?.allyId !== p.id)) return false;
         const validProject = p => p && money(p.cost) && p.cost > 0n && money(p.vlo) && money(p.vhi) && p.vlo <= p.vhi && Number.isFinite(p.slo) && Number.isFinite(p.shi) && p.slo >= 0 && p.slo <= p.shi && p.shi <= 1 && typeof p.name === 'string';
-        if (!validProject(g.project) || !g.drafts || !g.roundState || !Array.isArray(g.roundState.events) || !Array.isArray(g.roundState.opening)) return false;
+        if (!validProject(g.project) || !money(g.bankDraft) || !g.drafts || !g.roundState || !Array.isArray(g.roundState.events) || !Array.isArray(g.roundState.opening)) return false;
         if (g.roundState.opening.length !== g.players.length || g.roundState.opening.some(x=>!money(x))) return false;
         if (g.players.some(p => !money(g.drafts[p.id]) || (g.phase === 'investment' && g.drafts[p.id] > p.wealth))) return false;
         for (const [i,r] of g.records.entries()) {
           if (r.round !== i+1 || !validProject(r.project) || !['success','failure','skipped'].includes(r.status) || !money(r.value) || !money(r.raised) || !Array.isArray(r.events)) return false;
           if (['contributions','proceeds','interest','opening','closing'].some(k=>!Array.isArray(r[k]) || r[k].length !== g.players.length || r[k].some(x=>!money(x)))) return false;
-          if (sum(r.proceeds) !== r.value || sum(r.contributions) !== r.raised) return false;
+          if (!money(r.bankContribution) || !money(r.bankProceeds) || sum(r.proceeds)+r.bankProceeds !== r.value || sum(r.contributions)+r.bankContribution !== r.raised) return false;
           if (r.probability !== null && (!Number.isFinite(r.probability) || r.probability < .01 || r.probability > .99)) return false;
           if (g.players.some((p,j)=>p.history[i+1] !== r.closing[j])) return false;
         }
@@ -244,7 +257,7 @@
         return true;
       } catch { return false; }
     }
-    return Object.freeze({createGame,generateProject,sampleValue,allocate,formAlliance,prepareRound,setDraft,settleRound,advanceRound,totalDraft,totalWealth,living,validState,sum,random});
+    return Object.freeze({createGame,generateProject,sampleValue,allocate,formAlliance,prepareRound,setDraft,setBankDraft,settleRound,advanceRound,totalDraft,totalFunding,totalWealth,living,validState,sum,random});
   })();
   </script>
 
@@ -252,11 +265,14 @@
   'use strict';
   const $ = s => document.querySelector(s);
   const app = $('#app');
-  const STORAGE_KEY = 'funding-monopoly.v1';
+  const STORAGE_KEY = 'funding-monopoly.final.v1';
   const COLORS = ['#28664d','#ba5438','#436f9b','#967124','#785393','#377e83','#a64f78','#586876'];
   let game = null, savedGame = null, saveTimer = null, toastTimer = null, storageFailed = false;
   let setupNames = ['玩家 1','玩家 2','玩家 3','玩家 4'];
   let hiddenPlayers = new Set();
+  let screen = 'alliance', animating = false, sequenceToken = 0, bankEnabled = false, expenseOpening = null;
+  const sleep = ms => new Promise(resolve=>setTimeout(resolve,ms));
+  const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const esc = text => String(text).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const color = id => COLORS[id-1] || `hsl(${((id-1)*137.508)%360},42%,39%)`;
   const money = value => value.toString().replace(/\B(?=(\d{3})+(?!\d))/g,',');
@@ -299,59 +315,77 @@
     const node = $('#toast'); node.textContent = text; node.hidden = false;
     clearTimeout(toastTimer); toastTimer = setTimeout(()=>node.hidden = true,3000);
   }
-  function rules() {
-    return `<details class="rules"><summary>游戏规则与结算约定</summary><div class="rule-columns">
-      <div class="rule-item"><strong>起点与轮数。</strong>每人初始资金 1,000 元，游戏进行 10–20 轮。线下讨论、各自认购；同一设备由大家共同操作。已破产玩家退出后续回合，轨迹继续保留。</div>
-      <div class="rule-item"><strong>每轮顺序。</strong>查看新项目 → 联盟操作 → 日常开销 → 外部风险 → 协商认购 → 项目结算 → 未投资剩余现金获得 2% 利息。利息不包含当轮项目分配款。</div>
-      <div class="rule-item"><strong>项目资金。</strong>在本轮开始、扣费之前，从 5%–50% 均匀抽取比例，乘所有玩家当时的总财富，确定最低融资额。本轮内该金额固定。允许超募；超募不提高项目总价值。</div>
-      <div class="rule-item"><strong>概率区间。</strong>每轮先分别从 [0.3, 0.6]、[0.5, 0.95] 均匀抽数，排序得到 [slo, shi]。区间代表正态分布的 ±3σ：μ=(slo+shi)/2，σ=(shi−slo)/6。正式投资后才抽取真实成功概率，并限制在 [0.01, 0.99]，再抽取成功或失败。</div>
-      <div class="rule-item"><strong>成功总价值。</strong>收益率端点分别从 [0.2, 1.2]、[0.8, 6] 均匀抽取，排序后加 1，再乘最低融资额得到 [vlo, vhi]。同样按 ±3σ 解释；成功后抽取实际总价值，低于 0 取 0。分配款包含本金，按照实际总投入的股权占比分配。失败时投入全部损失。</div>
-      <div class="rule-item"><strong>日常开销与外部风险。</strong>独立玩家每轮支付 50 元，联盟成员各支付 40 元。日常费用按该阶段开始时的联盟状态同时计算，阶段内解散不追补费用。每位存续玩家独立抽取 10% 的疾病风险与 5% 的灾害风险，两者可同时发生；先疾病扣 200 元，再灾害扣当时财富的 10%。</div>
-      <div class="rule-item"><strong>联盟。</strong>每人最多一名盟友。任意一轮开始时可结盟，费用每人 50 元，即刻扣除；双方需有足够资金支付。无法主动解除，直至一方破产。解散后存续方恢复独立状态，可在后续轮次开始时与其他玩家结盟。</div>
-      <div class="rule-item"><strong>自动救助。</strong>每类外部风险先同时扣款，再判定破产，随后存续盟友同时转账救助。救助额=min(受害者实际损失的 50%，救助者扣除本次风险后总财富的 3%)，从救助者账户转入受害者账户。日常开销、联盟费用与项目亏损不触发救助。</div>
-      <div class="rule-item"><strong>整数与破产。</strong>金额以整数元记账，使用 BigInt。项目金额及抽样价值四舍五入；百分比扣款、救助和利息向下取整。项目分配采用最大余数法，余数相同时按玩家编号分配，确保分配总额准确。扣款最多扣至 0，归零立即破产、联盟立即解除，后续救助不复活玩家。认购款在项目结算前仍视为在投资产，全仓认购不立即判破产。</div>
-      <div class="rule-item"><strong>跳过与结束。</strong>筹资不足时可继续修改，也可放弃；放弃不扣认购款，已经发生的费用与风险保留，未投资现金仍计息，随后直接进入下一轮。全员破产时提前结束。单轮复合收益率按实际完成轮数折算。0 元没有对数值，图中放入独立的破产区。</div>
-    </div><p class="footnote">无需联网、无需账户。进度在允许本地保存的浏览器中自动保存；请使用同一浏览器、同一 HTML 文件恢复。游戏仅供娱乐。</p></details>`;
+  const defaultNamePool = ['玩家 1','玩家 2','玩家 3','玩家 4'];
+  function uniqueNames(raw) {
+    const seen = new Set();
+    const pool = raw.map(v=>String(v||'').trim().slice(0,30)).filter(Boolean);
+    const bases = pool.length ? pool : defaultNamePool;
+    return raw.map((value,i)=>{
+      const base = String(value||'').trim().slice(0,30) || bases[i % bases.length];
+      let chosen = base;
+      while(seen.has(chosen)) {
+        const suffix = '-' + (Math.floor(GameEngine.random()*900000)+100000);
+        chosen = base.slice(0,30-suffix.length)+suffix;
+      }
+      seen.add(chosen);
+      return chosen;
+    });
+  }
+  function expandedNames(existing,count) {
+    const pool = existing.map(v=>String(v||'').trim()).filter(Boolean);
+    const bases = pool.length?pool:defaultNamePool;
+    return uniqueNames(Array.from({length:count},(_,i)=>existing[i] || (i<bases.length?bases[i]:bases[i%bases.length])));
   }
   function nameFields(count) {
     return Array.from({length:count},(_,i)=>`<label class="name-field" style="--player-color:${color(i+1)}"><span class="avatar" aria-hidden="true">${String(i+1).padStart(2,'0')}</span><input type="text" maxlength="30" class="setup-name" data-index="${i}" aria-label="玩家 ${i+1} 的名字" value="${esc(setupNames[i] || `玩家 ${i+1}`)}"></label>`).join('');
   }
   function renderSetup() {
     const count = setupNames.length;
-    app.innerHTML = `<section class="setup-grid"><div class="hero"><span class="hero-tag">围坐一桌，自由协商</span><h1>每一轮，都是<br>新的可能。</h1><p>认购项目、结成联盟，迎接突如其来的小插曲。<br>和朋友一起，把 1,000 元的起点玩出不同的结局。</p><div class="hero-stats"><div><strong>1,000<span> 元</span></strong><span>每人的初始资金</span></div><div><strong>10–20<span> 轮</span></strong><span>一局的冒险长度</span></div><div><strong>1–N<span> 人</span></strong><span>单人或多人同桌</span></div></div><div class="table-illustration" aria-hidden="true"><div class="illustration-card"><span>项目 / PROJECT</span><strong>投一票</strong><span>未知的下一轮</span></div><div class="illustration-card"><span>联盟 / ALLIANCE</span><strong>搭个伴</strong><span>共同分担日常</span></div><div class="illustration-card"><span>财富 / FORTUNE</span><strong>看结果</strong><span>记录每次起落</span></div></div></div>
-      <form id="setup-form" class="card setup-card"><div class="eyebrow">NEW GAME</div><h2 style="margin-top:8px">设置这一桌</h2><p class="subtitle">名字可以自定义，所有玩家使用同一屏幕操作。</p><div class="setup-fields"><label><span class="field-label">游戏轮数</span><select id="round-count">${Array.from({length:11},(_,i)=>`<option value="${i+10}" ${i+10===15?'selected':''}>${i+10} 轮</option>`).join('')}</select></label><label><span class="field-label">玩家人数</span><input id="player-count" type="number" min="1" step="1" value="${count}" required></label></div><div style="margin-top:22px" class="field-label">玩家名单</div><div id="name-fields" class="name-grid">${nameFields(count)}</div><button class="btn primary full" type="submit">开局 · 每人 1,000 元 <span aria-hidden="true">→</span></button><div id="setup-error" class="error" role="alert"></div>
-      ${savedGame ? `<div class="saved-resume"><div><strong>${savedGame.phase==='finished' ? '上一局战绩' : '有一局还没结束'}</strong><div class="muted">${savedGame.players.length} 人 · ${savedGame.phase==='finished'?`完成 ${savedGame.records.length} 轮`:`第 ${savedGame.round} / ${savedGame.rounds} 轮`}</div></div><button class="btn secondary small-btn" type="button" data-action="resume">${savedGame.phase==='finished'?'查看结果':'继续游戏'}</button></div>` : ''}</form></section>${rules()}<p class="copyright">好玩的不只是结果，还有一桌人的讨论。</p>`;
+    app.innerHTML = `<section class="setup-grid"><div class="hero"><span class="hero-tag">围坐一桌，自由协商</span><h1>每一轮，都是<br>新的可能。</h1><p>认购项目、结成联盟，迎接突如其来的小插曲。<br>和朋友一起，把 1,000 元的起点玩出不同的结局。</p><div class="hero-stats"><div><strong>1,000<span> 元</span></strong><span>每人的初始资金</span></div><div><strong>10+<span> 轮</span></strong><span>轮数无上限</span></div><div><strong>1–N<span> 人</span></strong><span>单人或多人同桌</span></div></div><div class="table-illustration" aria-hidden="true"><div class="illustration-card"><span>项目 / PROJECT</span><strong>投一票</strong><span>未知的下一轮</span></div><div class="illustration-card"><span>联盟 / ALLIANCE</span><strong>搭个伴</strong><span>共同分担日常</span></div><div class="illustration-card"><span>财富 / FORTUNE</span><strong>看结果</strong><span>记录每次起落</span></div></div></div>
+      <form id="setup-form" class="card setup-card"><div class="eyebrow">NEW GAME</div><h2 style="margin-top:8px">设置这一桌</h2><p class="subtitle">名字可以自定义，所有玩家使用同一屏幕操作。</p><div class="setup-fields"><label><span class="field-label">游戏轮数</span><input id="round-count" type="number" min="10" step="1" value="15" required aria-label="游戏轮数"></label><label><span class="field-label">玩家人数</span><input id="player-count" type="number" min="1" step="1" value="${count}" required></label></div><div style="margin-top:22px" class="field-label">玩家名单</div><div id="name-fields" class="name-grid">${nameFields(count)}</div><button class="btn primary full" type="submit">开局 · 每人 1,000 元 <span aria-hidden="true">→</span></button><div id="setup-error" class="error" role="alert"></div>
+      ${savedGame ? `<div class="saved-resume"><div><strong>${savedGame.phase==='finished' ? '上一局战绩' : '有一局还没结束'}</strong><div class="muted">${savedGame.players.length} 人 · ${savedGame.phase==='finished'?`完成 ${savedGame.records.length} 轮`:`第 ${savedGame.round} / ${savedGame.rounds} 轮`}</div></div><button class="btn secondary small-btn" type="button" data-action="resume">${savedGame.phase==='finished'?'查看结果':'继续游戏'}</button></div>` : ''}</form></section><p class="copyright">好玩的不只是结果，还有一桌人的讨论。</p>`;
     $('#save-status').innerHTML = '<span class="status-dot"></span>无需联网';
   }
   function phaseSteps() {
-    const active = game.phase === 'preparation' ? 0 : game.phase === 'investment' ? 2 : 3;
-    return `<div class="steps" aria-label="本轮流程">${['查看项目与联盟','日常开销与风险','协商认购','本轮结算'].map((s,i)=>`<div class="step ${i===active?'current':i<active?'done':''}" ${i===active?'aria-current="step"':''}><span class="step-number">${i<active?'✓':i+1}</span><span>${s}</span></div>`).join('')}</div>`;
+    const steps=['是否联盟','日常开销与风险','项目与协商认购','本轮结算'];
+    const current=game.phase==='result'?3:screen==='alliance'?0:screen==='expenses'?1:screen==='investment'?2:3;
+    return `<nav class="steps" aria-label="本轮流程">${steps.map((label,i)=>`<div class="step ${i===current?'current':i<current?'done':''}"><span class="step-number">${i<current?'✓':i+1}</span><span>${label}</span></div>`).join('')}</nav>`;
   }
   function projectInfo(project = game.project) {
-    const raised = game.phase==='result' ? game.records.at(-1).raised : GameEngine.totalDraft(game);
+    const raised = game.phase==='result' ? game.records.at(-1).raised : GameEngine.totalFunding(game);
     return `<div class="project-head"><h2>${esc(project.name)} <span class="pill gray" style="margin-left:7px">本轮项目</span></h2><span class="small">区间公开 · 结果在投资后抽取</span></div><section class="project-grid" aria-label="项目信息"><div class="card project-tile cost"><div class="tile-label">最低融资额</div><div class="tile-value mono">${yuan(project.cost)}</div><div class="tile-note">允许超募 · 金额在本轮固定</div></div><div class="card project-tile"><div class="tile-label">成功概率区间</div><div class="tile-value interval mono">${probabilityText(project.slo)} – ${probabilityText(project.shi)}</div><div class="raw-interval">[${project.slo.toFixed(4)}, ${project.shi.toFixed(4)}]</div><div class="tile-note">正态分布的 ±3σ 区间</div></div><div class="card project-tile"><div class="tile-label">成功后的总价值区间 · 含本金</div><div class="tile-value interval mono">${yuan(project.vlo)} – ${yuan(project.vhi)}</div><div class="tile-note">正态分布的 ±3σ 区间<br>总价值按股权分配，超募不增加总价值。</div></div></section><div class="project-funding-inline"><span>${game.phase==='result'?'本轮实际融资':'所有玩家总认购'} <strong id="project-funded" class="mono">${yuan(raised)}</strong></span><span id="project-funding-label">${game.phase==='preparation'?'处理开销与风险后开放认购':game.phase==='result'?'本轮已结算':''}</span></div>`;
   }
   function preparation() {
-    const candidates = game.players.filter(p=>!p.bankrupt && p.allyId===null && p.wealth>=50n);
-    const options = chosen => candidates.map(p=>`<option value="${p.id}" ${p.id===chosen?'selected':''}>${esc(p.name)} · ${yuan(p.wealth)}</option>`).join('');
-    const pairs = game.players.filter(p=>p.allyId!==null && p.id<p.allyId);
-    const alliancePanel = game.players.length===1 ? `<p>单人游戏没有联盟。准备好后，处理本轮开销与风险。</p>` : `<p>双方各支付 50 元。联盟持续至一方破产，双方仍各自决策。</p>${candidates.length>=2 ? `<div class="alliance-selects"><select id="ally-a" aria-label="联盟的第一位玩家">${options(candidates[0].id)}</select><span aria-hidden="true">＋</span><select id="ally-b" aria-label="联盟的第二位玩家">${options(candidates[1].id)}</select></div><button type="button" class="btn secondary full" data-action="alliance">建立联盟 · 共 100 元</button>` : `<p class="phase-note">目前没有两名满足条件的未结盟玩家。</p>`}<div class="alliance-list">${pairs.map(p=>`<span class="pill">${esc(p.name)} × ${esc(nameOf(p.allyId))}</span>`).join('')}</div>`;
-    return `<section class="prep-grid"><div class="card prep-card"><h3>这一轮，找个盟友？</h3>${alliancePanel}</div><div class="card prep-card"><h3>先安排好日常</h3><p>认购前一次性处理费用与风险，之后的余额才是本轮可投资资金。</p><div class="expense-preview"><div><strong>50<span class="small"> 元 / 人</span></strong>独立玩家日常开销</div><div><strong>40<span class="small"> 元 / 人</span></strong>联盟成员日常开销</div></div><div class="small muted">疾病：10% 概率扣 200 元<br>神秘灾害：5% 概率扣当前财富的 10%</div></div></section><div class="card prep-bottom"><div><p>项目已公开，可以先讨论、再结盟。</p><div class="small">下一步扣除开销并抽取风险，本轮仅处理一次。</div></div><button class="btn primary" type="button" data-action="prepare">处理开销与风险，开始认购 <span aria-hidden="true">→</span></button></div>`;
+    const candidates=game.players.filter(p=>!p.bankrupt && p.allyId===null && p.wealth>=50n);
+    const options=chosen=>candidates.map(p=>`<option value="${p.id}" ${p.id===chosen?'selected':''}>${esc(p.name)} · ${yuan(p.wealth)}</option>`).join('');
+    const pairs=game.players.filter(p=>p.allyId!==null && p.id<p.allyId);
+    return `<div class="card focus-panel"><div class="eyebrow">01 / 是否联盟</div><h2>这一轮，要结盟吗？</h2><p class="muted">联盟双方各付 ¥50，后续每轮各省 ¥10 日常开销；发生疾病或灾害时，存续盟友会自动提供有限救助。联盟持续至一方破产。</p>
+      ${candidates.length>=2?`<div class="alliance-selects"><select id="ally-a" aria-label="第一位盟友">${options(candidates[0].id)}</select><span>＋</span><select id="ally-b" aria-label="第二位盟友">${options(candidates[1].id)}</select></div><button class="btn secondary" data-action="alliance">双方结盟 · 各付 ¥50</button>`:'<p class="phase-note">目前没有可组成新联盟的玩家。</p>'}
+      ${pairs.length?`<div class="alliance-list">${pairs.map(p=>`<span class="pill">${esc(p.name)} × ${esc(nameOf(p.allyId))}</span>`).join('')}</div>`:''}
+      <div class="focus-footer"><span class="small muted">可建立多组联盟，或直接继续；随后系统自动依次处理开销、疾病、灾害与救助。</span><button class="btn primary" data-action="finish-alliance">完成联盟安排 →</button></div></div>`;
+  }
+  function expenseStage() {
+    return `<section class="card focus-panel" aria-live="polite"><div class="eyebrow">02 / 自动结算</div><h2>日常开销与风险</h2><p class="muted">每人日常扣 ¥50，联盟成员扣 ¥40；疾病发生率 10%、损失最多 ¥200；神秘灾害发生率 5%、扣当前资金 10%。如有风险，盟友将按规则自动救助。</p><div class="animation-ledger" id="animation-ledger">${game.players.map(p=>`<div class="ledger-person" data-ledger="${p.id}"><span>${esc(p.name)}</span><strong class="mono" data-balance="${p.id}">${yuan(expenseOpening?.get(p.id) ?? p.wealth)}</strong></div>`).join('')}</div><div id="event-stage" class="event-stage">系统正在依次处理本轮事项…</div></section>`;
+  }
+  function drawingStage() {
+    return `<div class="card draw-panel"><div class="eyebrow">04 / 本轮结算</div><div class="draw-orbit" aria-hidden="true"><span>✦</span><span>✧</span><span>✦</span></div><h2>项目正在开奖</h2><p>资金已经锁定，正在揭晓项目命运…</p><strong id="draw-countdown">3</strong></div>`;
   }
   function playerCards() {
-    const investing = game.phase === 'investment', total = GameEngine.totalDraft(game);
+    const investing = game.phase === 'investment', total = GameEngine.totalFunding(game);
     return `<div class="section-row"><h2>玩家仪表盘</h2><span class="muted">${investing?'金额可随时修改 · 口头协商后共同开始':'当前财富 · 处理开销与风险后开放认购'}</span></div><section class="players-grid" aria-label="玩家仪表盘">${game.players.map(p=>{
       const amount = game.drafts[p.id] || 0n;
       const ally = p.allyId===null ? '独立玩家' : `盟友：${nameOf(p.allyId)}`;
-      return `<article class="card player-card ${p.bankrupt?'dead':''}" style="--player-color:${color(p.id)}"><div class="player-head"><div class="player-identity"><span class="avatar" aria-hidden="true">${String(p.id).padStart(2,'0')}</span><div><div class="player-name">${esc(p.name)}</div><div class="ally-name">${esc(ally)}</div></div></div>${p.bankrupt?'<span class="pill gray">已破产</span>':''}</div><div class="wealth-label">${investing?'本轮可投资资金':'当前总财富'}</div><div class="player-wealth mono">${yuan(p.wealth)}</div>${p.bankrupt ? `<p class="bankrupt-message">第 ${p.bankruptRound} 轮破产。<br>退出后续操作，财富轨迹保留。</p>` : `<div class="investment-label"><label for="amount-${p.id}">认购金额</label><span>最多 ${yuan(p.wealth)}</span></div><div class="amount-input-wrap"><span aria-hidden="true">¥</span><input id="amount-${p.id}" class="investment-input" data-player="${p.id}" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="${p.wealth.toString().length}" autocomplete="off" value="${amount}" ${investing?'':'disabled'} aria-label="${esc(p.name)}的认购金额"></div><input id="slider-${p.id}" class="position-slider" data-player="${p.id}" type="range" min="0" max="1000" step="1" value="${Number(amount*1000n/p.wealth)}" ${investing?'':'disabled'} aria-label="${esc(p.name)}的认购比例"><div class="presets">${[0,25,50,100].map(v=>`<button type="button" class="preset" data-action="preset" data-player="${p.id}" data-percent="${v}" ${investing?'':'disabled'}>${v}%</button>`).join('')}</div><div class="player-ratios"><div>仓位占比<strong id="position-${p.id}" class="mono">${fraction(amount,p.wealth)}</strong></div><div>股权占比<strong id="equity-${p.id}" class="mono">${fraction(amount,total)}</strong></div></div><div class="cash-left">未投资现金 <span id="cash-${p.id}" class="mono">${yuan(p.wealth-amount)}</span></div>`}</article>`;
+      return `<article class="card player-card ${p.bankrupt?'dead':''}" style="--player-color:${color(p.id)}"><div class="player-head"><div class="player-identity"><span class="avatar" aria-hidden="true">${String(p.id).padStart(2,'0')}</span><div><div class="player-name">${esc(p.name)}</div><div class="ally-name">${esc(ally)}</div></div></div>${p.bankrupt?'<span class="pill gray">已破产</span>':''}</div><div class="wealth-label">${investing?'本轮可投资资金':'当前总财富'}</div><div class="player-wealth mono">${yuan(p.wealth)}</div>${p.bankrupt ? `<p class="bankrupt-message">第 ${p.bankruptRound} 轮破产。<br>退出后续操作，财富轨迹保留。</p>` : `<div class="investment-label"><label for="amount-${p.id}">认购金额</label><span>最多 ${yuan(p.wealth)}</span></div><div class="amount-input-wrap"><span aria-hidden="true">¥</span><input id="amount-${p.id}" class="investment-input" data-player="${p.id}" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="${p.wealth.toString().length}" autocomplete="off" value="${amount}" ${investing?'':'disabled'} aria-label="${esc(p.name)}的认购金额"></div><input id="slider-${p.id}" class="position-slider" data-player="${p.id}" type="range" min="0" max="1000" step="1" value="${Number(p.wealth ? amount*1000n/p.wealth : 0n)}" ${investing?'':'disabled'} aria-label="${esc(p.name)}的认购比例"><div class="presets">${[0,25,50,100].map(v=>`<button type="button" class="preset" data-action="preset" data-player="${p.id}" data-percent="${v}" ${investing?'':'disabled'}>${v}%</button>`).join('')}</div><div class="player-ratios"><div>仓位占比<strong id="position-${p.id}" class="mono">${fraction(amount,p.wealth)}</strong></div><div>股权占比<strong id="equity-${p.id}" class="mono">${fraction(amount,total)}</strong></div></div><div class="cash-left">未投资现金 <span id="cash-${p.id}" class="mono">${yuan(p.wealth-amount)}</span></div>`}</article>`;
     }).join('')}</section>${investing?'<p class="phase-note">仓位＝认购金额 / 本轮可投资资金；股权＝认购金额 / 所有玩家总认购额。</p>':''}`;
   }
   function fundingBar() {
-    return `<section class="card funding-bar" aria-label="实时筹资"><div><div class="funding-title">已筹集<strong id="raised-total" class="mono">¥0</strong><span class="small"> / ${yuan(game.project.cost)}</span></div><div class="funding-progress" role="progressbar" aria-label="筹资完成比例" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="funding-progress"><div id="funding-fill"></div></div><div id="funding-state" class="funding-state" aria-live="polite"></div></div><button id="commit-button" class="btn warning" type="button" data-action="commit">放弃当前项目，进入下一轮</button><div class="funding-note">超募不影响项目收益抽样。放弃时不扣认购款；开销与风险保留，剩余现金计息后直接进入下一轮。</div></section>`;
+    return `<section class="card funding-bar" aria-label="实时筹资"><div><div class="funding-title">总融资<strong id="raised-total" class="mono">¥0</strong><span class="small"> / ${yuan(game.project.cost)}</span></div><div class="funding-progress" role="progressbar" aria-label="筹资进度" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="funding-progress"><div id="funding-fill"></div></div><div id="funding-state" class="funding-state" aria-live="polite"></div><div class="bank-controls"><label><input type="checkbox" id="bank-opt" ${bankEnabled?'checked':''}> 允许银行补足缺口</label><span id="bank-amount" class="mono"></span></div></div><button id="commit-button" class="btn primary" data-action="commit">结算本轮</button><div class="funding-note">银行仅补足玩家认购的缺口，不收手续费。银行作为外部出资人按股权占比分走项目收入，不参与玩家排行，也不享受现金利息；玩家可选择放弃项目。</div></section>`;
   }
   function updateFunding() {
     if (game.phase !== 'investment') return;
-    const total = GameEngine.totalDraft(game), cost = game.project.cost;
+    const personal = GameEngine.totalDraft(game), cost = game.project.cost;
+    GameEngine.setBankDraft(game,bankEnabled ? (cost>personal?cost-personal:0n):0n);
+    const total = GameEngine.totalFunding(game);
     for (const p of game.players.filter(p=>!p.bankrupt)) {
       const a = game.drafts[p.id] || 0n;
       $(`#position-${p.id}`).textContent = fraction(a,p.wealth);
@@ -359,15 +393,17 @@
       $(`#cash-${p.id}`).textContent = yuan(p.wealth-a);
     }
     $('#raised-total').textContent = yuan(total);
-    $('#project-funded').textContent = yuan(total);
+    const projectFunded=$('#project-funded'); if(projectFunded) projectFunded.textContent = yuan(total);
     const percent = Math.min(100,pctNumber(total,cost));
     $('#funding-fill').style.width = percent+'%';
     $('#funding-progress').setAttribute('aria-valuenow',percent.toFixed(2));
     $('#funding-progress').setAttribute('aria-valuetext',`${yuan(total)}，目标 ${yuan(cost)}`);
     $('#funding-state').textContent = total < cost ? `还差 ${yuan(cost-total)} · 可继续协商或放弃` : total === cost ? '已达到最低融资额，可以开始项目' : `已达到最低融资额 · 超募 ${yuan(total-cost)}`;
-    $('#project-funding-label').textContent = $('#funding-state').textContent;
+    const fundingLabel=$('#project-funding-label'); if(fundingLabel) fundingLabel.textContent = $('#funding-state').textContent;
+    for(const p of game.players.filter(p=>!p.bankrupt)){const equity=$(`#equity-${p.id}`);if(equity)equity.textContent=fraction(game.drafts[p.id]||0n,total);}
+    $('#bank-amount').textContent = game.bankDraft>0n?`银行出资 ${yuan(game.bankDraft)}，享有 ${fraction(game.bankDraft,total)} 股权`: '未使用银行资金';
     const button = $('#commit-button');
-    button.textContent = total >= cost ? '开始项目' : '放弃当前项目，进入下一轮';
+    button.textContent = total >= cost ? '锁定认购 · 开始开奖' : '融资不足 · 放弃本轮项目';
     button.className = 'btn '+(total>=cost?'primary':'warning');
   }
   function eventText(e) {
@@ -392,16 +428,16 @@
     const label = r.status==='success' ? '项目成功' : r.status==='failure' ? '项目失败' : '项目已放弃';
     const subtitle = r.status==='skipped' ? '认购款没有扣除，未投资现金获得利息。' : `投资后抽到的真实成功概率：${probabilityText(r.probability)}。${r.status==='failure'?'所有项目投入损失。':'总价值按认购比例分配。'}`;
     return `<section class="card result-banner ${r.status}"><div><div class="eyebrow">ROUND ${String(r.round).padStart(2,'0')} · ${esc(r.project.name)}</div><h2>${label}</h2><p>${subtitle}</p></div><div class="result-value"><span>${r.status==='skipped'?'本轮现金利息合计':'实际项目总价值 · 含本金'}</span><strong class="mono">${yuan(r.status==='skipped'?GameEngine.sum(r.interest):r.value)}</strong><span>${r.status==='skipped'?'已发生的费用与风险仍然保留':`实际融资 ${yuan(r.raised)}`}</span></div></section>
-      <div class="section-row"><h2>这一轮的账本</h2><span class="muted">未投资现金计息 2%</span></div><div class="table-wrap"><table><thead><tr><th scope="col">玩家</th><th scope="col">轮初财富</th><th scope="col">实际认购</th><th scope="col">项目分配</th><th scope="col">现金利息</th><th scope="col">轮末财富</th><th scope="col">本轮变化</th></tr></thead><tbody>${game.players.map((p,i)=>`<tr><td><div class="player-identity"><span class="avatar" style="--player-color:${color(p.id)}" aria-hidden="true">${String(p.id).padStart(2,'0')}</span><strong>${esc(p.name)}</strong>${r.closing[i]===0n?'<span class="pill gray">破产</span>':''}</div></td><td>${yuan(r.opening[i])}</td><td>${yuan(r.contributions[i])}</td><td>${yuan(r.proceeds[i])}</td><td>${yuan(r.interest[i])}</td><td><strong>${yuan(r.closing[i])}</strong></td><td class="${changeClass(r.closing[i]-r.opening[i])}">${signedYuan(r.closing[i]-r.opening[i])}</td></tr>`).join('')}</tbody></table></div>${eventsDetail(r.events,'当轮事件记录')}`;
+      <div class="section-row"><h2>这一轮的账本</h2><span class="muted">未投资现金计息 2%</span></div><div class="table-wrap"><table><thead><tr><th scope="col">玩家</th><th scope="col">轮初财富</th><th scope="col">实际认购</th><th scope="col">项目分配</th><th scope="col">现金利息</th><th scope="col">轮末财富</th><th scope="col">本轮变化</th></tr></thead><tbody>${game.players.map((p,i)=>`<tr><td><div class="player-identity"><span class="avatar" style="--player-color:${color(p.id)}" aria-hidden="true">${String(p.id).padStart(2,'0')}</span><strong>${esc(p.name)}</strong>${r.closing[i]===0n?'<span class="pill gray">破产</span>':''}</div></td><td>${yuan(r.opening[i])}</td><td>${yuan(r.contributions[i])}</td><td>${yuan(r.proceeds[i])}</td><td>${yuan(r.interest[i])}</td><td><strong>${yuan(r.closing[i])}</strong></td><td class="${changeClass(r.closing[i]-r.opening[i])}">${signedYuan(r.closing[i]-r.opening[i])}</td></tr>`).join('')}</tbody></table></div>${r.bankContribution>0n?`<p class="notice">银行出资 ${yuan(r.bankContribution)}，分得 ${yuan(r.bankProceeds)}。该款项不计入玩家财富。</p>`:''}${eventsDetail(r.events,'当轮事件记录')}`;
   }
   function renderRound() {
-    const alive = GameEngine.living(game).length;
-    app.innerHTML = `<div class="round-heading"><div><div class="eyebrow">THE TABLE IS OPEN</div><h1 style="margin-top:7px">第 ${String(game.round).padStart(2,'0')} 轮 <span class="round-total">/ ${game.rounds}</span></h1><p>${alive} / ${game.players.length} 人存续 · 当前总财富 ${yuan(GameEngine.totalWealth(game))}</p></div><div class="heading-actions"><span class="pill ${game.phase==='result'?'gray':''}">${game.phase==='preparation'?'查看项目与联盟':game.phase==='investment'?'协商认购中':'本轮已结算'}</span><button class="btn secondary small-btn" type="button" data-action="restart">新开一局</button></div></div>${phaseSteps()}
-      ${game.lastNotice?`<div class="notice" role="status">${esc(game.lastNotice)}</div>`:''}${projectInfo()}
-      ${game.phase==='preparation'?preparation():''}
-      ${game.phase==='result'?`${recordContent(game.records.at(-1))}<div class="next-row"><button class="btn primary" type="button" data-action="next">${game.round===game.rounds || alive===0?'查看最终结果':`进入第 ${game.round+1} 轮`} <span aria-hidden="true">→</span></button></div>`:`${playerCards()}${game.phase==='investment'?`${eventsDetail(game.roundState.events)}${fundingBar()}`:game.roundState.events.length?eventsDetail(game.roundState.events,'本轮已发生事件'):''}`}
-      ${historyPanel()}${rules()}<p class="copyright">大富翁 · 生存合作冒险。</p>`;
-    if (game.phase==='investment') updateFunding();
+    const alive=GameEngine.living(game).length;
+    const isResult=game.phase==='result';
+    app.innerHTML=`<div class="round-heading"><div><div class="eyebrow">THE TABLE IS OPEN</div><h1>第 ${String(game.round).padStart(2,'0')} 轮 <span class="round-total">/ ${game.rounds}</span></h1><p>${alive} / ${game.players.length} 人存续 · 玩家总财富 ${yuan(GameEngine.totalWealth(game))}</p></div><div class="heading-actions"><button class="btn secondary small-btn" data-action="restart">新开一局</button></div></div>${phaseSteps()}
+      ${isResult?`${recordContent(game.records.at(-1))}<div class="next-row"><button class="btn primary" data-action="next">${game.round===game.rounds || alive===0?'查看最终结果':`进入第 ${game.round+1} 轮`} →</button></div>`:
+      screen==='alliance'?preparation():screen==='expenses'?expenseStage():screen==='drawing'?drawingStage():`<p class="phase-note">先查看项目目标与收益区间，再直接在下方调整各玩家认购。认购不足时可选择银行补资。</p>${projectInfo()}${playerCards()}${fundingBar()}`}
+      ${!isResult && screen==='investment'?eventsDetail(game.roundState.events):''}${historyPanel()}<p class="copyright">大富翁 · 生存合作冒险。</p>`;
+    if(!isResult && screen==='investment') updateFunding();
   }
   function chartSvg() {
     const players = game.players.filter(p=>!hiddenPlayers.has(p.id));
@@ -446,7 +482,7 @@
     app.innerHTML = `<section class="finish-heading"><div><div class="eyebrow">THE FINAL SCORE</div><h1>这一桌，落下帷幕。</h1><p>${rounds} / ${game.rounds} 轮 · ${game.players.length} 位玩家 · ${esc(game.endReason)}</p></div><div class="finish-actions"><button class="btn secondary" type="button" data-action="export">导出战绩 CSV</button><button class="btn primary" type="button" data-action="restart">再开一局 <span aria-hidden="true">→</span></button></div></section><div class="summary-grid"><div class="card summary-card"><span>最终总财富</span><strong class="mono">${yuan(total)}</strong></div><div class="card summary-card"><span>相比初始总资金</span><strong class="mono ${changeClass(total-initial)}">${signedYuan(total-initial)}</strong></div><div class="card summary-card"><span>最后仍然存续</span><strong>${GameEngine.living(game).length} <span> / ${game.players.length} 人</span></strong></div></div>
       <div class="section-row"><h2>玩家最终成绩</h2><span class="muted">单轮复合收益率按实际 ${rounds} 轮折算</span></div><div class="table-wrap"><table><thead><tr><th scope="col">玩家</th><th scope="col">最终财富</th><th scope="col">总盈亏</th><th scope="col">单轮复合收益率</th><th scope="col">状态</th></tr></thead><tbody>${ranked.map((p,i)=>`<tr><td><div class="player-identity"><span class="rank">${i+1}</span><span class="avatar" style="--player-color:${color(p.id)}" aria-hidden="true">${String(p.id).padStart(2,'0')}</span><strong>${esc(p.name)}</strong></div></td><td><strong>${yuan(p.wealth)}</strong></td><td class="${changeClass(p.wealth-1000n)}">${signedYuan(p.wealth-1000n)}</td><td class="${changeClass(p.wealth-1000n)}">${growth(p.wealth,rounds)}</td><td>${p.bankrupt?`<span class="pill gray">第 ${p.bankruptRound} 轮破产</span>`:'<span class="pill">存续</span>'}</td></tr>`).join('')}</tbody></table></div>
       <section class="card chart-card"><div class="chart-heading"><div><h2>财富的起落</h2><p>纵轴为 log₁₀ 财富，横轴为轮次。点击名字切换轨迹，悬停或聚焦圆点查看金额。</p></div><span class="pill gray">保留所有玩家</span></div><div class="legend" aria-label="显示或隐藏玩家轨迹">${game.players.map(p=>`<button class="legend-button ${hiddenPlayers.has(p.id)?'off':''}" style="--player-color:${color(p.id)}" type="button" data-action="legend" data-player="${p.id}" aria-pressed="${!hiddenPlayers.has(p.id)}"><span class="legend-dot" aria-hidden="true"></span>${esc(p.name)}</button>`).join('')}</div><div id="wealth-chart" class="chart-scroll">${chartSvg()}</div><p class="footnote">0 元没有对数值：破产后的点位于单独的“0 元”区域，未用小额正数替代。</p></section>
-      <div class="section-row"><h2>累计收支</h2><span class="muted">救助为玩家之间的转账</span></div><div class="table-wrap"><table><thead><tr><th scope="col">玩家</th><th scope="col">累计认购</th><th scope="col">项目分配</th><th scope="col">利息</th><th scope="col">日常开销</th><th scope="col">联盟费用</th><th scope="col">风险损失</th><th scope="col">救助支出</th><th scope="col">收到救助</th></tr></thead><tbody>${game.players.map(p=>`<tr><td><strong>${esc(p.name)}</strong></td>${['invested','proceeds','interest','expenses','allianceFees','riskLoss','aidGiven','aidReceived'].map(k=>`<td>${yuan(p.stats[k])}</td>`).join('')}</tr>`).join('')}</tbody></table></div>${historyPanel()}${rules()}<p class="copyright">下一局，会是另一个故事。</p>`;
+      <div class="section-row"><h2>累计收支</h2><span class="muted">救助为玩家之间的转账</span></div><div class="table-wrap"><table><thead><tr><th scope="col">玩家</th><th scope="col">累计认购</th><th scope="col">项目分配</th><th scope="col">利息</th><th scope="col">日常开销</th><th scope="col">联盟费用</th><th scope="col">风险损失</th><th scope="col">救助支出</th><th scope="col">收到救助</th></tr></thead><tbody>${game.players.map(p=>`<tr><td><strong>${esc(p.name)}</strong></td>${['invested','proceeds','interest','expenses','allianceFees','riskLoss','aidGiven','aidReceived'].map(k=>`<td>${yuan(p.stats[k])}</td>`).join('')}</tr>`).join('')}</tbody></table></div>${historyPanel()}<p class="copyright">下一局，会是另一个故事。</p>`;
   }
   function render() { game.phase==='finished' ? renderFinished() : renderRound(); }
   function syncDraft(id,value,keepEmpty = false) {
@@ -461,21 +497,84 @@
   function startNewGame() {
     const count = Number($('#player-count').value), rounds = Number($('#round-count').value);
     if (!Number.isSafeInteger(count) || count < 1) { $('#setup-error').textContent='玩家人数须为正整数。'; return; }
-    if (!Number.isInteger(rounds) || rounds<10 || rounds>20) { $('#setup-error').textContent='请选择 10–20 轮。'; return; }
+    if (!Number.isSafeInteger(rounds) || rounds<10) { $('#setup-error').textContent='请填写至少 10 轮。'; return; }
     const inputs=[...document.querySelectorAll('.setup-name')];
-    const names=Array.from({length:count},(_,i)=>inputs[i]?.value.trim() || `玩家 ${i+1}`);
-    setupNames=names; game=GameEngine.createGame(names,rounds); hiddenPlayers.clear();
+    const names=uniqueNames(Array.from({length:count},(_,i)=>inputs[i]?.value.trim() || setupNames[i] || ''));
+    setupNames=names; game=GameEngine.createGame(names,rounds); hiddenPlayers.clear(); screen='alliance'; bankEnabled=false;
     saveNow(); render(); window.scrollTo({top:0,behavior:'instant'});
   }
-  function commitRound() {
-    if (game.phase!=='investment') return;
-    const start=GameEngine.totalDraft(game)>=game.project.cost;
-    const r=GameEngine.settleRound(game,start);
-    if (!start) {
-      GameEngine.advanceRound(game);
-      if (game.phase!=='finished') game.lastNotice=`第 ${r.round} 轮项目已放弃。认购未扣款，现金利息共 ${yuan(GameEngine.sum(r.interest))} 已到账；详情可在历史结算中查看。`;
+  async function runExpenseSequence() {
+    const token=++sequenceToken;
+    animating=true; screen='expenses';
+    const before=new Map(game.players.map(p=>[p.id,p.wealth]));
+    expenseOpening=new Map(before);
+    GameEngine.prepareRound(game); saveNow(); render();
+    const events=game.roundState.events.filter(e=>e.type!=='alliance');
+    const expenses=events.filter(e=>e.type==='expense');
+    const remaining=events.filter(e=>e.type!=='expense');
+    function changeBalance(id,delta) {
+      before.set(id,(before.get(id)||0n)+delta);
+      const balance=$(`[data-balance="${id}"]`);
+      if(balance) balance.textContent=yuan(before.get(id));
+      const row=$(`[data-ledger="${id}"]`);
+      if(row) {
+        const float=document.createElement('span');
+        float.className='money-float '+(delta>0n?'gain':'loss');
+        float.textContent=signedYuan(delta);
+        row.append(float);
+        float.addEventListener('animationend',()=>float.remove(),{once:true});
+      }
     }
-    saveNow(); render(); window.scrollTo({top:0,behavior:'instant'});
+    // 日常开销是同一批次：所有人同时扣款和播放金额动画。
+    if(expenses.length) {
+      const node=$('#event-stage');
+      if(node) {
+        node.textContent=`日常开销：${expenses.length} 位存续玩家同时扣款，独立玩家最多 ¥50，盟友最多 ¥40。`;
+        node.className='event-stage';
+      }
+      for(const e of expenses) changeBalance(e.id,-e.amount);
+      toast(`日常开销已同步扣除：共 ${yuan(expenses.reduce((total,e)=>total+e.amount,0n))}`);
+      await sleep(reducedMotion()?300:2300);
+    }
+    // 疾病、神秘灾害、救助和破产事件仍按原始顺序逐一展示。
+    for(const e of remaining) {
+      if(token!==sequenceToken) return;
+      const node=$('#event-stage');
+      if(!node) break;
+      const message=eventText(e);
+      node.textContent=message;
+      node.className='event-stage '+(e.type==='risk'?'risk-flash':e.type==='aid'?'aid-flash':'');
+      if(e.type==='risk') changeBalance(e.id,-e.amount);
+      else if(e.type==='aid') {
+        changeBalance(e.from,-e.amount);
+        changeBalance(e.to,e.amount);
+      }
+      toast(message);
+      await sleep(reducedMotion()?180:e.type==='risk'?2100:e.type==='aid'?1900:1200);
+    }
+    if(token!==sequenceToken) return;
+    animating=false;expenseOpening=null;
+    if(GameEngine.living(game).length===0){GameEngine.settleRound(game,false);GameEngine.advanceRound(game);screen='alliance';}
+    else screen='investment';
+    saveNow();render();window.scrollTo({top:0,behavior:'instant'});
+  }
+  async function commitRound() {
+    if(game.phase!=='investment'||animating)return;
+    const start=GameEngine.totalFunding(game)>=game.project.cost;
+    if(!start){
+      const r=GameEngine.settleRound(game,false);GameEngine.advanceRound(game);screen='alliance';bankEnabled=false;
+      if(game.phase!=='finished')game.lastNotice=`第 ${r.round} 轮已放弃，现金利息 ${yuan(GameEngine.sum(r.interest))} 已入账。`;
+      saveNow();render();toast('融资不足，项目放弃；本轮未扣认购款。');return;
+    }
+    animating=true;screen='drawing';const token=++sequenceToken;render();
+    for(let sec=3;sec>=1;sec--){const count=$('#draw-countdown');if(count)count.textContent=sec;await sleep(reducedMotion()?100:1000);if(token!==sequenceToken)return;}
+    const r=GameEngine.settleRound(game,true);saveNow();
+    const panel=$('.draw-panel');
+    if(panel){panel.classList.add(r.status==='success'?'draw-success':'draw-failure');panel.innerHTML=`<div class="result-symbol">${r.status==='success'?'✦':'×'}</div><h2>${r.status==='success'?'项目成功！':'项目失败'}</h2><p>${r.status==='success'?`总价值 ${yuan(r.value)} · 按出资比例分配`:'本轮投资本金全部损失'}</p>`;}
+    toast(r.status==='success'?'开奖成功，收益已结算':'开奖失败，投入资金已损失');
+    await sleep(reducedMotion()?150:1250);
+    if(token!==sequenceToken)return;
+    animating=false;render();window.scrollTo({top:0,behavior:'instant'});
   }
   function exportCsv() {
     const rows=[['资金大富翁战绩'],['实际完成轮数',game.records.length],['设定轮数',game.rounds],[],['玩家','最终财富','总盈亏','单轮复合收益率','破产轮次','累计认购','项目分配','利息','日常开销','联盟费用','风险损失','救助支出','收到救助']];
@@ -483,19 +582,20 @@
     for (const p of game.players) rows.push([safeName(p.name),p.wealth,p.wealth-1000n,growth(p.wealth,game.records.length),p.bankruptRound || '',...['invested','proceeds','interest','expenses','allianceFees','riskLoss','aidGiven','aidReceived'].map(k=>p.stats[k])]);
     rows.push([],['逐轮财富'],['轮次',...game.players.map(p=>safeName(p.name))]);
     for(let i=0;i<=game.records.length;i++) rows.push([i,...game.players.map(p=>p.history[i])]);
-    rows.push([],['逐轮项目'],['轮次','项目','最低融资额','概率下端点','概率上端点','价值下端点','价值上端点','结果','实际成功概率','实际融资','实际总价值']);
-    for (const r of game.records) rows.push([r.round,r.project.name,r.project.cost,r.project.slo.toFixed(6),r.project.shi.toFixed(6),r.project.vlo,r.project.vhi,statusName(r.status),r.probability===null?'':r.probability.toFixed(6),r.raised,r.value]);
+    rows.push([],['逐轮项目'],['轮次','项目','最低融资额','概率下端点','概率上端点','价值下端点','价值上端点','结果','实际成功概率','实际融资','实际总价值','银行出资','银行分配']);
+    for (const r of game.records) rows.push([r.round,r.project.name,r.project.cost,r.project.slo.toFixed(6),r.project.shi.toFixed(6),r.project.vlo,r.project.vhi,statusName(r.status),r.probability===null?'':r.probability.toFixed(6),r.raised,r.value,r.bankContribution,r.bankProceeds]);
     const csv='\ufeff'+rows.map(row=>row.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\r\n');
     const url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
     const link=document.createElement('a');link.href=url;link.download='资金大富翁_战绩.csv';document.body.append(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
   }
   document.addEventListener('submit',e=>{if(e.target.id==='setup-form'){e.preventDefault();startNewGame();}});
   document.addEventListener('change',e=>{
+    if(e.target.id==='bank-opt' && game?.phase==='investment'){bankEnabled=e.target.checked;updateFunding();queueSave();return;}
     if(e.target.id!=='player-count') return;
     const count=Number(e.target.value);
     if(!Number.isSafeInteger(count)||count<1){$('#setup-error').textContent='玩家人数须为正整数。';return;}
     setupNames=[...document.querySelectorAll('.setup-name')].map(input=>input.value);
-    setupNames=Array.from({length:count},(_,i)=>setupNames[i] || `玩家 ${i+1}`);
+    setupNames=expandedNames(setupNames,count);
     $('#name-fields').innerHTML=nameFields(count);$('#setup-error').textContent='';
   });
   document.addEventListener('input',e=>{
@@ -513,32 +613,30 @@
     const action=button.dataset.action;
     try {
       if(action==='close-dialog'){button.closest('dialog')?.close();return;}
-      if(action==='resume'){game=savedGame;hiddenPlayers.clear();render();saveNow();window.scrollTo({top:0,behavior:'instant'});return;}
+      if(action==='resume'){game=savedGame;hiddenPlayers.clear();screen=game.phase==='preparation'?'alliance':game.phase==='investment'?'investment':'result';bankEnabled=game.bankDraft>0n;render();saveNow();window.scrollTo({top:0,behavior:'instant'});return;}
       if(action==='restart'){
-        if(game.phase==='finished'){setupNames=game.players.map(p=>p.name);savedGame=game;game=null;renderSetup();window.scrollTo({top:0,behavior:'instant'});}
+        if(game.phase==='finished'){sequenceToken++;animating=false;setupNames=game.players.map(p=>p.name);savedGame=game;game=null;renderSetup();window.scrollTo({top:0,behavior:'instant'});}
         else $('#confirm-dialog').showModal();return;
       }
       if(action==='confirm-restart'){
-        $('#confirm-dialog').close();saveNow();setupNames=game.players.map(p=>p.name);game=null;renderSetup();window.scrollTo({top:0,behavior:'instant'});return;
+        $('#confirm-dialog').close();sequenceToken++;animating=false;saveNow();setupNames=game.players.map(p=>p.name);game=null;renderSetup();window.scrollTo({top:0,behavior:'instant'});return;
       }
-      if(!game)return;
+      if(!game || animating)return;
       if(action==='alliance'){
         const a=Number($('#ally-a').value),b=Number($('#ally-b').value);
         GameEngine.formAlliance(game,a,b);
         if(GameEngine.living(game).length===0){GameEngine.prepareRound(game);GameEngine.settleRound(game,false);GameEngine.advanceRound(game);}
         saveNow();render();toast('联盟费用已扣除。');
-      }else if(action==='prepare'){
+      }else if(action==='finish-alliance'){
         if(game.phase!=='preparation')return;
-        GameEngine.prepareRound(game);
-        if(GameEngine.living(game).length===0){GameEngine.settleRound(game,false);GameEngine.advanceRound(game);}
-        saveNow();render();toast(game.phase==='finished'?'所有玩家已破产，对局结束。':'开销与风险已结算，可以认购了。');
+        runExpenseSequence();
       }else if(action==='preset'){
         if(game.phase!=='investment')return;
         const id=Number(button.dataset.player),p=game.players.find(p=>p.id===id);
         syncDraft(id,p.wealth*BigInt(button.dataset.percent)/100n);
       }else if(action==='commit')commitRound();
       else if(action==='next'){
-        GameEngine.advanceRound(game);saveNow();render();window.scrollTo({top:0,behavior:'instant'});
+        GameEngine.advanceRound(game);screen='alliance';bankEnabled=false;saveNow();render();window.scrollTo({top:0,behavior:'instant'});
       }else if(action==='open-record'){
         const r=game.records.find(r=>r.round===Number(button.dataset.round));if(!r)return;
         $('#record-content').innerHTML=`<div class="dialog-top"><h2 id="record-title">第 ${r.round} 轮结算</h2><button class="dialog-close" type="button" data-action="close-dialog">关闭</button></div>${recordContent(r)}`;
