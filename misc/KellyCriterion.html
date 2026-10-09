@@ -21,6 +21,19 @@
     @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}@media print{.topbar,.heading-actions,.finish-actions,.legend,.copyright,.rules,.event-details,.next-row{display:none!important}body{background:white}.container{max-width:none;padding:0}.card{box-shadow:none;break-inside:avoid}.chart-scroll svg{min-width:0}.table-wrap{overflow:visible}table{font-size:10px}th,td{padding:8px}.chart-card{break-before:page}}
 
     .steps{grid-template-columns:repeat(4,minmax(0,1fr))}.focus-panel{padding:clamp(20px,4vw,38px);max-width:900px;margin:0 auto;display:grid;gap:17px}.focus-panel>h2{font-size:clamp(23px,3vw,32px)}.focus-panel>.muted{font-size:13px}.focus-footer{border-top:1px solid var(--line);padding-top:20px;display:flex;align-items:center;justify-content:space-between;gap:20px;margin-top:12px}.focus-footer>span{max-width:450px}.focus-panel .project-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.focus-panel .project-tile{padding:16px}.focus-panel .tile-value{font-size:20px}.animation-ledger{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px}.ledger-person{border:1px solid var(--line);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:6px;position:relative;overflow:hidden}.ledger-person strong{font-size:21px}.event-stage{border-radius:13px;background:#e8efe3;padding:17px;min-height:57px;font-size:14px;transition:background .2s}.risk-flash{background:#f9d8cd;animation:risk-shake 1.05s ease}.aid-flash{background:#dbf4df;animation:aid-glow 1.25s ease}.money-float{position:absolute;right:14px;top:5px;font-size:22px;font-weight:800;pointer-events:none;animation:float-up 1.55s forwards}.money-float.loss{color:#b44c32}.money-float.gain{color:#1a8754}.bank-controls{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:11px;font-size:12px}.bank-controls label{display:flex;align-items:center;gap:7px;cursor:pointer}.bank-controls input{accent-color:var(--green)}.draw-panel{text-align:center;padding:64px 20px;min-height:380px;display:grid;justify-items:center;gap:12px;align-content:center}.draw-panel>strong{font-size:55px}.draw-orbit{height:80px;width:120px;position:relative;font-size:37px;animation:orbit-spin 2s linear infinite}.draw-orbit span{position:absolute;left:43px;top:18px}.draw-orbit span:nth-child(2){transform:translate(40px,14px);opacity:.6}.draw-orbit span:nth-child(3){transform:translate(-36px,9px);opacity:.7}.draw-success{background:#dff4e6;animation:celebrate .7s ease}.draw-failure{background:#f9e2de;animation:risk-shake .5s ease}.result-symbol{font-size:82px;line-height:1;color:var(--green);animation:pop-in .6s ease}.draw-failure .result-symbol{color:var(--orange)}@keyframes float-up{0%{opacity:0;transform:translateY(18px) scale(.8)}22%{opacity:1}100%{opacity:0;transform:translateY(-43px) scale(1.1)}}@keyframes risk-shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-5px)}40%,80%{transform:translateX(5px)}}@keyframes aid-glow{50%{box-shadow:0 0 0 8px #a1dcb84d}}@keyframes orbit-spin{to{transform:rotate(360deg)}}@keyframes celebrate{50%{box-shadow:0 0 0 16px #74b68b33}}@keyframes pop-in{0%{transform:scale(.2);opacity:0}70%{transform:scale(1.25)}100%{transform:scale(1);opacity:1}}@media(max-width:650px){.steps{gap:2px}.step{font-size:9px;flex-direction:column;gap:3px}.focus-footer{flex-direction:column;align-items:stretch}.focus-footer .btn{width:100%}.focus-panel .project-grid{grid-template-columns:1fr}.focus-panel .project-tile.cost{grid-column:auto;display:block}.focus-panel .project-tile.cost .tile-value{text-align:left}.animation-ledger{grid-template-columns:repeat(2,minmax(0,1fr))}.ledger-person strong{font-size:17px}}@media(prefers-reduced-motion:reduce){.money-float,.draw-orbit,.draw-success,.draw-failure,.result-symbol,.risk-flash,.aid-flash{animation:none!important}}
+    .choice-buttons{display:flex;gap:7px;margin-top:15px}.choice-buttons .btn{flex:1}.work-income{margin-top:16px;padding:15px 11px;border-radius:10px;background:#e9f0e7;font-size:12px}.work-income strong{display:block;font-size:24px}.prayer-option{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:700;margin-top:13px}.prayer-option input{width:16px;height:16px;accent-color:#245b47}.funding-progress{height:13px;border-radius:9px}.funding-segments{height:100%;width:100%;display:flex;overflow:hidden}.funding-segments>div{height:100%;flex-shrink:0;transition:width .15s}.funding-legend{display:flex;flex-wrap:wrap;gap:6px 15px;margin-top:10px;font-size:11px;color:var(--muted)}.funding-legend span{display:inline-flex;align-items:center;gap:5px}.funding-legend i{display:inline-block;width:9px;height:9px;border-radius:3px}
+    /* V3: 防止旧通用规则将彩色出资容器压缩为 0 宽 */
+    #funding-progress{position:relative;height:23px;overflow:visible;border:1px solid #d4dbd1;border-radius:10px;background:#e6e9df;margin-top:17px}
+    #funding-progress #funding-segments{display:flex!important;width:100%!important;height:100%!important;min-width:100%;overflow:hidden;border-radius:9px;background:transparent}
+    #funding-progress #funding-segments .funding-slice{height:100%;min-width:0;border-right:2px solid #ffffffb3;box-sizing:border-box}
+    #funding-progress #funding-segments .funding-slice:last-child{border-right:0}
+    .funding-target-marker{position:absolute;top:-5px;bottom:-5px;width:3px;background:#172d28;transform:translateX(-50%);z-index:2;box-shadow:0 0 0 1px white;pointer-events:none}
+    .funding-target-marker::after{content:'目标';position:absolute;top:-20px;left:50%;transform:translateX(-50%);font-size:10px;color:#172d28;font-weight:800;white-space:nowrap}
+    .funding-target-marker[hidden],.funding-overfund[hidden]{display:none!important}
+    .funding-legend{margin-top:12px}.funding-legend span{background:#f1f3ed;border-radius:7px;padding:4px 7px;color:var(--ink)}
+    .funding-legend i{width:12px;height:12px}
+    .funding-overfund{margin-top:12px;padding:11px 13px;border:2px solid #cf743f;background:#fff0e4;color:#9f4021;border-radius:10px;display:grid;gap:2px}
+    .funding-overfund strong{font-size:14px}.funding-overfund span{font-size:11px}
   </style>
 </head>
 <body>
@@ -38,7 +51,7 @@
   // 金额全程使用 BigInt；Number 仅用于无量纲随机变量、比例展示和图表。
   const GameEngine = (() => {
     const SCALE = 1000000000000n;
-    const STAT_KEYS = ['invested','proceeds','interest','expenses','allianceFees','riskLoss','aidGiven','aidReceived'];
+    const STAT_KEYS = ['invested','proceeds','interest','wages','prayerFees','prayerRefunds','expenses','allianceFees','riskLoss','aidGiven','aidReceived','wages','prayerFees','prayerRefunds'];
     const PROJECT_NAMES = ['晴湾旅社','星河工坊','山野咖啡','绿洲农场','云端影院','深海探险','晨光书店','风车小镇','北岛航线','森林营地','月亮集市','麦田酿造','落日港口','火山温泉','极光研究所','花园乐园','远山列车','流星矿场','蓝鲸电台','城市新星'];
     function random() {
       if (globalThis.crypto && typeof globalThis.crypto.getRandomValues === 'function') {
@@ -61,7 +74,13 @@
     const living = g => g.players.filter(p => !p.bankrupt);
     const totalWealth = g => sum(g.players.map(p => p.wealth));
     const totalDraft = g => sum(g.players.map(p => p.bankrupt ? 0n : g.drafts[p.id] || 0n));
-    const totalFunding = g => totalDraft(g) + (g.bankDraft || 0n);
+    const bankGap = g => max(0n,g.project.cost-totalDraft(g));
+    const totalFunding = g => totalDraft(g) + bankGap(g);
+    const workerCount = g => g.players.filter(p=>!p.bankrupt && g.working?.[p.id]).length;
+    function minimumWage(g,p) {
+      const workers = BigInt(workerCount(g));
+      return 60n + 100n/(1n+workers) + 20000n/(200n+p.wealth) + totalWealth(g)/800n;
+    }
     function generateProject(total, round, rng = random) {
       const ratio = uniform(.05,.5,rng);
       const cost = max(1n, rounded(total * fixed(ratio), SCALE));
@@ -97,13 +116,15 @@
       g.project = generateProject(totalWealth(g),g.round,rng);
       g.drafts = Object.fromEntries(g.players.map(p => [p.id,0n]));
       g.bankDraft = 0n;
+      g.working = Object.fromEntries(g.players.map(p=>[p.id,false]));
+      g.prayers = Object.fromEntries(g.players.map(p=>[p.id,false]));
       g.roundState = {opening:g.players.map(p => p.wealth),events:[]};
       g.lastNotice = '';
     }
     function createGame(names, rounds, rng = random) {
       if (!Array.isArray(names) || names.length < 1) throw new Error('至少需要一名玩家');
       if (!Number.isSafeInteger(rounds) || rounds < 10) throw new Error('轮数至少为 10');
-      const g = {version:3,round:1,rounds,phase:'preparation',records:[],endReason:'',lastNotice:'',
+      const g = {version:4,round:1,rounds,phase:'preparation',records:[],endReason:'',lastNotice:'',
         players:names.map((name,i) => ({id:i+1,name:String(name).trim().slice(0,30) || `玩家 ${i+1}`,
           wealth:1000n,allyId:null,bankrupt:false,bankruptRound:null,history:[1000n],
           stats:Object.fromEntries(STAT_KEYS.map(k => [k,0n]))})),drafts:{},project:null,roundState:null};
@@ -174,28 +195,53 @@
     function setDraft(g,id,amount) {
       if (g.phase !== 'investment') throw new Error('目前不能修改认购');
       const p = player(g,id);
-      if (!p || p.bankrupt || typeof amount !== 'bigint') return;
-      g.drafts[id] = max(0n,min(amount,p.wealth));
+      if (!p || p.bankrupt || typeof amount !== 'bigint' || g.working[id]) return;
+      g.drafts[id] = max(0n,min(amount,p.wealth-(g.prayers[id]?20n:0n)));
+      if (g.drafts[id] === 0n) g.prayers[id] = false;
+      g.bankDraft = bankGap(g);
     }
-    function setBankDraft(g, amount) {
-      if (g.phase !== 'investment') throw new Error('目前不能申请银行融资');
-      if (typeof amount !== 'bigint' || amount < 0n) throw new Error('银行融资额无效');
-      const gap = max(0n,g.project.cost-totalDraft(g));
-      g.bankDraft = min(amount,gap);
+    function setWorking(g,id,yes) {
+      if(g.phase !== 'investment') throw new Error('目前无法切换打工');
+      const p=player(g,id);
+      if(!p || p.bankrupt) return;
+      g.working[id]=Boolean(yes);
+      if(yes){g.drafts[id]=0n;g.prayers[id]=false;}
+      g.bankDraft=bankGap(g);
+    }
+    function setPrayer(g,id,yes) {
+      if(g.phase !== 'investment') throw new Error('目前无法切换祈福');
+      const p=player(g,id);
+      if(!p || p.bankrupt || g.working[id]) return;
+      if(yes && (g.drafts[id]===0n || p.wealth<20n)) throw new Error('祈福需要投资且额外预留 20 元');
+      if(yes) g.drafts[id]=min(g.drafts[id],p.wealth-20n);
+      g.prayers[id]=Boolean(yes);
+      g.bankDraft=bankGap(g);
     }
     function settleRound(g,start,rng = random) {
       if (g.phase !== 'investment') throw new Error('本轮已经结算或尚未准备');
       if (start && totalFunding(g) < g.project.cost) throw new Error('筹资不足');
       const contributions = g.players.map(p => start && !p.bankrupt ? g.drafts[p.id] || 0n : 0n);
-      const bankContribution = start ? g.bankDraft : 0n;
+      const bankContribution = start ? bankGap(g) : 0n;
       const raised = sum(contributions) + bankContribution;
       let probability = null, status = 'skipped', value = 0n;
+      const prayers = g.players.map(p=>start && !p.bankrupt && !!g.prayers[p.id] && contributions[g.players.indexOf(p)]>0n);
+      // 每个打工玩家分别、独立采样一次标准正态随机变量，不共用本轮抽样值。
+      const workerDraws = g.players.map(p => {
+        if (!start || p.bankrupt || !g.working[p.id]) return null;
+        const y = normal(rng);
+        const x = y*y + y*y*y*y/4;
+        return {y, x, bonus:BigInt(Math.floor(x))};
+      });
+      const wages = g.players.map((p,i)=>workerDraws[i] ? minimumWage(g,p)+workerDraws[i].bonus : 0n);
+      const prayerFees = prayers.map(yes=>yes?20n:0n);
+      const refunds = contributions.map((v,i)=>0n);
       if (start) {
-        for (let i=0;i<g.players.length;i++) g.players[i].wealth -= contributions[i];
+        for (let i=0;i<g.players.length;i++) g.players[i].wealth -= contributions[i]+prayerFees[i];
         const {slo,shi} = g.project;
         probability = Math.min(.99,Math.max(.01,(slo+shi)/2 + (shi-slo)/6 * normal(rng)));
         status = rng() < probability ? 'success' : 'failure';
         if (status === 'success') value = sampleValue(g.project,rng);
+        else contributions.forEach((v,i)=>{if(prayers[i])refunds[i]=v/10n;});
       }
       const allProceeds = allocate(value,[...contributions,bankContribution]);
       const proceeds = allProceeds.slice(0,-1);
@@ -205,13 +251,14 @@
         const p = g.players[i];
         // 仅未投资的剩余现金计息；当轮项目分配款不计入 2% 的计息本金。
         const earned = p.wealth*2n/100n;
-        p.wealth += proceeds[i] + earned;
+        p.wealth += proceeds[i] + earned + wages[i] + refunds[i];
         p.stats.invested += contributions[i]; p.stats.proceeds += proceeds[i]; p.stats.interest += earned;
+        p.stats.wages += wages[i]; p.stats.prayerFees += prayerFees[i]; p.stats.prayerRefunds += refunds[i];
         interest.push(earned);
       }
       for (const p of g.players) bankrupt(g,p,'项目结算');
       const record = {round:g.round,project:{...g.project},status,probability,value,raised,bankContribution,bankProceeds,
-        contributions,proceeds,interest,opening:[...g.roundState.opening],
+        contributions,proceeds,interest,wages,workerDraws,prayers,prayerFees,refunds,working:g.players.map(p=>!!g.working[p.id]),opening:[...g.roundState.opening],
         closing:g.players.map(p => p.wealth),events:[...g.roundState.events]};
       g.records.push(record);
       for (const p of g.players) p.history.push(p.wealth);
@@ -229,7 +276,7 @@
     function validState(g) {
       try {
         const money = v => typeof v === 'bigint' && v >= 0n;
-        if (!g || g.version !== 3 || !['preparation','investment','result','finished'].includes(g.phase)) return false;
+        if (!g || g.version !== 4 || !['preparation','investment','result','finished'].includes(g.phase)) return false;
         if (!Number.isSafeInteger(g.rounds) || g.rounds < 10 || !Number.isInteger(g.round) || g.round < 1 || g.round > g.rounds) return false;
         if (!Array.isArray(g.players) || !g.players.length || !Array.isArray(g.records) || g.records.length > g.rounds) return false;
         const pids = new Set();
@@ -242,13 +289,13 @@
         }
         for (const p of g.players) if (p.allyId !== null && (p.bankrupt || player(g,p.allyId)?.allyId !== p.id)) return false;
         const validProject = p => p && money(p.cost) && p.cost > 0n && money(p.vlo) && money(p.vhi) && p.vlo <= p.vhi && Number.isFinite(p.slo) && Number.isFinite(p.shi) && p.slo >= 0 && p.slo <= p.shi && p.shi <= 1 && typeof p.name === 'string';
-        if (!validProject(g.project) || !money(g.bankDraft) || !g.drafts || !g.roundState || !Array.isArray(g.roundState.events) || !Array.isArray(g.roundState.opening)) return false;
+        if (!validProject(g.project) || !money(g.bankDraft) || !g.working || !g.prayers || !g.drafts || !g.roundState || !Array.isArray(g.roundState.events) || !Array.isArray(g.roundState.opening)) return false;
         if (g.roundState.opening.length !== g.players.length || g.roundState.opening.some(x=>!money(x))) return false;
-        if (g.players.some(p => !money(g.drafts[p.id]) || (g.phase === 'investment' && g.drafts[p.id] > p.wealth))) return false;
+        if (g.players.some(p => !money(g.drafts[p.id]) || typeof g.working[p.id]!=='boolean' || typeof g.prayers[p.id]!=='boolean' || (g.working[p.id] && (g.drafts[p.id]!==0n || g.prayers[p.id])) || (g.phase==='investment' && g.prayers[p.id] && (g.drafts[p.id]===0n || g.drafts[p.id]+20n>p.wealth)) || (g.phase === 'investment' && g.drafts[p.id] > p.wealth))) return false;
         for (const [i,r] of g.records.entries()) {
           if (r.round !== i+1 || !validProject(r.project) || !['success','failure','skipped'].includes(r.status) || !money(r.value) || !money(r.raised) || !Array.isArray(r.events)) return false;
-          if (['contributions','proceeds','interest','opening','closing'].some(k=>!Array.isArray(r[k]) || r[k].length !== g.players.length || r[k].some(x=>!money(x)))) return false;
-          if (!money(r.bankContribution) || !money(r.bankProceeds) || sum(r.proceeds)+r.bankProceeds !== r.value || sum(r.contributions)+r.bankContribution !== r.raised) return false;
+          if (['contributions','proceeds','interest','wages','prayerFees','refunds','opening','closing'].some(k=>!Array.isArray(r[k]) || r[k].length !== g.players.length || r[k].some(x=>!money(x)))) return false;
+          if (!Array.isArray(r.workerDraws) || r.workerDraws.length !== g.players.length || r.workerDraws.some(d=>d !== null && (!Number.isFinite(d.y) || !Number.isFinite(d.x) || !money(d.bonus))) || !Array.isArray(r.working) || !Array.isArray(r.prayers) || r.working.length!==g.players.length || r.prayers.length!==g.players.length || !money(r.bankContribution) || !money(r.bankProceeds) || sum(r.proceeds)+r.bankProceeds !== r.value || sum(r.contributions)+r.bankContribution !== r.raised) return false;
           if (r.probability !== null && (!Number.isFinite(r.probability) || r.probability < .01 || r.probability > .99)) return false;
           if (g.players.some((p,j)=>p.history[i+1] !== r.closing[j])) return false;
         }
@@ -257,7 +304,7 @@
         return true;
       } catch { return false; }
     }
-    return Object.freeze({createGame,generateProject,sampleValue,allocate,formAlliance,prepareRound,setDraft,setBankDraft,settleRound,advanceRound,totalDraft,totalFunding,totalWealth,living,validState,sum,random});
+    return Object.freeze({createGame,generateProject,sampleValue,allocate,formAlliance,prepareRound,setDraft,setWorking,setPrayer,minimumWage,workerCount,bankGap,settleRound,advanceRound,totalDraft,totalFunding,totalWealth,living,validState,sum,random});
   })();
   </script>
 
@@ -265,12 +312,12 @@
   'use strict';
   const $ = s => document.querySelector(s);
   const app = $('#app');
-  const STORAGE_KEY = 'funding-monopoly.final.v1';
+  const STORAGE_KEY = 'funding-monopoly.work-prayer.v3';
   const COLORS = ['#28664d','#ba5438','#436f9b','#967124','#785393','#377e83','#a64f78','#586876'];
   let game = null, savedGame = null, saveTimer = null, toastTimer = null, storageFailed = false;
   let setupNames = ['玩家 1','玩家 2','玩家 3','玩家 4'];
   let hiddenPlayers = new Set();
-  let screen = 'alliance', animating = false, sequenceToken = 0, bankEnabled = false, expenseOpening = null;
+  let screen = 'alliance', animating = false, sequenceToken = 0, expenseOpening = null;
   const sleep = ms => new Promise(resolve=>setTimeout(resolve,ms));
   const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const esc = text => String(text).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -353,7 +400,7 @@
   }
   function projectInfo(project = game.project) {
     const raised = game.phase==='result' ? game.records.at(-1).raised : GameEngine.totalFunding(game);
-    return `<div class="project-head"><h2>${esc(project.name)} <span class="pill gray" style="margin-left:7px">本轮项目</span></h2><span class="small">区间公开 · 结果在投资后抽取</span></div><section class="project-grid" aria-label="项目信息"><div class="card project-tile cost"><div class="tile-label">最低融资额</div><div class="tile-value mono">${yuan(project.cost)}</div><div class="tile-note">允许超募 · 金额在本轮固定</div></div><div class="card project-tile"><div class="tile-label">成功概率区间</div><div class="tile-value interval mono">${probabilityText(project.slo)} – ${probabilityText(project.shi)}</div><div class="raw-interval">[${project.slo.toFixed(4)}, ${project.shi.toFixed(4)}]</div><div class="tile-note">正态分布的 ±3σ 区间</div></div><div class="card project-tile"><div class="tile-label">成功后的总价值区间 · 含本金</div><div class="tile-value interval mono">${yuan(project.vlo)} – ${yuan(project.vhi)}</div><div class="tile-note">正态分布的 ±3σ 区间<br>总价值按股权分配，超募不增加总价值。</div></div></section><div class="project-funding-inline"><span>${game.phase==='result'?'本轮实际融资':'所有玩家总认购'} <strong id="project-funded" class="mono">${yuan(raised)}</strong></span><span id="project-funding-label">${game.phase==='preparation'?'处理开销与风险后开放认购':game.phase==='result'?'本轮已结算':''}</span></div>`;
+    return `<div class="project-head"><h2>${esc(project.name)} <span class="pill gray" style="margin-left:7px">本轮项目</span></h2><span class="small">区间公开 · 结果在投资后抽取</span></div><section class="project-grid" aria-label="项目信息"><div class="card project-tile cost"><div class="tile-label">最低融资额</div><div class="tile-value mono">${yuan(project.cost)}</div><div class="tile-note">允许超募 · 金额在本轮固定</div></div><div class="card project-tile"><div class="tile-label">成功概率区间</div><div class="tile-value interval mono">${probabilityText(project.slo)} – ${probabilityText(project.shi)}</div><div class="raw-interval">[${project.slo.toFixed(4)}, ${project.shi.toFixed(4)}]</div><div class="tile-note">正态分布的 ±3σ 区间</div></div><div class="card project-tile"><div class="tile-label">成功后的总价值区间 · 含本金</div><div class="tile-value interval mono">${yuan(project.vlo)} – ${yuan(project.vhi)}</div><div class="tile-note">正态分布的 ±3σ 区间<br>总价值按股权分配，超募不增加总价值。</div></div></section><div class="project-funding-inline"><span>${game.phase==='result'?'本轮实际融资':'玩家与银行总出资'} <strong id="project-funded" class="mono">${yuan(raised)}</strong></span><span id="project-funding-label">${game.phase==='preparation'?'处理开销与风险后开放认购':game.phase==='result'?'本轮已结算':''}</span></div>`;
   }
   function preparation() {
     const candidates=game.players.filter(p=>!p.bankrupt && p.allyId===null && p.wealth>=50n);
@@ -371,40 +418,48 @@
     return `<div class="card draw-panel"><div class="eyebrow">04 / 本轮结算</div><div class="draw-orbit" aria-hidden="true"><span>✦</span><span>✧</span><span>✦</span></div><h2>项目正在开奖</h2><p>资金已经锁定，正在揭晓项目命运…</p><strong id="draw-countdown">3</strong></div>`;
   }
   function playerCards() {
-    const investing = game.phase === 'investment', total = GameEngine.totalFunding(game);
-    return `<div class="section-row"><h2>玩家仪表盘</h2><span class="muted">${investing?'金额可随时修改 · 口头协商后共同开始':'当前财富 · 处理开销与风险后开放认购'}</span></div><section class="players-grid" aria-label="玩家仪表盘">${game.players.map(p=>{
-      const amount = game.drafts[p.id] || 0n;
-      const ally = p.allyId===null ? '独立玩家' : `盟友：${nameOf(p.allyId)}`;
-      return `<article class="card player-card ${p.bankrupt?'dead':''}" style="--player-color:${color(p.id)}"><div class="player-head"><div class="player-identity"><span class="avatar" aria-hidden="true">${String(p.id).padStart(2,'0')}</span><div><div class="player-name">${esc(p.name)}</div><div class="ally-name">${esc(ally)}</div></div></div>${p.bankrupt?'<span class="pill gray">已破产</span>':''}</div><div class="wealth-label">${investing?'本轮可投资资金':'当前总财富'}</div><div class="player-wealth mono">${yuan(p.wealth)}</div>${p.bankrupt ? `<p class="bankrupt-message">第 ${p.bankruptRound} 轮破产。<br>退出后续操作，财富轨迹保留。</p>` : `<div class="investment-label"><label for="amount-${p.id}">认购金额</label><span>最多 ${yuan(p.wealth)}</span></div><div class="amount-input-wrap"><span aria-hidden="true">¥</span><input id="amount-${p.id}" class="investment-input" data-player="${p.id}" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="${p.wealth.toString().length}" autocomplete="off" value="${amount}" ${investing?'':'disabled'} aria-label="${esc(p.name)}的认购金额"></div><input id="slider-${p.id}" class="position-slider" data-player="${p.id}" type="range" min="0" max="1000" step="1" value="${Number(p.wealth ? amount*1000n/p.wealth : 0n)}" ${investing?'':'disabled'} aria-label="${esc(p.name)}的认购比例"><div class="presets">${[0,25,50,100].map(v=>`<button type="button" class="preset" data-action="preset" data-player="${p.id}" data-percent="${v}" ${investing?'':'disabled'}>${v}%</button>`).join('')}</div><div class="player-ratios"><div>仓位占比<strong id="position-${p.id}" class="mono">${fraction(amount,p.wealth)}</strong></div><div>股权占比<strong id="equity-${p.id}" class="mono">${fraction(amount,total)}</strong></div></div><div class="cash-left">未投资现金 <span id="cash-${p.id}" class="mono">${yuan(p.wealth-amount)}</span></div>`}</article>`;
-    }).join('')}</section>${investing?'<p class="phase-note">仓位＝认购金额 / 本轮可投资资金；股权＝认购金额 / 所有玩家总认购额。</p>':''}`;
+    const investing=game.phase==='investment',total=GameEngine.totalFunding(game);
+    return `<div class="section-row"><h2>玩家仪表盘</h2><span class="muted">每位玩家选择投资或打工；打工不能投资</span></div><section class="players-grid">${game.players.map(p=>{
+      const amount=game.drafts[p.id]||0n, working=!!game.working[p.id],prayer=!!game.prayers[p.id];
+      const ally=p.allyId===null?'独立玩家':`盟友：${nameOf(p.allyId)}`;
+      return `<article class="card player-card ${p.bankrupt?'dead':''}" style="--player-color:${color(p.id)}"><div class="player-head"><div class="player-identity"><span class="avatar">${String(p.id).padStart(2,'0')}</span><div><div class="player-name">${esc(p.name)}</div><div class="ally-name">${esc(ally)}</div></div></div>${p.bankrupt?'<span class="pill gray">已破产</span>':''}</div><div class="wealth-label">当前财富</div><div class="player-wealth mono">${yuan(p.wealth)}</div>${p.bankrupt?`<p class="bankrupt-message">第 ${p.bankruptRound} 轮破产。</p>`:`<div class="choice-buttons"><button type="button" class="btn small-btn ${working?'secondary':'primary'}" data-action="choose-invest" data-player="${p.id}" ${investing?'':'disabled'}>投资</button><button type="button" class="btn small-btn ${working?'primary':'secondary'}" data-action="choose-work" data-player="${p.id}" ${investing?'':'disabled'}>打工</button></div>${working?`<div class="work-income">打工最低收益 <strong id="work-${p.id}">${yuan(GameEngine.minimumWage(game,p))}</strong><div class="small muted">结算另加随机收益 X；现金仍享 2% 利息</div></div>`:`<div class="investment-label"><label for="amount-${p.id}">认购金额</label><span>最多 ${yuan(p.wealth-(prayer?20n:0n))}</span></div><div class="amount-input-wrap"><span>¥</span><input id="amount-${p.id}" class="investment-input" data-player="${p.id}" type="text" inputmode="numeric" value="${amount}" ${investing?'':'disabled'}></div><input id="slider-${p.id}" class="position-slider" data-player="${p.id}" type="range" min="0" max="1000" value="${Number(p.wealth?amount*1000n/p.wealth:0n)}" ${investing?'':'disabled'}><div class="presets">${[0,25,50,100].map(v=>`<button type="button" class="preset" data-action="preset" data-player="${p.id}" data-percent="${v}" ${investing?'':'disabled'}>${v}%</button>`).join('')}</div><label class="prayer-option"><input type="checkbox" class="prayer-toggle" data-player="${p.id}" ${prayer?'checked':''} ${investing && amount>0n?'':'disabled'}> 神庙祈福（¥20）</label><div class="small muted">投资失败时退还本金的 10%；成功时不产生额外收益</div><div class="player-ratios"><div>仓位占比<strong id="position-${p.id}">${fraction(amount,p.wealth)}</strong></div><div>股权占比<strong id="equity-${p.id}">${fraction(amount,total)}</strong></div></div><div class="cash-left">未投资现金 <span id="cash-${p.id}">${yuan(p.wealth-amount-(prayer?20n:0n))}</span></div>`}`}</article>`;
+    }).join('')}</section>`;
   }
   function fundingBar() {
-    return `<section class="card funding-bar" aria-label="实时筹资"><div><div class="funding-title">总融资<strong id="raised-total" class="mono">¥0</strong><span class="small"> / ${yuan(game.project.cost)}</span></div><div class="funding-progress" role="progressbar" aria-label="筹资进度" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="funding-progress"><div id="funding-fill"></div></div><div id="funding-state" class="funding-state" aria-live="polite"></div><div class="bank-controls"><label><input type="checkbox" id="bank-opt" ${bankEnabled?'checked':''}> 允许银行补足缺口</label><span id="bank-amount" class="mono"></span></div></div><button id="commit-button" class="btn primary" data-action="commit">结算本轮</button><div class="funding-note">银行仅补足玩家认购的缺口，不收手续费。银行作为外部出资人按股权占比分走项目收入，不参与玩家排行，也不享受现金利息；玩家可选择放弃项目。</div></section>`;
+    return `<section class="card funding-bar" aria-label="实时筹资"><div><div class="funding-title">总融资<strong id="raised-total">¥0</strong><span class="small"> / ${yuan(game.project.cost)}</span></div><div class="funding-progress" id="funding-progress" role="progressbar" aria-label="出资占比" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100"><div id="funding-segments" class="funding-segments"></div><div id="funding-target-marker" class="funding-target-marker" hidden></div></div><div id="funding-legend" class="funding-legend"></div><div id="funding-overfund" class="funding-overfund" hidden></div><div id="funding-state" class="funding-state"></div><div class="bank-controls"><span id="bank-amount"></span></div></div><button id="commit-button" class="btn primary" data-action="commit">锁定选择 · 开始开奖</button><div class="funding-note">银行自动补齐玩家认购不足的项目资金，并依出资比例分配项目收入；超额认购保留。打工者不能投资，打工收益在本轮结算到账。</div></section>`;
   }
   function updateFunding() {
-    if (game.phase !== 'investment') return;
-    const personal = GameEngine.totalDraft(game), cost = game.project.cost;
-    GameEngine.setBankDraft(game,bankEnabled ? (cost>personal?cost-personal:0n):0n);
-    const total = GameEngine.totalFunding(game);
-    for (const p of game.players.filter(p=>!p.bankrupt)) {
-      const a = game.drafts[p.id] || 0n;
-      $(`#position-${p.id}`).textContent = fraction(a,p.wealth);
-      $(`#equity-${p.id}`).textContent = fraction(a,total);
-      $(`#cash-${p.id}`).textContent = yuan(p.wealth-a);
+    if(game.phase!=='investment')return;
+    const personal=GameEngine.totalDraft(game),cost=game.project.cost,bank=GameEngine.bankGap(game),total=personal+bank;
+    game.bankDraft=bank;
+    for(const p of game.players.filter(p=>!p.bankrupt)){
+      const a=game.drafts[p.id]||0n;
+      const position=$(`#position-${p.id}`),equity=$(`#equity-${p.id}`),cash=$(`#cash-${p.id}`);
+      if(position)position.textContent=fraction(a,p.wealth);
+      if(equity)equity.textContent=fraction(a,total);
+      if(cash)cash.textContent=yuan(p.wealth-a-(game.prayers[p.id]?20n:0n));
+      const wage=$(`#work-${p.id}`);if(wage)wage.textContent=yuan(GameEngine.minimumWage(game,p));
     }
-    $('#raised-total').textContent = yuan(total);
-    const projectFunded=$('#project-funded'); if(projectFunded) projectFunded.textContent = yuan(total);
-    const percent = Math.min(100,pctNumber(total,cost));
-    $('#funding-fill').style.width = percent+'%';
-    $('#funding-progress').setAttribute('aria-valuenow',percent.toFixed(2));
-    $('#funding-progress').setAttribute('aria-valuetext',`${yuan(total)}，目标 ${yuan(cost)}`);
-    $('#funding-state').textContent = total < cost ? `还差 ${yuan(cost-total)} · 可继续协商或放弃` : total === cost ? '已达到最低融资额，可以开始项目' : `已达到最低融资额 · 超募 ${yuan(total-cost)}`;
-    const fundingLabel=$('#project-funding-label'); if(fundingLabel) fundingLabel.textContent = $('#funding-state').textContent;
-    for(const p of game.players.filter(p=>!p.bankrupt)){const equity=$(`#equity-${p.id}`);if(equity)equity.textContent=fraction(game.drafts[p.id]||0n,total);}
-    $('#bank-amount').textContent = game.bankDraft>0n?`银行出资 ${yuan(game.bankDraft)}，享有 ${fraction(game.bankDraft,total)} 股权`: '未使用银行资金';
-    const button = $('#commit-button');
-    button.textContent = total >= cost ? '锁定认购 · 开始开奖' : '融资不足 · 放弃本轮项目';
-    button.className = 'btn '+(total>=cost?'primary':'warning');
+    $('#raised-total').textContent=yuan(total);
+    const projectFunded=$('#project-funded');if(projectFunded)projectFunded.textContent=yuan(total);
+    const entries=game.players.map(p=>({name:p.name,amount:game.drafts[p.id]||0n,color:color(p.id)})).filter(x=>x.amount>0n);
+    if(bank>0n)entries.push({name:'银行',amount:bank,color:'#8993a3'});
+    const segments=$('#funding-segments');
+    // 过去的 .funding-progress div {width:0} 会压缩颜色容器。用独立的内层容器和明确 flex-basis 解决。
+    segments.innerHTML=entries.map(x=>`<div class="funding-slice" title="${esc(x.name)}：${yuan(x.amount)} (${fraction(x.amount,total)})" style="flex:0 0 ${pctNumber(x.amount,total)}%;width:${pctNumber(x.amount,total)}%;background-color:${x.color}"></div>`).join('');
+    const marker=$('#funding-target-marker'), overfund=$('#funding-overfund');
+    if(total>cost){
+      const over=total-cost, excessPct=pctNumber(over,cost), targetPosition=pctNumber(cost,total);
+      marker.hidden=false;marker.style.left=targetPosition+'%';
+      overfund.hidden=false;
+      overfund.innerHTML=`<strong>超额融资 +${yuan(over)}（超过目标 ${excessPct.toFixed(2)}%）</strong><span>彩色分段显示总融资的出资比例；竖线为最低融资目标。超募不增加项目总价值。</span>`;
+    }else{marker.hidden=true;overfund.hidden=true;overfund.textContent='';}
+    $('#funding-legend').innerHTML=entries.map(x=>`<span><i style="background:${x.color}"></i>${esc(x.name)} ${fraction(x.amount,total)}</span>`).join('');
+    $('#funding-progress').setAttribute('aria-valuetext',entries.map(x=>`${x.name} ${fraction(x.amount,total)}`).join('，'));
+    $('#funding-state').textContent=total>cost?`已超募 ${yuan(total-cost)} · 玩家总投入 ${yuan(personal)} · 银行出资 ¥0`:bank>0n?`玩家投入 ${yuan(personal)}，银行自动补足 ${yuan(bank)}`:'玩家已足额筹资，无需银行';
+    const label=$('#project-funding-label');if(label)label.textContent=$('#funding-state').textContent;
+    $('#bank-amount').textContent=bank>0n?`银行：${yuan(bank)} · ${fraction(bank,total)} 股权`:'银行出资 ¥0';
+    $('#commit-button').textContent='锁定选择 · 开始开奖';
   }
   function eventText(e) {
     if (e.type === 'alliance') return `${nameOf(e.ids[0])} 与 ${nameOf(e.ids[1])} 建立联盟，各支付 50 元。`;
@@ -426,16 +481,16 @@
   }
   function recordContent(r) {
     const label = r.status==='success' ? '项目成功' : r.status==='failure' ? '项目失败' : '项目已放弃';
-    const subtitle = r.status==='skipped' ? '认购款没有扣除，未投资现金获得利息。' : `投资后抽到的真实成功概率：${probabilityText(r.probability)}。${r.status==='failure'?'所有项目投入损失。':'总价值按认购比例分配。'}`;
+    const subtitle = r.status==='skipped' ? '未启动项目。' : `实际成功概率：${probabilityText(r.probability)}。${r.status==='failure'?'普通投资全部亏损；祈福投资只损失本金的 90%。':'总价值按认购比例分配，祈福不额外生效。'}`;
     return `<section class="card result-banner ${r.status}"><div><div class="eyebrow">ROUND ${String(r.round).padStart(2,'0')} · ${esc(r.project.name)}</div><h2>${label}</h2><p>${subtitle}</p></div><div class="result-value"><span>${r.status==='skipped'?'本轮现金利息合计':'实际项目总价值 · 含本金'}</span><strong class="mono">${yuan(r.status==='skipped'?GameEngine.sum(r.interest):r.value)}</strong><span>${r.status==='skipped'?'已发生的费用与风险仍然保留':`实际融资 ${yuan(r.raised)}`}</span></div></section>
-      <div class="section-row"><h2>这一轮的账本</h2><span class="muted">未投资现金计息 2%</span></div><div class="table-wrap"><table><thead><tr><th scope="col">玩家</th><th scope="col">轮初财富</th><th scope="col">实际认购</th><th scope="col">项目分配</th><th scope="col">现金利息</th><th scope="col">轮末财富</th><th scope="col">本轮变化</th></tr></thead><tbody>${game.players.map((p,i)=>`<tr><td><div class="player-identity"><span class="avatar" style="--player-color:${color(p.id)}" aria-hidden="true">${String(p.id).padStart(2,'0')}</span><strong>${esc(p.name)}</strong>${r.closing[i]===0n?'<span class="pill gray">破产</span>':''}</div></td><td>${yuan(r.opening[i])}</td><td>${yuan(r.contributions[i])}</td><td>${yuan(r.proceeds[i])}</td><td>${yuan(r.interest[i])}</td><td><strong>${yuan(r.closing[i])}</strong></td><td class="${changeClass(r.closing[i]-r.opening[i])}">${signedYuan(r.closing[i]-r.opening[i])}</td></tr>`).join('')}</tbody></table></div>${r.bankContribution>0n?`<p class="notice">银行出资 ${yuan(r.bankContribution)}，分得 ${yuan(r.bankProceeds)}。该款项不计入玩家财富。</p>`:''}${eventsDetail(r.events,'当轮事件记录')}`;
+      <div class="section-row"><h2>这一轮的账本</h2><span class="muted">未投资现金计息 2%</span></div><div class="table-wrap"><table><thead><tr><th scope="col">玩家</th><th scope="col">轮初财富</th><th scope="col">实际认购</th><th scope="col">项目分配</th><th scope="col">现金利息</th><th scope="col">打工收入</th><th scope="col">随机加成 X（取整）</th><th scope="col">祈福费</th><th scope="col">祈福返还</th><th scope="col">轮末财富</th><th scope="col">本轮变化</th></tr></thead><tbody>${game.players.map((p,i)=>`<tr><td><div class="player-identity"><span class="avatar" style="--player-color:${color(p.id)}" aria-hidden="true">${String(p.id).padStart(2,'0')}</span><strong>${esc(p.name)}</strong>${r.closing[i]===0n?'<span class="pill gray">破产</span>':''}</div></td><td>${yuan(r.opening[i])}</td><td>${yuan(r.contributions[i])}</td><td>${yuan(r.proceeds[i])}</td><td>${yuan(r.interest[i])}</td><td>${yuan(r.wages[i])}</td><td>${r.workerDraws[i]?yuan(r.workerDraws[i].bonus):'—'}</td><td>${yuan(r.prayerFees[i])}</td><td>${yuan(r.refunds[i])}</td><td><strong>${yuan(r.closing[i])}</strong></td><td class="${changeClass(r.closing[i]-r.opening[i])}">${signedYuan(r.closing[i]-r.opening[i])}</td></tr>`).join('')}</tbody></table></div>${r.bankContribution>0n?`<p class="notice">银行出资 ${yuan(r.bankContribution)}，分得 ${yuan(r.bankProceeds)}。该款项不计入玩家财富。</p>`:''}${eventsDetail(r.events,'当轮事件记录')}`;
   }
   function renderRound() {
     const alive=GameEngine.living(game).length;
     const isResult=game.phase==='result';
     app.innerHTML=`<div class="round-heading"><div><div class="eyebrow">THE TABLE IS OPEN</div><h1>第 ${String(game.round).padStart(2,'0')} 轮 <span class="round-total">/ ${game.rounds}</span></h1><p>${alive} / ${game.players.length} 人存续 · 玩家总财富 ${yuan(GameEngine.totalWealth(game))}</p></div><div class="heading-actions"><button class="btn secondary small-btn" data-action="restart">新开一局</button></div></div>${phaseSteps()}
       ${isResult?`${recordContent(game.records.at(-1))}<div class="next-row"><button class="btn primary" data-action="next">${game.round===game.rounds || alive===0?'查看最终结果':`进入第 ${game.round+1} 轮`} →</button></div>`:
-      screen==='alliance'?preparation():screen==='expenses'?expenseStage():screen==='drawing'?drawingStage():`<p class="phase-note">先查看项目目标与收益区间，再直接在下方调整各玩家认购。认购不足时可选择银行补资。</p>${projectInfo()}${playerCards()}${fundingBar()}`}
+      screen==='alliance'?preparation():screen==='expenses'?expenseStage():screen==='drawing'?drawingStage():`<p class="phase-note">先查看项目目标与收益区间，再选择投资或打工。银行将自动补足投资缺口。</p>${projectInfo()}${playerCards()}${fundingBar()}`}
       ${!isResult && screen==='investment'?eventsDetail(game.roundState.events):''}${historyPanel()}<p class="copyright">大富翁 · 生存合作冒险。</p>`;
     if(!isResult && screen==='investment') updateFunding();
   }
@@ -482,7 +537,7 @@
     app.innerHTML = `<section class="finish-heading"><div><div class="eyebrow">THE FINAL SCORE</div><h1>这一桌，落下帷幕。</h1><p>${rounds} / ${game.rounds} 轮 · ${game.players.length} 位玩家 · ${esc(game.endReason)}</p></div><div class="finish-actions"><button class="btn secondary" type="button" data-action="export">导出战绩 CSV</button><button class="btn primary" type="button" data-action="restart">再开一局 <span aria-hidden="true">→</span></button></div></section><div class="summary-grid"><div class="card summary-card"><span>最终总财富</span><strong class="mono">${yuan(total)}</strong></div><div class="card summary-card"><span>相比初始总资金</span><strong class="mono ${changeClass(total-initial)}">${signedYuan(total-initial)}</strong></div><div class="card summary-card"><span>最后仍然存续</span><strong>${GameEngine.living(game).length} <span> / ${game.players.length} 人</span></strong></div></div>
       <div class="section-row"><h2>玩家最终成绩</h2><span class="muted">单轮复合收益率按实际 ${rounds} 轮折算</span></div><div class="table-wrap"><table><thead><tr><th scope="col">玩家</th><th scope="col">最终财富</th><th scope="col">总盈亏</th><th scope="col">单轮复合收益率</th><th scope="col">状态</th></tr></thead><tbody>${ranked.map((p,i)=>`<tr><td><div class="player-identity"><span class="rank">${i+1}</span><span class="avatar" style="--player-color:${color(p.id)}" aria-hidden="true">${String(p.id).padStart(2,'0')}</span><strong>${esc(p.name)}</strong></div></td><td><strong>${yuan(p.wealth)}</strong></td><td class="${changeClass(p.wealth-1000n)}">${signedYuan(p.wealth-1000n)}</td><td class="${changeClass(p.wealth-1000n)}">${growth(p.wealth,rounds)}</td><td>${p.bankrupt?`<span class="pill gray">第 ${p.bankruptRound} 轮破产</span>`:'<span class="pill">存续</span>'}</td></tr>`).join('')}</tbody></table></div>
       <section class="card chart-card"><div class="chart-heading"><div><h2>财富的起落</h2><p>纵轴为 log₁₀ 财富，横轴为轮次。点击名字切换轨迹，悬停或聚焦圆点查看金额。</p></div><span class="pill gray">保留所有玩家</span></div><div class="legend" aria-label="显示或隐藏玩家轨迹">${game.players.map(p=>`<button class="legend-button ${hiddenPlayers.has(p.id)?'off':''}" style="--player-color:${color(p.id)}" type="button" data-action="legend" data-player="${p.id}" aria-pressed="${!hiddenPlayers.has(p.id)}"><span class="legend-dot" aria-hidden="true"></span>${esc(p.name)}</button>`).join('')}</div><div id="wealth-chart" class="chart-scroll">${chartSvg()}</div><p class="footnote">0 元没有对数值：破产后的点位于单独的“0 元”区域，未用小额正数替代。</p></section>
-      <div class="section-row"><h2>累计收支</h2><span class="muted">救助为玩家之间的转账</span></div><div class="table-wrap"><table><thead><tr><th scope="col">玩家</th><th scope="col">累计认购</th><th scope="col">项目分配</th><th scope="col">利息</th><th scope="col">日常开销</th><th scope="col">联盟费用</th><th scope="col">风险损失</th><th scope="col">救助支出</th><th scope="col">收到救助</th></tr></thead><tbody>${game.players.map(p=>`<tr><td><strong>${esc(p.name)}</strong></td>${['invested','proceeds','interest','expenses','allianceFees','riskLoss','aidGiven','aidReceived'].map(k=>`<td>${yuan(p.stats[k])}</td>`).join('')}</tr>`).join('')}</tbody></table></div>${historyPanel()}<p class="copyright">下一局，会是另一个故事。</p>`;
+      <div class="section-row"><h2>累计收支</h2><span class="muted">救助为玩家之间的转账</span></div><div class="table-wrap"><table><thead><tr><th scope="col">玩家</th><th scope="col">累计认购</th><th scope="col">项目分配</th><th scope="col">利息</th><th scope="col">打工收入</th><th scope="col">祈福费用</th><th scope="col">祈福返还</th><th scope="col">日常开销</th><th scope="col">联盟费用</th><th scope="col">风险损失</th><th scope="col">救助支出</th><th scope="col">收到救助</th></tr></thead><tbody>${game.players.map(p=>`<tr><td><strong>${esc(p.name)}</strong></td>${['invested','proceeds','interest','wages','prayerFees','prayerRefunds','expenses','allianceFees','riskLoss','aidGiven','aidReceived'].map(k=>`<td>${yuan(p.stats[k])}</td>`).join('')}</tr>`).join('')}</tbody></table></div>${historyPanel()}<p class="copyright">下一局，会是另一个故事。</p>`;
   }
   function render() { game.phase==='finished' ? renderFinished() : renderRound(); }
   function syncDraft(id,value,keepEmpty = false) {
@@ -492,7 +547,9 @@
     const input=$(`#amount-${id}`),slider=$(`#slider-${id}`);
     if (!(keepEmpty && input.value==='')) input.value=a.toString();
     slider.value=Number(a*1000n/p.wealth);
-    updateFunding(); queueSave();
+    const prayer=$(`.prayer-toggle[data-player="${id}"]`);
+    if(prayer){prayer.checked=!!game.prayers[id];prayer.disabled=a===0n;const card=prayer.closest('.player-card');const limit=card?.querySelector('.investment-label span');if(limit)limit.textContent='最多 '+yuan(p.wealth-(game.prayers[id]?20n:0n));}
+    updateFunding();queueSave();
   }
   function startNewGame() {
     const count = Number($('#player-count').value), rounds = Number($('#round-count').value);
@@ -500,7 +557,7 @@
     if (!Number.isSafeInteger(rounds) || rounds<10) { $('#setup-error').textContent='请填写至少 10 轮。'; return; }
     const inputs=[...document.querySelectorAll('.setup-name')];
     const names=uniqueNames(Array.from({length:count},(_,i)=>inputs[i]?.value.trim() || setupNames[i] || ''));
-    setupNames=names; game=GameEngine.createGame(names,rounds); hiddenPlayers.clear(); screen='alliance'; bankEnabled=false;
+    setupNames=names; game=GameEngine.createGame(names,rounds); hiddenPlayers.clear(); screen='alliance';
     saveNow(); render(); window.scrollTo({top:0,behavior:'instant'});
   }
   async function runExpenseSequence() {
@@ -562,7 +619,7 @@
     if(game.phase!=='investment'||animating)return;
     const start=GameEngine.totalFunding(game)>=game.project.cost;
     if(!start){
-      const r=GameEngine.settleRound(game,false);GameEngine.advanceRound(game);screen='alliance';bankEnabled=false;
+      const r=GameEngine.settleRound(game,false);GameEngine.advanceRound(game);screen='alliance';
       if(game.phase!=='finished')game.lastNotice=`第 ${r.round} 轮已放弃，现金利息 ${yuan(GameEngine.sum(r.interest))} 已入账。`;
       saveNow();render();toast('融资不足，项目放弃；本轮未扣认购款。');return;
     }
@@ -570,27 +627,27 @@
     for(let sec=3;sec>=1;sec--){const count=$('#draw-countdown');if(count)count.textContent=sec;await sleep(reducedMotion()?100:1000);if(token!==sequenceToken)return;}
     const r=GameEngine.settleRound(game,true);saveNow();
     const panel=$('.draw-panel');
-    if(panel){panel.classList.add(r.status==='success'?'draw-success':'draw-failure');panel.innerHTML=`<div class="result-symbol">${r.status==='success'?'✦':'×'}</div><h2>${r.status==='success'?'项目成功！':'项目失败'}</h2><p>${r.status==='success'?`总价值 ${yuan(r.value)} · 按出资比例分配`:'本轮投资本金全部损失'}</p>`;}
-    toast(r.status==='success'?'开奖成功，收益已结算':'开奖失败，投入资金已损失');
+    if(panel){panel.classList.add(r.status==='success'?'draw-success':'draw-failure');panel.innerHTML=`<div class="result-symbol">${r.status==='success'?'✦':'×'}</div><h2>${r.status==='success'?'项目成功！':'项目失败'}</h2><p>${r.status==='success'?`总价值 ${yuan(r.value)} · 按出资比例分配`:'未祈福的投资本金全部损失；祈福者返还 10% 投资本金'}</p>`;}
+    toast(r.status==='success'?'开奖成功，投资与打工收益已结算':'开奖失败，打工收益及祈福返还已到账');
     await sleep(reducedMotion()?150:1250);
     if(token!==sequenceToken)return;
     animating=false;render();window.scrollTo({top:0,behavior:'instant'});
   }
   function exportCsv() {
-    const rows=[['资金大富翁战绩'],['实际完成轮数',game.records.length],['设定轮数',game.rounds],[],['玩家','最终财富','总盈亏','单轮复合收益率','破产轮次','累计认购','项目分配','利息','日常开销','联盟费用','风险损失','救助支出','收到救助']];
+    const rows=[['资金大富翁战绩'],['实际完成轮数',game.records.length],['设定轮数',game.rounds],[],['玩家','最终财富','总盈亏','单轮复合收益率','破产轮次','累计认购','项目分配','利息','打工收入','祈福费用','祈福返还','日常开销','联盟费用','风险损失','救助支出','收到救助']];
     const safeName = s=>/^[=+\-@\t\r]/.test(s) ? "'"+s : s;
-    for (const p of game.players) rows.push([safeName(p.name),p.wealth,p.wealth-1000n,growth(p.wealth,game.records.length),p.bankruptRound || '',...['invested','proceeds','interest','expenses','allianceFees','riskLoss','aidGiven','aidReceived'].map(k=>p.stats[k])]);
+    for (const p of game.players) rows.push([safeName(p.name),p.wealth,p.wealth-1000n,growth(p.wealth,game.records.length),p.bankruptRound || '',...['invested','proceeds','interest','wages','prayerFees','prayerRefunds','expenses','allianceFees','riskLoss','aidGiven','aidReceived'].map(k=>p.stats[k])]);
     rows.push([],['逐轮财富'],['轮次',...game.players.map(p=>safeName(p.name))]);
     for(let i=0;i<=game.records.length;i++) rows.push([i,...game.players.map(p=>p.history[i])]);
-    rows.push([],['逐轮项目'],['轮次','项目','最低融资额','概率下端点','概率上端点','价值下端点','价值上端点','结果','实际成功概率','实际融资','实际总价值','银行出资','银行分配']);
-    for (const r of game.records) rows.push([r.round,r.project.name,r.project.cost,r.project.slo.toFixed(6),r.project.shi.toFixed(6),r.project.vlo,r.project.vhi,statusName(r.status),r.probability===null?'':r.probability.toFixed(6),r.raised,r.value,r.bankContribution,r.bankProceeds]);
+    rows.push([],['逐轮项目'],['轮次','项目','最低融资额','概率下端点','概率上端点','价值下端点','价值上端点','结果','实际成功概率','实际融资','实际总价值','银行出资','银行分配','打工人数','打工总收入','祈福总费用','祈福总返还']);
+    for (const r of game.records) rows.push([r.round,r.project.name,r.project.cost,r.project.slo.toFixed(6),r.project.shi.toFixed(6),r.project.vlo,r.project.vhi,statusName(r.status),r.probability===null?'':r.probability.toFixed(6),r.raised,r.value,r.bankContribution,r.bankProceeds,r.working.filter(Boolean).length,GameEngine.sum(r.wages),GameEngine.sum(r.prayerFees),GameEngine.sum(r.refunds)]);
     const csv='\ufeff'+rows.map(row=>row.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\r\n');
     const url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
     const link=document.createElement('a');link.href=url;link.download='资金大富翁_战绩.csv';document.body.append(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
   }
   document.addEventListener('submit',e=>{if(e.target.id==='setup-form'){e.preventDefault();startNewGame();}});
   document.addEventListener('change',e=>{
-    if(e.target.id==='bank-opt' && game?.phase==='investment'){bankEnabled=e.target.checked;updateFunding();queueSave();return;}
+    if(game?.phase==='investment' && e.target.classList.contains('prayer-toggle')) { try {GameEngine.setPrayer(game,Number(e.target.dataset.player),e.target.checked);render();queueSave();} catch(err) {toast(err.message);render();} return; }
     if(e.target.id!=='player-count') return;
     const count=Number(e.target.value);
     if(!Number.isSafeInteger(count)||count<1){$('#setup-error').textContent='玩家人数须为正整数。';return;}
@@ -612,8 +669,9 @@
     const button=e.target.closest('[data-action]');if(!button||button.disabled)return;
     const action=button.dataset.action;
     try {
+      if(action==='choose-work' || action==='choose-invest'){GameEngine.setWorking(game,Number(button.dataset.player),action==='choose-work');saveNow();render();return;}
       if(action==='close-dialog'){button.closest('dialog')?.close();return;}
-      if(action==='resume'){game=savedGame;hiddenPlayers.clear();screen=game.phase==='preparation'?'alliance':game.phase==='investment'?'investment':'result';bankEnabled=game.bankDraft>0n;render();saveNow();window.scrollTo({top:0,behavior:'instant'});return;}
+      if(action==='resume'){game=savedGame;hiddenPlayers.clear();screen=game.phase==='preparation'?'alliance':game.phase==='investment'?'investment':'result';render();saveNow();window.scrollTo({top:0,behavior:'instant'});return;}
       if(action==='restart'){
         if(game.phase==='finished'){sequenceToken++;animating=false;setupNames=game.players.map(p=>p.name);savedGame=game;game=null;renderSetup();window.scrollTo({top:0,behavior:'instant'});}
         else $('#confirm-dialog').showModal();return;
@@ -636,7 +694,7 @@
         syncDraft(id,p.wealth*BigInt(button.dataset.percent)/100n);
       }else if(action==='commit')commitRound();
       else if(action==='next'){
-        GameEngine.advanceRound(game);screen='alliance';bankEnabled=false;saveNow();render();window.scrollTo({top:0,behavior:'instant'});
+        GameEngine.advanceRound(game);screen='alliance';saveNow();render();window.scrollTo({top:0,behavior:'instant'});
       }else if(action==='open-record'){
         const r=game.records.find(r=>r.round===Number(button.dataset.round));if(!r)return;
         $('#record-content').innerHTML=`<div class="dialog-top"><h2 id="record-title">第 ${r.round} 轮结算</h2><button class="dialog-close" type="button" data-action="close-dialog">关闭</button></div>${recordContent(r)}`;
