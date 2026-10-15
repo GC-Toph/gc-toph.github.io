@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0e182b">
+<title>Learning Kelly — 学习时间投资规划器</title>
+<style>
+:root{--bg:#f4f6fa;--card:#fff;--line:#e6eaf1;--txt:#172238;--muted:#788397;--navy:#101b30;--teal:#137e83;--tealLight:#e6f5f2;--blue:#4979da;--warning:#c77b18;--shadow:0 9px 28px rgba(15,36,68,.045);--r:18px}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--txt);font:14px/1.55 -apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei","Noto Sans CJK SC",sans-serif;font-variant-numeric:tabular-nums}button,input,select,textarea{font:inherit}button{cursor:pointer}button:disabled{opacity:.38;cursor:not-allowed}a{color:inherit}.app{max-width:1310px;margin:auto;padding:0 28px 50px}.topbar{height:76px;display:flex;align-items:center;justify-content:space-between;gap:15px}.brand{display:flex;align-items:center;gap:11px;font-size:18px;font-weight:850;letter-spacing:-.6px}.logo{height:36px;width:36px;border-radius:11px;background:var(--navy);display:grid;place-items:center;color:#b7f3dc;font-size:19px}.brand small{font-size:10px;font-weight:650;color:#8995a8;letter-spacing:2px;margin-left:3px}.top-actions{display:flex;align-items:center;gap:9px;flex-wrap:wrap}.pill{font-size:11px;background:#e9f5ef;color:#287759;padding:5px 10px;border-radius:99px;white-space:nowrap}.btn{background:#fff;border:1px solid #dce3ee;color:#263450;border-radius:10px;padding:9px 13px;display:inline-flex;gap:7px;align-items:center;justify-content:center;font-weight:680;transition:.15s;white-space:nowrap}.btn:hover:not(:disabled){border-color:#9db8c6;background:#f7fcfc}.btn.dark{color:#fff;border-color:#182e46;background:#182e46}.btn.dark:hover{background:#263f59}.btn.light-danger{color:#b34f44}.btn.sm{padding:6px 10px;font-size:12px}.hero{background:#fff;border:1px solid var(--line);border-radius:16px;padding:20px 24px;color:var(--txt);display:flex;align-items:center;justify-content:space-between;gap:20px}.hero h1{font-size:22px;line-height:1.3;letter-spacing:-.6px;font-weight:800;margin:0 0 5px}.hero p{margin:0;color:var(--muted);font-size:12px;max-width:660px}.hero-stat{min-width:150px;flex:none;border-left:1px solid var(--line);padding:0 0 0 20px;background:none;border-radius:0}.hero-stat span{font-size:11px;color:#8190a3}.hero-stat strong{display:block;font-size:26px;line-height:1.25;letter-spacing:-.5px;margin:2px 0;color:var(--txt)}.hero-stat small{display:block;font-size:10px;color:var(--muted)}.section-heading{display:flex;justify-content:space-between;align-items:end;gap:12px;margin:30px 0 14px}.section-heading h2{font-size:18px;margin:0;letter-spacing:-.4px}.section-heading p{color:var(--muted);font-size:12px;margin:3px 0 0}.grid-top{display:grid;grid-template-columns:375px minmax(0,1fr);gap:15px}.panel{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}.panel-pad{padding:22px}.panel-hd{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:17px}.panel-hd h3{margin:0;font-size:15px}.badge{font-size:11px;border:1px solid #dbe6e9;color:#4d7d81;background:#f3faf9;border-radius:7px;padding:3px 7px;font-weight:700;white-space:nowrap}.field-title{font-size:12px;color:#48566d;font-weight:750;margin-bottom:8px}.field-note{font-size:11px;color:#8b96a5;margin-top:6px}.budgets{display:grid;grid-template-columns:1fr 1fr;gap:10px}.input-suffix{display:flex;align-items:center;border:1px solid #dfe5ee;border-radius:10px;overflow:hidden;background:#fcfdff}.input-suffix:focus-within{border-color:#45a3a7;box-shadow:0 0 0 3px #45a3a71c}.input-suffix input{width:100%;min-width:0;border:0;outline:0;background:transparent;padding:10px 12px;font-weight:750;font-size:17px;color:var(--txt)}.input-suffix span{padding-right:11px;color:#94a0af;font-size:11px}.slider-head{display:flex;align-items:center;justify-content:space-between}.slider-head strong{color:#197c84}input[type=range]{width:100%;accent-color:var(--teal);cursor:pointer;margin:10px 0 1px}.range-ends{display:flex;justify-content:space-between;color:#9ca6b3;font-size:10px}.divider{height:1px;background:var(--line);margin:20px 0}.toggle{display:flex;padding:4px;background:#f0f3f7;border-radius:11px;gap:3px}.toggle button{flex:1;border:0;background:transparent;border-radius:8px;padding:9px 8px;color:#8190a3;font-weight:750;font-size:12px}.toggle button.selected{background:white;color:#173c54;box-shadow:0 2px 8px #20355313}.metric-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:11px}.metric{border:1px solid #e9edf2;border-radius:12px;padding:13px;background:#fcfdff}.metric-label{font-size:11px;color:#8490a2}.metric-val{font-size:25px;font-weight:800;letter-spacing:-.8px;line-height:1.3;margin:7px 0 2px}.metric-unit{font-size:11px;color:#98a5b4;font-weight:450;margin-left:3px}.metric-sub{font-size:10px;color:#9aa5b3}.allocation-track{height:14px;background:#edf0f5;border-radius:99px;overflow:hidden;display:flex;margin:22px 0 12px}.allocation-track>span{height:100%;transition:width .3s}.legend{display:flex;flex-wrap:wrap;gap:10px 16px}.legend-item{display:flex;align-items:center;gap:6px;font-size:11px;color:#5e6b7e}.dot{height:9px;width:9px;border-radius:3px;flex:none}.small-insight{background:#f3f8f9;color:#5c7781;font-size:11px;line-height:1.7;padding:11px 12px;border-radius:10px;margin-top:16px}.warning-insight{background:#fff7e9;color:#96631c}.project-table-wrap{overflow-x:auto}.project-table{border-collapse:collapse;width:100%;min-width:940px}.project-table th{text-align:left;font-weight:650;color:#94a0af;background:#fafbfe;border-bottom:1px solid var(--line);padding:13px 17px;font-size:11px;white-space:nowrap}.project-table td{padding:16px 17px;border-bottom:1px solid #eef1f5;vertical-align:middle}.project-table tbody tr:last-child td{border-bottom:0}.project-title{font-size:14px;font-weight:760;display:flex;align-items:center;gap:8px}.project-goal{color:#8994a3;font-size:11px;max-width:260px;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;margin-top:4px}.bar-mini{background:#eaf0f4;height:5px;width:85px;border-radius:8px;overflow:hidden;margin-top:6px}.bar-mini i{height:100%;display:block;border-radius:8px}.stat-strong{font-weight:770}.tiny-muted{font-size:11px;color:#929cab}.status{font-size:10px;padding:4px 7px;border-radius:6px;font-weight:700;white-space:nowrap;display:inline-block}.status.live{color:#15765d;background:#e8f7f0}.status.off{color:#808c9f;background:#f0f2f6}.status.alert{color:#a76c1d;background:#fff2db}.table-action{border:1px solid #dce4ed;background:#fff;border-radius:8px;padding:6px 10px;color:#385367;font-size:12px;font-weight:700}.table-action:hover{background:#eaf8f6}.chart-grid{display:grid;grid-template-columns:minmax(0,1.22fr) minmax(0,.78fr);gap:15px}.day-stack{display:flex;gap:4px;align-items:center;margin:13px 0}.day-stack .part{height:16px;border-radius:4px;min-width:0}.chart-label{font-size:12px;font-weight:760}.chart-sub{font-size:11px;color:#93a0b0}.week-row{margin:16px 0 21px}.week-row:last-child{margin-bottom:0}.week-summary{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:19px}.weekly-stat{background:#f6f8fb;border-radius:11px;padding:14px}.weekly-stat strong{font-size:25px;letter-spacing:-.6px}.weekly-stat small{display:block;color:#96a0b0;font-size:11px}.weekly-list{display:flex;flex-direction:column;gap:12px;margin-top:15px}.weekly-list-row{display:grid;grid-template-columns:11px minmax(0,1fr) auto;gap:10px;align-items:center;font-size:12px;color:#617083}.weekly-list-row b{color:#26344a}.empty{border:1px dashed #dbe3ec;background:#fbfcff;border-radius:13px;text-align:center;color:#8c97a8;padding:28px 14px}.footer{text-align:center;margin:26px 0 0;color:#aab2bd;font-size:11px}.overlay{position:fixed;inset:0;z-index:40;background:#0b1522a1;display:none;justify-content:flex-end}.overlay.open{display:flex}.drawer{width:min(100%,610px);height:100%;background:#fff;overflow-y:auto;box-shadow:-18px 0 40px #06102025;display:flex;flex-direction:column}.drawer-head{padding:24px 26px 18px;position:sticky;top:0;z-index:4;background:#fffffff5;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}.drawer-head h2{margin:0;font-size:18px}.drawer-body{padding:22px 26px 100px;flex:1}.drawer-bottom{position:sticky;bottom:0;background:#fff;border-top:1px solid var(--line);padding:15px 26px;display:flex;justify-content:space-between;align-items:center;gap:7px}.form-label{font-size:12px;color:#536177;font-weight:700;display:block;margin:14px 0 7px}.form-input{border:1px solid #dce4ee;border-radius:10px;padding:10px 12px;width:100%;background:#fff;color:#253a4e;outline:0}.form-input:focus{border-color:#63a7ae;box-shadow:0 0 0 3px #3d9da91a}.form-input.textarea{resize:vertical;min-height:66px;line-height:1.6}.form-columns{display:grid;grid-template-columns:1fr 1fr;gap:11px}.form-three{display:grid;grid-template-columns:1fr 1fr 1fr;gap:11px}.drawer-subtitle{font-size:14px;font-weight:800;margin:0 0 4px}.divider.dense{margin:22px 0}.evidence-item{border:1px solid #e7edf3;border-radius:10px;padding:10px;background:#fcfdff;margin:8px 0}.evidence-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px}.tag-positive{color:#167962;background:#e9f7f1}.tag-negative{color:#ae6b2b;background:#fff3e6}.evidence-title{font-size:11px;padding:3px 7px;border-radius:6px;font-weight:700}.delete-inline{border:0;background:none;color:#a0a9b5;padding:3px 7px;font-size:11px}.delete-inline:hover{color:#c14b48}.row-actions{display:flex;gap:7px;margin-top:10px;flex-wrap:wrap}.falsify-top{display:flex;align-items:center;gap:7px}.falsify-top label{font-size:11px;color:#a16a22}.drawer-preview{background:#eff8f8;border:1px solid #d4eae9;border-radius:12px;padding:12px 14px;margin-top:18px;font-size:12px;line-height:1.8;color:#416974}.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(30px);opacity:0;pointer-events:none;transition:.23s;z-index:90;background:#172c42;color:white;border-radius:10px;padding:11px 17px;box-shadow:0 12px 32px #0002;max-width:90vw;text-align:center;font-size:12px}.toast.show{transform:translateX(-50%) translateY(0);opacity:1}.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}.muted{color:#8794a4}.inline-dot{display:inline-block;vertical-align:middle;height:8px;width:8px;border-radius:50%;margin-right:5px}.warning-text{color:#ac751f!important}.count-badge{background:#f2f5f9;color:#7e8b9a;padding:2px 6px;border-radius:6px;font-size:10px}
+@media(max-width:1080px){.grid-top{grid-template-columns:1fr}.chart-grid{grid-template-columns:1fr}.app{padding:0 20px 35px}}@media(max-width:650px){.app{padding:0 13px 30px}.topbar{height:auto;min-height:68px;align-items:flex-start;padding:15px 0;flex-direction:column}.brand small{display:none}.top-actions{width:100%}.top-actions .pill{margin-right:auto}.section-heading{margin-top:25px}.panel-pad{padding:17px}.metric-grid{grid-template-columns:1fr 1fr;gap:7px}.metric{padding:11px}.metric-val{font-size:23px}.form-three{grid-template-columns:1fr 1fr}.drawer-head,.drawer-body,.drawer-bottom{padding-left:17px;padding-right:17px}.drawer-bottom{flex-wrap:wrap}}
+
+@media(max-width:650px){.hero{padding:16px;gap:12px;align-items:flex-start;flex-direction:column}.hero h1{font-size:20px}.hero-stat{border-left:0;border-top:1px solid var(--line);padding:10px 0 0;min-width:0;width:100%}.hero-stat strong{font-size:22px}}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="topbar"><div class="brand"><span class="logo">↗</span><span>LEARNING KELLY <small>TIME ALLOCATION</small></span></div><div class="top-actions"><span class="pill">● 离线运行 · 自动保存在本机</span><button class="btn" id="importBtn">↑ 导入 JSON</button><button class="btn" id="exportBtn">↓ 导出 JSON</button><input class="sr-only" type="file" accept=".json,application/json" id="importFile"></div></header>
+<section class="hero">
+  <div><h1>学习时间配置</h1><p>根据成功概率、收益评级与证据判断，按比例分配每天的学习时间。</p></div>
+  <div class="hero-stat"><span>每周计划总量</span><strong id="heroWeek">—</strong><small id="heroWeekSub">工作日 × 5 · 周末 × 2</small></div>
+</section>
+<div class="section-heading"><div><h2>01 / 时间预算与分配引擎</h2><p>修改输入后立即重新计算，所有结果自动保存。</p></div><span class="badge">按比例计算 · 不拆分时段</span></div>
+<section class="grid-top">
+<div class="panel panel-pad"><div class="panel-hd"><h3>参数控制台</h3><span class="badge">自定义</span></div><div class="field-title">每日净学习预算</div><div class="budgets"><div><label class="tiny-muted" for="weekdayInput">工作日</label><div class="input-suffix"><input id="weekdayInput" type="number" min="1" max="720" step="1"><span>分钟</span></div></div><div><label class="tiny-muted" for="weekendInput">周末</label><div class="input-suffix"><input id="weekendInput" type="number" min="1" max="720" step="1"><span>分钟</span></div></div></div><div class="field-note">直接按日预算计算各项目的分钟数与时间占比，不拆分学习时段。</div><div class="divider"></div><div class="field-title">分配规则</div><div class="field-note" style="line-height:1.8">以折扣凯利比例直接配置时间；总比例超出 100% 时等比例缩小，单项目最多占日预算的 60%。扣除上限后如仍有剩余，尝试将一半分配给已有项目、一半留给探索性学习。</div><div class="divider"></div><div class="field-title">当前查看</div><div class="toggle"><button type="button" id="tabWeekday" class="selected">工作日</button><button type="button" id="tabWeekend">周末</button></div></div>
+<div class="panel panel-pad"><div class="panel-hd"><h3>时间投资组合</h3><span class="badge" id="activeBadge">0 个参与分配</span></div><div class="metric-grid"><div class="metric"><div class="metric-label">每日预算</div><div class="metric-val" id="budgetMetric">—<span class="metric-unit">分</span></div><div class="metric-sub" id="budgetSub">—</div></div><div class="metric"><div class="metric-label">已有项目</div><div class="metric-val" id="projectMetric">—</div><div class="metric-sub" id="projectSub">—</div></div><div class="metric"><div class="metric-label">探索性学习</div><div class="metric-val" id="exploreMetric">—</div><div class="metric-sub" id="exploreSub">—</div></div><div class="metric"><div class="metric-label">项目时间占比</div><div class="metric-val" id="projectShareMetric">—</div><div class="metric-sub" id="projectShareSub">其余用于探索</div></div></div><div class="allocation-track" id="mainAllocation"></div><div class="legend" id="mainLegend"></div><div class="small-insight" id="allocationInsight">—</div></div>
+</section>
+<div class="section-heading"><div><h2>02 / 学习项目与判断依据</h2><p>最多 10 个学习项目；折扣凯利低于 3% 的项目保留候选资格，但不分配时间。</p></div><button class="btn dark" id="addProject">＋ 新建学习项目</button></div>
+<section class="panel"><div class="project-table-wrap"><table class="project-table"><thead><tr><th>学习项目 / 明确成果</th><th>成功概率 p</th><th>收益评级 / 净赔率</th><th>凯利折扣</th><th>折扣凯利 a</th><th>当日时间 / 占比</th><th>状态</th><th>操作</th></tr></thead><tbody id="projectsBody"></tbody></table></div><div id="projectEmpty" class="empty" style="display:none;margin:18px">暂无项目。添加项目并提供成功概率、收益评级及可证伪的目标。</div></section>
+<div class="section-heading"><div><h2>03 / 每周分配概览</h2><p>按照工作日 × 5、周末 × 2 汇总，不预设具体星期的完成情况。</p></div></div>
+<section class="chart-grid"><div class="panel panel-pad"><div class="panel-hd"><h3>工作日与周末的学习结构</h3><span class="badge">计划值 · 非实际打卡</span></div><div id="weekBars"></div><div class="week-summary"><div class="weekly-stat"><small>每周净学习总分配</small><strong id="weeklyMinutes">—</strong><small id="weeklyHours">—</small></div><div class="weekly-stat"><small>每周探索性学习</small><strong id="weeklyExplore">—</strong><small id="weeklyExploreSub">—</small></div></div></div><div class="panel panel-pad"><div class="panel-hd"><h3>按项目汇总</h3><span class="badge">分钟 / 周</span></div><div id="weeklyList" class="weekly-list"></div></div></section>
+<footer class="footer">LEARNING KELLY · 本地优先的学习投资仪表盘 · 数据仅保存在当前浏览器，除非你主动导出</footer>
+</div>
+<div class="overlay" id="editorOverlay" role="dialog" aria-modal="true" aria-labelledby="editorTitle"><div class="drawer"><div class="drawer-head"><h2 id="editorTitle">编辑学习项目</h2><button class="btn sm" id="closeEditor" aria-label="关闭">✕ 关闭</button></div><div class="drawer-body"><label class="form-label" for="editName">项目名称</label><input id="editName" class="form-input" maxlength="60" placeholder="例如：AI应用开发"><label class="form-label" for="editGoal">成功的明确成果目标</label><textarea id="editGoal" class="form-input textarea" maxlength="400" placeholder="例如：90天内独立完成并公开发布一个能被真实用户使用的应用"></textarea><div class="form-three"><div><label class="form-label" for="editHorizon">评价周期</label><select class="form-input" id="editHorizon"><option>3个月</option><option>6个月</option><option>1年</option><option>2年</option><option>3年</option><option>5年</option></select></div><div><label class="form-label" for="editProb">成功概率 p (%)</label><input id="editProb" class="form-input" type="number" min="0" max="100" step="1"></div><div><label class="form-label" for="editRating">收益评级 (1–10)</label><input id="editRating" class="form-input" type="number" min="1" max="10" step="1"></div></div><label class="form-label" for="editLambda">凯利折扣 λ <b id="editLambdaValue" style="color:#187a82;float:right">0.8</b></label><input type="range" id="editLambda" min="0.1" max="1" step="0.1" value="0.8"><div class="range-ends"><span>保守 · 0.1</span><span>全凯利 · 1.0</span></div><div class="drawer-preview" id="editorPreview">—</div><div class="divider dense"></div><h3 class="drawer-subtitle">支持与反对证据 <span id="evCount" class="count-badge">0 条</span></h3><div class="field-note">每条证据都可独立修正和删除；请尽量写出具体事实，而非主观感受。</div><div id="evidenceList"></div><div class="row-actions"><button type="button" class="btn sm" id="addPositive">＋ 支持证据</button><button type="button" class="btn sm" id="addNegative">＋ 反对证据</button></div><div class="divider dense"></div><h3 class="drawer-subtitle">可证伪条件 <span id="falsifyCount" class="count-badge">0 条</span></h3><div class="field-note">写明什么事实发生时，你会承认当前判断可能错误。可标记“已触发”，但系统不会擅自修改概率。</div><div id="falsifyList"></div><div class="row-actions"><button type="button" class="btn sm" id="addFalsify">＋ 新增证伪条件</button></div></div><div class="drawer-bottom"><button class="btn light-danger" id="deleteProject">删除项目</button><div style="display:flex;gap:8px"><button class="btn" id="cancelEditor">取消</button><button class="btn dark" id="saveProject">保存项目与证据</button></div></div></div></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script>
+(() => {
+'use strict';
+const STORE='learning-kelly-planner-v3', VERSION=3, LOSS=0.85, THRESHOLD=.03;
+const COLORS=['#2b9b8d','#4778d8','#9a6bd0','#e3a44f','#cf7189','#2391ab','#94885c','#ce699f','#708ba2','#8eae57'];
+const EXPLORE='#77869d';
+const $=id=>document.getElementById(id);
+const clamp=(v,low,high)=>Math.min(high,Math.max(low,v));
+const num=(v,fallback,low,high)=>{const x=Number(v);return Number.isFinite(x)?clamp(x,low,high):fallback};
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const stamp=()=>new Date().toISOString();
+const id=()=> 'p_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,8);
+const fmtMin=n=>{const v=Math.round((n+Number.EPSILON)*10)/10;return Number.isInteger(v)?String(v):v.toFixed(1)};
+const fmtHour=n=>(n/60).toFixed(1).replace(/\.0$/,'')+' 小时';
+const ratingToOdds=r=>2+(r-1)*6/9;
+const demo=()=>({version:VERSION,settings:{weekday:120,weekend:180,view:'weekday'},projects:[
+ {id:'p_demo_communication',name:'沟通能力',goal:'准确辨析事实、感受、需求、方案，按照「事实 → 感受 → 需求 → 方案」的顺序表达，并向他人提供可预测性与稳定的预期；每周复盘至少3次真实沟通。',horizon:'6个月',prob:75,rating:8,lambda:.5,evidence:[],falsify:[],updatedAt:stamp()},
+ {id:'p_demo_psychology',name:'心理学',goal:'系统学习认知心理学、行为主义学习理论、认知行为疗法（CBT）、大五人格理论（Big Five / OCEAN），结合间隔重复、Anki和微休息实践；每月形成一份带例证的应用笔记。',horizon:'1年',prob:65,rating:7,lambda:.5,evidence:[],falsify:[],updatedAt:stamp()},
+ {id:'p_demo_professional',name:'专业技能',goal:'在6个月内完成一个可验收的专业成果，形成作品或交付物，并获得至少一次真实反馈。',horizon:'6个月',prob:70,rating:9,lambda:.9,evidence:[],falsify:[],updatedAt:stamp()}
+]});
+const cleanText=(v,max)=>String(v??'').trim().slice(0,max);
+function sanitizeProject(p,i){
+ if(!p||typeof p!=='object')return null;
+ const ev=Array.isArray(p.evidence)?p.evidence.slice(0,60).map(e=>({type:e?.type==='con'?'con':'pro',text:cleanText(e?.text,600)})).filter(e=>e.text):[];
+ const fs=Array.isArray(p.falsify)?p.falsify.slice(0,40).map(f=>({text:cleanText(f?.text,600),triggered:!!f?.triggered})).filter(f=>f.text):[];
+ return {id:/^p_[a-zA-Z0-9_-]+$/.test(String(p.id))?String(p.id):id(),name:cleanText(p.name,60)||`学习项目 ${i+1}`,goal:cleanText(p.goal,400),horizon:['3个月','6个月','1年','2年','3年','5年'].includes(p.horizon)?p.horizon:'1年',prob:num(p.prob,50,0,100),rating:Math.round(num(p.rating,5,1,10)),lambda:Math.round(num(p.lambda,.8,.1,1)*10)/10,evidence:ev,falsify:fs,updatedAt:cleanText(p.updatedAt,40)||stamp()};
+}
+function sanitize(source){
+ if(!source||typeof source!=='object'||!Array.isArray(source.projects))throw Error('文件不包含有效的学习项目');
+ const settings=source.settings||{};
+ const projects=source.projects.slice(0,10).map(sanitizeProject).filter(Boolean);
+ const seen=new Set();projects.forEach(p=>{if(seen.has(p.id))p.id=id();seen.add(p.id)});
+ return {version:VERSION,settings:{weekday:Math.round(num(settings.weekday,120,1,720)),weekend:Math.round(num(settings.weekend,180,1,720)),view:settings.view==='weekend'?'weekend':'weekday'},projects};
+}
+let state;try{const stored=localStorage.getItem(STORE);state=stored?sanitize(JSON.parse(stored)):demo()}catch(err){state=demo();console.warn('加载本地数据失败',err)}
+let activeDraft=null;let editId=null;let toastTimer;
+function save(){try{localStorage.setItem(STORE,JSON.stringify(state))}catch(e){toast('本地保存失败：请检查浏览器存储权限或空间')}}
+function toast(message){const el=$('toast');el.textContent=message;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),2800)}
+function analyze(p){const probability=p.prob/100,b=ratingToOdds(p.rating);const full=Math.max(0,(probability*b-(1-probability)*LOSS)/(b*LOSS));const adjusted=full*p.lambda;return {probability,b,full,adjusted,eligible:adjusted>=THRESHOLD-1e-10};}
+// 仅用于剩余预算的一半：按原始折扣凯利权重追加给未触及60%上限的项目。
+function distribute(target,mins,valid,weights,cap){
+ let left=Math.max(0,target), pool=weights.map((w,i)=>i).filter(i=>valid[i]&&weights[i]>0&&mins[i]<cap-1e-9);
+ while(left>1e-8&&pool.length){
+   const sum=pool.reduce((a,i)=>a+weights[i],0);if(sum<=0)break;
+   const reached=pool.filter(i=>left*weights[i]/sum>=cap-mins[i]-1e-9);
+   if(!reached.length){pool.forEach(i=>{mins[i]+=left*weights[i]/sum});left=0;break;}
+   for(const i of reached){const added=Math.min(left,Math.max(0,cap-mins[i]));mins[i]+=added;left-=added;}
+   const locked=new Set(reached);pool=pool.filter(i=>!locked.has(i));
+ }
+ return target-left;
+}
+// 仅为显示保留0.1分钟精度，使用最大余数法确保显示数值之和仍等于预算。
+function quantizeMinutes(values,budget,cap){
+ const raw=values.map(x=>Math.max(0,x)*10);
+ const rounded=raw.map(x=>Math.floor(x+1e-8));
+ let left=Math.round(budget*10)-rounded.reduce((a,b)=>a+b,0);
+ const order=raw.map((v,i)=>({i,fract:v-rounded[i]})).sort((a,b)=>b.fract-a.fract||a.i-b.i);
+ for(let k=0;left>0&&k<order.length*2;k++){
+   const i=order[k%order.length].i;
+   if(i<values.length-1&&rounded[i]+1>cap*10+1e-8)continue;
+   rounded[i]++;left--;
+ }
+ if(left>0)rounded[rounded.length-1]+=left;
+ return rounded.map(x=>x/10);
+}
+function calculate(day){
+ const budget=state.settings[day],cap=budget*.6;
+ const items=state.projects.map((p,i)=>({...analyze(p),project:p,color:COLORS[i]}));
+ const valid=items.map(x=>x.eligible),active=items.filter(x=>x.eligible);
+ const totalKelly=active.reduce((s,x)=>s+x.adjusted,0),demand=Math.min(1,totalKelly);
+ // 严格同比例缩小：当 Σa_i > 1 时，所有合格项目统一乘 1/Σa_i；
+ // 然后独立对每个项目应用60%硬上限，不在基础阶段向其他项目重新分配被截断的额度。
+ const weights=items.map(x=>x.eligible?x.adjusted:0);
+ const scaleFactor=totalKelly>1?1/totalKelly:1;
+ const mins=weights.map(w=>Math.min(cap,budget*w*scaleFactor));
+ const initialTarget=budget*demand,initialGiven=mins.reduce((a,b)=>a+b,0);
+ // 未用掉的额度：一半尝试按原始比例追加给合格项目；其余一半用于探索。
+ // 若项目上限使追加额无法全部吸收，未使用的追加额同样计入探索。
+ const extrasWanted=(budget-initialGiven)/2;
+ const extrasGiven=distribute(extrasWanted,mins,valid,weights,cap);
+ const explored=budget-mins.reduce((a,b)=>a+b,0);
+ const quantized=quantizeMinutes([...mins,explored],budget,cap);
+ const allocations=quantized.slice(0,-1),explore=quantized[quantized.length-1];
+ return {budget,cap,items,allocations,explore,initialTarget,initialGiven,extrasGiven,totalKelly,demand,activeCount:active.length,scaleFactor};
+}
+function getPieces(calc){
+ const parts=calc.items.map((it,i)=>({name:it.project.name,color:it.color,mins:calc.allocations[i]})).filter(x=>x.mins>0);
+ if(calc.explore>0)parts.push({name:'探索性学习',color:EXPLORE,mins:calc.explore});
+ return parts;
+}
+function drawAllocation(){
+ const calc=calculate(state.settings.view),projectMins=calc.allocations.reduce((a,b)=>a+b,0);
+ $('budgetMetric').innerHTML=`${calc.budget}<span class="metric-unit">分</span>`;$('budgetSub').textContent='100% 每日可学习预算';
+ $('projectMetric').innerHTML=`${fmtMin(projectMins)}<span class="metric-unit">分</span>`;$('projectSub').textContent=`${calc.activeCount} 个达标候选项目`;
+ $('exploreMetric').innerHTML=`${fmtMin(calc.explore)}<span class="metric-unit">分</span>`;$('exploreSub').textContent='不含固定学习项目';
+ $('projectShareMetric').innerHTML=`${(projectMins/calc.budget*100).toFixed(1)}<span class="metric-unit">%</span>`;
+ $('projectShareSub').textContent=`探索性学习 ${(calc.explore/calc.budget*100).toFixed(1)}%`;
+ $('activeBadge').textContent=`${calc.activeCount} / ${state.projects.length} 个参与分配`;
+ const pieces=getPieces(calc);
+ $('mainAllocation').innerHTML=pieces.map(v=>`<span title="${esc(v.name)} ${fmtMin(v.mins)}分钟" style="width:${v.mins/calc.budget*100}%;background:${v.color}"></span>`).join('');
+ $('mainLegend').innerHTML=pieces.map(v=>`<span class="legend-item"><i class="dot" style="background:${v.color}"></i>${esc(v.name)} · ${fmtMin(v.mins)}分 (${(v.mins/calc.budget*100).toFixed(1)}%)</span>`).join('')||'<span class="tiny-muted">暂无可分配项目</span>';
+ const eligibleText=calc.activeCount===0?'目前没有达到3%门槛的项目，全部预算用于探索性学习。':`折扣凯利合计 ${(calc.totalKelly*100).toFixed(1)}%；${calc.totalKelly>1?'超出预算，按同比例系数 '+calc.scaleFactor.toFixed(3)+' 缩小':'按原始折扣凯利比例投入'}。单项目上限为60%；截断后剩余预算的一半尝试分配给已有项目，另一半用于探索；上限无法吸收的部分也转入探索。`;
+ const alerts=state.projects.filter(p=>p.falsify.some(f=>f.triggered)).length;
+ $('allocationInsight').className='small-insight'+(alerts?' warning-insight':'');
+ $('allocationInsight').textContent=eligibleText+(alerts?` ⚠ ${alerts} 个项目存在已触发的证伪条件，请重新评估成功概率。`:'');
+}
+function drawProjects(){
+ const calc=calculate(state.settings.view);
+ $('projectEmpty').style.display=state.projects.length?'none':'block';$('addProject').disabled=state.projects.length>=10;
+ $('projectsBody').innerHTML=calc.items.map((it,i)=>{
+ const p=it.project,mins=calc.allocations[i],warning=p.falsify.some(f=>f.triggered),status=warning?'<span class="status alert">证伪预警</span>':!it.eligible?'<span class="status off">候选 · 未达3%</span>':mins<=0?'<span class="status off">受上限约束</span>':'<span class="status live">参与分配</span>';
+ const pros=p.evidence.filter(e=>e.type==='pro').length,cons=p.evidence.length-pros;
+ return `<tr><td><div class="project-title"><span class="inline-dot" style="background:${it.color}"></span>${esc(p.name)}</div><div class="project-goal" title="${esc(p.goal)}">${esc(p.goal||'尚未定义具体成果')} · ${esc(p.horizon)}</div><div class="tiny-muted" style="margin-top:6px">证据 +${pros} / −${cons} · 证伪 ${p.falsify.length} 条</div></td><td><span class="stat-strong">${p.prob.toFixed(p.prob%1?1:0)}%</span><div class="bar-mini"><i style="background:${it.color};width:${p.prob}%"></i></div></td><td><span class="stat-strong">${p.rating} / 10</span><div class="tiny-muted">b = ${it.b.toFixed(2)}</div></td><td><span class="stat-strong">${p.lambda.toFixed(1)}×</span></td><td><span class="stat-strong">${(it.adjusted*100).toFixed(1)}%</span><div class="tiny-muted">全凯利 ${(it.full*100).toFixed(1)}%</div></td><td><span class="stat-strong">${fmtMin(mins)} 分</span><div class="tiny-muted">${(mins/calc.budget*100).toFixed(1)}% 日预算</div></td><td>${status}</td><td><button class="table-action" data-edit="${esc(p.id)}">编辑 / 证据 →</button></td></tr>`
+ }).join('');
+}
+function drawWeekly(){
+ const wk=calculate('weekday'),we=calculate('weekend');const total=wk.budget*5+we.budget*2,exp=wk.explore*5+we.explore*2;
+ $('heroWeek').textContent=fmtHour(total);$('heroWeekSub').textContent=`工作日 ${wk.budget} 分 × 5 · 周末 ${we.budget} 分 × 2`;
+ $('weeklyMinutes').textContent=fmtMin(total)+' 分';$('weeklyHours').textContent=fmtHour(total)+' · 按比例规划';
+ $('weeklyExplore').textContent=fmtMin(exp)+' 分';$('weeklyExploreSub').textContent=total?((exp/total*100).toFixed(1)+'% 的周学习时间'):'暂无规划时间';
+ $('weekBars').innerHTML=[['工作日',wk,5],['周末',we,2]].map(([label,c,mult])=>{
+ const pieces=getPieces(c);return `<div class="week-row"><div style="display:flex;justify-content:space-between"><span class="chart-label">${label} <span class="tiny-muted">× ${mult} 天</span></span><span class="chart-sub">预算 ${c.budget} 分 · 已分配 100%</span></div><div class="day-stack">${pieces.map(v=>`<span title="${esc(v.name)} ${fmtMin(v.mins)}分钟" class="part" style="background:${v.color};width:${v.mins/c.budget*100}%"></span>`).join('')}</div><div class="chart-sub">${pieces.map(x=>`${esc(x.name)} ${fmtMin(x.mins)}分 (${(x.mins/c.budget*100).toFixed(1)}%)`).join(' · ')||'暂无项目'}</div></div>`
+ }).join('');
+ const rows=state.projects.map((p,i)=>({name:p.name,color:COLORS[i],mins:wk.allocations[i]*5+we.allocations[i]*2}));rows.push({name:'探索性学习',color:EXPLORE,mins:exp});
+ $('weeklyList').innerHTML=rows.map(row=>`<div class="weekly-list-row"><span class="dot" style="background:${row.color}"></span><span>${esc(row.name)}</span><b>${fmtMin(row.mins)} 分</b></div>`).join('');
+}
+function renderAll(){drawAllocation();drawProjects();drawWeekly()}
+function refreshSettings(){const s=state.settings;$('weekdayInput').value=s.weekday;$('weekendInput').value=s.weekend;$('tabWeekday').classList.toggle('selected',s.view==='weekday');$('tabWeekend').classList.toggle('selected',s.view==='weekend')}
+function selectDay(day){state.settings.view=day;refreshSettings();save();renderAll()}
+$('tabWeekday').addEventListener('click',()=>selectDay('weekday'));$('tabWeekend').addEventListener('click',()=>selectDay('weekend'));
+for(const [key,dom] of [['weekday','weekdayInput'],['weekend','weekendInput']])$(dom).addEventListener('change',e=>{state.settings[key]=Math.round(num(e.target.value,state.settings[key],1,720));refreshSettings();save();renderAll()});
+$('projectsBody').addEventListener('click',e=>{const b=e.target.closest('[data-edit]');if(b)openEditor(b.dataset.edit)});
+function blankProject(){return {id:id(),name:'',goal:'',horizon:'1年',prob:50,rating:5,lambda:.8,evidence:[],falsify:[],updatedAt:stamp()}}
+function openEditor(projectId){const project=projectId?state.projects.find(p=>p.id===projectId):null;if(projectId&&!project)return;editId=project?project.id:null;activeDraft=JSON.parse(JSON.stringify(project||blankProject()));$('editorTitle').textContent=project?'编辑学习项目':'新建学习项目';$('editName').value=activeDraft.name;$('editGoal').value=activeDraft.goal;$('editHorizon').value=activeDraft.horizon;$('editProb').value=activeDraft.prob;$('editRating').value=activeDraft.rating;$('editLambda').value=activeDraft.lambda;$('deleteProject').style.visibility=project?'visible':'hidden';renderEvidence();updatePreview();$('editorOverlay').classList.add('open');document.body.style.overflow='hidden';setTimeout(()=>$('editName').focus(),30)}
+function closeEditor(){$('editorOverlay').classList.remove('open');document.body.style.overflow='';activeDraft=null;editId=null}
+$('addProject').addEventListener('click',()=>{if(state.projects.length<10)openEditor(null)});$('closeEditor').addEventListener('click',closeEditor);$('cancelEditor').addEventListener('click',closeEditor);$('editorOverlay').addEventListener('click',e=>{if(e.target===$('editorOverlay'))closeEditor()});document.addEventListener('keydown',e=>{if(e.key==='Escape'&&activeDraft)closeEditor()});
+function syncForm(){if(!activeDraft)return;activeDraft.name=$('editName').value.slice(0,60);activeDraft.goal=$('editGoal').value.slice(0,400);activeDraft.horizon=$('editHorizon').value;activeDraft.prob=num($('editProb').value,0,0,100);activeDraft.rating=Math.round(num($('editRating').value,1,1,10));activeDraft.lambda=Math.round(num($('editLambda').value,.8,.1,1)*10)/10;updatePreview()}
+for(const key of ['editName','editGoal','editHorizon','editProb','editRating','editLambda'])$(key).addEventListener('input',syncForm);
+function updatePreview(){if(!activeDraft)return;const a=analyze(activeDraft);$('editLambdaValue').textContent=activeDraft.lambda.toFixed(1);$('editorPreview').innerHTML=`净赔率 <b>${a.b.toFixed(2)}×</b> · 全凯利 <b>${(a.full*100).toFixed(1)}%</b> · 折扣后 <b>${(a.adjusted*100).toFixed(1)}%</b> · <b>${a.eligible?'达到3%门槛':'低于3%门槛，保留候选'}</b><br><span class="muted">失败损失按85%计算，学习成功概率由你根据证据手动修正。</span>`}
+function renderEvidence(){if(!activeDraft)return;
+ $('evCount').textContent=activeDraft.evidence.length+' 条';$('falsifyCount').textContent=activeDraft.falsify.length+' 条';
+ $('evidenceList').innerHTML=activeDraft.evidence.map((item,i)=>`<div class="evidence-item"><div class="evidence-top"><span class="evidence-title ${item.type==='pro'?'tag-positive':'tag-negative'}">${item.type==='pro'?'＋ 支持证据':'− 反对证据'}</span><button class="delete-inline" data-remove-ev="${i}">删除</button></div><textarea class="form-input textarea" rows="2" maxlength="600" placeholder="描述可核验的观察或事实" data-evidence="${i}">${esc(item.text)}</textarea></div>`).join('')||'<p class="field-note">尚无证据。建议在确定概率前记录判断依据。</p>';
+ $('falsifyList').innerHTML=activeDraft.falsify.map((item,i)=>`<div class="evidence-item"><div class="evidence-top"><div class="falsify-top"><input type="checkbox" data-trigger="${i}" ${item.triggered?'checked':''} id="trigger_${i}"><label for="trigger_${i}" class="${item.triggered?'warning-text':''}">${item.triggered?'已触发 · 请重估':'标记为已触发'}</label></div><button class="delete-inline" data-remove-fs="${i}">删除</button></div><textarea class="form-input textarea" rows="2" maxlength="600" placeholder="在什么可观察条件下，你会认为判断不成立？" data-falsify="${i}">${esc(item.text)}</textarea></div>`).join('')||'<p class="field-note">尚未定义证伪条件。</p>';
+ $('addPositive').disabled=$('addNegative').disabled=activeDraft.evidence.length>=60;$('addFalsify').disabled=activeDraft.falsify.length>=40;
+}
+$('addPositive').addEventListener('click',()=>{if(activeDraft?.evidence.length<60){activeDraft.evidence.push({type:'pro',text:''});renderEvidence()}});
+$('addNegative').addEventListener('click',()=>{if(activeDraft?.evidence.length<60){activeDraft.evidence.push({type:'con',text:''});renderEvidence()}});
+$('addFalsify').addEventListener('click',()=>{if(activeDraft?.falsify.length<40){activeDraft.falsify.push({text:'',triggered:false});renderEvidence()}});
+$('evidenceList').addEventListener('input',e=>{const t=e.target;if(activeDraft&&t.dataset.evidence!==undefined){activeDraft.evidence[Number(t.dataset.evidence)].text=t.value}});
+$('falsifyList').addEventListener('input',e=>{const t=e.target;if(activeDraft&&t.dataset.falsify!==undefined)activeDraft.falsify[Number(t.dataset.falsify)].text=t.value});
+$('falsifyList').addEventListener('change',e=>{const t=e.target;if(activeDraft&&t.dataset.trigger!==undefined){activeDraft.falsify[Number(t.dataset.trigger)].triggered=t.checked;const label=t.nextElementSibling;label.textContent=t.checked?'已触发 · 请重估':'标记为已触发';label.classList.toggle('warning-text',t.checked)}});
+$('evidenceList').addEventListener('click',e=>{const b=e.target.closest('[data-remove-ev]');if(b&&activeDraft){activeDraft.evidence.splice(Number(b.dataset.removeEv),1);renderEvidence()}});
+$('falsifyList').addEventListener('click',e=>{const b=e.target.closest('[data-remove-fs]');if(b&&activeDraft){activeDraft.falsify.splice(Number(b.dataset.removeFs),1);renderEvidence()}});
+$('saveProject').addEventListener('click',()=>{
+ if(!activeDraft)return;syncForm();if(!activeDraft.name.trim()){toast('请填写项目名称');$('editName').focus();return}if(!activeDraft.goal.trim()){toast('请填写明确的成果目标');$('editGoal').focus();return}
+ const cleaned=sanitizeProject({...activeDraft,updatedAt:stamp()},0);
+ if(editId){const idx=state.projects.findIndex(p=>p.id===editId);if(idx>=0)state.projects[idx]=cleaned}
+ else{if(state.projects.length>=10){toast('最多10个学习项目');return}state.projects.push(cleaned)}
+ save();closeEditor();renderAll();toast('学习项目与证据已保存在本地')
+});
+$('deleteProject').addEventListener('click',()=>{if(!editId||!activeDraft)return;if(!confirm('确定删除「'+activeDraft.name+'」及其所有证据和证伪条件？此操作无法撤销。'))return;state.projects=state.projects.filter(p=>p.id!==editId);save();closeEditor();renderAll();toast('项目已删除')});
+$('exportBtn').addEventListener('click',()=>{const json=JSON.stringify({...state,exportedAt:stamp()},null,2);const blob=new Blob([json],{type:'application/json;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='learning-kelly-'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),2000);toast('JSON 已导出')});
+$('importBtn').addEventListener('click',()=>$('importFile').click());
+$('importFile').addEventListener('change',async e=>{const file=e.target.files?.[0];if(!file)return;e.target.value='';if(file.size>2000000){toast('JSON 超过2MB，已拒绝导入');return}try{const parsed=JSON.parse(await file.text());const incoming=sanitize(parsed);if(!confirm(`导入将覆盖当前 ${state.projects.length} 个项目与时间预算。确定导入 ${incoming.projects.length} 个项目吗？`))return;state=incoming;save();refreshSettings();renderAll();toast('JSON 导入成功')}catch(err){toast('导入失败：'+(err.message||'JSON 格式错误'))}});
+refreshSettings();renderAll();
+})();
+</script>
+</body></html>

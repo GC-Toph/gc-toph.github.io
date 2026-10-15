@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="十二支点：离线心理成长与沟通训练工作台，数据保存在本地浏览器。">
+  <title>十二支点 · 成长工作台</title>
+  <style>
+:root{color-scheme:light;--bg:#f5f7f8;--panel:#fff;--ink:#1f3036;--muted:#718087;--subtle:#89979e;--line:#e3e9eb;--main:#227d75;--main-2:#125e58;--mint:#e6f3ef;--blue:#eaf0ff;--amber:#fff4e6;--red:#b14b48;--redbg:#fff0ed;--purple:#7466bb;--shadow:0 8px 32px rgba(40,71,75,.045);--radius:16px;--sidebar:#fafcfb}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;font-size:14px;line-height:1.55}button,input,select,textarea{font:inherit}button{cursor:pointer}button:disabled{cursor:not-allowed;opacity:.47}a{color:var(--main)}h1,h2,h3,h4,p{margin-top:0}h1{font-size:25px;line-height:1.25;margin:3px 0 0;letter-spacing:-.035em}h2{font-size:20px;letter-spacing:-.025em}h3{font-size:16px}.muted{color:var(--muted)}.small{font-size:12px}.tiny{font-size:11px}.text-danger{color:var(--red)}.fw{font-weight:700}.mb0{margin-bottom:0}.mb1{margin-bottom:9px}.mb2{margin-bottom:18px}.mt1{margin-top:10px}.mt2{margin-top:20px}.mt3{margin-top:30px}.pre-line{white-space:pre-line;overflow-wrap:anywhere}.wrap-any{overflow-wrap:anywhere}.app-shell{display:grid;grid-template-columns:248px minmax(0,1fr);min-height:100vh}.sidebar{position:sticky;top:0;height:100vh;background:var(--sidebar);border-right:1px solid var(--line);display:flex;flex-direction:column;padding:27px 15px 16px;z-index:12}.brand{display:flex;gap:12px;align-items:center;padding:0 11px 36px}.brand-mark{width:41px;height:41px;background:var(--main);color:white;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:850;letter-spacing:-.06em}.brand-mark span{color:#a3e2d1;font-size:18px;padding-left:1px}.brand strong{display:block;font-size:17px;line-height:1.1}.brand small{display:block;font-size:11px;color:var(--muted);margin-top:5px}.side-overline{font-size:10px;color:#9aa7ac;letter-spacing:.12em;font-weight:750;padding-left:15px;margin:0 0 9px}.side-nav{display:grid;gap:4px}.nav-item{border:0;background:transparent;display:flex;gap:13px;align-items:center;padding:12px 15px;border-radius:11px;text-align:left;color:#63737a;font-weight:600;width:100%;transition:.13s}.nav-item:hover{background:#edf4f1;color:var(--main)}.nav-item.active{background:var(--mint);color:var(--main-2)}.nav-ico{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;font-size:19px;font-weight:500}.side-footer{margin-top:auto;border-top:1px solid var(--line);padding:17px 12px 0}.tiny-status{font-size:12px;font-weight:650;color:var(--main)}.side-privacy{font-size:11px;color:var(--muted);margin-top:9px}.online-dot{width:7px;height:7px;border-radius:50%;display:inline-block;background:#45ab88;margin-right:4px;vertical-align:middle}.workspace{min-width:0;display:flex;flex-direction:column}.topbar{padding:24px clamp(20px,3.2vw,48px) 14px;display:flex;align-items:center;justify-content:space-between;gap:12px}.topbar-title{display:flex;align-items:center;gap:12px}.topbar-actions{display:flex;align-items:center;gap:13px}.eyebrow{text-transform:none;letter-spacing:.02em;color:var(--muted);font-size:12px;font-weight:500}.save-indicator{font-size:12px;color:var(--muted);white-space:nowrap}.top-action,.avatar-btn,.icon-btn{height:37px;border:1px solid var(--line);border-radius:10px;background:#fff;color:#5c6b73;padding:0 12px;display:flex;gap:8px;align-items:center;justify-content:center;font-weight:650}.top-action:hover,.avatar-btn:hover,.icon-btn:hover{border-color:#a7d0c5;color:var(--main)}.avatar-btn{width:37px;font-size:19px}.mobile-menu{display:none}.main{padding:14px clamp(20px,3.2vw,48px) 50px;width:100%;max-width:1530px}.page-footer{padding:0 clamp(20px,3.2vw,48px) 25px;color:#a1afb1;font-size:11px;margin-top:auto}.bottom-nav{display:none}.grid{display:grid;gap:16px}.grid-2{grid-template-columns:repeat(2,minmax(0,1fr))}.grid-3{grid-template-columns:repeat(3,minmax(0,1fr))}.grid-4{grid-template-columns:repeat(4,minmax(0,1fr))}.dash-top{display:grid;grid-template-columns:1.35fr .8fr .8fr;gap:16px}.dashboard-columns{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(290px,.85fr);gap:18px;margin-top:18px}.stack{display:grid;gap:16px;align-content:start}.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:22px;box-shadow:var(--shadow);min-width:0}.card.compact{padding:17px}.card.soft{background:#f0f7f4;border-color:#d7e7e0}.card.light{box-shadow:none}.card.warn{background:#fff9ef;border-color:#f1dcbd}.card.alert{background:#fff5f2;border-color:#f2d1c9}.card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:17px}.card-head h2,.card-head h3{margin:0}.card-head .muted{margin:4px 0 0}.section-title{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:27px 0 12px}.section-title h2{margin:0;font-size:17px}.dashboard-main{background:linear-gradient(145deg,#19746e,#14615e);color:white;border:0;position:relative;overflow:hidden}.dashboard-main:after{content:"";width:220px;height:220px;position:absolute;border:35px solid rgba(255,255,255,.06);border-radius:50%;right:-90px;top:-110px}.dashboard-main .muted{color:#bbdad4}.hero-value{font-size:46px;line-height:1;letter-spacing:-.05em;font-weight:800;margin:12px 0 12px;font-variant-numeric:tabular-nums}.hero-value small{font-size:16px;letter-spacing:0;font-weight:500;opacity:.8}.progress{height:10px;background:#eaf1ef;border-radius:999px;overflow:hidden}.progress>span{display:block;height:100%;background:var(--main);border-radius:999px;transition:width .25s}.dashboard-main .progress{background:rgba(255,255,255,.22)}.dashboard-main .progress>span{background:#d1f3e9}.progress.thin{height:6px}.metric-number{font-size:33px;font-weight:790;line-height:1.15;letter-spacing:-.04em;font-variant-numeric:tabular-nums;margin:9px 0 6px}.stat-context{font-size:12px;color:var(--muted)}.row{display:flex;gap:12px;align-items:center}.between{justify-content:space-between}.row.wrap{flex-wrap:wrap}.col{display:flex;flex-direction:column;gap:10px}.grow{flex:1;min-width:0}.pills{display:flex;gap:6px;flex-wrap:wrap}.pill{display:inline-flex;align-items:center;gap:5px;background:#f3f6f6;color:#60737b;padding:5px 9px;border-radius:999px;font-size:11px;font-weight:650;border:1px solid #e8eeee;white-space:nowrap}.pill.green{background:#e9f5f1;color:#147566;border-color:#d4e9e0}.pill.blue{background:#edf3ff;color:#516da9;border-color:#dfebff}.pill.orange{background:#fff4e7;color:#98642b;border-color:#f9e6cf}.pill.red{background:#fff0ee;color:#a85350;border-color:#f9d9d5}.pill.purple{background:#f1effb;color:#7167a2;border-color:#e7e3f7}.btn{border:1px solid transparent;border-radius:10px;min-height:38px;padding:9px 14px;background:var(--main);color:white;font-weight:700;display:inline-flex;gap:8px;align-items:center;justify-content:center;text-align:center;transition:.15s;line-height:1.2}.btn:hover{background:var(--main-2)}.btn.secondary{border-color:var(--line);background:white;color:#496069}.btn.secondary:hover{background:#edf5f2;border-color:#bfdcd3;color:var(--main)}.btn.soft{background:var(--mint);color:var(--main)}.btn.soft:hover{background:#d5ebe5}.btn.ghost{background:transparent;color:var(--main);border-color:transparent}.btn.ghost:hover{background:var(--mint)}.btn.danger{background:#fff0ed;color:#ad4541;border:1px solid #f0cac7}.btn.danger:hover{background:#ffe3e0}.btn.sm{font-size:12px;min-height:30px;padding:6px 10px;border-radius:8px}.btn.icononly{padding:6px;width:34px;min-width:34px}.btn.full{width:100%}.btnrow{display:flex;flex-wrap:wrap;gap:9px;align-items:center}.task-row{display:flex;gap:12px;align-items:flex-start;padding:15px 0;border-top:1px solid #eff2f2}.task-row:first-child{border-top:0;padding-top:0}.task-number{width:35px;height:35px;border-radius:10px;background:#eef5f3;color:var(--main);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-weight:800}.task-number.done{background:#ddf1e7;color:#197d66}.task-number.blocked{background:#f4f4f4;color:#acb6bb}.task-row .task-copy{flex:1;min-width:0}.task-row .task-copy strong{display:block;font-size:14px}.task-row .task-copy .muted{font-size:12px;margin-top:4px}.task-actions{display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end}.empty{background:#f9fbfa;border:1px dashed #ccd7d6;border-radius:13px;padding:27px;text-align:center;color:var(--muted)}.empty strong{display:block;color:var(--ink);margin-bottom:7px}.quick-link{border:1px solid #dfebe7;border-radius:12px;padding:14px;background:#f7fbf9;cursor:pointer;text-align:left;width:100%;display:flex;align-items:center;gap:12px}.quick-link:hover{border-color:#a4d5c6;background:#edf8f3}.quick-symbol{width:38px;height:38px;border-radius:11px;background:#dcefe8;color:#167463;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}.quick-link strong{display:block;font-size:13px}.quick-link small{display:block;color:var(--muted);font-size:11px;margin-top:2px}.tool-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.tool-card{display:flex;flex-direction:column;gap:11px;padding:17px;min-width:0}.tool-card h3{font-size:15px;margin:0}.tool-card p{font-size:12px;color:var(--muted);margin:0;flex:1}.tool-card .btnrow{margin-top:5px}.input,.select,.textarea{width:100%;border:1px solid #dce5e7;border-radius:10px;background:white;color:var(--ink);min-height:40px;padding:9px 12px;outline:none;transition:border-color .12s,box-shadow .12s}.textarea{resize:vertical;min-height:88px;line-height:1.6}.input:focus,.select:focus,.textarea:focus{border-color:#63b5a1;box-shadow:0 0 0 3px #dcf1eb}.input[type="range"]{padding:0;min-height:24px;accent-color:var(--main)}.input[type="checkbox"]{width:auto;min-height:unset;accent-color:var(--main)}.field{margin-bottom:15px}.field>label,.field>.field-label{display:block;font-weight:700;font-size:13px;margin-bottom:7px;color:#3f535c}.field .help{font-size:11px;color:var(--muted);margin:5px 0}.field-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.field-grid.three{grid-template-columns:repeat(3,minmax(0,1fr))}.form-actions{display:flex;gap:9px;justify-content:flex-end;flex-wrap:wrap;margin-top:20px}.filterbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:16px 0}.filterbar .input{flex:1;min-width:200px}.filterbar .select{width:auto;min-width:120px}.segmented{display:inline-flex;background:#eef2f2;border-radius:11px;padding:4px;gap:3px;max-width:100%;flex-wrap:wrap}.segmented button{border:0;border-radius:8px;background:transparent;color:var(--muted);font-weight:650;padding:7px 12px;font-size:12px}.segmented button.active{background:white;color:var(--main);box-shadow:0 2px 8px rgba(30,60,65,.08)}.plan-banner{background:linear-gradient(110deg,#e7f4ef,#f6faf8);border-color:#d3e8e0}.stage{margin-bottom:18px}.stage-head{display:flex;gap:12px;align-items:center;justify-content:space-between;margin-bottom:9px;flex-wrap:wrap}.stage-index{background:#e6f3ee;color:#17675f;border-radius:9px;padding:7px 11px;font-weight:800;font-size:12px}.stage-body{padding-left:14px;border-left:2px solid #dbe8e3;margin-left:19px;display:grid;gap:9px}.plan-item{border:1px solid var(--line);border-radius:11px;padding:12px;display:flex;gap:12px;align-items:center;background:white}.plan-item-title{font-weight:700;font-size:13px}.plan-item small{color:var(--muted)}.plan-item .tools{display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end}.divider{height:1px;background:var(--line);border:0;margin:17px 0}.hintbox{background:#edf6f3;border:1px solid #d9ece5;border-radius:12px;padding:13px 15px;color:#315e55;font-size:12px}.warningbox{background:#fff8ed;border:1px solid #f0ddbd;border-radius:12px;padding:13px 15px;color:#855a34;font-size:12px}.dangerbox{background:#fff2ef;border:1px solid #eed0ca;border-radius:12px;padding:13px 15px;color:#9d504b;font-size:12px}.callout-title{font-weight:750;margin-bottom:6px}.choice-chip{border:1px solid #dae5e3;border-radius:999px;padding:8px 12px;background:white;color:#4b6166;font-size:12px;cursor:pointer;font-weight:650;display:inline-flex;align-items:center;gap:5px}.choice-chip.selected,.choice-chip[aria-pressed="true"]{background:#e0f1eb;border-color:#76b69f;color:#136958}.choice-chip:hover{border-color:#82c0ac}.choice-chips{display:flex;gap:7px;flex-wrap:wrap}.flow-steps{display:flex;gap:5px;flex-wrap:wrap;margin:7px 0 20px}.flow-steps .flow-step{flex:1;min-width:92px;background:#f0f4f4;border-radius:10px;padding:10px 7px;font-size:12px;font-weight:700;text-align:center;color:var(--muted)}.flow-steps .flow-step.current{background:#dcefe8;color:#125f57}.flow-steps .flow-step.done{background:#eaf4e9;color:#3c8b62}.range-line{display:flex;align-items:center;gap:12px}.range-line input{flex:1}.score-large{font-weight:800;color:var(--main);font-size:22px;min-width:52px;text-align:right}.journal-record{border-bottom:1px solid var(--line);padding:14px 0}.journal-record:last-child{border-bottom:0}.journal-record .date{color:var(--muted);font-size:11px}.hist-row{display:grid;grid-template-columns:100px 1fr;gap:12px;padding:7px 0;font-size:12px;border-bottom:1px solid #f0f3f2}.hist-row:last-child{border-bottom:0}.mini-chart{width:100%;height:175px;display:block;background:#fbfdfc;border:1px solid var(--line);border-radius:10px}.bar-day{height:7px;border-radius:999px;background:#e8efee;overflow:hidden;margin-top:7px}.bar-day span{display:block;height:100%;background:#4da394}.quiz-choice{width:100%;text-align:left;border:1px solid #dce6e5;background:white;border-radius:12px;padding:13px 15px;color:var(--ink);font-weight:550;transition:.12s}.quiz-choice:hover{border-color:#7fc2ad;background:#f5fbf8}.quiz-choice.selected{border-color:#2c8c7b;background:#e8f5f0;color:#125f58}.quiz-choice.correct{background:#e9f7eb;border-color:#7fb98e;color:#286840}.quiz-choice.wrong{background:#ffefed;border-color:#db8d85;color:#a04b48}.quiz-order-item{border:1px solid #dce5e4;background:white;border-radius:11px;padding:11px;display:flex;align-items:center;gap:11px;margin:8px 0}.quiz-order-item>span{background:#edf5f2;color:var(--main);width:26px;height:26px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-weight:800;flex-shrink:0}.quiz-order-item .order-text{flex:1}.quiz-order-item .btnrow{gap:4px}.quiz-explanation{background:#eff8f3;border-radius:12px;padding:15px;margin-top:16px;border:1px solid #d5eadf}.rule-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.rule-tile{padding:12px;border-radius:11px;background:#fafcfc;border:1px solid var(--line)}.rule-tile strong{display:block;font-size:12px;margin-bottom:4px}.rule-tile p{font-size:11px;color:var(--muted);margin:0}.timeline{display:grid;gap:6px}.timeline-entry{display:grid;grid-template-columns:118px 1fr;gap:11px;padding:10px 12px;background:#fafcfb;border-left:3px solid var(--main);border-radius:6px;font-size:12px}.task-builder-row{display:grid;grid-template-columns:minmax(0,1.6fr) 80px 116px 100px auto;gap:9px;align-items:end}.no-wrap{white-space:nowrap}.option-note{font-size:11px;color:var(--muted)}.day-switch{display:flex;gap:7px;flex-wrap:wrap}.day-switch label{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--line);padding:8px 10px;border-radius:9px;cursor:pointer;font-size:12px}.day-switch label:has(input:checked){background:var(--mint);border-color:#9ccdbd;color:var(--main)}.day-switch input{accent-color:var(--main)}.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);z-index:110;background:#1e3a3d;color:#fff;padding:12px 18px;border-radius:11px;box-shadow:0 10px 30px rgba(0,0,0,.2);font-size:13px;max-width:min(90vw,600px)}.modal-wrap{position:fixed;inset:0;z-index:80;background:rgba(15,37,40,.48);display:flex;align-items:center;justify-content:center;padding:17px}.modal{width:min(680px,100%);max-height:min(89vh,900px);overflow:auto;background:#fff;border-radius:19px;padding:26px;box-shadow:0 35px 100px rgba(0,0,0,.2)}.modal.wide{width:min(900px,100%)}.modal-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:16px}.modal-head h2{margin:0}.modal-close{font-size:22px;border:0;background:transparent;color:var(--muted);padding:2px 8px}.modal-close:hover{color:var(--red)}.intro-strip{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:19px}.mini-tab{border:1px solid var(--line);background:#fff;color:var(--muted);border-radius:9px;padding:8px 11px;font-weight:650;font-size:12px}.mini-tab.active{border-color:#9ccfbe;color:var(--main);background:#e9f5ee}.checkbox-line{display:flex;gap:9px;align-items:flex-start;padding:8px 0}.checkbox-line input{margin-top:4px;accent-color:var(--main)}.safety-banner{border-left:4px solid #dfa65d;background:#fff9ee;border-radius:9px;padding:12px;color:#805a30;font-size:12px;margin:13px 0}.date-empty{font-size:12px;color:var(--muted);padding:14px}.keyboard{font-size:11px;color:#87989e}.copy-preview{white-space:pre-wrap;background:#f6faf8;padding:16px;border:1px solid var(--line);border-radius:12px;font-size:13px;line-height:1.8}.color-sample{height:8px;width:8px;border-radius:50%;display:inline-block}.sticky-actions{position:sticky;bottom:-26px;background:linear-gradient(0deg,white 80%,rgba(255,255,255,0));padding:18px 0 2px;z-index:4}.save-flash{color:var(--main)}
+@media (max-width:1350px){.tool-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.dash-top{grid-template-columns:1.2fr 1fr 1fr}.task-builder-row{grid-template-columns:1.3fr 70px 110px 95px auto}}
+@media (max-width:1080px){.app-shell{grid-template-columns:208px minmax(0,1fr)}.sidebar{padding:23px 11px 15px}.dash-top{grid-template-columns:1fr 1fr}.dash-top>.dashboard-main{grid-column:1/-1}.dashboard-columns{grid-template-columns:1fr}.topbar{padding-top:19px}.task-builder-row{grid-template-columns:repeat(2,1fr)}.task-builder-row>*:last-child{grid-column:1/-1}}
+@media (max-width:767px){.app-shell{display:block}.sidebar{display:none}.topbar{padding:18px 16px 8px;align-items:center}.topbar h1{font-size:21px}.topbar-actions{gap:7px}.top-action span{display:none}.save-indicator{font-size:10px;max-width:95px;overflow:hidden;text-overflow:ellipsis}.mobile-menu{display:flex}.main{padding:12px 14px 100px}.page-footer{padding:0 14px 100px}.bottom-nav{position:fixed;bottom:0;left:0;right:0;display:flex;justify-content:space-around;gap:1px;background:rgba(255,255,255,.97);border-top:1px solid var(--line);box-shadow:0 -6px 18px rgba(24,55,59,.06);z-index:40;padding:8px 5px calc(7px + env(safe-area-inset-bottom))}.bottom-nav .nav-item{display:flex;flex-direction:column;justify-content:center;gap:1px;width:20%;max-width:92px;font-size:10px;padding:5px 2px;border-radius:9px;text-align:center}.bottom-nav .nav-ico{font-size:21px}.dash-top{grid-template-columns:1fr 1fr;gap:9px}.dashboard-main{grid-column:1/-1}.dashboard-columns{margin-top:11px;gap:10px}.card{padding:17px;border-radius:14px}.card.compact{padding:13px}.tool-grid{grid-template-columns:1fr;gap:11px}.grid-3,.grid-4{grid-template-columns:repeat(2,minmax(0,1fr))}.field-grid,.field-grid.three{grid-template-columns:1fr}.tool-card{padding:16px}.task-row{flex-wrap:wrap}.task-row .task-actions{width:100%;justify-content:flex-end;padding-left:44px}.metric-number{font-size:27px}.hero-value{font-size:38px}.card-head{flex-wrap:wrap}.filterbar{align-items:stretch}.filterbar .input,.filterbar .select{width:100%;flex:1 1 100%}.stage-body{padding-left:9px;margin-left:12px}.plan-item{flex-wrap:wrap}.plan-item .tools{width:100%;justify-content:flex-end}.rule-grid{grid-template-columns:1fr}.modal{padding:18px 15px;max-height:92vh}.modal-wrap{padding:8px;align-items:flex-end}.modal{border-radius:18px 18px 0 0;max-height:94vh;width:100%}.intro-strip{flex-wrap:wrap}.timeline-entry{grid-template-columns:88px 1fr}}
+@media (max-width:395px){.dash-top{grid-template-columns:repeat(2,minmax(0,1fr))}.dash-top>.dashboard-main{grid-column:1/-1}.top-action{display:none}.grid-3,.grid-4{grid-template-columns:1fr}.task-builder-row{grid-template-columns:1fr}.task-builder-row>*:last-child{grid-column:auto}.pill{font-size:10px}}
+@media (prefers-reduced-motion: reduce){*{scroll-behavior:auto!important;transition:none!important}}
+/* V3: evidence-grounded tool instructions */
+.method-guide{background:#f6f9f8;border:1px solid #dbe7e3;border-radius:13px;padding:13px 16px}
+.method-guide summary{display:flex;align-items:center;justify-content:space-between;gap:8px;cursor:pointer;color:#245e56;list-style:none;flex-wrap:wrap}
+.method-guide summary::-webkit-details-marker{display:none}
+.method-guide summary:before{content:'▸';color:#328b78;margin-right:1px}
+.method-guide[open] summary:before{content:'▾'}
+.method-steps{margin:13px 0 14px 19px;padding:0;display:grid;gap:10px;font-size:14px;line-height:1.65}
+.method-steps li::marker{color:#277d6b;font-weight:750}
+.method-example{background:white;border-left:3px solid #5fa18e;padding:11px 13px;border-radius:0 10px 10px 0;font-size:13px;line-height:1.7}
+.method-example p{margin-top:5px}
+.communication-choice{display:flex;flex-direction:column;gap:8px;min-height:315px}
+.communication-choice>button{margin-top:auto;align-self:flex-start}
+/* 28-day protocol */
+.sleep-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin:0 0 15px}
+.sleep-tabs{flex-wrap:wrap}
+.sleep-section{padding:19px;background:#f9fbfb;border:1px solid #e0e8e6;border-radius:14px;min-width:0}
+.sleep-section h3{margin:0 0 17px;font-size:17px}
+.sleep-editor-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.sleep-check-grid{display:grid;grid-template-columns:1fr;gap:8px;margin:12px 0}
+.sleep-check{display:flex;align-items:flex-start;gap:11px;padding:10px 11px;background:white;border:1px solid #e0e7e4;border-radius:9px;cursor:pointer}
+.sleep-check input{width:17px;height:17px;flex-shrink:0;margin-top:3px;accent-color:var(--main)}
+.sleep-check span{display:grid;gap:3px}
+.sleep-check small{font-size:12px;color:var(--muted);line-height:1.45}
+.sleep-status{display:flex;align-items:center;min-height:42px;padding:10px 12px;background:#eaf4f0;border-radius:10px;color:#176456;font-weight:750}
+.sleep-feedback{padding:12px;background:#f2f6ed;border-radius:9px;font-size:13px;color:#5a6e52;line-height:1.65;margin-top:12px}
+.sleep-table-wrap{overflow:auto;border:1px solid #dce4e2;border-radius:12px;max-height:58vh;scrollbar-width:thin}
+.sleep-table{border-collapse:separate;border-spacing:0;min-width:1390px;width:100%;font-size:12px}
+.sleep-table th,.sleep-table td{padding:7px 5px;border-bottom:1px solid #e5ebea;border-right:1px solid #edf1ef;white-space:nowrap;text-align:center;background:white}
+.sleep-table thead th{position:sticky;top:0;z-index:4;background:#ebf3f1;color:#37635c;font-weight:800;padding:12px 6px}
+.sleep-table th:first-child{position:sticky;left:0;z-index:3;background:#f4f8f7;min-width:105px;text-align:left;padding-left:10px}
+.sleep-table thead th:first-child{z-index:5;background:#e1eeea}
+.sleep-table tbody tr:nth-child(even) td{background:#fbfcfc}
+.sleep-table tbody th small{display:block;color:#879799;margin-top:3px;font-weight:400}
+.sleep-day-link{border:0;background:transparent;color:var(--main);font-size:12px;font-weight:800;text-decoration:underline;cursor:pointer;padding:1px}
+.sleep-mini-input{width:83px;min-height:30px;border:1px solid #dce5e4;border-radius:7px;padding:4px 5px;font:inherit;background:white;color:var(--ink);text-align:center}
+.sleep-mini-input[type=number]{width:63px}
+.sleep-check-cell input{width:15px;height:15px;accent-color:var(--main);cursor:pointer}
+.sleep-table-wrap :focus-visible,.breath-widget :focus-visible{outline:2px solid var(--main);outline-offset:2px}
+/* Offline dual-tone physiological sigh guide (optional) */
+.breath-widget{border:1px solid #cfe2df;border-radius:16px;background:linear-gradient(135deg,#f4faf7,#f4f7fc);padding:18px;margin:14px 0}
+.breath-widget h3{margin:5px 0 0;font-size:17px}
+.breath-body{display:flex;align-items:center;gap:25px;margin-top:16px}
+.breath-circle{--breath-progress:0%;flex:0 0 168px;width:168px;height:168px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;border-radius:50%;background:radial-gradient(closest-side,#f7fbfa 87%,transparent 89% 100%),conic-gradient(#55a69a var(--breath-progress),#d9e9e6 0);transition:background .14s}
+.breath-circle[data-phase=exhale]{background:radial-gradient(closest-side,#f7fbfa 87%,transparent 89% 100%),conic-gradient(#7c9bbd var(--breath-progress),#d9e9e6 0)}
+.breath-circle span{font-size:19px;font-weight:850;color:#246b61}
+.breath-circle small{font-size:12px;color:#678184;margin-top:8px}
+.breath-instructions{flex:1;min-width:0}
+.breath-big-text{font-size:15px;font-weight:750;line-height:1.7;min-height:28px}
+.breath-audio-controls{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.breath-audio-controls label{display:flex;align-items:center;gap:8px}
+.breath-audio-controls input{width:112px;accent-color:var(--main)}
+@media(max-width:900px){.sleep-editor-grid{grid-template-columns:1fr}}
+@media(max-width:520px){.breath-body{flex-direction:column;text-align:center}.breath-instructions{width:100%}.breath-audio-controls,.breath-body .btnrow{justify-content:center}.breath-circle{width:145px;height:145px;flex-basis:145px}.sleep-section{padding:12px}.sleep-head{align-items:flex-start}}
+
+</style>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="主要导航">
+      <div class="brand" role="banner"><div class="brand-mark">12<span>•</span></div><div><strong>十二支点</strong><small>成长工作台</small></div></div>
+      <div class="side-overline">工作空间</div>
+      <nav id="desktop-nav" class="side-nav"></nav>
+      <div class="side-footer"><div class="tiny-status"><span class="online-dot"></span> 完全本地 · 无需联网</div><div class="side-privacy">数据保存在当前浏览器。请定期导出 JSON 备份。</div></div>
+    </aside>
+    <div class="workspace">
+      <header class="topbar">
+        <div class="topbar-title"><button class="icon-btn mobile-menu" data-act="show-menu" aria-label="展开导航">☰</button><div><div id="breadcrumb" class="eyebrow">个人成长 / 概览</div><h1 id="page-title">今天，继续向前</h1></div></div>
+        <div class="topbar-actions"><span id="save-indicator" class="save-indicator"><span class="online-dot"></span> 已自动保存</span><button class="top-action" data-act="export-json" title="导出 JSON 备份">⇩ <span>导出备份</span></button><button class="avatar-btn" data-nav="settings" aria-label="设置与数据">⚙</button></div>
+      </header>
+      <main id="main" class="main" tabindex="-1" aria-live="polite"></main>
+      <footer class="page-footer">十二支点 · 本地测试版 · 本工具用于自助学习与记录，不提供诊断、治疗或危机监控。</footer>
+    </div>
+  </div>
+  <nav class="bottom-nav" id="mobile-nav" aria-label="移动端导航"></nav>
+  <div id="overlay-root"></div>
+  <div id="toast" role="status" aria-live="polite" class="toast" hidden></div>
+  <input id="import-file" type="file" accept="application/json,.json" hidden>
+  <script>
+/* bundled: data.js */
+/* 十二支点工具与题库 · 所有内容随本地文件离线提供 */
+'use strict';
+const CHAPTERS = [
+  ['梳理问题的成因','Unravel the Causes'],
+  ['发现你的指导性基础','Uncover Your Guiding Foundations'],
+  ['践行你的指导性基础','Actualize Your Guiding Foundations'],
+  ['为风暴做好准备','Prepare for the Storm'],
+  ['直面恐惧','Approach the Monster'],
+  ['通过身体调节心理','Shift Your Body to Shift Your Mind'],
+  ['管理你的思维','Steward Your Thoughts'],
+  ['优化生产力方程','Tune the Productivity Equation'],
+  ['多做事后庆幸的事','Do More Glad-You-Did-It Activities'],
+  ['掌握沟通技巧','Communicate Skillfully'],
+  ['选择你的态度','Choose Your Attitude'],
+  ['善用注意力','Pay Attention']
+];
+// F 频率：day 100 / weekMany 85 / week 60 / stage 35 / situational 20
+// 证据等级仅粗略表明支持该类别/技术的研究情况，不能当作独立临床疗效评分。
+const TOOL_SPECS = [
+// id | chapter | name | mode | freq | evidence | duration | core description | prompts | tags | safety
+['abc',1,'ABC 情绪分析','abc','situational','B',8,'把触发事实、解释和情绪行为结果分开，寻找维持困扰的具体机制。',[], '困扰,思维'],
+['vulnerability',1,'背景易感因素','form','week','C',6,'记录睡眠、疲劳、压力与其他可能放大情绪反应的背景条件。',['当前困扰或事件','最近睡眠、身体、工作、人际等背景','哪些条件可以实际调整？'],'分析,身体'],
+['inner-why',1,'内在追问法','form','stage','C',10,'连续追问情绪或行为背后的担忧与需要，避免无限反刍。',['我想理解的具体反应','它为什么对我重要或可怕？','更深一层我担心失去什么？','目前发现的关键因素与下一步'],'分析,价值'],
+['bright-spots',1,'亮点分析法','form','week','C',8,'寻找问题较轻的例外时刻，复制已经起作用的条件。',['要改善的问题','哪次问题较轻或没有出现？','那次有什么不同？','准备重复的一个条件'],'行动,分析'],
+['values',2,'内在价值澄清','values','stage','B',12,'区分真正在意的价值与达成价值的工具，形成个人方向。',[],'价值,规划'],
+['principles',2,'个人原则整理','form','stage','C',10,'把价值转换为可长期使用的决策准则。',['我重视的核心价值','与价值相符的原则','下一次怎样实践原则'],'价值,规划'],
+['priorities',2,'当前优先领域','form','week','C',6,'确认这一阶段最值得投入的生活领域。',['目前最重要的生活领域','为什么这些领域现在重要？','这周准备怎样分配注意力？'],'价值,规划'],
+['value-check',2,'价值一致性检验','form','situational','C',10,'通过价值标准比较多个现实选项，避免只追逐外部认可。',['需要比较的选择','最重要的三个价值','每个方案如何满足这些价值？','决定与理由'],'价值,决策'],
+['vast',3,'VAST 目标设计','vast','stage','B',12,'使用有价值、有追求性、精简、明确的目标框架。',[],'目标,规划'],
+['habit',3,'习惯与如果—那么计划','form','week','B',8,'把期望行为与具体场景绑定，并减少环境阻力。',['我要建立的习惯','如果发生什么情境','那么我将采取的最小行动','怎样减少执行阻力？'],'行动,习惯'],
+['toward',3,'今日价值行动','toward','day','B',2,'在当下选择一项更接近自身价值的小行动。',[],'价值,行动'],
+['review',3,'周进展回顾','review','week','B',12,'检查已经完成的行动和仍存在的障碍，调整下一周。',[],'回顾,规划'],
+['rid',4,'RID 风险与应对计划','rid','stage','B',12,'提前识别风险、早期信号与应对策略。',[],'压力,规划'],
+['warning-signs',4,'预警信号观察','form','situational','B',5,'在问题扩大前记录可观察的预警迹象。',['目前发生了哪些早期迹象？','它与过去哪种模式相似？','我可以做的第一件安全行动'],'压力,应对'],
+['stop',4,'STOP 暂停技巧','guided','situational','B',3,'停止、退一步、观察，再带着觉察行动。',['暂停后我观察到什么？','下一步更合适的行动？'],'压力,即时'],
+['opposite',4,'反向行动','form','situational','B',7,'确认情绪冲动是否适合现实，若不适合则选择符合价值的替代行动。',['当前情绪及冲动','冲动符合现实风险与长期价值吗？','安全而合适的替代行动'],'情绪,行动'],
+['fear-hierarchy',5,'恐惧等级表','hierarchy','stage','A',12,'把安全但被回避的情境逐步拆成低到高的挑战。',[],'恐惧,规划','caution'],
+['exposure',5,'渐进暴露记录','form','situational','A',12,'在有明确安全条件时记录暴露预测、行动与现实反馈。',['要面对的安全情境','预期会发生什么、概率如何？','实际观察到什么？','下一步的合适挑战'],'恐惧,行动','caution'],
+['behavior-test',5,'行为实验','form','situational','A',12,'检验具体可观察的担忧预测，而不是笼统与焦虑对抗。',['我的可检验预测','怎样在安全情况下检验？','实际结果','新的理解'],'恐惧,认知','caution'],
+['safety-behaviors',5,'安全行为识别','form','stage','B',8,'识别可能妨碍现实学习的过度保护行为，但保留真正必要的防护。',['我通常怎样避免不适？','哪些属于合理安全措施？','哪些可能妨碍检验预测？'],'恐惧,分析','caution'],
+['erp',5,'ERP 与内感受暴露说明','education','stage','A',6,'了解相关治疗的适用范围与风险。本地版不提供未经评估的高强度自助方案。',[],'进阶,临床','restricted'],
+['sleep',6,'SLEEP PROTOCOL TRACKER · 28天睡眠追踪','sleep','day','B',3,'记录起床、精力、晨光、咖啡因、午睡、傍晚光照、饮水、睡前环境和夜醒。',['昨夜的睡眠与恢复情况','影响睡眠的现实因素','今晚可以调整的一件事'],'身体,健康'],
+['pmr',6,'渐进式肌肉放松','guided','weekMany','B',7,'轻柔辨识不同肌肉的紧张与放松，身体不适时可停止。',['身体目前最紧张的部位','结束后身体体验有什么变化？'],'身体,放松','caution'],
+['breathing',6,'温和 4/8 呼吸与双次鼻吸','guided','weekMany','B',5,'可选用鼻吸约3秒＋短补吸1秒、嘴缓吐气8秒的有声音引导；不追求憋气或过度呼吸。',['现在的呼吸体验','练习后有什么变化？'],'身体,放松','caution'],
+['exercise',6,'运动行动记录','form','weekMany','A',4,'安排适合自己身体状况、愿意持续的身体活动。',['今天进行或计划的运动','实际持续时间和感受','怎样让下次更容易开始？'],'身体,行动'],
+['cold',6,'冷刺激与快速呼吸：证据说明','education','stage','D',4,'相关研究有限且可能有身体风险；不作为默认练习。',[],'探索,身体','restricted'],
+['reframe',7,'认知重构','cognitive','situational','A',10,'收集支持和反面证据，生成准确而平衡的替代解释。',[],'思维,情绪'],
+['distortions',7,'认知偏差识别','form','situational','B',7,'观察灾难化、读心、过度概括等思维模式。',['让我难受的自动想法','它可能包含哪些认知偏差？','有哪些更准确的解释？'],'思维,认知'],
+['parts',7,'部分工作法','form','stage','C',12,'以慈悲态度理解彼此冲突的动机，不把“心理部分”当作真实独立人格。',['第一种内在声音与愿望','另一种声音与担忧','各自尝试保护什么？','可以怎样兼顾并采取小行动？'],'思维,自我','caution'],
+['postpone',7,'担忧推迟','form','situational','B',5,'把反复却暂无新进展的担忧安排到有限的固定思考时段。',['反复出现的担忧','计划处理的时间','现在更需要进行的活动'],'思维,即时'],
+['belief-log',7,'卡点与信念追踪','belief','week','C',8,'借鉴认知加工工具的卡点日志，记录信念强度随证据和时间变化；不用于诊断。',[],'认知,反思','caution'],
+['responsibility',7,'责任与后见偏差辨析','form','stage','C',10,'区分当时已知信息、可行选择与事后才获得的信息。',['我当时确实知道什么？','当时现实可行的选择有哪些？','哪些结论是事后才得知的？','更平衡的责任判断'],'认知,反思','caution'],
+['top-task',8,'今天最重要的一件事','top-task','day','B',2,'从任务数量转向真正重要的成果，选出一项可实现的优先行动。',[],'生产力,行动'],
+['project-check',8,'项目重要性评估','form','stage','C',8,'比较价值、影响与实际可行性。',['我正在考虑的项目','项目服务哪些个人价值？','它真正可能产生什么结果？','是否存在更高价值的替代方案？'],'规划,决策'],
+['premortem',8,'事前验尸法','form','stage','C',12,'假设计划已经失败，提前寻找关键失误与预防方案。',['假设项目失败了，结果是什么？','导致失败的三个最可能原因','我可以现在预防什么？'],'项目,规划'],
+['time-track',8,'时间记录与审计','form','week','B',10,'识别值得保留的休息、必要事务和真正的无意识时间浪费。',['昨天主要的时间分配','哪些真正体现价值或恢复？','哪些时间使用希望改变？'],'时间,分析'],
+['daily-planner',8,'今日任务与黄金时间排程','planner','day','C',10,'结合重要/紧急、任务难度、黄金时间、短休息，生成可调整的本地日程。',[],'生产力,任务'],
+['batch',8,'批量处理与自动化','form','week','C',7,'集中重复事务、自动化或交换任务，保护真正重要的时间。',['哪类事务占用很多时间？','哪些可以批量、自动化或交换？','本周实施的一步'],'时间,效率'],
+['task-split',8,'两分钟任务拆解','form','situational','B',4,'把巨大或模糊的任务缩小为下一步可完成的动作。',['我一直难以开始的任务','能否拆到两分钟内的第一步？','完成后具体下一步是什么？'],'生产力,行动'],
+['solve',8,'结构化问题解决','form','situational','B',10,'先澄清问题，再广泛生成方案，最后选择一个可行解。',['真正的问题是什么？','尽量列出三个可能方法','我选哪个方案、为什么？','我何时实施？'],'问题,行动'],
+['mood',9,'情绪与精力打点','mood','day','B',1,'记录当下心情、精力和活动，不把单次评分当作诊断。',[],'情绪,记录'],
+['activity-list',9,'事后庆幸活动清单','activities','week','A',12,'从愉悦、成就、价值、运动、社交等类别寻找完成后更满意的活动。',[],'生活,行动'],
+['activity-schedule',9,'行为激活与活动安排','form','weekMany','A',7,'根据活动不足或过度活动，增加有价值的行动或恢复性休息。',['目前更接近活动不足、平衡还是过度活动？','下一次事后庆幸活动与时间','开始前最大的阻力与应对'],'生活,行动'],
+['before-after',9,'活动前后情绪比较','before-after','day','B',3,'通过活动前后评分观察个人体验；相关性不等于因果关系。',[],'情绪,行动'],
+['conversation',10,'深入对话','form','week','B',8,'用真诚倾听、高光与低谷、适当自我分享建立联结。',['准备和谁交流？','我想真诚了解对方的什么？','可以提出什么开放式问题？','交流之后学到了什么？'],'关系,沟通'],
+['assertive',10,'坚定表达','form','situational','B',9,'明确表达自身感受与需要，同时承认对方的正当需要。',['具体、可观察的行为','我的感受与需要','准备礼貌提出的请求','如果被拒绝，我如何尊重边界？'],'沟通,边界'],
+['nvc',10,'事实→感受→需求→方案','nvc','weekMany','B',10,'沿用四段式沟通，澄清事实、感受、需要与可执行的协商方案。',[],'沟通,练习'],
+['conflict',10,'冲突暂停与修复协议','conflict','situational','C',12,'强烈冲突时先明确暂停和恢复时间，再用四段表达制定可检验的协议。',[],'沟通,冲突','caution'],
+['communication-quiz',10,'沟通与八项规则练习题','quiz','weekMany','C',7,'分类、多选、排序和规则辨析的互动题库，反馈具体原因。',[],'沟通,测验'],
+['optimism',11,'习得性乐观：三个 P','form','situational','B',7,'将永久化、泛化与过度个人归因调整为更加准确的解释。',['近期挫折','是否把它看作永远、所有方面、完全是我的错？','更加具体且符合事实的解释'],'态度,认知'],
+['growth',11,'成长型思维','form','situational','B',5,'区分当前能力限制与永久无法改善。',['我认为自己“不行”的一件事','哪些能力可以通过练习改善？','可以尝试的第一步'],'态度,成长'],
+['best-self',11,'最佳可能自我','form','week','B',15,'具体描绘符合价值的未来生活，再连接现实行动。',['若重要目标进展顺利，生活会是什么样？','我重视哪些方面？','现在能开始的一个动作'],'价值,未来'],
+['begin-again',11,'重新开始','guided','situational','C',2,'觉察已经偏离方向，然后从下一步重新行动。',['我想重新开始什么？','接下来最小的一步'],'即时,行动'],
+['acceptance',11,'接纳与释放抵抗','form','situational','B',8,'承认不可更改的事实，同时识别可采取的现实行动。',['我在抵抗什么现实？','什么部分无法改变？','我还能影响哪些方面？'],'情绪,接纳'],
+['distance',11,'时间距离化','form','situational','B',5,'从未来更宽的时间范围重新理解当下困扰。',['当前困扰','一年或五年后可能如何看待？','这改变了我现在的行动吗？'],'情绪,态度'],
+['stoic',11,'斯多葛晨间准备','form','weekMany','C',5,'预想现实可能出现的困难并准备从容回应，而非反复灾难化。',['今天可能的现实困难','当它发生时我能控制什么？','我希望怎样回应？'],'态度,规划'],
+['savor',11,'品味与欣赏','form','day','B',5,'把注意力投入正在发生或曾经发生的愉悦细节。',['值得细细感受的一件小事','它有哪些感官或人际细节？','我如何不匆忙地享受它？'],'感恩,生活'],
+['three-good',11,'三件好事','three-good','day','B',4,'记下三件好事及其发生原因，增加对积极体验的注意。',[],'感恩,情绪'],
+['gratitude-letter',11,'感恩信','form','stage','B',12,'真诚写给值得感谢的人；发送与否由自己决定。',['我想感谢谁？','对方具体做了什么？','这件事给我带来什么影响？','我想怎样表达？'],'感恩,关系'],
+['gratitude-walk',11,'感恩散步','guided','week','B',8,'在普通步行中注意值得欣赏的周围事物。',['途中注意到的好事物','我愿意继续留意什么？'],'感恩,身体'],
+['kindness',11,'善意行动','form','week','B',5,'选择具体、尊重边界且实际可完成的善意行为。',['我希望帮助谁？','这项善意行为是否尊重对方意愿？','我准备何时做？'],'关系,态度'],
+['self-compassion',11,'自我慈悲信','form','week','B',10,'用温和而不逃避责任的方式回应自己的难处。',['当前让我难过的经历','如果一位善意朋友安慰我，会说什么？','我想向自己传达怎样的支持？'],'自我,情绪'],
+['lovingkind',11,'慈爱冥想','guided','weekMany','B',8,'以简短祝愿练习对自己与他人的善意。',['练习时出现了什么感受？','可以如何尊重地将善意带入行动？'],'正念,善意'],
+['grounding',12,'3-3-3 感官扎根','grounding','situational','B',3,'观察三件看到、三种听到、三种感受到的事物；可略过身体部分。',[],'即时,注意力'],
+['att',12,'ATT 注意力训练','guided','weekMany','B',5,'听觉定向两分钟、快速切换两分钟、开放聆听一分钟。',['我选择的两种声音','最后开放聆听时注意到了什么？'],'正念,注意力'],
+['mindfulness',12,'呼吸正念','guided','day','B',5,'温和地觉察呼吸，分心后重新回来，不追求完全不分心。',['练习中最明显的感受','注意力飘走时我如何带回？'],'正念,注意力','caution'],
+['noting',12,'心理标记','guided','weekMany','B',5,'用“看见、听见、感觉、思考”等标签观察体验。',['我注意到哪些体验？','遇到想法时能否只是标记“思考”？'],'正念,注意力'],
+['expansion',12,'扩展法 OBCA','form','situational','B',7,'观察、呼吸、创造空间、允许当前感受，不强迫其消失。',['当前不适主要位于哪里？','身体感觉具体是什么？','如何允许它暂时存在？'],'正念,情绪','caution'],
+['defusion',12,'认知解融合','form','situational','B',5,'把想法标记为心理事件，而不是必须相信的命令。',['困扰我的想法','将其改写为“我正在产生一个……的想法”','现在我希望继续做什么？'],'正念,思维'],
+['nondual',12,'非二元正念说明','education','stage','D',5,'属于探索性主观体验领域，证据有限；不作为默认训练要求。',[],'探索,正念','restricted']
+];
+const FREQ_SCORE = {day:100,weekMany:85,week:60,stage:35,situational:20};
+const EVIDENCE = {A:90,B:70,C:45,D:20};
+const FREQ_LABEL = {day:'每日 / 高频',weekMany:'每周多次',week:'每周',stage:'阶段性',situational:'按需使用'};
+const EVIDENCE_LABEL = {A:'较强研究支持',B:'一定研究支持',C:'初步或间接支持',D:'探索性'};
+const TOOLS = TOOL_SPECS.map(([id,chapter,name,mode,freq,evidence,duration,description,prompts,tags,safety])=>({
+ id,chapter,name,mode,freq,evidence,duration,description,prompts:prompts||[],tags:(tags||'').split(',').filter(Boolean),safety:safety||'standard',
+ score:Math.round(FREQ_SCORE[freq]*.40 + EVIDENCE[evidence]*.35 + (['mood','toward','top-task','activity-schedule','three-good','mindfulness','nvc','review'].includes(id)?90:65)*.25)
+}));
+const TOOL_INDEX = Object.fromEntries(TOOLS.map(t=>[t.id,t]));
+const FEELINGS = ['开心','安心','放松','感激','满足','有希望','被理解','被尊重','亲密','失落','伤心','难过','焦虑','害怕','愤怒','委屈','烦躁','困惑','紧张','疲惫','羞耻','孤单'];
+const NEEDS = ['尊重','回应','理解','安全','信任','清晰','自主','边界','休息','陪伴','公平','稳定','合作','空间','可预测性','参与感'];
+const VALUES = ['联结','成长','健康','创造','自主','善意','诚实','好奇','美','冒险','掌握','公平','家庭','安宁','意义','乐趣'];
+// 人际协议中的“对等适用”是对富勒“普遍性”的应用改写，而非将其等同于法律原文。
+const FULLER_RULES = [
+ ['普遍／对等适用','规则尽可能适用于相关各方，避免为某人设置任意特权。'],
+ ['公开','规则应被明确告知，而不是依赖未说出的猜测。'],
+ ['面向未来','规则约束之后的行为，避免用新规则追溯处罚过去。'],
+ ['明确','时间、触发条件和结果可以被合理理解与核对。'],
+ ['不矛盾','多条规则相互之间不能提出无法同时满足的要求。'],
+ ['可履行','规则要求应符合现实能力与客观条件。'],
+ ['稳定','试行期间不能频繁且任意地改变规则。'],
+ ['言行一致','实际执行应与已经公开的规则保持一致。']
+];
+// 题目由原始四段式流程与八项规则概念重新撰写，均为通用的教学示例，不属于原文件中的真实个案记录。
+const QUIZ_BANK = [
+ {id:'c1',type:'single',q:'“昨天晚上 21:00 我发了两条消息，直到今天早上 8:00 才收到回复。”主要属于哪种沟通要素？',options:['事实','感受','需求','方案'],answers:[0],why:'它报告可核对的时间和行为，没有猜测动机。'},
+ {id:'c2',type:'single',q:'“我感到有些失落和不安。”最直接表达哪一要素？',options:['事实','感受','需求','方案'],answers:[1],why:'失落、不安是在命名当前的情绪体验。'},
+ {id:'c3',type:'single',q:'“我需要重要的安排能够提前说清楚。”最直接表达哪一要素？',options:['事实','感受','需求','方案'],answers:[2],why:'它说明重视可预测与清晰，而没有指定对方只能做哪一件事。'},
+ {id:'c4',type:'single',q:'“如果临时加班，能否在约定时间前发消息，并告诉我新的见面时间？”最直接表达哪一要素？',options:['事实','感受','需求','方案'],answers:[3],why:'它描述能够执行和核对的未来行动。'},
+ {id:'c5',type:'multi',q:'下列哪些句子主要包含可观察事实，而不是未经证实的动机推测？（多选）',options:['“昨天会议你打断了我两次。”','“你根本不尊重我。”','“我们约的是 19:00，你在 19:25 到达。”','“你故意让我出丑。”'],answers:[0,2],why:'次数和具体时间可以核对；尊重与动机推断需要另外澄清。'},
+ {id:'c6',type:'multi',q:'下列哪些表达属于感受，而不是将行动要求伪装成需求？（多选）',options:['“我有点失望。”','“我感到很紧张。”','“我需要你十分钟内道歉。”','“我要求你以后都不能出门。”'],answers:[0,1],why:'失望与紧张是情绪；其余两句提出了具体的行动要求。'},
+ {id:'c7',type:'multi',q:'一个可以协商的具体方案通常包含哪些特征？（多选）',options:['指明未来能观察的行动','考虑双方能否实际履行','让对方自行猜测何时开始','明确适当的时间或复核方式'],answers:[0,1,3],why:'方案应清楚、可行、有适当的时间边界和评估方式。'},
+ {id:'c11',type:'multi',q:'“昨天开会时你两次打断我的陈述，我感到挫败，因为我希望有完整表达的机会。”这句话已经包含哪些沟通要素？（多选）',options:['事实','感受','需求','方案'],answers:[0,1,2],why:'打断次数属于可观察事实；挫败属于感受；有完整表达机会属于需要。没有提出未来具体执行方案。'},
+ {id:'c12',type:'multi',q:'“我有些担心，我希望提前了解变动；下周如果计划改变，能否在中午前发消息？”这句话包含哪些要素？（多选）',options:['事实','感受','需求','方案'],answers:[1,2,3],why:'担心是感受；提前了解变动是需要；下周中午前发消息是可执行请求。没有给出过去发生的可观察事实。'},
+ {id:'c13',type:'multi',q:'“我们原定周六 10:00 出发，但实际在 11:00 才出门。我希望以后有更稳定的时间安排。”这里明确包含哪些要素？（多选）',options:['事实','感受','需求','方案'],answers:[0,2],why:'出发时间可核对，属于事实；稳定安排描述需要。句中没有直接命名情绪，也没有提出明确可协商的未来执行方案。'},
+ {id:'c8',type:'order',q:'请把以下四句话排列成：事实 → 感受 → 需求 → 方案。',parts:['昨晚我们约好 20:00 通话，21:00 才接通。','我感到失落，有些担心。','我需要约定有可预测性，也需要被及时告知变化。','如果会晚于约定时间，能否提前告知并提供新时间？'],why:'先说可核对事实，再表达感受、背后的需求，最后提出可商量的具体行动。'},
+ {id:'c9',type:'order',q:'请给下列反馈排序，使它遵循四段式沟通。',parts:['这周两次例会，我的汇报都被中途打断。','我感到挫败，也有点紧张。','我需要完成表达的空间。','下次能否等我汇报完两分钟再讨论问题？'],why:'四段式的固定顺序是事实、感受、需求、方案。'},
+ {id:'c10',type:'order',q:'请排列关于共同家务的四句话。',parts:['上周我们原先约定的三次洗碗，有两次没有完成。','我感到压力有些大。','我需要任务分配更清晰、负担更公平。','我们能否先试行一周，每天晚饭后确认轮值并周日复盘？'],why:'描述客观情境 → 命名情绪 → 说明重要需要 → 提供未来方案。'},
+ {id:'r1',type:'single',q:'“我从未告诉你这条约定，但你应该自己知道并接受处罚。”主要违反哪一条规则？',options:FULLER_RULES.map(x=>x[0]).slice(0,4),answers:[1],why:'没有事先告知即要求遵守，主要违反公开原则。'},
+ {id:'r2',type:'single',q:'“从明天起执行新规定，并因此追究上个月的行为。”主要违反哪条？',options:['面向未来','稳定','可履行','言行一致'],answers:[0],why:'把新约定追溯应用于发生在规则制定之前的行为。'},
+ {id:'r3',type:'single',q:'“必须及时回应，但及时究竟是多少分钟全凭我当天心情决定。”主要违反哪条？',options:['可履行','明确','公开','对等适用'],answers:[1],why:'没有能够一致理解和核对的时间标准。'},
+ {id:'r4',type:'single',q:'“同一时间必须完全不发消息，又必须持续保持消息回复。”主要违反哪条？',options:['稳定','不矛盾','面向未来','公开'],answers:[1],why:'两项要求相互冲突，无法同时得到满足。'},
+ {id:'r5',type:'single',q:'“要求对方每一分钟保持专注并且不得睡觉。”主要违反哪条？',options:['稳定','言行一致','可履行','面向未来'],answers:[2],why:'要求超越现实的身体能力，缺乏可履行性。'},
+ {id:'r6',type:'single',q:'“每次讨论前临时修改约定，今天允许、明天禁止，而且从不说明理由。”主要违反哪条？',options:['明确','稳定','公开','面向未来'],answers:[1],why:'规则反复任意变化，损害可预期性。'},
+ {id:'r7',type:'single',q:'“我们明明约好都可以暂停，但我执行时只允许自己暂停。”主要违反哪条？',options:['对等适用','面向未来','明确','稳定'],answers:[0],why:'协议对相关双方的适用方式不对等。'},
+ {id:'r8',type:'single',q:'“协议明确写着暂停 20 分钟，但每次执行都随意改为 2 小时且不告知。”主要违反哪条？',options:['可履行','公开','言行一致','面向未来'],answers:[2],why:'实际执行与公开规则不一致。'},
+ {id:'r9',type:'multi',q:'以下做法违反了哪些规则？“我们不公开新的沟通标准，却要求对方遵守；标准还每天改变。”（多选）',options:['公开','稳定','面向未来','言行一致'],answers:[0,1],why:'未说明规则涉及公开原则；每天随意变化涉及稳定原则。题干没有说明追溯处罚或执行偏离已公开规定。'},
+ {id:'r10',type:'multi',q:'“未说明时限的承诺，要求任何情况下立即完成。”至少存在哪两种规则风险？（多选）',options:['明确','可履行','面向未来','对等适用'],answers:[0,1],why:'“立即”未给出合适的可核对标准，而且在所有现实情境中都要求立刻完成，可能无法履行。'},
+ {id:'r11',type:'order',q:'冲突需要暂停时，按较合适的操作顺序排列：',parts:['发现情绪正在升级并停止争辩。','明确告知双方可接受的恢复沟通时间。','说明暂停期间的接触方式与空间边界。','到了约定时间按共同意愿恢复交流，必要时提前协商延期。'],why:'先停止升级，再形成公开明确的暂停协议，最后按约定执行。'},
+ {id:'r12',type:'multi',q:'下列哪些方案更符合未来可执行与核对的原则？（多选）',options:['“每周日 20:30 复盘家务安排十分钟。”','“下次不舒服时先说‘暂停’，二十分钟后再沟通。”','“以后永远不能让我有负面情绪。”','“试行十四天，每周检查一次执行情况。”'],answers:[0,1,3],why:'前三个正确选项明确具体时间或周期，且可以观察执行；绝对禁止别人体验负面情绪不可履行。'}
+];
+
+</script>
+  <script>
+/* bundled: guides.js */
+/* 原书章节方法整理 + 针对 App 的教学示例。教学例句不是对原书的逐字引述。 */
+'use strict';
+const TOOL_GUIDES = {};
+function guide(id,steps,example,note='',origin='原书对应支点的方法，操作步骤为教学性整理；示例如未特别说明则为教学改写。'){
+ TOOL_GUIDES[id]={steps,example,note,origin};
+}
+// CH1 · 找到维持机制
+ guide('abc',['A：记录可核对的触发事实，不写对方的动机。','B：逐字记录脑海中出现的解释与信念。','C：分开描述情绪、身体感觉与行动，再寻找背景因素。','问：哪个环节既可改变、又最可能影响后续反应？'],'A：会议上主管指出报告两个问题；B：他觉得我无能；C：羞耻、紧张，之后回避发言。','A≠B。“他瞧不起我”是尚待检验的解释，不是直接观察。');
+ guide('vulnerability',['选一件反应明显超出预期的事件。','回顾此前睡眠、饥饿、疲劳、压力和社会支持。','只保留有实际线索的背景条件。','选择一项可在未来调整的条件。'],'同一句反馈，在连续熬夜后比充分休息时更容易激起愤怒。');
+ guide('inner-why',['挑选一个具体行为或担忧。','问“它为什么会让我难受？”并记录第一个答案。','对答案再次追问更深的顾虑，通常两三层即可。','找到可采取行动的原因便停止，不要无限追问。'],'不敢发言 → 怕犯错 → 怕被看不起 → 过度把自我价值绑定在表现上。','如果答案重复、追问加重反刍，就停止并转向实际行动。');
+ guide('bright-spots',['精确定义一个持续存在的问题。','回想问题较轻或没有出现的真实例外。','列出那次与往常不同的条件。','在下一周主动复制一个有帮助的条件。'],'平时晚间总刷手机，但与朋友约散步的那天提前放下了手机。');
+// CH2
+ guide('values',['回忆真正有意义、令人满足的时刻。','区分本身珍视的价值与仅用于达成其他目的的工具。','从候选价值中选出当前最重要的少数几项。','为一项价值安排最小的具体行动。'],'收入对某人重要，是因为它支持自由与照顾家人；因此“自由、联结”可能更接近深层价值。');
+ guide('principles',['写出一项内在价值。','把它翻译为可以反复使用的行为准则。','检验它在困难情境下仍然是否现实且有帮助。','写出近期一次具体适用的决策。'],'价值：诚实；原则：做重要承诺时清楚说明自己真正能做到什么。');
+ guide('priorities',['列出健康、关系、工作、成长等当前生活领域。','评估这一阶段最需要投入哪几个领域。','明确必须暂时降低优先级的事项。','安排本周的一次对应行动。'],'最近睡眠不足时，健康可能暂时高于新兴趣项目。');
+ guide('value-check',['确定两种或更多备选方案。','列出三项真正重要的价值。','分别判断每个选项对价值的实际满足程度。','解释取舍，不机械服从总分。'],'原书比较“学葡萄牙语”与“副业”时，按联结、冒险、掌握等价值给出不同评分。');
+// CH3
+ guide('vast',['V：解释目标如何服务自己的价值。','A：明确值得努力、同时现实可望的方向。','S：保留少数目标，减少同时追逐的项目。','T：定义能够检查的结果或下一步。'],'与其写“变得健康”，不如写“未来四周每周安排三次适合身体状况的运动”。');
+ guide('habit',['挑选可以重复的最小行为。','选取一个稳定的外部触发条件。','写下“如果……那么……”承诺。','提前调整环境，减少阻力，并定期反思。'],'如果晚饭吃完，就先穿鞋出门走十分钟。');
+ guide('toward',['注意今天面临的一个选择节点。','想起这次选择涉及的个人价值。','区分“趋向价值”与“远离价值”的可能动作。','选择此刻可做到的一小步。'],'价值是联结；冲突后可以选择认真倾听，而不是为了逃避不适立即冷处理。');
+ guide('review',['回顾真实完成的行动。','找出哪项行动确实靠近价值。','识别受阻步骤，并区分现实困难与错误预估。','下周最多选择两项具体调整。'],'本周原计划跑三次，实际上两次；调查阻力后决定把一次运动改到周末。');
+// CH4
+ guide('rid',['R：列出使问题更可能发生的风险条件。','I：写出最早可识别的预警信号。','D：针对每个信号准备预防与应对策略。','写下“如果—那么”步骤，并注明何时联系支持。'],'若连续两晚睡少又开始取消社交：先调整作息，并联系可信任的人讨论。','一般的 RID 表单不能取代个性化自杀安全计划或危机干预。');
+ guide('warning-signs',['回想上次问题升级前的最初迹象。','记录自己和他人能够观察到的变化。','选一项早期且低风险的干预动作。'],'情绪爆发前总会说话加快、反复打断对方，此时先暂停。');
+ guide('stop',['S：先停止说话和动作。','T：暂时退一步，不立刻作决定。','O：注意事实、情绪、冲动和环境。','P：在更有觉察的状态下继续行动。'],'激烈争论时先停下并约定恢复时间，而不是继续解释到对方屈服。');
+ guide('opposite',['识别情绪推动的行为冲动。','核对该冲动是否与真实风险及个人价值一致。','若不一致，选择安全、适度的反向行动。','记录后果，必要时重新评估。'],'面对没有真实危险的安全社交，因为尴尬想逃跑时，可以先留下并完成一句问候。','真实危险中不应因为“反向行动”而放弃自我保护。');
+// CH5
+ guide('fear-hierarchy',['选择现实中安全却被过度回避的情境。','列出从相对容易到较难的具体行动。','逐一对主观恐惧评分 0—10。','先从可承受的小挑战入手，按经验调整等级。'],'社交焦虑的阶梯可从询问店员、同事寒暄、会议发言逐步升级。','不建议对危险、创伤重现或严重症状自行开展高强度暴露。');
+ guide('exposure',['确定安全条件与行动边界。','写出具体的灾难预测及预估概率。','在可承受范围内实施小规模面对练习。','记录实际发生的事，而不只记录是否不紧张。'],'担心给同事提问就会被嘲笑；实际提问后留意对方的具体反应。','暴露不是逼自己忍到情绪消失，若存在真实风险应优先安全。');
+ guide('behavior-test',['把笼统担忧改写为可观察、可证伪的预测。','设计一个适当且低风险的试验。','完成试验并记录与预测相关的事实。','比较预测与观察，得出合理而不夸大的结论。'],'“邀请同事吃饭会被讽刺”可以通过一次礼貌邀请来检验。');
+ guide('safety-behaviors',['列出自己在恐惧情境中的额外保护动作。','区分必要的现实安全措施与用于回避学习的动作。','选择一种可安全降低的过度保护行为。','观察减少它以后对预测的影响。'],'聚会上反复检查手机可能妨碍获得正常交流的真实经验。');
+ guide('erp',['学习暴露与反应预防的基本结构。','了解为什么去除强迫行为需要专业风险判断。','如症状显著影响生活，寻求专业人员制定具体方案。'],'强迫症患者可能需要在治疗师指导下逐步面对触发情境并减少仪式化反应。','本模块不提供独立的高强度 ERP 操作指令。');
+// CH6
+ guide('sleep',['保持相对一致的就寝、起床时间；原书建议通常不超过约一小时浮动。','睡前减少过度刺激，留意包括绿茶在内的咖啡因来源。','白天尤其清晨接触户外亮光并适当运动。','记录 28 天睡眠协议；观察趋势，不把某一晚差睡看作失败。'],'原书中，一位来访者睡前喝绿茶却不知道其中含有咖啡因；识别这一习惯后才能调整。','本页面的 12:30、20:30、2000mL 等阈值来自用户的个人追踪模板，不是原书或统一医学标准。饮水目标需考虑个体需要与医生限制。','CH6 原文：Sleep / How to Optimize Your Sleep；清单中的具体时点按用户提供的协议扩充。');
+ guide('pmr',['在舒适位置坐下或躺下，轻轻闭眼。','从脚趾开始绷紧约 5 秒，但不能疼痛。','放松约 10 秒，并注意紧绷与放松的差别。','继续到小腿、臀部、腹部、手臂、肩膀和面部。'],'原书建议逐渐从脚趾向上，最后轻柔地同时绷紧全身。','用户另提供 4 秒全身绷紧/缓慢松开的短版，可按身体耐受选择；若疼痛请跳过。');
+ guide('breathing',['先坐稳、放松，不强行吸过量空气。','选择温和 4/8 引导：鼻吸约 3 秒、轻轻补吸约 1 秒。','嘴缓缓呼气约 8 秒，直到自然、舒适地结束。','若头晕、刺痛或胸闷，停止节律引导并恢复自然呼吸。'],'原书 SNAPE 提醒：慢、鼻、腹部、节律、呼气略长；“两次吸气 + 4/8”是本应用按用户要求提供的可选变体。','不要憋气、强力吸满或在驾驶时练习；它不是人人都适合的标准配方。','原书 CH6 Slow Breathing（SNAPE）；两段鼻吸、8 秒呼气为用户要求的个性化设计。');
+ guide('exercise',['选择自己愿意长期重复、身体能够承受的活动。','从小幅增加开始，不追求一次性高强度。','记录时长及活动后心情。','在生活日程中为下一次活动留出时间。'],'原书强调“最好的运动，是你实际会去做的运动”。');
+ guide('cold',['了解相关研究目前仍有较多限制。','检查心血管或呼吸系统等风险，避免强烈突然刺激。','更优先考虑证据更稳健的运动与睡眠。'],'冷刺激或快速呼吸可能使人短暂清醒，但不能视为已经充分证实的心理疾病治疗。');
+// CH7
+ guide('reframe',['写下诱发情绪的具体自动想法。','列出客观支持证据。','主动寻找反面证据与其他合理解释。','写出既不美化也不灾难化的平衡想法，再观察情绪变化。'],'“上司没有回复”并不能直接证明“我马上会被开除”；还可能是忙碌或尚未看到。','不是积极思考比赛。现实困难真实存在时，仍应采取必要行动。');
+ guide('distortions',['写下一个确切想法，而不是先给自己贴标签。','看看是否存在读心、灾难化、过度概括等模式。','逐项检查是否有足够事实。','用更准确的表述重新组织该想法。'],'“这次做错，我做什么都不行”属于把单次结果过度推广。');
+ guide('parts',['写下两种彼此冲突的内心倾向。','分别询问它们重视什么、担心什么。','用慈悲而非攻击的方式理解各自保护意图。','寻找兼顾不同需要的现实行动。'],'一部分渴望表达，另一部分担心被嘲笑；可在安全小组先练习发言。','心理部分是一种帮助理解动机的模型，并非独立人格；严重解离等情况应寻求专业帮助。');
+ guide('postpone',['选一个固定、有限的担忧时间段。','无益担忧出现时先简短记下，提醒自己稍后考虑。','把注意力重新投入当前活动。','到规定时间再决定是否需要解决问题。'],'通勤时想起明天汇报会失败，可先记下“明天汇报准备”，在晚间指定时间处理。','真正紧急或危险的问题不应推迟。');
+ guide('belief-log',['写下卡点信念并评分相信程度。','分析当时已知与事后才知道的信息。','记录新证据和不同解释。','隔天或隔周再次评分，观察变化。'],'“我当时应该预见一切”可和事件发生时真正掌握的信息作对照。','本工具是认知反思日志，不提供 PTSD 或道德损伤诊断。');
+ guide('responsibility',['明确事件时点自己能知道的事实。','分开整理当时有能力控制与不能控制的因素。','找出事后新获得的信息，避免把后见之明当作当时可知。','写出考虑现实限制后的责任判断。'],'不能以“我现在知道结局”推断“那时我必定能够预见”。');
+// CH8
+ guide('top-task',['写出今天最重要且现实中可完成的一件事。','说明它服务什么长期价值或核心成果。','将行动细化到可以立即开始的步骤。','先推进这一项，再处理次要事务。'],'写论文的人可以先解决核心论证，而不是不断阅读无关文章。');
+ guide('project-check',['列出项目选项及预期结果。','检查宏观层面的价值一致性。','听取受项目影响者的真实需要和反馈。','比较机会成本与更有价值的备选方案。'],'原书 PlayPump 案例提醒：受奖助和关注的产品不一定符合当地使用者的需求。');
+ guide('premortem',['想象这个项目已经失败。','倒推可能造成失败的具体原因。','列出自己现在能检测的高风险假设。','为最重要的风险制定提前预防措施。'],'假设产品无人使用，可能是没有充分访谈真实用户。');
+ guide('time-track',['记录具有代表性的一天实际活动与持续时间。','区分必要事务、真正有恢复价值的休息和后悔的浪费。','选出可以批量、减少或转移的内容。','下周再记录一次，检查调整是否有效。'],'原书一名来访者通过记录发现每天约两小时在手机上无意识滚动。');
+ guide('daily-planner',['录入工作及生活任务和估计时长。','按重要/紧急四象限及难度排序。','优先保证重要工作连贯进行，再安排合理短休。','完成后标记状态并根据现实调整，不机械服从排程。'],'先安排重要不紧急的报告工作，避免整天被零碎消息吞没。','本 App 使用可解释的优先级排程，不复现原小工具的模拟退火算法。');
+ guide('batch',['列出一周内反复出现的行政事务。','识别可集中处理、自动化、交换或外包的部分。','选择最简单的一项改善。','比较节省的时间与付出的成本。'],'一周统一采购、自动支付固定账单，都可能减少频繁切换。');
+ guide('task-split',['找到大到令人无从开始的任务。','把它改成两分钟以内能启动的动作。','执行第一步，再列出下一步。','每一步都尽量是清楚的可操作动作。'],'原书例子：写博士论文太难开始时，先只打开 Word 并找到结果章节。');
+ guide('solve',['明确当前究竟遇到什么具体问题。','不急于评价，先广泛列出几个可能解法。','比较可行性并选择一个。','安排何时尝试，随后复盘。'],'“邮件写不出来”可以拆分为：先确认目标、列关键点，再写第一段。');
+// CH9
+ guide('mood',['记录时间、当下情绪和精力。','写下当时正在进行的主要活动。','连续记录，寻找重复出现的模式。','避免根据单次评分推断心理疾病。'],'连续一周观察到“与朋友吃饭时通常比无意识刷手机更愉快”，可尝试调整活动。');
+ guide('activity-list',['优先列出监测时情绪较好的活动。','回忆旧爱好、愉悦型与成就型活动。','加入长期回避任务、价值行动、运动和社交。','筛选一两项完成后可能会庆幸的活动。'],'原书将运动、社交单独列为值得特别考虑的活动类别。');
+ guide('activity-schedule',['判断目前属于活动不足、平衡或过度活动。','从清单中挑选 2—3 项适合的行动，或恢复性休息。','给它们指定真实日期和时间。','执行后观察是否庆幸做过，不只凭事前动力决定。'],'如果忙碌到倦怠，计划中的“主动休息两小时”也可能属于事后庆幸型活动。');
+ guide('before-after',['确定一项事后可能庆幸的活动。','活动前给心情评分。','实际完成活动。','完成后再评分，并记录是否值得重复。'],'原书建议对同一种活动反复记录，寻找规律；前后评分不等于证明因果。');
+// CH10
+ guide('conversation',['先提供完整、真诚、好奇的注意。','从兴趣逐步询问观点或近期重要经历。','关系安全时适当分享自己的真实经历。','对对方的感受进行认可，避免只顾给建议。'],'原书建议讨论一周的“高光与低谷”，但也强调尊重彼此界限。');
+ guide('assertive',['写清可核对的具体行为。','用“我”陈述讲出感受和需要。','提出清楚、礼貌、可拒绝的请求。','若持续受到施压，平静重复边界或约定后果。'],'“你又迟到了”可改为“我们约好七点，你七点半到；我有些焦虑，希望以后提前通知”。');
+ guide('nvc',['事实：避免读心与人格判断。','感受：命名自己的情绪，不给对方定性。','需求：说什么对自己重要，不规定对方唯一动作。','方案：提出可协商、可履行的未来请求。'],'事实：昨晚约 20:00 通话却 21:00 才接通；感受：我有些失落；需求：我需要可预测性；方案：临时变化时可否提前发一条消息？','四段式模板来自你提供的 NVC 工具，是本产品的练习协议，不是原书第十支点的唯一沟通模型。','用户提供的小工具 NVC_feedback.html、conflict_resolution_protocol.html；结合原书 CH10。');
+ guide('conflict',['先评估当前情绪强度，必要时暂停并说明恢复时间。','事实→感受→需求→未来方案逐步填写。','将试行周期、核对方式、例外与修改规则说清楚。','用富勒八项规则检查质量，避免让协议成为单方面惩罚工具。'],'暂停 20 分钟后，用四段式表达；协商“遇到加班提前给出预计回复时间”，试行 14 天。','如存在威胁、控制、暴力风险，不建议用协商表格代替现实安全支持。','用户上传的冲突处理流程 + 朗·富勒规则的沟通场景应用改写。');
+ guide('communication-quiz',['选择单选、多选或排序题进行训练。','在查看反馈前独立作答。','核对被误认的事实/推测、需要/方案区别。','在真实沟通中尝试结构化表达。'],'“你根本不在乎我”不是可核对事实；“昨天 21:00 发消息，今早收到回复”才是具体事实。','八项规则的“普遍/对等”是人际协议的类比，不是法律学原文等价论述。');
+// CH11
+ guide('optimism',['记录一次挫折以及最自动的解释。','找出其中可能的永久化、泛化、过度个人归因。','用暂时、具体且考虑现实多因素的表达重写。','继续处理现实中需要承担的责任。'],'“这次面试失败”不等于“我永远做不好任何工作”。');
+ guide('growth',['写出一句固定能力判断。','区分当前水平与可能通过练习改善的部分。','把目标变成具体学习活动。','观察下一次能力表现。'],'“我不会演讲”→“我还不熟练，可以在小组里试练一次”。');
+ guide('best-self',['给自己 15—20 分钟写作时间。','设想符合个人价值的未来目标进展良好。','写清关系、生活、能力等具体场景。','从愿景中提取近期行动，不把想象当作承诺结果。'],'未来能够与亲近的人稳定相处、学习并保持健康时，一天会怎样度过？');
+ guide('begin-again',['注意自己已经偏离希望的方向。','停止额外的自责或反复分析。','在心中说“重新开始”。','执行下一项最小的价值行动。'],'本来想写作却刷了很久手机，可以从打开文档和写一句话重新开始。');
+ guide('acceptance',['写清楚已经发生、无法取消的事实。','识别反复出现的“它本来不应该发生”式抵抗。','允许相关自然情绪存在。','将努力转向仍然可以影响的下一步。'],'过去考试失败无法撤销，但可以复盘、寻求帮助和制定新计划。','接纳不等于赞成伤害，也不等于停止保护自己。');
+ guide('distance',['准确写下当前困扰。','想象一年或五年后再看这件事。','比较当时可能重视和不重视的部分。','提取现在值得做的一项行动。'],'一次尴尬谈话可能在五年后已经不再重要。');
+ guide('stoic',['早晨挑一两个现实可能出现的小困难。','具体想象遇到时的情绪与冲动。','想想自己能控制的回应。','把准备转化为冷静的行动计划。'],'如果通勤延误，提前准备如何告知对方并调整当天顺序。','不应反复想象极端灾难，避免让预想变成反刍。');
+ guide('savor',['挑选当前、过去或未来的一个愉快体验。','缓慢注意其中真实的感官、人物和意义。','减少同时刷手机等分心。','结束后记录一个值得保留的细节。'],'喝茶时认真注意温度、香气和味道，而不是一边匆忙处理消息。');
+ guide('three-good',['回顾今天三件具体好事，可以很小。','分别写下发生的原因或贡献因素。','允许普通甚至困难的一天也存在一些好事。','完成即可，不要求当下情绪必须变好。'],'朋友发来问候、天气适合散步、完成了困难任务的第一步。');
+ guide('gratitude-letter',['选择一位确实帮助过自己的人。','写清对方具体做了什么。','说明当时和后来给自己带来的影响。','决定是否适合发送或当面表达。'],'“你去年在我焦虑时陪我讨论计划，让我感到有人支持。”');
+ guide('gratitude-walk',['选择适合身体情况的简单路线。','走路时寻找平常忽略的小好事物。','轻轻注意声音、植物、光线或公共设施。','结束时写下一到两点发现。'],'注意树影、鸟鸣或一段顺畅的人行道。');
+ guide('kindness',['选一个能够尊重对方意愿的小行为。','明确何时、做什么以及自己是否有能力做到。','实施后注意对方回应，不索取感谢。','如果不合适，下次更换方式。'],'帮同事解释一个操作流程，而不是未经同意替他做决定。');
+ guide('self-compassion',['写下让自己难过的一件真实经历。','想象一位友善、诚实的朋友会如何回应。','同时承认痛苦与自己应承担的责任。','为自己选择一个支持性行动。'],'“我做错了这件事，但这不代表我的全部；我可以道歉并学习。”');
+ guide('lovingkind',['选择容易表达善意的对象开始。','温和重复“愿你平安、愿你安好”等祝愿。','逐步扩展到自己、熟人等对象。','不要求强行产生温暖感觉。'],'先对关心的人表达祝愿，再考虑对自己表达同样的善意。');
+// CH12
+ guide('grounding',['看见并说出眼前三个物体。','识别周围三种声音。','如果合适，觉察三种身体感受。','注意力飘走就重新回到感官线索。'],'原书治疗案例中，杰里米与来访者抛接毛绒恐龙，帮助对方把注意力带回现场。','如果关注心跳等身体感受加重惊恐，可以略过第三类，只关注外部。');
+ guide('att',['找到两种能够持续或重复出现的环境声音。','前 2 分钟约每 10 秒慢速切换一次。','随后 2 分钟每几秒快速切换。','最后 1 分钟开放地聆听整个声场。'],'在鸟鸣与交通声之间切换，再打开注意听其他背景声音。','这里的听觉训练不是跟随呼吸节律；不必强制控制身体呼吸。');
+ guide('mindfulness',['坐稳，选择鼻部、胸部或腹部自然呼吸感觉。','允许吸气与呼气按照自身节奏发生。','发现分心后温和地标记，再回到呼吸。','同时练习接纳与知道自己在体验什么。'],'觉察鼻端的气流；想到晚餐时，只需知道“正在思考”，再回到呼吸。','4/8 双次鼻吸—长呼气是可选的独立引导，不是原书基础呼吸正念的要求。');
+ guide('noting',['以开放方式注意当前最明显的体验。','用“看见、听见、感觉、思考”简短标记。','发现思绪较长时间占据注意时标记“思考”。','不急着判断好坏，继续观察。'],'听见街道声音时标记“听见”；脑中开始计划时标记“思考”。');
+ guide('expansion',['O：温和观察不舒服感觉的部位与特点。','B：缓慢呼吸，想象气息流向那个部位。','C：想象周围存在足够容纳感觉的空间。','A：暂时允许它出现，不强迫它消失。'],'原书建议可以把两分钟分为四个 30 秒阶段。','持续疼痛或新的身体症状仍然需要适当医学评估。');
+ guide('defusion',['把反复出现的想法写成一个完整句子。','在它前面加上“我正在产生一个……的想法”。','或者想象把它放在溪流的树叶上漂远。','返回当前真正要做的事情。'],'“没有人喜欢我” → “我正在产生一个‘没有人喜欢我’的想法”。');
+ guide('nondual',['先熟悉基础正念，保持轻松开放。','可短暂提问“谁正在觉察？”或“自我在哪里？”。','观察直接体验，不进行强迫性哲学推理。','如果困惑就返回自然呼吸。'],'书中两位叙述者对非二元体验的理解与经历不同，因此无需追求相同结果。','研究证据非常有限，不应将其作为标准化疗效训练。');
+// 增补教学题：用于识别沟通要素和八项协议质量规则；题例均为产品原创，不是临床量表。
+QUIZ_BANK.push(
+ {id:'c14',type:'single',q:'“我想要的是在讨论中有机会把话完整说完。”最直接属于什么？',options:['事实','感受','需求','方案'],answers:[2],why:'这句话说明表达机会这一重要需要，没有要求对方遵守某个具体时限。'},
+ {id:'c15',type:'single',q:'“你每次都只顾自己，从来不考虑我。”这句话最需要先处理什么问题？',options:['过度概括与动机推断','感受标签不足','未来时间太具体','没有试行周期'],answers:[0],why:'“每次、从来”是笼统概括，“只顾自己”包含对动机的判断；可先还原具体行为。'},
+ {id:'c16',type:'single',q:'“明天下午三点之前，我们各自把待办事项写在共享清单中。”主要是四段中的哪一项？',options:['事实','感受','需求','方案'],answers:[3],why:'给出了未来具体可执行的行为和时间。'},
+ {id:'c17',type:'single',q:'哪种表达最接近“不把需求和指定策略混为一谈”？',options:['“我需要可预测的安排。”','“我需要你每十分钟回复。”','“你必须照我的规则做。”','“我不接受任何解释。”'],answers:[0],why:'可预测性是较一般化的需要；其他说法直接规定对方必须采取的策略。'},
+ {id:'c18',type:'multi',q:'“昨晚约定八点，实际九点开始；我有些失落，希望下次变化时能及时知道。”明确包含什么？',options:['事实','感受','需求','已经明确的未来方案'],answers:[0,1,2],why:'时间差是事实，失落是感受，希望知道变化是需要。尚未指定可执行的行动、截止时间或沟通安排。'},
+ {id:'c19',type:'multi',q:'哪些表达是可以观察的事实，而不是对心理动机的猜测？',options:['“对话中他离开房间两次。”','“他根本没有同理心。”','“今天我发送信息后两小时收到回复。”','“他就是故意惩罚我。”'],answers:[0,2],why:'离开次数、回复时间都可以核对；同理心和动机需要单独讨论。'},
+ {id:'c20',type:'multi',q:'哪些通常更适合作为“感受”标签？',options:['焦虑','失望','不被尊重','紧张'],answers:[0,1,3],why:'焦虑、失望、紧张直接命名内在情绪；“不被尊重”通常也包含对他人行为的解释，需要再澄清。'},
+ {id:'c21',type:'multi',q:'下列哪些更像“需要”，而非已经写明的解决方案？',options:['自主空间','清楚的时间安排','每晚必须通话两小时','被理解'],answers:[0,1,3],why:'自主、清晰与理解是需要；指定每天通话两小时则是具体策略。'},
+ {id:'c22',type:'order',q:'一位同事的项目交付延误。请将四句话排成合适的表达顺序。',parts:['这份报告原定周二发出，周四我才收到。','我感到压力有点大。','我需要团队时间安排比较清楚。','下次预计延误时，能否提前一天告诉我新的交付时间？'],why:'先说明可核对的交付时间，再表达情绪、需要和可协商请求。'},
+ {id:'c23',type:'order',q:'请将关于家庭噪声的四段话重新排序。',parts:['昨晚 23:30 后客厅电视声音仍然很响。','我感到烦躁，也难以放松。','我需要晚上较安静的休息环境。','以后 22:30 后，能否用耳机观看并一起观察一周？'],why:'分别代表事实、感受、需求和可执行方案。'},
+ {id:'r13',type:'single',q:'规则写道：“只有提出规则的人能够暂时休息，另一方不享有相同权利。”主要违反哪项？',options:['普遍／对等适用','面向未来','公开','明确'],answers:[0],why:'这为一方创建了不合理特权，是人际协议中对普遍适用原则的类比应用。'},
+ {id:'r14',type:'single',q:'规则在周一公布“周三开始适用”，这本身最符合哪项原则？',options:['面向未来','可履行','稳定','言行一致'],answers:[0],why:'事先公布并规定未来开始执行的时间，符合不追溯处罚的要求。'},
+ {id:'r15',type:'single',q:'规则写“永远不能产生任何不满情绪”，主要违反哪项？',options:['明确','可履行','公开','稳定'],answers:[1],why:'人的情绪不是可以完全按意志禁止的行为，该要求难以履行。'},
+ {id:'r16',type:'single',q:'公开说“每次冲突可暂停20分钟”，实际却长期不允许任何人暂停，主要违反哪条？',options:['言行一致','面向未来','明确','稳定'],answers:[0],why:'实际执行与公开规则持续不一致。'},
+ {id:'r17',type:'multi',q:'协议要求“立刻回复”；没有说明“立刻”的含义，且无论是否睡觉都要执行。风险包括哪些？',options:['明确','可履行','面向未来','公开'],answers:[0,1],why:'时间表达模糊，不够明确；睡眠期间要求回复可能无法履行。'},
+ {id:'r18',type:'multi',q:'下列哪些做法有助于提升双方协商协议的质量？',options:['写清可观察的行为','公开沟通并给予双方选择权','允许随时追溯处罚过去行为','约定试行与复核时间'],answers:[0,1,3],why:'具体、公开、自愿及可复核有助于可预期的合作；追溯惩罚既不符合面向未来原则，也可能构成控制。'},
+ {id:'r19',type:'order',q:'一项沟通协议要开始试行，哪种流程更合适？',parts:['先公开说明每个人的需要与限制。','共同制定可实际履行的未来行动。','明确试行时间、例外和复核方式。','按协议实践，并在约定时间检查是否需要修改。'],why:'先了解与公开，再制定明确可行规则，约定检查条件，最后言行一致地实施。'},
+ {id:'r20',type:'multi',q:'关于朗·富勒的八项元规则，下列哪些表述适合用于检查沟通协议？',options:['不应该让不同规则互相冲突','应提前公开而不是让人猜','稳定意味着永远不可修改','执行方式应与声明保持一致'],answers:[0,1,3],why:'规则可以通过双方合理协商修改，但不应在执行期间毫无预告地随意变化。'}
+);
+
+</script>
+  <script>
+/* bundled: enhancements.js */
+/* V3 扩展：原书步骤引导、睡眠协议追踪、离线柔和呼吸声（Web Audio）。 */
+'use strict';
+function renderGuide(toolId,full=false){
+ const g=TOOL_GUIDES[toolId];if(!g)return '';
+ return `<details class="method-guide mb2" ${full?'open':'open'}><summary><strong>按步骤练习 · ${g.steps.length} 步</strong><span class="small muted">来自章节方法，含示例与注意事项</span></summary>
+ <ol class="method-steps">${g.steps.map(x=>`<li>${esc(x)}</li>`).join('')}</ol>
+ <div class="method-example"><strong>例子</strong><p class="mb0">${esc(g.example)}</p></div>
+ ${g.note?`<p class="small muted mt2 mb0"><strong>使用提醒：</strong>${esc(g.note)}</p>`:''}
+ ${full?`<p class="small muted mt2 mb0"><strong>来源与改编：</strong>${esc(g.origin)}</p>`:''}
+ </details>`;
+}
+const SLEEP_FLAGS=[
+ ['morningLight','晨光 ≥10分钟','醒后尽快到户外接触自然光；强光照计划需考虑季节与天气。'],
+ ['eveningLight','傍晚户外光','建议接触约10分钟自然光，按天气与个人情况调整。'],
+ ['noLateEating','20:30后避免大餐','睡前尽量减少会造成胃部不适的进食。'],
+ ['dimLight','20:30后调暗灯光','减少高亮刺激，保持可安全活动的照明。'],
+ ['darkRoom','睡前黑暗环境','卧室尽量暗；夜间起床可用低位、暖色、暗光灯。'],
+ ['phoneFar','手机远离床边','自定目标约5米；现实空间受限时至少不易伸手拿到。'],
+ ['coolRoom','凉爽卧室','用户目标18—24°C，按个人体感、身体状况调整。']
+];
+function sleepDayIndex(day){return daysBetween(state.sleepProtocol.cycleStart,day)+1;}
+function sleepFirstDate(){return addDays(state.sleepProtocol.cycleStart,(ui.sleepCycle||0)*28);}
+function sleepStatus(log){return !log?'未填':log.wakeTime&&log.energy?'已记录':'部分记录';}
+function sleepTextField(day,key,label,kind='text',placeholder='',min='',max=''){
+ const value=state.sleepLogs[day]?.[key]??'';
+ return `<div class="field"><label>${esc(label)}</label><input class="input sleep-control" type="${kind}" data-sleep-date="${day}" data-sleep-field="${key}" value="${esc(value)}" ${placeholder?`placeholder="${esc(placeholder)}"`:''} ${min!==''?`min="${min}"`:''} ${max!==''?`max="${max}"`:''}></div>`;
+}
+function sleepCheck(day,key,label,explanation){
+ const yes=Boolean(state.sleepLogs[day]?.[key]);
+ return `<label class="sleep-check"><input type="checkbox" data-sleep-date="${day}" data-sleep-field="${key}" ${yes?'checked':''}><span><strong>${esc(label)}</strong>${explanation?`<small>${esc(explanation)}</small>`:''}</span></label>`;
+}
+function sleepFields(){
+ const c=state.sleepProtocol,d=ui.sleepDate||localDate(),log=state.sleepLogs[d]||{},start=sleepFirstDate();
+ const tabs=[['today','今日填写'],['table','28天追踪总表'],['protocol','夜醒CBT-I流程与设置']];
+ const count=Array.from({length:28},(_,i)=>state.sleepLogs[addDays(start,i)]).filter(x=>x&&(x.wakeTime||x.bedtime||x.energy)).length;
+ const tabsHtml=`<div class="sleep-head"><div><div class="eyebrow">SLEEP PROTOCOL TRACKER</div><h3 class="mb0">28 天睡眠追踪</h3><div class="small muted">第 ${ui.sleepCycle+1} 期 · ${prettyDate(start)}—${prettyDate(addDays(start,27))} · ${count}/28 天有记录</div></div><div class="btnrow"><button type="button" class="btn sm secondary" data-act="sleep-cycle" data-dir="-1" ${ui.sleepCycle<=0?'disabled':''}>← 上期</button><button type="button" class="btn sm secondary" data-act="sleep-cycle" data-dir="1">下期 →</button></div></div>
+ <div class="segmented sleep-tabs mb2">${tabs.map(([id,title])=>`<button type="button" data-act="sleep-tab" data-tab="${id}" class="${ui.sleepTab===id?'active':''}">${title}</button>`).join('')}</div>`;
+ if(ui.sleepTab==='today'){
+  const flags=SLEEP_FLAGS.map(x=>sleepCheck(d,x[0],x[0]==='noLateEating'?c.lastMealCutoff+'后避免大餐':x[0]==='dimLight'?c.dimLightFrom+'后调暗灯光':x[1],x[2])).join('');
+  return tabsHtml+`<div class="field-grid mb2"><div class="field"><label>记录日期（以当天起床日为准）</label><input id="sleep-selected-date" class="input" type="date" min="${start}" max="${addDays(start,27)}" value="${esc(d)}"></div><div class="field"><label>当前记录状态</label><div class="sleep-status">${sleepStatus(log)}</div></div></div>
+  <div class="sleep-editor-grid">
+   <div class="sleep-section"><h3>醒来与白天状态</h3><div class="field-grid">${sleepTextField(d,'wakeTime','起床时间','time')}${sleepTextField(d,'energy','白天精力 1—5 分','number','例如 3','1','5')}</div>
+    <div class="field-grid">${sleepTextField(d,'caffeineLast','最后一次摄入咖啡因时间','time')}${sleepTextField(d,'napMinutes','午睡分钟数（可提前设闹钟）','number','例如 20','0','600')}</div>
+    <div class="field-grid">${sleepTextField(d,'morningLightMinutes','晨光户外分钟数','number','例如 10','0','600')}${sleepTextField(d,'eveningLightMinutes','傍晚户外分钟数','number','例如 10','0','600')}</div>
+    ${sleepTextField(d,'waterMl','18:00 前饮水量（毫升）','number','例如 1800','0','10000')}
+    <div id="sleep-feedback" class="sleep-feedback">${sleepLiveHints(log)}</div>
+   </div>
+   <div class="sleep-section"><h3>睡前与夜间</h3><div class="field-grid">${sleepTextField(d,'bedtime','当天上床时间（大约）','time')}${sleepTextField(d,'nightAwakenings','夜间醒来次数','number','少量夜醒很正常','0','40')}</div>
+    <div class="sleep-check-grid">${flags}</div>
+    <div class="field"><label>睡眠备注（可选）</label><textarea class="textarea sleep-control" data-sleep-date="${d}" data-sleep-field="note" rows="3" placeholder="例如：今天起床较晚，晚上灯光过亮；不必要求每天完美">${esc(log.note||'')}</textarea></div>
+   </div>
+  </div><div class="hintbox mt2">记录修改立即保存。你可以先填写早晨信息，晚上回来补充上床时间和环境；点击页面底部“完成并保存”会把当前睡眠记录关联到训练计划。</div>`;
+ }
+ if(ui.sleepTab==='table'){
+  const cols=[['wakeTime','起床','time'],['energy','精力 1–5','number'],['morningLight','晨光','check'],['caffeineLast','最后咖啡因','time'],['napMinutes','午睡分钟','number'],['eveningLight','傍晚光','check'],['waterMl','18时前水mL','number'],['noLateEating','晚间少进食','check'],['dimLight','20:30调暗','check'],['darkRoom','睡前暗','check'],['phoneFar','手机远','check'],['coolRoom','卧室凉爽','check'],['bedtime','上床','time'],['nightAwakenings','夜醒次数','number']];
+  const rows=Array.from({length:28},(_,i)=>{const day=addDays(start,i),record=state.sleepLogs[day]||{};return `<tr><th scope="row"><button type="button" class="sleep-day-link" data-act="sleep-day" data-date="${day}">Day ${i+1}</button><small>${prettyDate(day)}</small></th>${cols.map(([key,name,type])=>{if(type==='check')return `<td class="sleep-check-cell"><input aria-label="第${i+1}天：${name}" type="checkbox" data-sleep-date="${day}" data-sleep-field="${key}" ${record[key]?'checked':''}></td>`;return `<td><input aria-label="第${i+1}天：${name}" class="sleep-mini-input" type="${type==='number'?'number':'time'}" ${key==='energy'?'min="1" max="5"':key==='napMinutes'||key==='waterMl'||key==='nightAwakenings'?'min="0"':''} data-sleep-date="${day}" data-sleep-field="${key}" value="${esc(record[key]??'')}"></td>`;}).join('')}</tr>`;}).join('');
+  return tabsHtml+`<p class="small muted">点击 Day 编号可打开当天的详细记录；也可以直接在表格中编辑。手机端表格可水平滚动。</p><div class="sleep-table-wrap" role="region" aria-label="28天睡眠记录，可横向滚动" tabindex="0"><table class="sleep-table"><thead><tr><th>天数 / 日期</th>${cols.map(c=>`<th>${c[1]}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table></div><div class="option-note mt2">提醒：28 天清单是自我观察工具，不应当把每项打勾数当成睡眠质量、健康分数或诊断依据。</div>`;
+ }
+ // Protocol includes both user's template and original's more cautious evidence-based framing.
+ const config=[['morningMinutes','晨光目标（分钟）','number'],['eveningMinutes','傍晚户外光目标（分钟）','number'],['caffeineCutoff','最后咖啡因目标时间','time'],['napMaxMinutes','午睡上限（分钟）','number'],['waterGoalMl','18:00前饮水参考目标（mL）','number'],['lastMealCutoff','晚间进食参考时点','time'],['dimLightFrom','晚上调暗灯光起点','time'],['phoneDistanceMeters','手机远离床边（米）','number'],['bedroomTemperature','卧室舒适温度说明','text']];
+ return tabsHtml+`<section class="sleep-section mb2"><h3>半夜醒来：CBT-I 中的刺激控制思路</h3><ol class="method-steps"><li>短暂醒来时，尽量不看时间、不拿手机，也不处理工作或其他问题。</li><li>如果感觉清醒很久，开始烦躁或努力逼自己睡着，可离开床。</li><li>到光线较暗、安全的地方，轻微伸展、安静坐着，或进行自然舒适的放松呼吸。</li><li>等到再次有困意，再返回床上。</li><li>若再次长时间清醒，可以重复；不需要计时或强迫自己入睡。</li></ol><div class="warningbox">如果因跌倒风险、身体状况或其他原因不适合起床，请优先确保安全。持续严重失眠可考虑专业 CBT-I；睡眠限制不是本应用提供的自助任务。</div></section>
+ <section class="sleep-section mb2"><h3>睡眠环境与睡前放松</h3><div class="grid grid-2"><div><strong>环境</strong><p class="small muted">尽量黑暗；夜间照明选较低位置的暗暖光，避免突然开头顶强光；卧室凉爽，用户协议参考前半夜约18—24°C，后半夜可稍暖、以舒适为准；手机不放在床边；床尽量与睡眠关联，减少高刺激任务。</p></div><div><strong>短版放松（可选）</strong><p class="small muted">PMR：轻柔绷紧肌肉约 4 秒 → 缓慢松开，做 1—3 轮，不疼痛。呼吸：鼻吸 → 轻补吸 → 嘴缓缓长呼，做 1—3 轮；如不舒服就恢复自然呼吸。</p><button type="button" class="btn sm secondary" data-act="open-breath-from-sleep">进入有声呼吸练习 →</button></div></div></section>
+ <section class="sleep-section"><h3>个人打卡目标（可以调整）</h3><p class="small muted">这些具体时点、饮水量和手机距离来自你要求加入的睡眠协议模板。它们是可编辑的个人习惯目标，并非原书为所有人规定的医学阈值。</p><div class="field-grid">${config.map(([key,label,type])=>`<div class="field"><label>${esc(label)}</label><input class="input" type="${type}" data-sleep-config="${key}" value="${esc(c[key]??'')}"></div>`).join('')}</div><div class="warningbox mt2">如果医生要求限水，或你有心脏、肾脏等特殊情况，不应以 2000 mL 作为硬性目标。原书 CH6 重点是规律、避免睡前过度刺激与白天亮光；短午睡通常建议 10—20 分钟，具体睡眠相位干预的光照时间可能长于 10 分钟。</div></section>`;
+}
+function sleepLiveHints(log){const c=state.sleepProtocol;let arr=[];
+ if(log.caffeineLast&&log.caffeineLast>c.caffeineCutoff)arr.push(`咖啡因最后摄入晚于个人目标 ${c.caffeineCutoff}。`);
+ if(log.napMinutes!==undefined&&log.napMinutes!==''&&Number(log.napMinutes)>Number(c.napMaxMinutes))arr.push(`午睡超过个人目标 ${c.napMaxMinutes} 分钟。`);
+ if(log.waterMl!==undefined&&log.waterMl!==''&&Number(log.waterMl)<Number(c.waterGoalMl))arr.push(`18:00 前饮水低于个人参考目标 ${c.waterGoalMl} mL（有饮水限制者不适用）。`);
+ if(log.morningLightMinutes!==undefined&&log.morningLightMinutes!==''&&Number(log.morningLightMinutes)<Number(c.morningMinutes))arr.push(`晨光未达到自设 ${c.morningMinutes} 分钟。`);
+ if(log.eveningLightMinutes!==undefined&&log.eveningLightMinutes!==''&&Number(log.eveningLightMinutes)<Number(c.eveningMinutes))arr.push(`傍晚光未达到自设 ${c.eveningMinutes} 分钟。`);
+ return arr.length?`<strong>可留意的事项：</strong> ${arr.map(esc).join(' ')}`:'这些记录用于观察规律；少量夜醒与不完美的睡眠并不意味着失败。';
+}
+function writeSleepInput(el){
+ const day=el.dataset.sleepDate,key=el.dataset.sleepField;
+ if(!/^\d{4}-\d{2}-\d{2}$/.test(day)||!['wakeTime','energy','morningLight','caffeineLast','napMinutes','eveningLight','waterMl','noLateEating','dimLight','darkRoom','phoneFar','coolRoom','bedtime','nightAwakenings','note','morningLightMinutes','eveningLightMinutes'].includes(key))return;
+ const record=state.sleepLogs[day]||(state.sleepLogs[day]={});
+ record[key]=el.type==='checkbox'?el.checked:el.value;
+ record.editedAt=dateTime();
+ if(key==='morningLightMinutes')record.morningLight=Number(el.value)>=Number(state.sleepProtocol.morningMinutes)&&el.value!=='';
+ if(key==='eveningLightMinutes')record.eveningLight=Number(el.value)>=Number(state.sleepProtocol.eveningMinutes)&&el.value!=='';
+ const hint=document.getElementById('sleep-feedback');if(hint)hint.innerHTML=sleepLiveHints(record);
+ persist();
+}
+function breathWidget(t){
+ const b=ui.breath,remaining=Math.max(0,Math.ceil((b.offsetMs||0)/1000));
+ return `<section class="breath-widget" aria-label="温和 4秒吸气8秒呼气有声引导">
+  <div class="row between wrap"><div><div class="eyebrow">自选 · 4 / 8 呼吸引导</div><h3>${t.id==='mindfulness'?'可选节律练习（与自然呼吸正念分开）':'鼻吸 → 轻补吸 → 嘴缓吐气'}</h3></div><span class="pill blue">一轮 12 秒 · 不憋气</span></div>
+  <div class="breath-body"><div class="breath-circle" id="breath-circle"><span id="breath-phase">准备开始</span><small id="breath-seconds">吸气4秒 · 呼气8秒</small></div><div class="breath-instructions"><p id="breath-instruction" class="breath-big-text">找到舒适的姿势，呼吸保持自然，不强求深度。</p><div class="small muted">吸气约 3 秒 → 轻轻补吸约 1 秒 → 嘴缓缓吐气约 8 秒。</div><div class="small muted mt1">已完成 <strong id="breath-cycles">${Math.floor(remaining/12)}</strong> 轮 · 已用 <span id="breath-elapsed">${remaining}</span> 秒</div><div class="btnrow mt2"><button type="button" class="btn" data-act="breath-start">▶ 开始有声引导</button><button type="button" class="btn secondary" data-act="breath-pause">暂停</button><button type="button" class="btn secondary" data-act="breath-reset">重置</button></div><div class="breath-audio-controls mt2"><button type="button" class="btn sm secondary" id="breath-sound-btn" data-act="breath-sound">${b.sound?'♪ 音效开启':'音效静音'}</button><label class="small muted">音量 <input type="range" min="0" max="100" value="${Math.round(b.volume*100)}" id="breath-volume" aria-label="音量"></label></div></div></div>
+  <div class="option-note mt2">这是可选的放松提示音，不是需要严格完成的呼吸任务。原书基本正念建议自然呼吸；4/8 双次鼻吸是按你的训练偏好添加。不要强行深吸或憋气；感到头晕、气短、胸闷或不适时立即停止。</div>
+ </section>`;
+}
+function breathPhaseTone(phase){
+ const b=ui.breath;clearBreathNodes();if(!b.sound||!b.running)return;
+ try{
+  const Ctx=window.AudioContext||window.webkitAudioContext;if(!Ctx)return;
+  if(!b.audioContext)b.audioContext=new Ctx();
+  const ctx=b.audioContext;ctx.resume?.();
+  const freq=phase==='inhale'?330:phase==='topup'?392:220;
+  const osc=ctx.createOscillator(),gain=ctx.createGain();osc.type='sine';osc.frequency.value=freq;
+  const now=ctx.currentTime;gain.gain.setValueAtTime(0,now);gain.gain.linearRampToValueAtTime(Math.min(.035,b.volume*.065),now+.18);gain.gain.setTargetAtTime(Math.min(.017,b.volume*.035),now+.8,.18);
+  osc.connect(gain);gain.connect(ctx.destination);osc.start(now);b.nodes.push({osc,gain});
+ }catch(e){console.warn('音频播放暂不可用',e);}
+}
+function clearBreathNodes(){const b=ui.breath;for(const n of b.nodes||[]){try{n.gain.gain.setTargetAtTime(0,b.audioContext.currentTime,.035);n.osc.stop(b.audioContext.currentTime+.18);}catch{try{n.osc.stop();}catch{}}}b.nodes=[];}
+function breathUpdateUI(){
+ const b=ui.breath,elapsed=b.offsetMs+(b.running?performance.now()-b.startMs:0);
+ if(b.running&&elapsed>=b.limitMs){breathPause();notify('节律引导时长已到，可以保存本次练习。');return;}
+ const cycle=(elapsed%12000+12000)%12000;
+ const phase=cycle<3000?'inhale':cycle<4000?'topup':'exhale';
+ if(phase!==b.phase){b.phase=phase;breathPhaseTone(phase);}
+ const label=phase==='inhale'?'鼻吸气':phase==='topup'?'轻补吸':'嘴缓呼气';
+ const instr=phase==='inhale'?'轻柔经鼻吸气 · 不用把胸肺强行吸满':phase==='topup'?'用鼻子轻轻补吸一小口 · 不憋气':'经嘴慢慢、轻柔地吐气 · 不强求完全吐尽';
+ const remain=phase==='inhale'?Math.ceil((3000-cycle)/1000):phase==='topup'?Math.ceil((4000-cycle)/1000):Math.ceil((12000-cycle)/1000);
+ const el=document.getElementById('breath-phase');if(!el)return;
+ el.textContent=label;document.getElementById('breath-seconds').textContent=`本阶段剩余 ${remain} 秒`;
+ document.getElementById('breath-instruction').textContent=instr;
+ document.getElementById('breath-cycles').textContent=Math.floor(elapsed/12000);
+ document.getElementById('breath-elapsed').textContent=Math.floor(elapsed/1000);
+ document.getElementById('breath-circle').style.setProperty('--breath-progress',`${cycle/12000*100}%`);
+ document.getElementById('breath-circle').dataset.phase=phase;
+}
+function breathStart(){const b=ui.breath;if(b.running)return;b.limitMs=(ui.practice?.occurrenceKey?findOcc(ui.practice.occurrenceKey)?.occ.task.duration:TOOL_INDEX[ui.practice?.toolId]?.duration||5)*60000;b.running=true;b.startMs=performance.now();b.phase='';breathUpdateUI();b.interval=setInterval(breathUpdateUI,125);}
+function breathPause(){const b=ui.breath;if(!b.running)return;b.offsetMs+=performance.now()-b.startMs;b.running=false;clearInterval(b.interval);b.interval=null;clearBreathNodes();b.phase='';const phase=document.getElementById('breath-phase');if(phase)phase.textContent='已暂停';}
+function stopBreath(reset=false){breathPause();if(reset){const b=ui.breath;b.offsetMs=0;b.phase='';if(b.audioContext){try{b.audioContext.close();}catch{}b.audioContext=null;}}}
+function breathReset(){stopBreath(true);const label=document.getElementById('breath-phase');if(label){label.textContent='准备开始';document.getElementById('breath-seconds').textContent='吸气4秒 · 呼气8秒';document.getElementById('breath-cycles').textContent='0';document.getElementById('breath-elapsed').textContent='0';document.getElementById('breath-circle').style.setProperty('--breath-progress','0%');}}
+
+</script>
+  <script>
+/* bundled: app.js */
+'use strict';
+/* 十二支点成长工作台 · V2 / schema 1 · 无第三方依赖 */
+const STORAGE_KEY='twelve_levers_workbench_v3';
+const $=id=>document.getElementById(id);
+const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const clamp=(n,a,b)=>Math.min(b,Math.max(a,Number(n)||0));
+const uid=()=>typeof crypto!=='undefined'&&crypto.randomUUID?crypto.randomUUID():'id_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,10);
+function localDate(d=new Date()){const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),day=String(d.getDate()).padStart(2,'0');return `${y}-${m}-${day}`;}
+function addDays(iso,n){const [y,m,d]=iso.split('-').map(Number),date=new Date(Date.UTC(y,m-1,d+n));return date.toISOString().slice(0,10);}
+function compareDate(a,b){return String(a).localeCompare(String(b));}
+function within(d,a,b){return d>=a&&d<=b;}
+function weekDay(iso){const [y,m,d]=iso.split('-').map(Number);return new Date(Date.UTC(y,m-1,d)).getUTCDay();}
+function daysBetween(a,b){const toUTC=x=>Date.parse(x+'T00:00:00Z');return Math.round((toUTC(b)-toUTC(a))/86400000);}
+function prettyDate(d){if(!d)return '—';const a=d.split('-');return `${Number(a[1])}月${Number(a[2])}日`;}
+function dateTime(){return new Date().toISOString();}
+function fmtDT(s){try{return new Date(s).toLocaleString('zh-CN',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'});}catch{return s||'';}}
+function copyObj(x){return JSON.parse(JSON.stringify(x));}
+function option(v,label,selected){return `<option value="${esc(v)}" ${String(selected)===String(v)?'selected':''}>${esc(label)}</option>`;}
+function pickLabel(id){return TOOL_INDEX[id]?.name||'未知工具';}
+function dfltPlan(){
+ const start=localDate(),end=addDays(start,29),id=uid();
+ const stages=[
+  {id:'base',name:'每日基础练习',gate:false},
+  {id:'s1',name:'第1阶段 · 行动与问题识别',gate:false},
+  {id:'s2',name:'第2阶段 · 睡眠、情绪与注意力',gate:false},
+  {id:'s3',name:'第3阶段 · 价值与沟通',gate:false},
+  {id:'s4',name:'第4阶段 · 态度与整合',gate:false},
+  {id:'s5',name:'总结 · 个人工具组合',gate:false}
+ ];
+ const all=Array.from({length:30},(_,i)=>addDays(start,i));
+ const reviewDays=[6,13,20,27];
+ const regular=all.filter((_,i)=>!reviewDays.includes(i));
+ const tasks=[];
+ const add=(toolId,stageId,dates,duration,required=true)=>tasks.push({id:uid(),toolId,stageId,position:tasks.length,duration,required,goalId:'',dependsOn:[],schedule:{type:'dates',dates}});
+ add('mood','base',all,1);
+ add('toward','base',all,2);
+ add('sleep','base',all,3);
+ add('mindfulness','base',regular.filter((_,i)=>i%2===0),3);
+ add('breathing','base',regular.filter((_,i)=>i%2===1),3);
+ // 每个普通日主题练习 6 分钟；每个回顾日使用 9 分钟周回顾；每天严格合计 15 分钟。
+ const themes=[
+  ['values','abc','activity-list','habit','bright-spots','savor'],
+  ['pmr','grounding','reframe','defusion','postpone','before-after'],
+  ['time-track','task-split','activity-schedule','conversation','conflict','communication-quiz'],
+  ['optimism','acceptance','self-compassion','kindness','stoic','lovingkind'],
+  ['review','activity-list']
+ ];
+ themes.forEach((items,st)=>{
+  const offset=st*7;
+  items.forEach((toolId,i)=>{const day=st===4?28+i:offset+i;if(day<30)add(toolId,'s'+(st+1),[all[day]],6);});
+ });
+ reviewDays.forEach((day,i)=>add('review','s'+(i+1),[all[day]],9));
+ return {id,name:'30 天基础成长训练',description:'包含 28 天睡眠追踪、ABC 问题识别、沟通与注意力练习等工具。',startDate:start,endDate:end,status:'active',stages,tasks,createdAt:dateTime(),updatedAt:dateTime(),isDefault:true};
+}
+function freshState(){const plan=dfltPlan();return {schemaVersion:2,createdAt:dateTime(),settings:{theme:'light'},guidingFoundations:{values:[],principles:'',priorities:'',goals:[]},plans:[plan],activePlanId:plan.id,practiceSessions:[],moodEntries:[],journalEntries:[],reviews:[],favorites:[],quizDraft:null,drafts:{},editorDrafts:{},occStatuses:{},reschedules:{},pausePeriods:[],plannerTasks:{},sleepProtocol:{cycleStart:localDate(),morningMinutes:10,eveningMinutes:10,caffeineCutoff:'12:30',napMaxMinutes:30,waterGoalMl:2000,waterBefore:'18:00',lastMealCutoff:'20:30',dimLightFrom:'20:30',phoneDistanceMeters:5,bedroomTemperature:'18—24℃'},sleepLogs:{},lastExportAt:null};}
+function validateState(x){
+ if(!x||typeof x!=='object'||x.schemaVersion!==2)throw Error('数据版本不匹配：当前仅支持 schemaVersion 2；旧版本不兼容。');
+ for(const key of ['plans','practiceSessions','moodEntries','journalEntries','reviews','favorites'])if(!Array.isArray(x[key]))throw Error('备份文件缺少 '+key+' 数组。');
+ if(!x.guidingFoundations||!Array.isArray(x.guidingFoundations.goals))throw Error('缺少价值目标结构。');
+ if(!x.sleepProtocol||typeof x.sleepProtocol!=='object'||!x.sleepLogs||typeof x.sleepLogs!=='object'||Array.isArray(x.sleepLogs))throw Error('缺少睡眠协议配置或记录。');
+ if(typeof x.drafts!=='object'||!x.drafts||typeof x.occStatuses!=='object'||!x.occStatuses||typeof x.reschedules!=='object'||!x.reschedules)throw Error('缺少练习状态或日期结构。');
+ for(const p of x.plans){if(!p.id||!Array.isArray(p.tasks)||!Array.isArray(p.stages)||!/^\d{4}-\d{2}-\d{2}$/.test(p.startDate)||!/^\d{4}-\d{2}-\d{2}$/.test(p.endDate))throw Error('计划数据不完整。');if(daysBetween(p.startDate,p.endDate)<0||daysBetween(p.startDate,p.endDate)>730)throw Error('计划日期范围无效或超过两年。');
+  if(p.tasks.length>1500)throw Error('单个计划的工具任务数量超限。');
+  const ids=new Set(p.tasks.map(t=>t.id));if(ids.size!==p.tasks.length)throw Error('存在重复的任务 ID。');
+  const stages=new Set(p.stages.map(s=>s.id));if(stages.size!==p.stages.length)throw Error('存在重复的阶段 ID。');
+  for(const t of p.tasks){if(!TOOL_INDEX[t.toolId]||!stages.has(t.stageId)||!t.schedule||!['dates','once','daily','weekly'].includes(t.schedule.type))throw Error('计划包含未知工具、阶段或日程规则。');if((t.dependsOn||[]).some(d=>!ids.has(d)||d===t.id))throw Error('计划存在无效任务依赖。');}
+  if(hasCycle(p))throw Error('计划存在循环依赖。');stageValidateOrder(p);
+ }
+ return x;
+}
+function hasCycle(p){const graph=new Map(p.tasks.map(t=>[t.id,t.dependsOn||[]])),color=new Map();const visit=id=>{if(color.get(id)===1)return true;if(color.get(id)===2)return false;color.set(id,1);for(const dep of graph.get(id)||[]){if(visit(dep))return true;}color.set(id,2);return false;};return [...graph.keys()].some(visit);}
+let state;let loadError='';
+try{const raw=localStorage.getItem(STORAGE_KEY);state=raw?validateState(JSON.parse(raw)):freshState();}catch(e){loadError='无法读取已有数据：'+e.message+'。暂时使用未保存的新工作区；请先导出或处理旧数据。';state=freshState();}
+if(!state.editorDrafts||typeof state.editorDrafts!=='object')state.editorDrafts={};
+const ui={view:'home',toolSearch:'',toolCategory:'全部',chapter:'all',toolSort:'score',planId:state.activePlanId,practice:null,quiz:state.quizDraft||null,quizTab:'quiz',commTab:'protocol',recordsTab:'sessions',sleepTab:'today',sleepDate:localDate(),sleepCycle:0,breath:{enabled:false,running:false,offsetMs:0,startMs:0,interval:null,phase:'',audioContext:null,nodes:[],sound:true,volume:.35},plannerDate:localDate(),activeModal:null,toolFilter:'all',timer:{remaining:0,running:false,interval:null},rendering:false};
+let saveTimer=null,toastTimer=null;
+function persist(immediate=false){$('save-indicator').innerHTML='<span class="online-dot"></span> 正在保存…';if(saveTimer)clearTimeout(saveTimer);if(immediate){writeSave();return;}saveTimer=setTimeout(writeSave,260);}
+function writeSave(){if(saveTimer)clearTimeout(saveTimer);saveTimer=null;try{localStorage.setItem(STORAGE_KEY,JSON.stringify(state));$('save-indicator').innerHTML='<span class="online-dot"></span> 已自动保存';}catch(e){$('save-indicator').textContent='⚠ 保存失败';notify('本地保存失败。请先导出 JSON 并检查浏览器空间。',true);}}
+function notify(s,error=false){const el=$('toast');el.textContent=s;el.style.background=error?'#8c3e39':'#1e3a3d';el.hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.hidden=true,3500);}
+const NAV=[['home','◫','首页'],['plans','▦','训练计划'],['library','◈','工具库'],['communication','◎','沟通训练'],['records','▥','成长记录'],['values','◇','价值目标'],['notes','▤','个人笔记'],['settings','⚙','设置与数据']];
+function iconNav(){const render=x=>`<button class="nav-item ${ui.view===x[0]?'active':''}" data-nav="${x[0]}"><span class="nav-ico">${x[1]}</span>${esc(x[2])}</button>`;
+ $('desktop-nav').innerHTML=NAV.map(render).join('');$('mobile-nav').innerHTML=[...NAV.slice(0,5)].map(render).join('');}
+function go(page){ui.view=page;iconNav();render();window.scrollTo({top:0,behavior:'instant'});}
+function activePlan(){return state.plans.find(p=>p.id===state.activePlanId)||null;}
+function selectedPlan(){return state.plans.find(p=>p.id===ui.planId)||activePlan()||state.plans[0]||null;}
+function expandDates(p,t){if(!t.schedule)return [];
+ const s=t.schedule,from=[s.start||p.startDate,p.startDate].sort().at(-1),to=[s.end||p.endDate,p.endDate].sort()[0],out=[];
+ if(s.type==='once')return within(s.date||p.startDate,p.startDate,p.endDate)?[s.date||p.startDate]:[];
+ if(s.type==='dates')return [...new Set((s.dates||[]).filter(x=>/^\d{4}-\d{2}-\d{2}$/.test(x)&&within(x,p.startDate,p.endDate)))].sort();
+ if(daysBetween(from,to)<0)return [];
+ for(let d=from,i=0;d<=to&&i<=731;d=addDays(d,1),i++)if(s.type==='daily'||(s.type==='weekly'&&Array.isArray(s.weekdays)&&s.weekdays.includes(weekDay(d))))out.push(d);
+ return out;
+}
+function occurrences(p){if(!p)return [];
+ const items=[];for(const t of p.tasks){for(const orig of expandDates(p,t)){const key=`${p.id}|${t.id}|${orig}`,moved=state.reschedules[key]||orig;
+ items.push({key,originalDate:orig,date:moved,task:t,status:state.occStatuses[key]||'todo'});}}
+ return items.sort((a,b)=>a.date.localeCompare(b.date)||stageIndex(p,a.task.stageId)-stageIndex(p,b.task.stageId)||Number(a.task.position||0)-Number(b.task.position||0));}
+function stageIndex(p,id){const i=p.stages.findIndex(s=>s.id===id);return i===-1?999:i;}
+function taskAvailable(p,occ,occs){
+ const t=occ.task,stage=p.stages.find(s=>s.id===t.stageId),idx=stageIndex(p,t.stageId);
+ if(stage?.gate&&idx>0){const prev=p.stages[idx-1];if(occs.some(o=>o.task.stageId===prev.id&&o.task.required&&o.status!=='done'))return {ok:false,why:'上一个阶段尚未完成'};}
+ for(const id of t.dependsOn||[])if(!occs.some(o=>o.task.id===id&&o.status==='done'))return {ok:false,why:'需先完成前置工具：'+pickLabel(p.tasks.find(x=>x.id===id)?.toolId)};
+ return {ok:true,why:''};
+}
+function planProgress(p){const occ=occurrences(p).filter(x=>x.task.required);let total=occ.length,done=occ.filter(x=>x.status==='done').length;return {total,done,pct:total?Math.round(done/total*100):0};}
+function goalProgress(goal){let completed=state.practiceSessions.filter(x=>x.goalId===goal.id).length;
+ for(const p of state.plans)for(const o of occurrences(p)){if(o.task.goalId===goal.id&&o.status==='done'&&!state.practiceSessions.some(s=>s.occurrenceKey===o.key))completed++;}
+ return {value:(Number(goal.manualCount)||0)+completed,target:Number(goal.target)||1};}
+function pauseDay(p,d){return state.pausePeriods.some(x=>x.planId===p.id&&x.start<=d&&(x.end||localDate())>=d);}
+function streak(p){if(!p)return 0;const occs=occurrences(p),today=localDate();let d=today,count=0;for(let j=0;j<730;j++,d=addDays(d,-1)){
+ if(d<p.startDate)break;if(pauseDay(p,d))continue;const required=occs.filter(x=>x.date===d&&x.task.required);
+ if(!required.length)continue;
+ if(required.every(x=>x.status==='done'))count++;
+ else if(d!==today)break;
+ }return count;}
+function journalRecord(title,text,meta={}){state.journalEntries.unshift({id:uid(),title,text,meta,at:dateTime()});persist();}
+function goalOptions(selected=''){return option('','不关联价值目标',selected)+state.guidingFoundations.goals.map(g=>option(g.id,g.name,selected)).join('');}
+function toolOptions(selected='',includeSafety=true){return TOOLS.filter(x=>includeSafety||x.safety!=='restricted').map(t=>option(t.id,`CH${t.chapter} · ${t.name}`,selected)).join('');}
+function pill(label,cls=''){return `<span class="pill ${cls}">${esc(label)}</span>`;}
+function evidencePill(tool){return pill('证据 '+tool.evidence+' · '+EVIDENCE_LABEL[tool.evidence],tool.evidence==='A'?'green':tool.evidence==='D'?'orange':'blue');}
+function headTitle(main,side=''){return `<div class="section-title"><h2>${main}</h2>${side}</div>`;}
+function empty(title,detail,button=''){return `<div class="empty"><strong>${esc(title)}</strong><div class="small">${esc(detail)}</div>${button?'<div class="mt2">'+button+'</div>':''}</div>`;}
+function render(){
+ const meta={home:['今天，继续向前','个人成长 / 概览'],plans:['训练计划','工作空间 / 计划'],library:['工具库','十二支点 / 全部工具'],communication:['沟通训练室','练习 / 沟通'],records:['成长记录','数据 / 反馈'],values:['价值与目标','方向 / 价值'],notes:['个人笔记','记录 / 反思'],settings:['设置与数据','偏好 / 数据']};
+ $('page-title').textContent=meta[ui.view][0];$('breadcrumb').textContent=meta[ui.view][1];iconNav();
+ const screens={home:renderHome,plans:renderPlans,library:renderLibrary,communication:renderCommunication,records:renderRecords,values:renderValues,notes:renderNotes,settings:renderSettings};
+ $('main').innerHTML=screens[ui.view]();
+}
+function taskRow(p,o,occs){const t=o.task,tool=TOOL_INDEX[t.toolId],lock=taskAvailable(p,o,occs),done=o.status==='done',skipped=o.status==='skipped',future=o.date>localDate(),restricted=tool.safety==='restricted';
+ return `<div class="task-row"><div class="task-number ${done?'done':!lock.ok?'blocked':''}">${done?'✓':!lock.ok?'⌁':skipped?'–':String(tool.chapter).padStart(2,'0')}</div>
+ <div class="task-copy"><strong>${esc(tool.name)}</strong><div class="muted">CH${tool.chapter} · ${t.duration||tool.duration} 分钟 · ${prettyDate(o.date)} ${o.originalDate!==o.date?'· 已顺延':''} ${!t.required?'· 可选':''}</div>${!lock.ok?`<div class="small text-danger">${esc(lock.why)}</div>`:''}${skipped?'<div class="small muted">已跳过；可以撤销</div>':''}${restricted?'<div class="small muted">仅展示教育说明，不提供自主高强度训练</div>':''}</div>
+ <div class="task-actions">${done?`<button class="btn sm secondary" data-act="undo-occ" data-key="${esc(o.key)}">撤销完成</button>`:skipped?`<button class="btn sm secondary" data-act="undo-occ" data-key="${esc(o.key)}">恢复</button>`:`${lock.ok?`<button class="btn sm" data-act="start" data-tool="${t.toolId}" data-key="${esc(o.key)}">${restricted?'阅读':'开始'}</button>`:`<button class="btn sm secondary" disabled>待解锁</button>`}<button class="btn sm secondary" data-act="skip-occ" data-key="${esc(o.key)}">跳过</button><button class="btn sm secondary" data-act="reschedule" data-key="${esc(o.key)}">改期</button>`}</div></div>`;
+}
+function renderHome(){const p=activePlan(),goalList=state.guidingFoundations.goals;const progress=planProgress(p),today=localDate(),day=p?Math.max(1,Math.min(30,daysBetween(p.startDate,today)+1)):0,goalsDone=goalList.filter(g=>goalProgress(g).value>=goalProgress(g).target).length;
+ const occs=occurrences(p),todays=occs.filter(o=>o.date===today),late=occs.filter(o=>o.date<today&&o.status==='todo'&&o.task.required).slice(-4);
+ const overview=`<div class="dash-top"><section class="card dashboard-main"><div class="row between"><span class="fw">${esc(p?.name||'尚未选择计划')}</span>${pill(p?.status==='paused'?'已暂停':'进行中','green')}</div><div class="hero-value">${progress.pct}<small>%</small></div><div class="progress"><span style="width:${progress.pct}%"></span></div><div class="row between mt1"><span class="small muted">${progress.done}/${progress.total} 个必做训练单元</span><span class="small muted">${p?'第 '+day+' 天 / '+Math.max(1,daysBetween(p.startDate,p.endDate)+1)+' 天':'—'}</span></div></section>
+ <section class="card compact"><div class="row between"><span class="muted small fw">价值目标</span><span class="pill green">◇</span></div><div class="metric-number">${goalList.length?goalsDone+'/'+goalList.length:'—'}</div><div class="stat-context">${goalList.length?'个行动目标已达成':'尚未设置价值目标'}</div><button class="btn ghost sm mt1" data-nav="values">${goalList.length?'查看目标':'创建价值目标'} →</button></section>
+ <section class="card compact"><div class="row between"><span class="muted small fw">连续打卡</span><span class="pill orange">◷</span></div><div class="metric-number">${streak(p)} <span class="small muted">天</span></div><div class="stat-context">按必做任务计算，休息日不打断</div><button class="btn ghost sm mt1" data-nav="records">查看训练记录 →</button></section></div>`;
+ return overview+`<div class="dashboard-columns"><div class="stack"><section class="card"><div class="card-head"><div><h2>今天的训练</h2><p class="muted small">${esc(today)} · ${todays.length} 个计划任务 · ${p?.status==='paused'?'计划已暂停':'本地自动保存'}</p></div><button class="btn secondary sm" data-nav="plans">编辑计划 ↗</button></div>
+ ${p?.status==='paused'?`<div class="warningbox">计划已暂停。恢复后可继续完成或改期未完成的任务。 <button class="btn sm soft" data-act="toggle-pause" data-id="${p.id}">恢复计划</button></div>`:todays.length?todays.map(o=>taskRow(p,o,occs)).join(''):empty('今天没有安排训练','可以从工具库选择一项按需练习。')}
+ ${late.length?`<details class="mt2"><summary class="muted small" style="cursor:pointer">还有 ${occs.filter(o=>o.date<today&&o.status==='todo'&&o.task.required).length} 项逾期待办（点击查看最近四项）</summary>${late.map(o=>taskRow(p,o,occs)).join('')}</details>`:''}</section>
+ <section class="card"><div class="card-head"><div><h2>最近的情绪记录</h2><p class="muted small">仅用于了解自己的趋势，不构成诊断</p></div><button class="btn secondary sm" data-nav="records">查看全部</button></div>${moodChart(state.moodEntries.slice(-14))}</section></div>
+ <div class="stack"><section class="card"><div class="card-head"><h3>现在需要什么？</h3><span class="muted small">快捷工具</span></div>
+ ${[['grounding','◉','情绪太强烈','3-3-3 感官扎根'],['reframe','≋','想法停不下来','认知重构'],['conflict','♡','想清楚怎么沟通','冲突场景沟通协议'],['top-task','↗','需要开始工作','今天最重要的一件事']].map(x=>`<button class="quick-link mb1" data-act="start" data-tool="${x[0]}"><span class="quick-symbol">${x[1]}</span><span><strong>${x[2]}</strong><small>${x[3]}</small></span><span class="grow"></span><span class="muted">→</span></button>`).join('')}
+ </section><section class="card"><div class="card-head"><h3>本周小结</h3><button class="btn ghost sm" data-act="start" data-tool="review">打开回顾 →</button></div>${weeklySummary(p)}</section>
+ <section class="card soft"><div class="fw mb1">一点提醒</div><p class="small muted mb0">成长不是把所有工具每天做一遍。先完成今天最重要的几项训练，再根据现实需要选择其他练习。</p></section></div></div>`;
+}
+function weeklySummary(p){const end=localDate(),start=addDays(end,-6),items=occurrences(p).filter(x=>within(x.date,start,end)&&x.task.required),done=items.filter(x=>x.status==='done');return `<div class="row between"><div><strong>${done.length}</strong><span class="muted small"> / ${items.length} 项完成</span></div>${pill(items.length?Math.round(done.length/items.length*100)+'% 完成':'暂无安排','green')}</div><div class="progress thin mt1"><span style="width:${items.length?done.length/items.length*100:0}%"></span></div><p class="small muted mt1 mb0">按最近七个日历日统计；休息日不会被视为失败。</p>`;}
+function moodChart(raw){const data=[...raw].sort((a,b)=>a.at.localeCompare(b.at)).slice(-14);
+ if(!data.length)return empty('还没有情绪趋势','完成一次“情绪与精力打点”即可看到图表。',`<button class="btn sm" data-act="start" data-tool="mood">立即记录</button>`);
+ const w=600,h=160,pad=25,pts=data.map((x,i)=>({x:pad+(w-2*pad)*(data.length===1?.5:i/(data.length-1)),y:pad+(h-2*pad)*(1-clamp(x.mood,0,10)/10)}));const line=pts.map((p,i)=>(i?'L':'M')+p.x.toFixed(1)+' '+p.y.toFixed(1)).join(' ');
+ return `<svg class="mini-chart" viewBox="0 0 ${w} ${h}" role="img" aria-label="最近${data.length}条心情评分趋势图"><line x1="25" y1="25" x2="575" y2="25" stroke="#edf1ef"/><line x1="25" y1="80" x2="575" y2="80" stroke="#edf1ef"/><line x1="25" y1="135" x2="575" y2="135" stroke="#edf1ef"/><text x="7" y="29" font-size="10" fill="#9ca9ab">10</text><text x="12" y="139" font-size="10" fill="#9ca9ab">0</text><path d="${line}" fill="none" stroke="#268b7c" stroke-width="2.5" stroke-linecap="round"/>${pts.map((p,i)=>`<circle cx="${p.x}" cy="${p.y}" r="3.5" fill="#268b7c"><title>${esc(fmtDT(data[i].at))}：${clamp(data[i].mood,0,10)}/10</title></circle>`).join('')}</svg><div class="row between small muted mt1"><span>${fmtDT(data[0].at)}</span><span>${fmtDT(data.at(-1).at)}</span></div>`;
+}
+function toolScore(t){
+ const fs=state.guidingFoundations||{},goals=fs.goals||[],values=[...(fs.values||[]),...goals.map(g=>g.value),...goals.map(g=>g.name)].join(' ');
+ const affinities={6:['健康','精力','睡眠','运动'],9:['健康','运动','联结','家庭','乐趣','生活'],10:['联结','家庭','诚实','公平','沟通','朋友','亲密'],3:['成长','掌握','习惯','行动'],8:['成长','自主','创造','工作','效率'],11:['善意','安宁','意义','感恩'],12:['安宁','注意力','正念']};
+ const match=(affinities[t.chapter]||[]).some(x=>values.includes(x))||t.tags.some(x=>values.includes(x));
+ const important=match?94:['mood','toward','top-task','activity-schedule','three-good','mindfulness','nvc','review'].includes(t.id)?90:65;
+ return Math.round(FREQ_SCORE[t.freq]*.4 + EVIDENCE[t.evidence]*.35 + important*.25);
+}
+function renderLibrary(){const categories=['全部','高频训练','周期训练','即时工具','深入探索'];const catMap={高频训练:t=>t.freq==='day'||t.freq==='weekMany',周期训练:t=>t.freq==='week',即时工具:t=>t.freq==='situational',深入探索:t=>t.freq==='stage'};
+ let ts=TOOLS.filter(t=>(ui.toolCategory==='全部'||catMap[ui.toolCategory](t))&&(ui.chapter==='all'||t.chapter===Number(ui.chapter))&&(t.name+t.description+t.tags.join('')+'CH'+t.chapter).toLowerCase().includes(ui.toolSearch.toLowerCase()));ts.sort((a,b)=>ui.toolSort==='name'?a.chapter-b.chapter||a.name.localeCompare(b.name,'zh-CN'):toolScore(b)-toolScore(a)||a.chapter-b.chapter);
+ return `<div class="intro-strip"><div><p class="muted mb0">${TOOLS.length} 项练习 · 12 个支点 · 可全部加入自定义计划</p></div><div class="pills">${pill('频率 40%','green')}${pill('研究证据 35%','blue')}${pill('重要程度 25%')}</div></div>
+ <div class="card compact"><div class="filterbar"><input class="input" id="tool-search" placeholder="搜索工具、问题或章节…" value="${esc(ui.toolSearch)}" aria-label="搜索工具"><select class="select" id="chapter-filter" aria-label="章节筛选">${option('all','全部章节',ui.chapter)}${CHAPTERS.map((c,i)=>option(i+1,'CH'+(i+1)+' '+c[0],ui.chapter)).join('')}</select><select class="select" id="sort-tools">${option('score','推荐优先级',ui.toolSort)}${option('name','原书章节顺序',ui.toolSort)}</select></div>
+ <div class="segmented">${categories.map(c=>`<button data-act="tool-cat" data-cat="${c}" class="${ui.toolCategory===c?'active':''}">${c}</button>`).join('')}</div></div>
+ ${headTitle(`当前显示 ${ts.length} 项`,`<span class="small muted">点击工具即可学习或开始</span>`)}
+ <div class="tool-grid">${ts.map(t=>`<section class="card tool-card"><div class="row between"><span class="small muted fw">CH${t.chapter} · ${esc(CHAPTERS[t.chapter-1][0])}</span><button class="btn sm ghost" data-act="favorite" data-tool="${t.id}" aria-label="收藏">${state.favorites.includes(t.id)?'★':'☆'}</button></div><h3>${esc(t.name)}</h3><p>${esc(t.description)}</p><div class="pills">${pill(FREQ_LABEL[t.freq],'green')}${pill('约 '+t.duration+' 分钟')}${t.safety!=='standard'?pill(t.safety==='restricted'?'阅读说明':'注意事项','orange'):''}</div><div class="btnrow"><button class="btn sm" data-act="start" data-tool="${t.id}">${t.safety==='restricted'?'了解':'开始练习'}</button><button class="btn sm secondary" data-act="tool-info" data-tool="${t.id}">详情</button><button class="btn sm secondary" data-act="add-plan-task" data-tool="${t.id}">＋ 计划</button></div></section>`).join('')}</div>
+ ${ts.length?'':empty('没有找到工具','试试修改搜索词或清除筛选。')}`;
+}
+function scheduleSummary(s){if(!s)return '未设置';if(s.type==='dates')return `指定 ${s.dates?.length||0} 个日期`;if(s.type==='once')return `一次 · ${prettyDate(s.date)}`;if(s.type==='daily')return `${prettyDate(s.start)}—${prettyDate(s.end)} 每日`;if(s.type==='weekly')return `每周 ${s.weekdays?.map(d=>'日一二三四五六'[d]).join('、')} · ${prettyDate(s.start)}—${prettyDate(s.end)}`;return '未设置';}
+function renderPlans(){const p=selectedPlan(),progress=planProgress(p);return `<div class="row between wrap mb2"><p class="muted mb0">以单个工具为单位编排，支持指定日期、阶段和前置依赖。</p><button class="btn" data-act="new-plan">＋ 新建计划</button></div>
+ <section class="card plan-banner mb2"><div class="field-grid"><div><label class="field-label fw small">当前编辑的计划</label><select class="select" id="plan-select">${state.plans.map(x=>option(x.id,x.name+(x.id===state.activePlanId?' · 首页计划':''),p?.id)).join('')}</select></div><div><label class="field-label fw small">操作</label><div class="btnrow"><button class="btn sm secondary" data-act="edit-plan" data-id="${p?.id||''}">编辑基本信息</button><button class="btn sm secondary" data-act="duplicate-plan" data-id="${p?.id||''}">复制</button>${p?.id!==state.activePlanId?`<button class="btn sm" data-act="activate-plan" data-id="${p?.id}">设为首页计划</button>`:`<button class="btn sm secondary" data-act="toggle-pause" data-id="${p?.id}">${p?.status==='paused'?'恢复':'暂停'}计划</button>`}</div></div></div>
+ ${p?`<div class="mt2 row between"><div><strong>${esc(p.name)}</strong><div class="small muted">${prettyDate(p.startDate)} 至 ${prettyDate(p.endDate)} · ${p.stages.length} 个阶段 · ${p.tasks.length} 项工具任务</div></div><div class="fw">${progress.pct}%</div></div><div class="progress mt1"><span style="width:${progress.pct}%"></span></div>`:''}</section>
+ ${p?`<div class="row between wrap mb2"><div class="pills">${pill('已完成 '+progress.done+' / '+progress.total,'green')}${pill('阶段 '+p.stages.length)}${pill('依赖顺序可检查')}</div><div class="btnrow"><button class="btn sm secondary" data-act="add-stage" data-id="${p.id}">＋ 阶段</button><button class="btn sm" data-act="add-task" data-id="${p.id}">＋ 添加工具</button></div></div>${p.stages.map((st,i)=>renderStage(p,st,i)).join('')}`:empty('没有计划','点击“新建计划”开始。')}
+ <div class="hintbox mt2"><strong>计划调度说明</strong><div class="mt1">每项工具可以设置单次、每天、指定星期或若干指定日期；前置依赖至少需要完成一次对应工具任务；阶段可选“上一阶段全部完成后解锁”。修改日期和任务会重新计算计划进度，历史练习仍保留。</div></div>`;
+}
+function renderStage(p,st,index){const ts=p.tasks.filter(t=>t.stageId===st.id).sort((a,b)=>a.position-b.position),count=occurrences(p).filter(o=>o.task.stageId===st.id&&o.status==='done').length,total=occurrences(p).filter(o=>o.task.stageId===st.id).length;
+ return `<section class="card stage"><div class="stage-head"><div class="row wrap"><span class="stage-index">${String(index+1).padStart(2,'0')}</span><div><h3 class="mb0">${esc(st.name)}</h3><span class="small muted">${ts.length} 项工具 · 完成 ${count}/${total} · ${st.gate?'需上一阶段完成':'可并行'}</span></div></div><div class="btnrow"><button class="btn sm secondary" data-act="rename-stage" data-id="${p.id}" data-stage="${st.id}">重命名</button><button class="btn sm secondary" data-act="toggle-gate" data-id="${p.id}" data-stage="${st.id}" ${index===0?'disabled':''}>${st.gate?'取消依赖':'阶段依赖'}</button><button class="btn sm secondary" data-act="move-stage" data-id="${p.id}" data-stage="${st.id}" data-dir="-1" ${index===0?'disabled':''}>↑</button><button class="btn sm secondary" data-act="move-stage" data-id="${p.id}" data-stage="${st.id}" data-dir="1" ${index===p.stages.length-1?'disabled':''}>↓</button><button class="btn sm danger" data-act="remove-stage" data-id="${p.id}" data-stage="${st.id}" ${p.stages.length<2?'disabled':''}>删除</button></div></div>
+ <div class="stage-body">${ts.map((t,i)=>`<div class="plan-item"><span class="stage-index">${i+1}</span><div class="grow"><div class="plan-item-title">${esc(pickLabel(t.toolId))} ${!t.required?pill('可选'):''}</div><small>${esc(scheduleSummary(t.schedule))} · ${t.duration}分钟 ${t.dependsOn?.length?'· 依赖 '+t.dependsOn.length+' 项':''}</small></div><div class="tools"><button class="btn sm secondary" data-act="edit-task" data-plan="${p.id}" data-task="${t.id}">设置</button><button class="btn sm secondary" data-act="move-task" data-plan="${p.id}" data-task="${t.id}" data-dir="-1" ${i===0?'disabled':''}>↑</button><button class="btn sm secondary" data-act="move-task" data-plan="${p.id}" data-task="${t.id}" data-dir="1" ${i===ts.length-1?'disabled':''}>↓</button><button class="btn sm danger" data-act="remove-task" data-plan="${p.id}" data-task="${t.id}">删除</button></div></div>`).join('')||'<div class="muted small">本阶段尚无工具。可通过上方“添加工具”配置。</div>'}</div></section>`;
+}
+function renderCommunication(){
+ if(ui.quiz)return renderQuiz();
+ return `<div class="intro-strip"><div><strong>沟通训练室</strong><p class="muted small mt1 mb0">先处理冲突安全，再依次表达事实、感受、需求和未来方案。通过练习题巩固分类、排序与朗·富勒八项规则。</p></div>${pill('事实 → 感受 → 需求 → 方案','green')}</div>
+ <div class="grid grid-2 mb2">
+ <section class="card communication-choice"><div class="eyebrow">实际情境 · 分步填写</div><h2>冲突场景沟通协议</h2><p class="muted">暂停与恢复时间 → 可核对事实 → 感受 → 需求 → 可执行方案 → 八项规则核查。</p><div class="hintbox mb2"><strong>示例</strong><br>事实：昨晚约定 20:00 通话，21:00 才接通。<br>感受：我有些失落。<br>需求：我希望安排更可预测。<br>方案：临时变化时，能否提前发消息，并约定新时间？</div><button class="btn" data-act="start" data-tool="conflict">进入冲突场景沟通协议 →</button></section>
+ <section class="card communication-choice"><div class="eyebrow">互动练习 · 即时反馈</div><h2>沟通挑战题</h2><p class="muted">随机抽取题目，包含单选、多选、四段式排序，以及违反富勒八条元规则的辨析。</p><div class="hintbox mb2">每题独立作答后查看原理与纠错说明；完成整轮后自动保存结果。</div><button class="btn" data-act="start-quiz" data-type="all">开始沟通挑战题 →</button></section></div>
+ <div class="card compact"><h3>八项规则的应用边界</h3><p class="small muted mb0">普遍、公开、面向未来、明确、不矛盾、可履行、稳定、言行一致。此处用于检查双方自愿协商的规则，不能取代现实安全措施，也不允许把沟通协议用作控制、羞辱或强制惩罚。</p></div>`;
+}
+function shuffle(xs){const a=xs.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function startQuiz(type='all',occurrenceKey=''){
+ let pool=QUIZ_BANK.filter(q=>type==='all'||(type==='nvc'?!q.id.startsWith('r'):q.id.startsWith('r')));
+ // 包含单选、多选和排序，默认一轮 9 题；小题库分类时自动选择最大可用数量。
+ const selected=shuffle(pool).slice(0,Math.min(9,pool.length));const hasType=t=>selected.some(q=>q.type===t);
+ if(type==='all')for(const t of ['single','multi','order'])if(!hasType(t)){const other=pool.find(q=>q.type===t&&!selected.some(x=>x.id===q.id));if(other)selected[selected.length-1]=other;}
+ ui.quiz={items:selected,index:0,answers:[],selected:[],order:[],checked:false,score:0,category:type,occurrenceKey,startedAt:dateTime(),saved:false};
+ ui.commTab='quiz';go('communication');
+}
+function renderQuiz(){const qz=ui.quiz;if(!qz)return `<section class="card"><h2>沟通技巧互动题库</h2><p class="muted">随机抽题，包含“句子属于哪一要素”、多选、四段式排序，以及八项规则的违例辨析。答题后逐题给出原因。</p><div class="grid grid-3 mt2">${[['all','综合挑战','混合三类题型'],['nvc','四段式练习','识别事实、感受、需求与方案'],['rules','八项规则','判断协议违反了哪些规则']].map(([t,n,d])=>`<div class="card light" style="background:#f8fbfa"><strong>${n}</strong><p class="muted small mt1">${d}</p><button class="btn sm" data-act="start-quiz" data-type="${t}">开始题目 →</button></div>`).join('')}</div><div class="warningbox mt2">题目为训练示例，不对真实人际关系作对错诊断。八项规则为适用于人际协议的改写方式。</div></section>`;
+ if(qz.index>=qz.items.length){return `<section class="card"><div class="pills mb2">${pill('本轮挑战已完成','green')}</div><h2>训练结果</h2><div class="hero-value" style="color:var(--main)">${qz.score}<small> / ${qz.items.length} 题</small></div><p class="muted">记住：分数衡量的是当前规则识别和排序题的回答，不代表真实沟通水平或人际关系质量。</p><div class="btnrow mt2"><button class="btn" data-act="start-quiz" data-type="${qz.category}">重新挑战</button><button class="btn secondary" data-act="quiz-exit">返回训练室</button></div></section>`;}
+ const item=qz.items[qz.index],selected=qz.selected||[];const correct=qz.answers[qz.index]?.ok;let answerUI='';
+ if(item.type==='order'){
+  if(!qz.order.length)qz.order=shuffle(item.parts.map((t,i)=>({id:i,text:t})));answerUI=`<div class="mb1"><span class="pill purple">排序题</span><span class="small muted"> 使用上下箭头重排句子</span></div><div>${qz.order.map((o,i)=>`<div class="quiz-order-item"><span>${i+1}</span><div class="order-text">${esc(o.text)}</div><div class="btnrow"><button class="btn sm secondary" data-act="quiz-move" data-i="${i}" data-dir="-1" ${qz.checked||i===0?'disabled':''}>↑</button><button class="btn sm secondary" data-act="quiz-move" data-i="${i}" data-dir="1" ${qz.checked||i===qz.order.length-1?'disabled':''}>↓</button></div></div>`).join('')}</div>`;
+ }else{answerUI=`<p class="small muted">${item.type==='multi'?'多选题：选择所有合适选项':'单选题：选择最合适的一项'}</p><div class="col">${item.options.map((label,i)=>`<button type="button" class="quiz-choice ${selected.includes(i)?'selected':''} ${qz.checked?(item.answers.includes(i)?'correct':selected.includes(i)?'wrong':''):''}" data-act="quiz-select" data-i="${i}" ${qz.checked?'disabled':''}><span class="fw">${String.fromCharCode(65+i)}.</span> ${esc(label)} ${qz.checked&&item.answers.includes(i)?'✓':''}</button>`).join('')}</div>`;}
+ return `<div class="card"><div class="row between mb1"><div class="pills">${pill('第 '+(qz.index+1)+' / '+qz.items.length+' 题','green')}${pill(item.type==='order'?'排序':item.type==='multi'?'多选':'单选')}</div><div class="muted small">累计答对 ${qz.score} 题</div></div><div class="progress thin mb2"><span style="width:${qz.index/qz.items.length*100}%"></span></div><h2 style="font-size:19px;line-height:1.5">${esc(item.q)}</h2><div class="mt2">${answerUI}</div>${qz.checked?`<div class="quiz-explanation"><strong>${correct?'✓ 回答正确':'尚未答对'}</strong><p class="mt1 mb0">${esc(item.why)}</p>${item.type==='order'&&!correct?`<p class="small muted mt1 mb0">正确顺序：${item.parts.map((x,i)=>(i+1)+'. '+x).map(esc).join(' → ')}</p>`:''}</div>`:''}<div class="form-actions"><button class="btn secondary" data-act="quiz-exit">结束本轮</button>${qz.checked?`<button class="btn" data-act="quiz-next">${qz.index===qz.items.length-1?'完成挑战':'下一题'} →</button>`:`<button class="btn" data-act="quiz-check" ${item.type!=='order'&&!selected.length?'disabled':''}>提交答案</button>`}</div></div>`;
+}
+function recordLine(s){const t=TOOL_INDEX[s.toolId];return `<div class="journal-record"><div class="row between wrap"><div class="grow"><strong>${esc(t?.name||s.toolId)}</strong><div class="date">${fmtDT(s.completedAt)} · ${s.duration||t?.duration||0} 分钟 ${s.planId?'· 来自训练计划':'· 自由练习'}</div></div><div class="btnrow"><button class="btn sm secondary" data-act="view-record" data-id="${s.id}">查看</button><button class="btn sm danger" data-act="delete-record" data-id="${s.id}">删除</button></div></div></div>`;}
+function renderRecords(){const opts=[['sessions','练习历史'],['mood','情绪趋势'],['sleep','睡眠趋势'],['belief','卡点追踪']];let content='';
+ if(ui.recordsTab==='sessions')content=`<section class="card"><div class="card-head"><h2>最近的练习</h2>${pill(state.practiceSessions.length+' 条完成记录','green')}</div>${state.practiceSessions.length?state.practiceSessions.slice().reverse().slice(0,80).map(recordLine).join(''):empty('尚未完成练习','从首页或工具库完成第一项训练。')}</section>`;
+ else if(ui.recordsTab==='mood')content=`<div class="grid grid-2"><section class="card"><h3>情绪分数</h3>${moodChart(state.moodEntries.slice(-30))}</section><section class="card"><h3>历史解释</h3><p class="muted">0—10 分是对当下体验的主观自评。不同日期可能受到睡眠、活动及其他因素影响，不能直接用于疾病诊断或推断某项工具具有因果疗效。</p></section></div><div class="card mt2"><h3>情绪记录明细</h3>${state.moodEntries.length?state.moodEntries.slice().reverse().slice(0,40).map(e=>`<div class="hist-row"><span>${fmtDT(e.at)}</span><span>心情 <strong>${e.mood}/10</strong> · 精力 ${e.energy}/10 ${e.activity?' · '+esc(e.activity):''}</span></div>`).join(''):empty('暂无情绪记录','完成情绪打点后显示历史。')}</div>`;
+ else if(ui.recordsTab==='sleep'){
+  const dates=Object.keys(state.sleepLogs).sort().reverse().slice(0,28),logs=dates.map(d=>({date:d,...state.sleepLogs[d]}));
+  const energies=logs.filter(l=>l.energy!==''&&l.energy!=null&&Number(l.energy)>=1&&Number(l.energy)<=5).map(l=>Number(l.energy));
+  const average=energies.length?(energies.reduce((a,b)=>a+b,0)/energies.length).toFixed(1):'—';
+  content=`<div class="grid grid-3 mb2"><div class="card compact"><div class="small muted">已记录睡眠日</div><div class="metric-number">${logs.length}</div></div><div class="card compact"><div class="small muted">最近记录的平均白天精力（1—5）</div><div class="metric-number">${average}</div></div><div class="card compact"><div class="small muted">睡眠工具</div><button class="btn sm mt1" data-act="start" data-tool="sleep">继续睡眠追踪 →</button></div></div>
+  <section class="card"><h2>最近睡眠记录</h2><p class="small muted">这些是个人观察数据；不用于诊断失眠，也不把是否遵守所有习惯规则合成为医学分数。</p>
+  ${logs.length?`<div class="sleep-table-wrap"><table class="sleep-table"><thead><tr><th>日期</th><th>起床</th><th>精力</th><th>最后咖啡因</th><th>午睡(分)</th><th>上床</th><th>夜醒</th></tr></thead><tbody>${logs.map(l=>`<tr><th>${esc(l.date)}</th><td>${esc(l.wakeTime||'—')}</td><td>${esc(l.energy||'—')}</td><td>${esc(l.caffeineLast||'—')}</td><td>${esc(l.napMinutes||'—')}</td><td>${esc(l.bedtime||'—')}</td><td>${esc(l.nightAwakenings||'—')}</td></tr>`).join('')}</tbody></table></div>`:empty('暂无睡眠记录','打开睡眠追踪工具填写起床时间和白天精力。')}</section>`;
+ }
+ else {const logs=state.practiceSessions.filter(s=>s.toolId==='belief-log');const groups=new Map();for(const record of logs){const belief=String(record.data?.belief||'未命名信念').trim().replace(/\s+/g,' ');if(!groups.has(belief))groups.set(belief,[]);groups.get(belief).push(record);}
+ const grouped=[...groups.entries()].sort((a,b)=>b[1].at(-1).completedAt.localeCompare(a[1].at(-1).completedAt));
+ content=`<div class="card"><div class="card-head"><div><h2>卡点与信念强度时间线</h2><p class="muted small">同一信念的多次记录会归在一张时间线中，便于观察强度变化；不是诊断量表。</p></div><button class="btn sm" data-act="start" data-tool="belief-log">＋ 新记录</button></div>
+ ${grouped.length?grouped.map(([belief,items])=>`<div class="journal-record"><strong>${esc(belief)}</strong><div class="small muted mt1">累计 ${items.length} 次记录 · 最近一次相信程度 ${esc(items.at(-1).data?.after??'—')}/100</div><div class="timeline mt2">${items.map(r=>`<div class="timeline-entry"><span>${fmtDT(r.completedAt)}</span><div><div><strong>${esc(r.data?.before||'—')} → ${esc(r.data?.after||'—')}</strong> <span class="small muted">相信程度 /100</span></div><div class="small muted pre-line">${esc(r.data?.alternative||'尚未填写替代解释')}</div><button class="btn sm ghost" data-act="view-record" data-id="${r.id}">查看完整记录 →</button></div></div>`).join('')}</div></div>`).join(''):empty('还没有卡点记录','可从工具库启动“卡点与信念追踪”。',`<button class="btn sm" data-act="start" data-tool="belief-log">开始记录</button>`)}</div>`;}
+ return `<div class="grid grid-3 mb2"><div class="card compact"><div class="small muted">完成练习</div><div class="metric-number">${state.practiceSessions.length}</div></div><div class="card compact"><div class="small muted">累计训练时长</div><div class="metric-number">${state.practiceSessions.reduce((a,s)=>a+(Number(s.duration)||0),0)} <span class="small muted">分钟</span></div></div><div class="card compact"><div class="small muted">情绪打点</div><div class="metric-number">${state.moodEntries.length}</div></div></div><div class="segmented mb2">${opts.map(([id,n])=>`<button data-act="records-tab" data-tab="${id}" class="${ui.recordsTab===id?'active':''}">${n}</button>`).join('')}</div>${content}`;
+}
+function renderValues(){const fs=state.guidingFoundations,g=fs.goals;return `<div class="grid grid-2"><section class="card"><div class="card-head"><h2>我的内在价值</h2>${pill(fs.values.length+' 项已选择')}</div><p class="muted small">先选出目前真正重视的少数价值；不需要为了填满所有选项而做选择。</p><div class="choice-chips" id="value-chips">${VALUES.map(v=>`<button type="button" class="choice-chip ${fs.values.includes(v)?'selected':''}" data-act="toggle-value" data-value="${v}" aria-pressed="${fs.values.includes(v)}">${fs.values.includes(v)?'✓ ':''}${v}</button>`).join('')}</div><div class="field mt2"><label>个人原则与备注</label><textarea class="textarea" id="principles" placeholder="例如：重要沟通尽量直接清楚；每周为家人留出不被工作占据的时间。">${esc(fs.principles)}</textarea></div></section>
+ <section class="card"><div class="card-head"><h2>价值目标</h2><button class="btn sm" data-act="new-goal">＋ 新建目标</button></div><p class="muted small">首页统计的是<strong>关联行动的完成情况</strong>，不是抽象价值的完成百分比。</p>${g.length?g.map(goal=>{const p=goalProgress(goal),pct=Math.min(100,Math.round(p.value/p.target*100));return `<div class="journal-record"><div class="row between"><div><strong>${esc(goal.name)}</strong><div class="small muted">${esc(goal.value||'未指定价值')} · ${p.value}/${p.target} ${esc(goal.unit||'次')}</div></div><div class="btnrow"><button class="btn sm soft" data-act="increment-goal" data-id="${goal.id}">＋1</button><button class="btn sm secondary" data-act="edit-goal" data-id="${goal.id}">编辑</button></div></div><div class="progress thin mt1"><span style="width:${pct}%"></span></div></div>`;}).join(''):empty('还没有价值目标','创建可观察的行动目标，例如本月联系朋友 4 次。',`<button class="btn sm" data-act="new-goal">创建目标</button>`)}</section></div><div class="hintbox mt2">目标完成次数 = 手动记录的行动 + 与目标关联的已完成训练单元。修改目标次数不会改变原有练习记录。</div>`;}
+function renderNotes(){const entries=state.journalEntries.slice().reverse();return `<div class="row between wrap mb2"><p class="muted mb0">长期反思、个人笔记与自主保存的文本内容都存放于当前浏览器。</p><button class="btn" data-act="new-note">＋ 写笔记</button></div><section class="card">${entries.length?entries.slice(0,80).map(r=>`<div class="journal-record"><div class="row between wrap"><div class="grow"><strong>${esc(r.title||'未命名笔记')}</strong><div class="date">${fmtDT(r.at)}</div><div class="small muted mt1 pre-line">${esc(String(r.text||'').slice(0,110))}${String(r.text||'').length>110?'…':''}</div></div><div class="btnrow"><button class="btn sm secondary" data-act="edit-note" data-id="${r.id}">编辑</button><button class="btn sm danger" data-act="delete-note" data-id="${r.id}">删除</button></div></div></div>`).join(''):empty('尚无笔记','可以创建第一条自由反思记录。')}</section>`;}
+function renderSettings(){const last=state.lastExportAt?fmtDT(state.lastExportAt):'尚未备份';return `<div class="grid grid-2"><section class="card"><h2>本地数据管理</h2><p class="muted">所有个人数据保存在当前浏览器的 localStorage 中，应用运行不需要联网。</p><div class="row between mb1"><span>数据结构版本</span>${pill('schema 2','green')}</div><div class="row between mb1"><span>训练计划</span><strong>${state.plans.length} 份</strong></div><div class="row between mb1"><span>练习记录</span><strong>${state.practiceSessions.length} 条</strong></div><div class="row between mb2"><span>最近一次导出</span><strong>${esc(last)}</strong></div><div class="btnrow"><button class="btn" data-act="export-json">⇩ 导出完整 JSON</button><button class="btn secondary" data-act="import-json">⇧ 导入并替换</button></div><hr class="divider"><h3>清空工作区</h3><p class="small muted">删除当前浏览器中的数据并重新创建默认的 30 天计划。不可撤销，请先备份。</p><button class="btn danger" data-act="reset">清空并重新开始</button></section>
+ <section class="card"><h2>隐私与练习边界</h2><div class="hintbox mb2">✓ 不需要登录账号<br>✓ 无云端同步和遥测<br>✓ 完整 JSON 导入 / 导出<br>✓ 导入前验证，确认后整库替换</div><div class="warningbox mb2"><strong>请妥善保管备份文件</strong><p class="mb0 mt1">localStorage 与 JSON 都没有加密。浏览器清除数据、切换设备或使用无痕窗口可能造成记录丢失；此版本不提供备份恢复服务。</p></div><div class="dangerbox"><strong>心理健康提示</strong><p class="mb0 mt1">应用用于教育和自助记录，不提供临床诊断或紧急监护。对持续严重的困扰应寻求合适的专业帮助；如有即时危险，应联系当地急救或危机支持服务。</p></div></section></div><section class="card mt2"><h2>工具排序说明</h2><div class="grid grid-3"><div><div class="metric-number">40%</div><div class="small muted">建议重复频率</div></div><div><div class="metric-number">35%</div><div class="small muted">研究证据类别</div></div><div><div class="metric-number">25%</div><div class="small muted">对当前目标的重要程度</div></div></div><p class="muted small mt2 mb0">此分数只用于界面排序，不是临床效能预测。用户创建计划后的自定义顺序始终优先于推荐排序。原书研究整体与单一技巧的研究证据不可混为一谈。</p></section>`;}
+function openModal(title,body,{wide=false}={}){ui.activeModal=title;$('overlay-root').innerHTML=`<div class="modal-wrap" data-act="close-overlay-backdrop"><div class="modal ${wide?'wide':''}" role="dialog" aria-modal="true" aria-label="${esc(title)}"><div class="modal-head"><h2>${esc(title)}</h2><button class="modal-close" aria-label="关闭" data-act="close-modal">×</button></div>${body}</div></div>`;const focus=$('overlay-root').querySelector('.input,.textarea,.select,.modal-close');if(focus)focus.focus({preventScroll:true});}
+function closeModal(){ui.activeModal=null;$('overlay-root').innerHTML='';ui.practice=null;stopTimer();stopBreath(true);}
+function stopTimer(){if(ui.timer.interval)clearInterval(ui.timer.interval);ui.timer.interval=null;ui.timer.running=false;}
+function simpleField(id,label,value='',type='textarea',extra=''){return `<div class="field"><label for="${esc(id)}">${esc(label)}</label>${type==='textarea'?`<textarea class="textarea" id="${esc(id)}" name="${esc(id)}" ${extra}>${esc(value)}</textarea>`:`<input class="input" type="${type}" id="${esc(id)}" name="${esc(id)}" value="${esc(value)}" ${extra}>`}</div>`;}
+function editorKey(form){
+ if(!form)return '';
+ return 'editor:'+form.id+':'+['planId','taskId','stageId','goalId','noteId','occKey'].map(x=>form.querySelector(`[name="${x}"]`)?.value||'').join(':');
+}
+function storeEditorDraft(form){
+ if(!form||!form.id||form.id==='practice-form')return;
+ const rows=[...form.querySelectorAll('[name]')].map(el=>({name:el.name,type:el.type,value:el.value,checked:el.checked}));
+ state.editorDrafts[editorKey(form)]=rows;persist();
+}
+function restoreEditorDraft(form){
+ const rows=state.editorDrafts[editorKey(form)];if(!Array.isArray(rows))return;
+ if(form.id==='task-form'){
+  const type=rows.find(x=>x.name==='scheduleType')?.value;
+  const p=state.plans.find(x=>x.id===form.querySelector('[name="planId"]')?.value);
+  if(type&&p){
+   const select=form.querySelector('#task-schedule-type');if(select)select.value=type;
+   const target=form.querySelector('#schedule-fields');
+   if(target)target.innerHTML=renderScheduleFields({type,start:p.startDate,end:p.endDate,dates:[p.startDate],date:p.startDate,weekdays:[1,3,5]},p);
+  }
+ }
+ for(const el of form.querySelectorAll('[name]')){
+  const line=rows.find(x=>x.name===el.name&&(el.type!=='checkbox'||x.value===el.value));
+  if(line){if(el.type==='checkbox')el.checked=Boolean(line.checked);else el.value=line.value;}
+ }
+}
+function clearEditorDraft(form){if(form)delete state.editorDrafts[editorKey(form)];}
+function modalForm(title,inner,formId,submit='保存',wide=false){
+ openModal(title,`<form id="${formId}">${inner}<div class="form-actions"><button type="button" class="btn secondary" data-act="close-modal">取消</button><button type="submit" class="btn">${submit}</button></div></form>`,{wide});
+ restoreEditorDraft($(formId));
+}
+function openPlanModal(p){const editing=!!p;modalForm(editing?'编辑计划':'创建自定义计划',`${simpleField('planName','计划名称',p?.name||'我的训练计划','text','required maxlength="80"')}
+ <div class="field-grid">${simpleField('planStart','开始日期',p?.startDate||localDate(),'date','required')}${simpleField('planEnd','结束日期',p?.endDate||addDays(localDate(),29),'date','required')}</div>
+ ${simpleField('planDesc','简要说明（可选）',p?.description||'')}
+ ${p?`<input type="hidden" name="planId" value="${esc(p.id)}">`:''}<div class="hintbox">新计划先包含一个空阶段。你可以添加其他阶段、工具任务、指定日期及依赖关系。</div>`, 'plan-form', editing?'保存修改':'创建计划',true);}
+function openStageModal(plan,stage){modalForm(stage?'重命名阶段':'添加阶段',simpleField('stageName','阶段名称',stage?.name||'新阶段','text','required maxlength="80"')+`<input type="hidden" name="planId" value="${esc(plan.id)}"><input type="hidden" name="stageId" value="${esc(stage?.id||'')}">`,'stage-form','保存');}
+function openGoalModal(goal){const existing=!!goal;modalForm(existing?'编辑价值目标':'创建价值目标',
+ simpleField('goalName','具体行动目标，例如“联系朋友”',goal?.name||'','text','required maxlength="80"')+
+ `<div class="field-grid"><div class="field"><label>关联内在价值</label><select class="select" name="goalValue">${option('','暂未选择',goal?.value)}${VALUES.map(v=>option(v,v,goal?.value)).join('')}</select></div>${simpleField('goalTarget','目标次数',goal?.target||4,'number','min="1" max="100000" required')}</div>`+
+ simpleField('goalUnit','单位',goal?.unit||'次','text','maxlength="30"')+
+ `<input type="hidden" name="goalId" value="${esc(goal?.id||'')}">`+
+ (existing?`<button class="btn sm danger" type="button" data-act="delete-goal" data-id="${goal.id}">删除目标</button>`:''),
+ 'goal-form','保存');}
+function openNoteModal(record){modalForm(record?'编辑笔记':'新建笔记',
+ simpleField('noteTitle','标题',record?.title||'','text','required maxlength="120"')+simpleField('noteText','内容',record?.text||'','textarea','required maxlength="15000"')+`<input type="hidden" name="noteId" value="${esc(record?.id||'')}">`, 'note-form','保存',true);}
+function openRescheduleModal(key){const found=findOcc(key);if(!found){notify('找不到该任务',true);return;}const {plan,occ}=found;modalForm('调整训练日期',`<p class="small muted">${esc(pickLabel(occ.task.toolId))} · 原日期 ${prettyDate(occ.originalDate)}</p><div class="field"><label>新训练日期</label><input class="input" name="newDate" type="date" value="${occ.date}" min="${plan.startDate}" max="${plan.endDate}" required></div><input type="hidden" name="occKey" value="${esc(key)}"><p class="small muted">只能顺延到当前计划日期范围内。如需延长，先编辑计划结束日期。</p>`, 'reschedule-form','保存日期');}
+function findOcc(key){for(const p of state.plans){const occ=occurrences(p).find(x=>x.key===key);if(occ)return {plan:p,occ};}return null;}
+function openTaskModal(p,t=null,preferredTool=''){const isEdit=!!t;let schedule=t?.schedule||{type:'daily',start:p.startDate,end:p.endDate,weekdays:[1,3,5],dates:[localDate()]};
+ const type=schedule.type||'daily';const deps=new Set(t?.dependsOn||[]);
+ const body=`<div class="field-grid"><div class="field"><label>训练工具</label><select class="select" name="toolId" required>${toolOptions(t?.toolId||preferredTool||'mood')}</select></div><div class="field"><label>所属阶段</label><select class="select" name="stageId">${p.stages.map(s=>option(s.id,s.name,t?.stageId||p.stages[0]?.id)).join('')}</select></div></div>
+ <div class="field-grid"><div class="field"><label>单次时长（分钟）</label><input class="input" type="number" name="duration" min="1" max="180" value="${t?.duration||TOOL_INDEX[preferredTool]?.duration||5}" required></div><div class="field"><label>重复类型</label><select class="select" name="scheduleType" id="task-schedule-type">${[['once','指定单日'],['dates','指定多个日期'],['daily','每天'],['weekly','指定星期']].map(x=>option(x[0],x[1],type)).join('')}</select></div></div>
+ <div id="schedule-fields">${renderScheduleFields(schedule,p)}</div>
+ <div class="field"><label>前置任务（可多选，完成任意一次该任务后解锁）</label><div class="choice-chips">${p.tasks.filter(x=>x.id!==t?.id).map(x=>`<label class="choice-chip" style="cursor:pointer"><input type="checkbox" class="input" style="min-height:auto;width:auto" name="dep" value="${esc(x.id)}" ${deps.has(x.id)?'checked':''}>${esc(pickLabel(x.toolId))}</label>`).join('')||'<span class="small muted">暂无其他任务</span>'}</div></div>
+ <div class="field"><label>关联价值目标</label><select class="select" name="goalId">${goalOptions(t?.goalId||'')}</select></div><label class="checkbox-line"><input type="checkbox" name="required" ${t?.required!==false?'checked':''}><span>必做训练（计入计划完成率与连续打卡）</span></label>
+ <input type="hidden" name="planId" value="${p.id}"><input type="hidden" name="taskId" value="${t?.id||''}"><div class="hintbox">到达预定日期但前置任务尚未完成时，会显示“待解锁”，不会自动判定失败。依赖不允许形成循环。</div>`;
+ modalForm(isEdit?'编辑训练任务':'添加训练任务',body,'task-form',isEdit?'保存任务':'添加任务',true);
+}
+function renderScheduleFields(s,p){let body='';const type=s.type||'daily';
+ if(type==='once')body=`${simpleField('dateOnce','执行日期',s.date||p.startDate,'date',`min="${p.startDate}" max="${p.endDate}" required`)}`;
+ if(type==='dates')body=`<div class="field"><label>指定多个日期（每行一个 YYYY-MM-DD，或英文逗号分隔）</label><textarea class="textarea" name="dates" id="dates" placeholder="${p.startDate}\n${addDays(p.startDate,2)}">${esc((s.dates||[p.startDate]).join('\n'))}</textarea></div>`;
+ if(type==='daily'||type==='weekly')body=`<div class="field-grid">${simpleField('scheduleStart','起始日期',s.start||p.startDate,'date',`min="${p.startDate}" max="${p.endDate}" required`)}${simpleField('scheduleEnd','结束日期',s.end||p.endDate,'date',`min="${p.startDate}" max="${p.endDate}" required`)}</div>`;
+ if(type==='weekly')body+=`<div class="field"><label>每周哪几天？</label><div class="day-switch">${['日','一','二','三','四','五','六'].map((d,i)=>`<label><input type="checkbox" name="weekday" value="${i}" ${(s.weekdays||[1,3,5]).includes(i)?'checked':''}>周${d}</label>`).join('')}</div></div>`;
+ return body;
+}
+function openToolInfo(tool){openModal(tool.name,`<div class="pills mb2">${pill('CH'+tool.chapter,'green')}${pill(FREQ_LABEL[tool.freq])}${evidencePill(tool)}${pill('约 '+tool.duration+' 分钟')}</div>
+ <p>${esc(tool.description)}</p>${renderGuide(tool.id,true)}<h3>什么情况下值得使用</h3><p class="muted small">${esc(tool.tags.join('、')||'与当前目标相关的情境')}。按自身情况选择，不必因为工具排序靠前就强迫每天使用。</p>
+ <h3>交互练习方式</h3><p class="muted small">${tool.prompts.length?esc(tool.prompts.map(x=>'· '+x).join('\n')):'在引导式界面中完成练习，并保存个人记录。'}</p>
+ <div class="warningbox mt1">研究证据等级为供界面排序的概括性元数据，可能反映治疗类别而不是单项工具的独立临床效果。${tool.safety==='restricted'?' 这一模块仅提供教育性说明，不开放高强度自助练习。':tool.safety==='caution'?' 如练习使不适明显加重，请停止并考虑合适的专业指导。':''}</div>
+ <div class="form-actions"><button class="btn secondary" data-act="add-plan-task" data-tool="${tool.id}">加入训练计划</button><button class="btn" data-act="start" data-tool="${tool.id}">${tool.safety==='restricted'?'查看教育说明':'开始练习'}</button></div>`);}
+function openRecord(id){const r=state.practiceSessions.find(s=>s.id===id);if(!r)return;const items=Object.entries(r.data||{}).filter(([k,v])=>v!==''&&v!==null&&(!(Array.isArray(v))||v.length));openModal('练习历史 · '+pickLabel(r.toolId),`<div class="pills mb2">${pill(fmtDT(r.completedAt),'green')}${pill((r.duration||0)+' 分钟')}${r.planId?pill('训练计划内') :pill('自由练习')}</div><div class="col">${items.map(([key,value])=>`<div class="rule-tile"><strong>${esc(key)}</strong><p class="pre-line" style="white-space:pre-wrap">${esc(Array.isArray(value)?value.join('、'):typeof value==='object'?JSON.stringify(value,null,2):value)}</p></div>`).join('')||'<div class="muted">本次只有完成状态，没有填写文本。</div>'}</div><div class="form-actions"><button class="btn secondary" data-act="close-modal">关闭</button></div>`,{wide:true});}
+function practiceKey(toolId,key=''){return key||'quick:'+toolId;}
+function openPractice(toolId,occurrenceKey=''){
+ const t=TOOL_INDEX[toolId];if(!t)return notify('工具不存在',true);
+ if(t.mode==='quiz'){closeModal();startQuiz('all',occurrenceKey);return;}
+ if(t.safety==='restricted'){openToolInfo(t);return;}
+ ui.practice={toolId,occurrenceKey,draftKey:practiceKey(toolId,occurrenceKey),startedAt:dateTime(),step:0};
+ if(t.mode==='sleep'){
+  ui.sleepDate=occurrenceKey?findOcc(occurrenceKey)?.occ.date||localDate():localDate();
+  const first=state.sleepProtocol.cycleStart;
+  ui.sleepCycle=Math.max(0,Math.floor(daysBetween(first,ui.sleepDate)/28));
+  ui.sleepTab='today';
+ }
+ if(t.mode==='guided'){stopTimer();stopBreath(true);ui.timer.remaining=(occurrenceKey?findOcc(occurrenceKey)?.occ.task.duration||t.duration:t.duration||5)*60;}
+ showPractice();
+}
+function fieldT(name,label,d,placeholder='',rows=3){return `<div class="field"><label>${esc(label)}</label><textarea name="${esc(name)}" class="textarea" rows="${rows}" placeholder="${esc(placeholder)}">${esc(d?.[name]||'')}</textarea></div>`;}
+function fieldI(name,label,d,placeholder='',type='text'){return `<div class="field"><label>${esc(label)}</label><input name="${esc(name)}" class="input" type="${type}" placeholder="${esc(placeholder)}" value="${esc(d?.[name]||'')}"></div>`;}
+function sliderField(name,label,d,defaultVal=5,max=10){const val=d?.[name]??defaultVal;return `<div class="field"><label>${esc(label)}</label><div class="range-line"><input class="input" type="range" min="0" max="${max}" step="1" name="${name}" value="${clamp(val,0,max)}" data-slider="${name}"><span class="score-large" id="slider-${name}">${clamp(val,0,max)}/${max}</span></div></div>`;}
+function checkChips(name,values,selected=[]){return `<div class="choice-chips">${values.map(x=>`<label class="choice-chip ${selected.includes(x)?'selected':''}"><input type="checkbox" name="${name}" value="${esc(x)}" ${selected.includes(x)?'checked':''} style="position:absolute;opacity:0;pointer-events:none"><span>${selected.includes(x)?'✓ ':''}${esc(x)}</span></label>`).join('')}</div>`;}
+function practiceFields(t,d){switch(t.mode){
+ case 'sleep':return sleepFields(d);
+ case 'abc':return `<div class="hintbox mb2">A 是可观察的事件，B 是解释或信念，C 是情绪和行为。避免把“他就是不尊重我”直接写成事实。</div>${fieldT('A · 触发事实','A · 发生了什么（事实）',d,'具体时间、行为、原话')}${fieldT('B · 想法或信念','B · 我当时怎样解释？',d,'例如：他一定对我很失望')}${fieldT('C · 情绪与行为','C · 随后发生了什么？',d,'情绪、身体变化、实际行动')}${fieldT('背景易感因素','哪些背景可能放大反应？',d,'疲劳、睡眠、其他压力…')}`;
+ case 'cognitive':return `${sliderField('before','开始时的困扰程度',d,7)}${fieldT('自动想法','让我难受的具体想法',d)}${fieldT('支持证据','支持这个想法的事实',d)}${fieldT('反面证据','反对它或提示其他解释的事实',d)}${fieldT('平衡解释','更准确且不过度乐观的解释',d)}${sliderField('after','现在的困扰程度',d,5)}`;
+ case 'mood':return `${sliderField('mood','现在的心情（0 非常糟糕，10 非常好）',d,5)}${sliderField('energy','现在的精力',d,5)}${fieldI('activity','刚才在做什么？',d,'例如：散步、午餐、工作')}${fieldT('note','可选备注',d,'无须解释全部原因；只记录当下体验',2)}`;
+ case 'toward':return `${fieldT('value','今天想践行的价值',d,'例如：联结、健康、成长')}${fieldT('action','今天可以采取的最小价值行动',d,'具体到何时做什么')}${fieldT('obstacle','可能遇到的阻力与应对',d,'如果……那么……',2)}`;
+ case 'top-task':return `${fieldT('main','今天最值得完成的一件事',d,'应当具体、可完成，并与长期价值有关')}${fieldT('micro','能在两分钟内开始的第一步',d)}${fieldT('why','它为什么比其他事情更重要？',d,'价值与影响，而非只有紧急程度',2)}`;
+ case 'vast':return `${fieldT('valuable','V · 为什么有价值？',d)}${fieldT('aspirational','A · 想努力达到什么？',d)}${fieldT('streamlined','S · 哪些目标需要暂时放下？',d)}${fieldT('targeted','T · 可以怎样判断进展？',d)}`;
+ case 'rid':return `${fieldT('risk','R · 风险与触发因素',d)}${fieldT('signs','I · 最早出现的预警信号',d)}${fieldT('prevention','D · 预防行动',d)}${fieldT('coping','困难真的出现后，我的应对步骤',d)}<div class="dangerbox">如果当前存在立即的自伤危险或无法维持安全，请优先寻求当地紧急支持，本记录不是替代性危机计划。</div>`;
+ case 'hierarchy':return `<div class="warningbox mb2">只为现实中安全、适合逐步接触的情境制定等级。复杂恐惧、创伤或强迫问题应考虑专业支持。</div>${Array.from({length:5},(_,i)=>`<div class="field-grid"><div>${fieldI('challenge'+i,`挑战 ${i+1}`,d,'从低难度到高难度')}</div><div>${sliderField('fear'+i,`预计恐惧程度 ${i+1}`,d,(i+1)*2)}</div></div>`).join('')}`;
+ case 'review':return `${fieldT('worked','这段时间哪些行动确实有帮助？',d)}${fieldT('block','哪些安排遇到阻碍？',d)}${fieldT('learned','我观察到了什么？',d)}${fieldT('next','下一周最值得调整的一步',d)}`;
+ case 'three-good':return `${fieldT('good1','第一件好事',d,'哪怕是很小的事')}${fieldT('why1','它为什么发生？',d)}${fieldT('good2','第二件好事',d)}${fieldT('why2','它为什么发生？',d)}${fieldT('good3','第三件好事',d)}${fieldT('why3','它为什么发生？',d)}`;
+ case 'before-after':return `${fieldT('activity','我准备做 / 已经做的活动',d)}${sliderField('before','活动开始前的心情',d,5)}${sliderField('after','活动结束后的心情',d,5)}${fieldT('glad','做完之后，我是否庆幸做了它？',d,'可以写“是 / 否 / 不确定”并解释',2)}`;
+ case 'values':return `<div class="field"><label>哪些价值现在对我最重要？</label>${checkChips('selectedValues',VALUES,d.selectedValues||[])}</div>${fieldT('intrinsic','哪些是我本身重视的，而不只是实现其他目的的工具？',d)}${fieldT('priorities','目前最优先的生活领域',d)}${fieldT('action','一个与价值一致的行动',d)}`;
+ case 'activities':return `<div class="hintbox mb2">活动不是越多越好。对于已经过度忙碌的人，休息也可以是事后庆幸活动。</div>${['情绪记录中较好的活动','过去喜欢的活动','愉悦型活动','成就型活动','长期回避但值得完成的任务','符合个人价值的行动','适合自己的运动','有意义的社交'].map((label,i)=>fieldI('category'+i,label,d,'可以留空')).join('')}${fieldT('schedule','这周优先安排什么？',d,'何时做、预计多久')}`;
+ case 'grounding':return `<div class="hintbox mb2">无需寻找特别的物品。让注意力温和地回到当前环境。如果身体感觉会加重焦虑，可以略过第三类。</div>${fieldT('see','看到的三件事',d,'例如：窗框、桌子、水杯')}${fieldT('hear','听到的三种声音',d,'例如：风、脚步、空调')}${fieldT('feel','感到的三种身体感觉（可跳过）',d,'例如：脚接触地面的感觉')}`;
+ case 'belief':return `${fieldT('belief','需要重新审视的卡点信念',d,'例如：只要没有做好，就是我全部的错')}${sliderField('before','开始前相信程度',d,70,100)}${fieldT('facts','可观察的事实与证据',d)}${fieldT('hindsight','哪些信息是事后才知道的？',d)}${fieldT('alternative','更加准确、有帮助的替代解释',d)}${sliderField('after','现在的相信程度',d,45,100)}`;
+ case 'guided':return `<div class="hintbox mb2">${esc(t.description)}<br>${esc(t.id==='att'?'原书 ATT：两种声音 2 分钟慢切换、2 分钟快切换、1 分钟开放聆听。':t.id==='stop'?'STOP：停下 → 退一步 → 观察 → 再行动。':t.id==='pmr'?'原书 PMR：从脚趾向上，每组轻绷约 5 秒、放松约 10 秒；有痛感请停止。':'练习可以随时暂停；不必追求特别的体验。')}</div>
+ ${(t.id==='breathing'||t.id==='mindfulness')?breathWidget(t):''}
+ ${t.id==='breathing'?'':`<div class="card light" style="background:#f6fbf8;text-align:center"><div class="muted small">${t.id==='mindfulness'?'自然呼吸正念计时（与节律引导独立）':'练习计时器'}</div><div id="timer-value" class="hero-value" style="color:var(--main)">${formatTimer(ui.timer.remaining)}</div><div class="btnrow" style="justify-content:center"><button type="button" class="btn sm" data-act="timer-toggle">开始 / 暂停</button><button type="button" class="btn sm secondary" data-act="timer-reset">重置</button></div></div>`}
+ <div class="mt2">${(t.prompts||[]).map((x,i)=>fieldT('note'+i,x,d)).join('')||fieldT('note','本次练习的感受（可选）',d)}</div>`;
+ case 'nvc':return nvcFields(d);
+ case 'conflict':return conflictFields(d);
+ case 'planner':return plannerFields(d);
+ default:return `<div class="hintbox mb2">${esc(t.description)}</div>${(t.prompts||[]).map((x,i)=>fieldT('f'+i,x,d)).join('')||fieldT('note','我的练习记录',d)}`;
+ }}
+function formatTimer(s){const seconds=Math.max(0,Math.ceil(s));return String(Math.floor(seconds/60)).padStart(2,'0')+':'+String(seconds%60).padStart(2,'0');}
+function nvcFields(d){const step=ui.practice?.step||0;
+ const names=['事实 · 只描述能核对的事情','感受 · 命名自己的情绪','需求 · 解释什么重要','方案 · 讨论未来行动'];
+ const header=`<div class="flow-steps">${names.map((n,i)=>`<div class="flow-step ${i===step?'current':i<step?'done':''}">${i+1}. ${n.split(' · ')[0]}</div>`).join('')}</div><h3>${names[step]}</h3>`;
+ const pages=[
+ `<div class="hintbox mb2">只描述日期、次数、行为和原话，尽量把推测与观察分开。</div>${fieldT('fact','这次事件中可以核对的事实',d,'例如：昨晚 21:00 我发了消息，今天 8:00 收到回复')}${fieldT('inference','我脑海中的推测（可选，单独列出）',d,'例如：他可能不重视我',2)}`,
+ `${fieldT('emotionNote','我现在想表达的感受（可选补充）',d,'我感到失落、难过……',2)}<div class="field"><label>选择感受（可多选）</label>${checkChips('feelings',FEELINGS,d.feelings||[])}</div>${sliderField('intensity','情绪强度',d,4)}`,
+ `<div class="field"><label>哪些需求对我重要？（可多选）</label>${checkChips('needs',NEEDS,d.needs||[])}</div>${fieldT('need','把需求写成一句话',d,'例如：我需要安排变化时能提前知道；尽量不把指定动作写成需求')}`,
+ `${fieldT('solution','我希望和对方协商的未来方案',d,'例如：若无法按时回复，提前给出预计回复时间')}${fieldI('trial','试行多久、何时复核？',d,'例如：试行 14 天，每周日复核')}${fieldT('agreement','怎样尊重双方选择权与实际能力？',d,'这是邀请协商的请求，不是单方面指令',2)}<div class="hintbox">完成后会保存完整四段表达。可先复制草稿给自己确认，再决定是否与他人分享。</div><button class="btn sm secondary" type="button" data-act="copy-nvc">复制四段式文字</button>`
+ ];
+ return header+pages[step]+`<div class="form-actions"><button type="button" class="btn secondary" data-act="nvc-prev" ${step===0?'disabled':''}>上一步</button>${step<3?`<button type="button" class="btn" data-act="nvc-next">下一步 →</button>`:`<button type="submit" class="btn">保存四段表达 ✓</button>`}</div>`;
+}
+function conflictFields(d){
+ const step=ui.practice?.step||0;
+ const pages=[
+ `<div class="warningbox mb2">当争执强烈时先暂停：暂停并不等于消失，也不应要求对方立即和好。如果存在威胁、暴力或控制风险，请优先现实安全而非强求协议。</div>${sliderField('intensity','当前情绪强度（0—10）',d,5)}<div id="conflict-pause-hint">${Number(d.intensity??5)>=7?'<div class="warningbox">当前情绪较强。先暂停沟通，并约定恢复时间和接触方式。</div>':''}</div><div class="field-grid">${fieldI('resume','约定何时恢复沟通（建议写具体时间）',d,'例如：20分钟后 / 今晚20:30')}${fieldI('distance','暂停期间的接触和空间边界',d,'例如：各自在不同房间，不发长消息')}</div>`,
+ `<div class="hintbox mb2"><strong>事实不是推测。</strong>事实包含能核对的日期、时间、具体行为和原话。<br>✕“你根本不在乎我”<br>✓“昨晚约定20:00通话，21:00才接通”</div>${fieldT('fact','发生了什么可观察的事实？',d,'例如：约定20:00通话，实际21:00接通')}${fieldT('inference','我产生了哪些推测？（单独列出，可选）',d,'例如：我担心对方不重视我',2)}`,
+ `<div class="hintbox mb2">感受是自身的体验，如难过、焦虑、委屈；“被你控制”之类词语可能混入对动机的解释，尝试写出更基本的情绪。</div><div class="field"><label>当前感受（可多选）</label>${checkChips('feelings',FEELINGS,d.feelings||[])}</div>${fieldT('feelingNote','我感到……（可补充）',d,'例如：失落、有些担心')}`,
+ `<div class="hintbox mb2">需求说明什么对我重要，例如理解、清晰、边界；“你必须立即道歉”是具体策略，不是需求本身。</div><div class="field"><label>需要被尊重的需求（可多选）</label>${checkChips('needs',NEEDS,d.needs||[])}</div>${fieldT('need','我更深层的需求是……',d,'例如：希望双方对时间安排具有可预测性')}`,
+ `<div class="hintbox mb2"><strong>方案与需求不同。</strong>方案应面向未来、双方自愿协商、可以实际履行和核对。例：如果会晚于约定时间，能否提前告知并给出新的时间？</div>${fieldT('solution','未来可以怎样做？',d,'例如：改变计划时提前告知预计回复时间')}<div class="field-grid">${fieldI('trial','试行周期',d,'例如：14天')}${fieldI('review','约定复核时间',d,'例如：每周日晚上')}</div>
+ <h3>八项规则质量检查</h3><p class="small muted">打勾表示“我认为当前方案已经满足这一条”；未勾选的条目留作以后修改。规则用于公平协商，不用于惩罚。</p><div class="rule-grid">${FULLER_RULES.map(([n,desc],i)=>`<label class="rule-tile" style="cursor:pointer;display:flex;gap:8px"><input type="checkbox" name="ruleCheck" value="${i}" ${(d.ruleCheck||[]).includes(String(i))?'checked':''} style="accent-color:var(--main)"><span><strong>${esc(n)}</strong><p>${esc(desc)}</p></span></label>`).join('')}</div><div class="btnrow mt2"><button class="btn sm secondary" type="button" data-act="copy-conflict">复制冲突协议草稿</button></div>`
+ ];
+ const names=['暂停与安全','事实','感受','需求','方案与规则'];
+ return `<div class="flow-steps">${names.map((x,i)=>`<div class="flow-step ${i===step?'current':i<step?'done':''}">${i+1}. ${x}</div>`).join('')}</div><h3>步骤 ${step+1} / 5 · ${names[step]}</h3>${pages[step]}<div class="form-actions sticky-actions"><button type="button" class="btn secondary" data-act="conflict-prev" ${step===0?'disabled':''}>← 上一步</button>${step<4?`<button type="button" class="btn" data-act="conflict-next">下一步 →</button>`:`<button class="btn" type="submit">保存完整沟通协议 ✓</button>`}</div>`;
+}
+function plannerFields(d){const date=ui.plannerDate||localDate(),all=state.plannerTasks[date]||[];return `<div class="field-grid"><div class="field"><label>排程日期</label><input class="input" id="planner-date" type="date" value="${esc(date)}"></div><div class="field"><label>开始工作时间</label><input class="input" id="planner-start" type="time" value="${esc(d.startTime||'09:00')}"></div></div><div class="hintbox mb2">参考原有日程工具：保留任务拆解、重要—紧急四象限、主任务连续性和间隔休息。这里采用可解释的贪心排程，不声称复现旧工具的模拟退火算法。</div><div class="task-builder-row mb2"><input id="planner-title" class="input" placeholder="新任务名称"><input id="planner-duration" class="input" type="number" value="30" min="5" max="300" title="时长（分钟）"><select id="planner-quadrant" class="select"><option value="q2">重要不紧急</option><option value="q1">重要且紧急</option><option value="q3">紧急不重要</option><option value="q4">不重要不紧急</option></select><select id="planner-diff" class="select"><option value="high">困难</option><option value="medium">中等</option><option value="low">简单</option></select><button type="button" class="btn" data-act="planner-add">添加</button></div>
+ <div id="planner-list">${all.length?all.map(x=>`<div class="plan-item"><span class="stage-index">${x.done?'✓':x.quadrant.toUpperCase()}</span><div class="grow"><strong>${esc(x.title)}</strong><div class="muted small">${x.duration} 分钟 · ${x.difficulty==='high'?'困难':x.difficulty==='low'?'简单':'中等'}</div></div><div class="btnrow"><button class="btn sm secondary" type="button" data-act="planner-toggle" data-id="${x.id}">${x.done?'撤销':'完成'}</button><button class="btn sm danger" type="button" data-act="planner-delete" data-id="${x.id}">删除</button></div></div>`).join(''):empty('暂无待排程任务','添加一项工作或生活任务后即可生成顺序。')}</div>
+ <div class="btnrow mt2"><button type="button" class="btn secondary" data-act="planner-generate">按优先级生成日程</button></div><div id="planner-output" class="mt2">${renderPlannerOutput(all,d.startTime||'09:00')}</div>${fieldT('note','本次排程的备注（可选）',d)}`;
+}
+function renderPlannerOutput(items,start='09:00'){const remaining=items.filter(x=>!x.done),priority={q1:4,q2:3,q3:2,q4:1};const sorted=remaining.slice().sort((a,b)=>priority[b.quadrant]-priority[a.quadrant]||({high:3,medium:2,low:1}[b.difficulty]-({high:3,medium:2,low:1}[a.difficulty])));
+ if(!sorted.length)return '<div class="small muted">没有未完成任务。</div>';
+ let m=(Number(start.split(':')[0])||9)*60+(Number(start.split(':')[1])||0),work=0;const fmt=t=>`${String(Math.floor(t/60)%24).padStart(2,'0')}:${String(t%60).padStart(2,'0')}`;
+ const html=[];for(const task of sorted){const dur=clamp(task.duration,5,300);if(work>=90){html.push(`<div class="timeline-entry" style="border-left-color:#dda357"><strong>${fmt(m)}–${fmt(m+10)}</strong><span>短暂休息 · 10 分钟</span></div>`);m+=10;work=0;}
+ html.push(`<div class="timeline-entry"><strong>${fmt(m)}–${fmt(m+dur)}</strong><span>${esc(task.title)} · ${task.quadrant.toUpperCase()} · ${dur}分钟</span></div>`);m+=dur;work+=dur;}
+ return `<div class="timeline">${html.join('')}</div><div class="option-note mt1">自动排序优先考虑重要紧急程度，其次安排较难任务。请根据个人精力与现实会议调整。</div>`;}
+function showPractice(){const ctx=ui.practice;if(!ctx)return;const t=TOOL_INDEX[ctx.toolId],d=state.drafts[ctx.draftKey]||{};
+ const keyInfo=ctx.occurrenceKey?`<span class="pill green">来自训练计划</span>`:'<span class="pill">自由练习</span>';
+ const form=`<div class="intro-strip"><div class="pills">${keyInfo}${pill('CH'+t.chapter)}${pill('约 '+t.duration+' 分钟')}</div><span class="small muted">修改自动保存草稿</span></div><p class="muted small">${esc(t.description)}</p>${t.mode==='sleep'?'':renderGuide(t.id,false)}${t.safety==='caution'?'<div class="warningbox mb2">如练习引起明显不适或涉及需要评估的心理/身体风险，请停止并考虑合适的专业指导。</div>':''}<form id="practice-form" novalidate>${practiceFields(t,d)}${t.mode==='nvc'||t.mode==='conflict'?'':`<div class="form-actions sticky-actions"><button type="button" class="btn secondary" data-act="close-modal">保存草稿，稍后继续</button><button type="submit" class="btn">完成并保存 ✓</button></div>`}</form>`;
+ openModal(t.name,form,{wide:t.mode==='nvc'||t.mode==='conflict'||t.mode==='planner'||t.mode==='sleep'});
+}
+function updateDraftFromForm(){const ctx=ui.practice,form=$('practice-form');if(!ctx||!form)return;
+ const d={...(state.drafts[ctx.draftKey]||{})},inputs=[...form.querySelectorAll('[name]')];const groups=new Set(inputs.filter(el=>el.type==='checkbox').map(x=>x.name));for(const name of groups)d[name]=[...form.querySelectorAll(`input[type="checkbox"][name="${name}"]:checked`)].map(x=>x.value);
+ for(const el of inputs){if(el.type==='checkbox')continue;if(el.type==='radio'){if(el.checked)d[el.name]=el.value;}else d[el.name]=el.value;}
+ if(TOOL_INDEX[ctx.toolId]?.mode==='planner')d.startTime=$('planner-start')?.value||d.startTime||'09:00';
+ state.drafts[ctx.draftKey]=d;persist();return d;
+}
+function completePractice(){const ctx=ui.practice;if(!ctx)return;const t=TOOL_INDEX[ctx.toolId],d=updateDraftFromForm()||{};
+ if(t.mode==='sleep'){const associated=ctx.occurrenceKey?findOcc(ctx.occurrenceKey)?.occ.date:null;if(associated&&associated!==ui.sleepDate){notify('当前编辑日期与计划任务日期不一致，请切回'+prettyDate(associated)+'再完成该任务；其他日期的记录已经自动保存。',true);return;}const log=state.sleepLogs[ui.sleepDate]||{};if(!log.wakeTime&&!log.bedtime&&!log.energy){notify('至少填写起床时间、上床时间或白天精力中的一项后再完成。',true);return;}Object.assign(d,{记录日期:ui.sleepDate,睡眠记录快照:copyObj(log)});}
+ if(t.mode==='conflict'&&(!d.fact?.trim()||!(d.feelings?.length||d.feelingNote?.trim())||!(d.needs?.length||d.need?.trim())||!d.solution?.trim())){notify('保存前请完成事实、感受、需求和方案四部分。',true);return;}
+ if(t.mode==='nvc'&&(!d.fact?.trim()||!(d.need?.trim()||(d.needs||[]).length)||!d.solution?.trim()||!(d.emotionNote?.trim()||(d.feelings||[]).length))){notify('请填写事实、感受、需求和方案四部分，再保存。',true);return;}
+ if(t.mode==='mood'&&(!d.mood||!d.energy)){/* 0 is valid and strings '0' truthy */}
+ if(t.mode==='three-good'&&!(d.good1||d.good2||d.good3)){notify('请至少写下一件好事。',true);return;}
+ if(t.mode==='planner')d.plannedTasks=copyObj(state.plannerTasks[ui.plannerDate]||[]);
+ const session={id:uid(),toolId:t.id,startedAt:ctx.startedAt,completedAt:dateTime(),duration:Math.max(1,Number(ctx.occurrenceKey?findOcc(ctx.occurrenceKey)?.occ.task.duration:t.duration)||t.duration),data:copyObj(d),planId:null,taskId:null,occurrenceKey:ctx.occurrenceKey||null,goalId:d.linkedGoalId||null};
+ if(ctx.occurrenceKey){const f=findOcc(ctx.occurrenceKey);if(!f){notify('关联任务不存在，无法写入计划进度',true);return;}session.planId=f.plan.id;session.taskId=f.occ.task.id;session.goalId=f.occ.task.goalId||null;state.occStatuses[ctx.occurrenceKey]='done';}
+ state.practiceSessions.push(session);
+ if(t.id==='mood')state.moodEntries.push({id:uid(),at:session.completedAt,mood:Number(d.mood??5),energy:Number(d.energy??5),activity:d.activity||'',sessionId:session.id});
+ delete state.drafts[ctx.draftKey];persist(true);closeModal();render();notify('练习已完成并自动保存');
+}
+function parseTaskForm(form,p,existing){const fd=new FormData(form),type=fd.get('scheduleType'),schedule={type};
+ if(type==='once')schedule.date=String(fd.get('dateOnce')||'');
+ if(type==='dates'){schedule.dates=[...new Set(String(fd.get('dates')||'').split(/[\n,，、\s]+/).map(x=>x.trim()).filter(Boolean))].sort();if(!schedule.dates.length)throw Error('请至少指定一个日期。');}
+ if(type==='daily'||type==='weekly'){schedule.start=String(fd.get('scheduleStart')||'');schedule.end=String(fd.get('scheduleEnd')||'');if(schedule.start>schedule.end)throw Error('训练开始日期不得晚于结束日期。');if(type==='weekly'){schedule.weekdays=fd.getAll('weekday').map(Number);if(!schedule.weekdays.length)throw Error('每周至少选择一天。');}}
+ for(const date of (schedule.type==='once'?[schedule.date]:schedule.type==='dates'?schedule.dates:[schedule.start,schedule.end]))if(!/^\d{4}-\d{2}-\d{2}$/.test(date)||!within(date,p.startDate,p.endDate))throw Error('指定日期必须在计划起止日期之间。');
+ const task={id:existing?.id||uid(),toolId:String(fd.get('toolId')),stageId:String(fd.get('stageId')),position:existing?.position??p.tasks.length,duration:clamp(fd.get('duration'),1,180),required:fd.get('required')==='on',goalId:String(fd.get('goalId')||''),dependsOn:fd.getAll('dep').map(String),schedule};
+ if(!TOOL_INDEX[task.toolId])throw Error('未找到选择的训练工具。');if(TOOL_INDEX[task.toolId].safety==='restricted')throw Error('高风险或探索性模块只提供教育说明，不支持加入训练计划。');if(!p.stages.some(s=>s.id===task.stageId))throw Error('训练阶段不存在。');if(task.dependsOn.includes(task.id))throw Error('任务不能依赖自己。');return task;
+}
+function stageValidateOrder(p){for(const t of p.tasks){for(const id of t.dependsOn||[]){const dep=p.tasks.find(x=>x.id===id);if(dep&&stageIndex(p,dep.stageId)>stageIndex(p,t.stageId))throw Error(`“${pickLabel(t.toolId)}”依赖了后续阶段的工具“${pickLabel(dep.toolId)}”。请调整阶段顺序。`);}}if(hasCycle(p))throw Error('检测到任务循环依赖，请取消造成循环的前置任务。');}
+function savePlanForm(form){const fd=new FormData(form),id=String(fd.get('planId')||''),name=String(fd.get('planName')||'').trim(),start=String(fd.get('planStart')||''),end=String(fd.get('planEnd')||'');if(!name||!/^\d{4}-\d{2}-\d{2}$/.test(start)||!/^\d{4}-\d{2}-\d{2}$/.test(end)||daysBetween(start,end)<0||daysBetween(start,end)>730)throw Error('请填写有效名称与不超过两年的日期范围。');
+ if(id){const p=state.plans.find(p=>p.id===id);if(!p)throw Error('计划不存在。');Object.assign(p,{name,startDate:start,endDate:end,description:String(fd.get('planDesc')||''),updatedAt:dateTime()});ui.planId=p.id;}
+ else{const p={id:uid(),name,description:String(fd.get('planDesc')||''),startDate:start,endDate:end,status:'paused',stages:[{id:uid(),name:'阶段 1',gate:false}],tasks:[],createdAt:dateTime(),updatedAt:dateTime()};state.plans.push(p);ui.planId=p.id;}
+ clearEditorDraft(form);persist(true);closeModal();go('plans');notify('训练计划已保存');}
+function saveTaskForm(form){const fd=new FormData(form),p=state.plans.find(x=>x.id===fd.get('planId')),existing=p?.tasks.find(x=>x.id===fd.get('taskId'));if(!p)throw Error('计划不存在。');const task=parseTaskForm(form,p,existing),temp=copyObj(p);
+ if(existing)temp.tasks[temp.tasks.findIndex(t=>t.id===existing.id)]=task;else temp.tasks.push(task);
+ stageValidateOrder(temp);p.tasks=temp.tasks;p.updatedAt=dateTime();clearEditorDraft(form);persist(true);closeModal();go('plans');notify('任务和日程已保存');}
+function saveStageForm(form){const fd=new FormData(form),p=state.plans.find(x=>x.id===fd.get('planId')),stage=p?.stages.find(x=>x.id===fd.get('stageId')),name=String(fd.get('stageName')||'').trim();if(!p||!name)throw Error('请输入阶段名称。');if(stage)stage.name=name;else p.stages.push({id:uid(),name,gate:false});p.updatedAt=dateTime();clearEditorDraft(form);persist();closeModal();render();}
+function saveGoalForm(form){const fd=new FormData(form),id=String(fd.get('goalId')||''),name=String(fd.get('goalName')||'').trim(),target=Number(fd.get('goalTarget'));if(!name||!Number.isInteger(target)||target<1||target>100000)throw Error('请填写有效的目标名称和正整数次数。');const goal=state.guidingFoundations.goals.find(g=>g.id===id);
+ if(goal)Object.assign(goal,{name,target,value:String(fd.get('goalValue')||''),unit:String(fd.get('goalUnit')||'次')});else state.guidingFoundations.goals.push({id:uid(),name,target,value:String(fd.get('goalValue')||''),unit:String(fd.get('goalUnit')||'次'),manualCount:0,createdAt:dateTime()});
+ clearEditorDraft(form);persist(true);closeModal();go('values');notify('价值目标已保存');}
+function saveNoteForm(form){const fd=new FormData(form),id=String(fd.get('noteId')||''),title=String(fd.get('noteTitle')||'').trim(),text=String(fd.get('noteText')||'').trim();if(!title||!text)throw Error('请填写标题和内容。');const note=state.journalEntries.find(x=>x.id===id);if(note)Object.assign(note,{title,text,updatedAt:dateTime()});else journalRecord(title,text);clearEditorDraft(form);persist(true);closeModal();go('notes');}
+function saveRuleForm(form){const fd=new FormData(form),text=String(fd.get('text')||'').trim();if(!text)throw Error('请先输入待检查的协议。');const checks=FULLER_RULES.map((x,i)=>({name:x[0],checked:fd.has('rule'+i)}));const s={id:uid(),toolId:'conflict',startedAt:dateTime(),completedAt:dateTime(),duration:5,occurrenceKey:null,planId:null,taskId:null,goalId:null,data:{'协议规则质量检查':text,'已满足的规则':checks.filter(x=>x.checked).map(x=>x.name),'有待改进的规则':checks.filter(x=>!x.checked).map(x=>x.name)}};
+ state.practiceSessions.push(s);clearEditorDraft(form);persist(true);render();notify('规则检查已保存');}
+function managePlanner(action,id=''){if(!ui.practice||ui.practice.toolId!=='daily-planner')return;updateDraftFromForm();const date=ui.plannerDate||localDate(),arr=state.plannerTasks[date]||(state.plannerTasks[date]=[]);
+ if(action==='add'){const title=$('planner-title')?.value.trim(),duration=Number($('planner-duration')?.value),quadrant=$('planner-quadrant')?.value,difficulty=$('planner-diff')?.value;if(!title||!Number.isFinite(duration)||duration<5||duration>300){notify('请填写任务名称及 5—300 分钟的时长。',true);return;}arr.push({id:uid(),title,duration,quadrant,difficulty,done:false});}
+ if(action==='toggle'){const t=arr.find(x=>x.id===id);if(t)t.done=!t.done;}
+ if(action==='delete'){const i=arr.findIndex(x=>x.id===id);if(i>=0)arr.splice(i,1);}
+ persist();showPractice();}
+function beginImport(){const f=$('import-file');f.value='';f.click();}
+async function importFile(file){if(!file)return;if(file.size>5*1024*1024){notify('备份文件超过 5 MB，请检查文件。',true);return;}let parsed;
+ try{parsed=validateState(JSON.parse(await file.text()));}catch(e){notify('无法导入：'+e.message,true);return;}
+ const message=`将导入 ${parsed.plans.length} 份计划、${parsed.practiceSessions.length} 条练习记录。\n\n这会完全替换当前浏览器中的所有十二支点数据，且无法自动恢复。建议先导出当前数据。\n\n确定继续吗？`;
+ if(!confirm(message))return;
+ try{localStorage.setItem(STORAGE_KEY,JSON.stringify(parsed));state=parsed;ui.planId=state.activePlanId||state.plans[0]?.id;ui.quiz=null;closeModal();go('home');notify('完整备份已导入并替换当前数据。');}catch(e){notify('本地空间不足，导入未完成。原数据未被替换。',true);}
+}
+function exportJSON(){state.lastExportAt=dateTime();persist(true);const filename='十二支点备份-'+localDate()+'.json';const url=URL.createObjectURL(new Blob([JSON.stringify(state,null,2)],{type:'application/json;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1200);notify('完整 JSON 备份已生成。请妥善保存。');render();}
+function removeOccurrence(key){const found=findOcc(key);if(!found)return;const origSessions=state.practiceSessions.filter(s=>s.occurrenceKey===key).map(s=>s.id);state.practiceSessions=state.practiceSessions.filter(s=>s.occurrenceKey!==key);state.moodEntries=state.moodEntries.filter(m=>!origSessions.includes(m.sessionId));delete state.occStatuses[key];persist(true);render();notify('已撤销该训练单元的状态');}
+function saveQuizCompletion(qz){if(qz.saved)return;qz.saved=true;const data={'答对题数':qz.score,'题目总数':qz.items.length,'题目类型':qz.category,'每题反馈':qz.answers.map((a,i)=>`${i+1}. ${qz.items[i].q}\n${a.ok?'答对':'未答对'}；${qz.items[i].why}`).join('\n\n')};let planId=null,taskId=null,goalId=null;
+ if(qz.occurrenceKey){const f=findOcc(qz.occurrenceKey);if(f){planId=f.plan.id;taskId=f.occ.task.id;goalId=f.occ.task.goalId||null;state.occStatuses[qz.occurrenceKey]='done';}}
+ state.practiceSessions.push({id:uid(),toolId:'communication-quiz',startedAt:qz.startedAt,completedAt:dateTime(),duration:7,occurrenceKey:qz.occurrenceKey||null,planId,taskId,goalId,data});state.quizDraft=null;persist(true);notify('沟通挑战成绩已保存');}
+function parseNvcMessage(d){return `【事实】${d.fact||'（未填）'}\n【感受】${[...(d.feelings||[]),d.emotionNote||''].filter(Boolean).join('、')||'（未填）'}\n【需求】${[...(d.needs||[]),d.need||''].filter(Boolean).join('；')||'（未填）'}\n【方案】${d.solution||'（未填）'}${d.trial?'\n【试行】'+d.trial:''}`;}
+async function copyText(str){try{await navigator.clipboard.writeText(str);notify('内容已复制到剪贴板');}catch(e){const t=document.createElement('textarea');t.value=str;t.style.position='fixed';t.style.opacity='0';document.body.appendChild(t);t.select();try{document.execCommand('copy');notify('已复制到剪贴板');}catch{notify('无法直接复制，请从记录页面选择文字。',true);}t.remove();}}
+function handleAction(el,event){const a=el.dataset.act;if(!a)return;
+ if(a==='sleep-tab'){ui.sleepTab=el.dataset.tab;showPractice();return;}
+ if(a==='sleep-cycle'){ui.sleepCycle=Math.max(0,ui.sleepCycle+Number(el.dataset.dir));ui.sleepDate=addDays(sleepFirstDate(),Math.min(27,Math.max(0,daysBetween(sleepFirstDate(),ui.sleepDate))));ui.sleepTab='table';showPractice();return;}
+ if(a==='sleep-day'){ui.sleepDate=el.dataset.date;ui.sleepTab='today';showPractice();return;}
+ if(a==='open-breath-from-sleep'){closeModal();openPractice('breathing');return;}
+ if(a==='breath-start'){breathStart();return;}
+ if(a==='breath-pause'){breathPause();return;}
+ if(a==='breath-reset'){breathReset();return;}
+ if(a==='breath-sound'){ui.breath.sound=!ui.breath.sound;const btn=document.getElementById('breath-sound-btn');if(btn)btn.textContent=ui.breath.sound?'♪ 音效开启':'音效静音';if(ui.breath.sound&&ui.breath.running)breathPhaseTone(ui.breath.phase);else clearBreathNodes();return;}
+ if(a==='conflict-prev'){updateDraftFromForm();ui.practice.step=Math.max(0,ui.practice.step-1);showPractice();return;}
+ if(a==='conflict-next'){const d=updateDraftFromForm()||{},step=ui.practice.step;
+  if(step===1&&!d.fact?.trim())return notify('请先记录一条可核对的事实。',true);
+  if(step===2&&!(d.feelings?.length||d.feelingNote?.trim()))return notify('请先选择或填写感受。',true);
+  if(step===3&&!(d.needs?.length||d.need?.trim()))return notify('请先选择或填写需求。',true);
+  ui.practice.step=Math.min(4,step+1);showPractice();return;
+ }
+ if(a==='copy-conflict'){const d=updateDraftFromForm()||{};return copyText(`【暂停】${d.resume||'未定'}；边界：${d.distance||'未定'}\n【事实】${d.fact||'未填'}\n【感受】${[...(d.feelings||[]),d.feelingNote||''].filter(Boolean).join('、')}\n【需求】${[...(d.needs||[]),d.need||''].filter(Boolean).join('、')}\n【方案】${d.solution||'未填'}\n【试行】${d.trial||'未定'}；复核：${d.review||'未定'}`);}
+
+ if(a==='close-overlay-backdrop'){if(event.target===el)closeModal();return;}
+ if(a==='close-modal'){closeModal();return;}
+ if(a==='show-menu'){openModal('导航',NAV.map(x=>`<button class="nav-item" data-nav="${x[0]}">${x[1]} ${x[2]}</button>`).join(''));return;}
+ if(a==='export-json')return exportJSON();
+ if(a==='import-json')return beginImport();
+ if(a==='reset'){if(!confirm('即将清空当前浏览器中的所有十二支点数据，并重建 30 天默认计划。确定吗？'))return;if(!confirm('最后确认：此操作不能撤销。是否已经备份所需记录？'))return;state=freshState();ui.planId=state.activePlanId;ui.quiz=null;persist(true);closeModal();go('home');notify('已重建全新工作区');return;}
+ if(a==='start')return openPractice(el.dataset.tool,el.dataset.key||'');
+ if(a==='tool-info')return openToolInfo(TOOL_INDEX[el.dataset.tool]);
+ if(a==='favorite'){const id=el.dataset.tool;state.favorites=state.favorites.includes(id)?state.favorites.filter(x=>x!==id):[...state.favorites,id];persist();render();return;}
+ if(a==='add-plan-task'){const p=activePlan()||selectedPlan();if(!p)return notify('请先创建训练计划',true);const toolId=el.dataset.tool;if(TOOL_INDEX[toolId]?.safety==='restricted')return notify('这一工具目前只开放教育说明，不建议安排自主训练。',true);return openTaskModal(p,null,toolId);}
+ if(a==='tool-cat'){ui.toolCategory=el.dataset.cat;render();return;}
+ if(a==='new-plan')return openPlanModal(null);
+ if(a==='edit-plan')return openPlanModal(state.plans.find(p=>p.id===el.dataset.id));
+ if(a==='activate-plan'){state.activePlanId=el.dataset.id;const p=activePlan();if(p)p.status='active';persist(true);render();notify('首页训练计划已切换');return;}
+ if(a==='toggle-pause'){const p=state.plans.find(p=>p.id===el.dataset.id);if(!p)return;let last=state.pausePeriods.find(x=>x.planId===p.id&&!x.end);if(p.status==='paused'){p.status='active';if(last)last.end=localDate();}else{p.status='paused';state.pausePeriods.push({planId:p.id,start:localDate(),end:null});}persist(true);render();return;}
+ if(a==='duplicate-plan'){const p=state.plans.find(x=>x.id===el.dataset.id);if(!p)return;const clone=copyObj(p),delta=daysBetween(p.startDate,localDate());clone.id=uid();clone.name=p.name+'（副本）';clone.status='paused';clone.isDefault=false;clone.startDate=addDays(p.startDate,delta);clone.endDate=addDays(p.endDate,delta);clone.createdAt=dateTime();const mapping={};clone.stages.forEach(x=>{const original=x.id;x.id=uid();mapping['stage:'+original]=x.id;});clone.tasks.forEach(t=>{const old=t.id;t.id=uid();mapping[old]=t.id;t.stageId=mapping['stage:'+t.stageId];if(t.schedule.type==='once')t.schedule.date=addDays(t.schedule.date,delta);if(t.schedule.type==='dates')t.schedule.dates=t.schedule.dates.map(d=>addDays(d,delta));if(['daily','weekly'].includes(t.schedule.type)){t.schedule.start=addDays(t.schedule.start,delta);t.schedule.end=addDays(t.schedule.end,delta);}});clone.tasks.forEach(t=>t.dependsOn=(t.dependsOn||[]).map(id=>mapping[id]));state.plans.push(clone);ui.planId=clone.id;persist(true);render();notify('已复制为新的独立训练计划');return;}
+ if(a==='add-stage')return openStageModal(state.plans.find(p=>p.id===el.dataset.id));
+ if(a==='rename-stage'){const p=state.plans.find(p=>p.id===el.dataset.id);return openStageModal(p,p.stages.find(s=>s.id===el.dataset.stage));}
+ if(a==='toggle-gate'){const p=state.plans.find(p=>p.id===el.dataset.id),s=p?.stages.find(s=>s.id===el.dataset.stage);if(s){s.gate=!s.gate;persist();render();}return;}
+ if(a==='move-stage'){const p=state.plans.find(p=>p.id===el.dataset.id),i=p?.stages.findIndex(s=>s.id===el.dataset.stage),j=i+Number(el.dataset.dir);if(!p||i<0||j<0||j>=p.stages.length)return;[p.stages[i],p.stages[j]]=[p.stages[j],p.stages[i]];try{stageValidateOrder(p);}catch(e){[p.stages[i],p.stages[j]]=[p.stages[j],p.stages[i]];notify(e.message,true);return;}persist();render();return;}
+ if(a==='remove-stage'){const p=state.plans.find(p=>p.id===el.dataset.id),id=el.dataset.stage;if(!p||p.stages.length<2)return;const count=p.tasks.filter(t=>t.stageId===id).length;if(!confirm(`删除阶段？${count?'其中 '+count+' 项工具任务将移动到第一个保留阶段。':''}`))return;const dest=p.stages.find(s=>s.id!==id);const orig=copyObj(p);p.stages=p.stages.filter(s=>s.id!==id);p.tasks.forEach(t=>{if(t.stageId===id)t.stageId=dest.id;});try{stageValidateOrder(p);}catch(e){Object.assign(p,orig);notify('删除后依赖顺序无效：'+e.message,true);return;}persist();render();return;}
+ if(a==='add-task'){const p=state.plans.find(p=>p.id===el.dataset.id);return openTaskModal(p);}
+ if(a==='edit-task'){const p=state.plans.find(p=>p.id===el.dataset.plan);return openTaskModal(p,p.tasks.find(t=>t.id===el.dataset.task));}
+ if(a==='move-task'){const p=state.plans.find(p=>p.id===el.dataset.plan),t=p?.tasks.find(t=>t.id===el.dataset.task);if(!t)return;const list=p.tasks.filter(x=>x.stageId===t.stageId).sort((a,b)=>a.position-b.position),i=list.indexOf(t),j=i+Number(el.dataset.dir);if(j<0||j>=list.length)return;const tmp=list[i].position;list[i].position=list[j].position;list[j].position=tmp;persist();render();return;}
+ if(a==='remove-task'){const p=state.plans.find(p=>p.id===el.dataset.plan),t=p?.tasks.find(t=>t.id===el.dataset.task);if(!t||!confirm(`删除工具任务“${pickLabel(t.toolId)}”？已保存的个人练习记录不会随之删除。`))return;
+ p.tasks=p.tasks.filter(x=>x.id!==t.id);p.tasks.forEach(x=>x.dependsOn=(x.dependsOn||[]).filter(id=>id!==t.id));persist();render();return;}
+ if(a==='skip-occ'){const f=findOcc(el.dataset.key);if(f?.occ.status==='todo'){state.occStatuses[el.dataset.key]='skipped';persist(true);render();}return;}
+ if(a==='undo-occ')return removeOccurrence(el.dataset.key);
+ if(a==='reschedule')return openRescheduleModal(el.dataset.key);
+ if(a==='comm-tab'){ui.commTab=el.dataset.tab;render();return;}
+ if(a==='start-quiz'){return startQuiz(el.dataset.type||'all',el.dataset.key||'');}
+ if(a==='quiz-select'){const q=ui.quiz;if(!q||q.checked)return;const i=Number(el.dataset.i),item=q.items[q.index];if(item.type==='single')q.selected=[i];else q.selected=q.selected.includes(i)?q.selected.filter(x=>x!==i):[...q.selected,i];state.quizDraft=copyObj(q);persist();render();return;}
+ if(a==='quiz-move'){const q=ui.quiz;if(!q||q.checked)return;const i=Number(el.dataset.i),j=i+Number(el.dataset.dir);if(j<0||j>=q.order.length)return;[q.order[i],q.order[j]]=[q.order[j],q.order[i]];state.quizDraft=copyObj(q);persist();render();return;}
+ if(a==='quiz-check'){const q=ui.quiz;if(!q||q.checked)return;const item=q.items[q.index];if(item.type!=='order'&&!q.selected.length)return;const correct=item.type==='order'?q.order.every((x,i)=>x.id===i):[...q.selected].sort().join(',')===[...item.answers].sort().join(',');q.answers.push({ok:correct,selected:item.type==='order'?q.order.map(x=>x.id):q.selected.slice()});if(correct)q.score++;q.checked=true;state.quizDraft=copyObj(q);persist();render();return;}
+ if(a==='quiz-next'){const q=ui.quiz;if(!q||!q.checked)return;q.index++;q.checked=false;q.selected=[];q.order=[];if(q.index>=q.items.length)saveQuizCompletion(q);else{state.quizDraft=copyObj(q);persist();}render();return;}
+ if(a==='quiz-exit'){if(ui.quiz?.index<ui.quiz?.items.length&&!confirm('结束当前挑战？已答的题目会保留为草稿，但不会计入计划完成。'))return;ui.quiz=null;state.quizDraft=null;persist();render();return;}
+ if(a==='records-tab'){ui.recordsTab=el.dataset.tab;render();return;}
+ if(a==='toggle-value'){const v=el.dataset.value;state.guidingFoundations.values=state.guidingFoundations.values.includes(v)?state.guidingFoundations.values.filter(x=>x!==v):[...state.guidingFoundations.values,v];persist();render();return;}
+ if(a==='new-goal')return openGoalModal(null);
+ if(a==='edit-goal')return openGoalModal(state.guidingFoundations.goals.find(g=>g.id===el.dataset.id));
+ if(a==='increment-goal'){const g=state.guidingFoundations.goals.find(g=>g.id===el.dataset.id);if(g){g.manualCount=(g.manualCount||0)+1;persist();render();}return;}
+ if(a==='delete-goal'){const id=el.dataset.id;if(!confirm('删除此目标？已保存的练习记录不会被删除。'))return;state.guidingFoundations.goals=state.guidingFoundations.goals.filter(g=>g.id!==id);for(const p of state.plans)for(const t of p.tasks)if(t.goalId===id)t.goalId='';persist();closeModal();render();return;}
+ if(a==='new-note')return openNoteModal(null);
+ if(a==='edit-note')return openNoteModal(state.journalEntries.find(r=>r.id===el.dataset.id));
+ if(a==='delete-note'){if(!confirm('永久删除这条笔记？'))return;state.journalEntries=state.journalEntries.filter(x=>x.id!==el.dataset.id);persist();render();return;}
+ if(a==='view-record')return openRecord(el.dataset.id);
+ if(a==='delete-record'){if(!confirm('删除这次练习记录？若它属于计划，关联任务也将恢复待办。'))return;const s=state.practiceSessions.find(s=>s.id===el.dataset.id);if(s?.occurrenceKey)delete state.occStatuses[s.occurrenceKey];state.practiceSessions=state.practiceSessions.filter(x=>x.id!==el.dataset.id);state.moodEntries=state.moodEntries.filter(x=>x.sessionId!==el.dataset.id);persist();render();return;}
+ if(a==='copy-nvc'){const d=updateDraftFromForm()||{};return copyText(parseNvcMessage(d));}
+ if(a==='timer-toggle'){if(ui.timer.running){stopTimer();}else{if(ui.timer.remaining<=0)ui.timer.remaining=TOOL_INDEX[ui.practice?.toolId]?.duration*60||300;ui.timer.running=true;ui.timer.interval=setInterval(()=>{ui.timer.remaining=Math.max(0,ui.timer.remaining-1);const el=$('timer-value');if(el)el.textContent=formatTimer(ui.timer.remaining);if(ui.timer.remaining<=0){stopTimer();notify('计时完成；可以保存本次练习。');}},1000);}return;}
+ if(a==='timer-reset'){stopTimer();ui.timer.remaining=(TOOL_INDEX[ui.practice?.toolId]?.duration||5)*60;if($('timer-value'))$('timer-value').textContent=formatTimer(ui.timer.remaining);return;}
+ if(a==='nvc-next'){const d=updateDraftFromForm()||{};const step=ui.practice?.step||0;if(step===0&&!d.fact?.trim())return notify('请先写下可观察的事实。',true);if(step===1&&!(d.feelings?.length||d.emotionNote?.trim()))return notify('请先记录一种感受。',true);if(step===2&&!(d.needs?.length||d.need?.trim()))return notify('请先说明一种需要。',true);ui.practice.step=Math.min(3,step+1);showPractice();return;}
+ if(a==='nvc-prev'){updateDraftFromForm();ui.practice.step=Math.max(0,ui.practice.step-1);showPractice();return;}
+ if(a==='planner-add'||a==='planner-toggle'||a==='planner-delete')return managePlanner(a.replace('planner-',''),el.dataset.id||'');
+ if(a==='planner-generate'){updateDraftFromForm();$('planner-output').innerHTML=renderPlannerOutput(state.plannerTasks[ui.plannerDate]||[],$('planner-start')?.value||'09:00');return;}
+}
+function formHandler(e){const form=e.target;if(!(form instanceof HTMLFormElement))return;e.preventDefault();
+ try{if(form.id==='practice-form')return completePractice();if(form.id==='plan-form')return savePlanForm(form);if(form.id==='task-form')return saveTaskForm(form);if(form.id==='stage-form')return saveStageForm(form);if(form.id==='goal-form')return saveGoalForm(form);if(form.id==='note-form')return saveNoteForm(form);if(form.id==='rule-form')return saveRuleForm(form);if(form.id==='reschedule-form'){const fd=new FormData(form),key=String(fd.get('occKey')||''),date=String(fd.get('newDate')||'');const f=findOcc(key);if(!f||!within(date,f.plan.startDate,f.plan.endDate))throw Error('日期超出计划范围。');if(date===f.occ.originalDate)delete state.reschedules[key];else state.reschedules[key]=date;clearEditorDraft(form);persist(true);closeModal();render();notify('任务日期已调整');return;}}
+ catch(err){notify('请检查输入：'+err.message,true);console.error(err);}
+}
+function onInput(e){const t=e.target;
+ if(t.dataset.sleepField){writeSleepInput(t);return;}
+ if(t.dataset.sleepConfig){const k=t.dataset.sleepConfig;state.sleepProtocol[k]=t.type==='number'?Number(t.value):t.value;persist();return;}
+ if(t.id==='breath-volume'){ui.breath.volume=Number(t.value)/100;if(ui.breath.running&&ui.breath.sound)breathPhaseTone(ui.breath.phase);return;}
+ if(t.id==='tool-search'){ui.toolSearch=t.value;const cursor=t.selectionStart;render();const input=$('tool-search');if(input){input.focus();input.setSelectionRange(cursor,cursor);}return;}
+ if(t.id==='principles'){state.guidingFoundations.principles=t.value;persist();return;}
+ if(t.id==='planner-date'&&ui.practice?.toolId==='daily-planner'){updateDraftFromForm();ui.plannerDate=t.value||localDate();showPractice();return;}
+ if(t.id==='planner-start'&&ui.practice?.toolId==='daily-planner'){updateDraftFromForm();const d=state.drafts[ui.practice.draftKey]||{};d.startTime=t.value;state.drafts[ui.practice.draftKey]=d;persist();return;}
+ if(t.matches('[data-slider]')){const label=$('slider-'+t.dataset.slider);if(label)label.textContent=t.value+'/'+t.max;if(t.name==='intensity'&&ui.practice?.toolId==='conflict'){const msg=$('conflict-pause-hint');if(msg)msg.innerHTML=Number(t.value)>=7?'<div class="warningbox">情绪强度较高。建议暂时停止争辩，并明确双方可接受的恢复时间与空间边界。</div>':'';}}
+ if(ui.practice&&$('practice-form')?.contains(t))updateDraftFromForm();
+ const editor=t.closest('form');if(editor&&editor.id!=='practice-form')storeEditorDraft(editor);
+}
+function onChange(e){const t=e.target;
+ if(t.id==='sleep-selected-date'){ui.sleepDate=t.value;showPractice();return;}
+ if(t.dataset.sleepField){writeSleepInput(t);return;}
+ if(t.dataset.sleepConfig){state.sleepProtocol[t.dataset.sleepConfig]=t.type==='number'?Number(t.value):t.value;persist();return;}if(t.id==='plan-select'){ui.planId=t.value;render();return;}
+ if(t.id==='chapter-filter'){ui.chapter=t.value;render();return;}
+ if(t.id==='sort-tools'){ui.toolSort=t.value;render();return;}
+ if(t.id==='task-schedule-type'){
+  const planId=$('task-form')?.querySelector('[name="planId"]')?.value,p=state.plans.find(x=>x.id===planId);if(p){const type=t.value;$('schedule-fields').innerHTML=renderScheduleFields({type,start:p.startDate,end:p.endDate,dates:[p.startDate],date:p.startDate,weekdays:[1,3,5]},p);storeEditorDraft($('task-form'));}return;
+ }
+ if(t.type==='checkbox'&&t.closest('.choice-chip')){const box=t.closest('.choice-chip');box.classList.toggle('selected',t.checked);const label=box.querySelector('span');if(label){const name=t.value;label.textContent=(t.checked?'✓ ':'')+name;}}
+ if(ui.practice&&$('practice-form')?.contains(t))updateDraftFromForm();
+ const editor=t.closest('form');if(editor&&editor.id!=='practice-form')storeEditorDraft(editor);
+}
+function bindEvents(){document.addEventListener('click',e=>{
+ const nav=e.target.closest('[data-nav]');if(nav){e.preventDefault();if(ui.activeModal)closeModal();go(nav.dataset.nav);return;}
+ const el=e.target.closest('[data-act]');if(!el)return;if(el.tagName==='BUTTON'||el.tagName==='A')e.preventDefault();
+ try{handleAction(el,e);}catch(err){console.error(err);notify('操作未能完成：'+err.message,true);}
+ });document.addEventListener('submit',formHandler);document.addEventListener('input',onInput);document.addEventListener('change',onChange);
+ $('import-file').addEventListener('change',e=>importFile(e.target.files?.[0]));
+ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&ui.activeModal)closeModal();});
+ document.addEventListener('visibilitychange',()=>{if(document.hidden)breathPause();});
+ window.addEventListener('beforeunload',()=>{stopBreath(true);if(saveTimer)writeSave();});
+}
+function init(){bindEvents();if(!loadError){try{if(!localStorage.getItem(STORAGE_KEY))writeSave();}catch(e){notify('无法启用本地保存：'+e.message,true);}}render();if(loadError)notify(loadError,true);if(state.quizDraft){ui.quiz=state.quizDraft;ui.commTab='quiz';}document.title='十二支点 · 成长工作台';}
+init();
+
+</script>
+</body>
+</html>
