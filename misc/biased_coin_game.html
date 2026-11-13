@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>抛硬币游戏</title>
+<style>
+  :root{color-scheme:light;font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;background:#f5f7fb;color:#192c42}
+  *{box-sizing:border-box}
+  body{margin:0;padding:34px 16px}
+  main{width:min(100%,480px);margin:auto}
+  h1{margin:0 0 8px;font-size:26px;letter-spacing:-.5px}
+  .intro{color:#65758b;margin:0 0 22px;font-size:14px;line-height:1.8}
+  .panel{background:#fff;border:1px solid #e2e9f3;border-radius:18px;padding:24px;box-shadow:0 12px 32px #20395a0b}
+  .balance{font-size:43px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-1.7px;margin:5px 0 20px;color:#174d9d;overflow-wrap:anywhere}
+  .eyebrow{font-size:12px;letter-spacing:.7px;font-weight:700;color:#72829a}
+  .stats{display:flex;justify-content:space-between;padding:13px 0 20px;border-top:1px solid #edf0f5;font-size:13px;color:#617087}
+  .stats strong{color:#253c59}
+  label{display:block;margin:0 0 8px;font-weight:700;font-size:14px}
+  .choices{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
+  .choices input{position:absolute;opacity:0;width:1px;height:1px}
+  .choices label{margin:0;padding:14px 10px;text-align:center;border:1px solid #dae3ef;border-radius:12px;cursor:pointer;background:#fff;transition:.15s}
+  .choices label:has(input:checked){background:#eaf2ff;border-color:#4683d8;color:#1656ad}
+  .choices label:has(input:focus-visible){outline:3px solid #8fb8fc;outline-offset:2px}
+  .betrow{display:flex;gap:10px;align-items:center;margin-bottom:8px}
+  .betrow input{width:100%;min-width:0;font:inherit;font-size:21px;border:1px solid #cedaea;border-radius:11px;padding:12px 13px}
+  .betrow input:focus{outline:2px solid #78a9f2;outline-offset:1px}
+  button{font:inherit;cursor:pointer}
+  .primary{width:100%;background:#2166c4;color:#fff;border:0;border-radius:12px;padding:15px;font-size:16px;font-weight:750}
+  .primary:hover{background:#1855ab}
+  .primary:disabled{background:#a6b7ce;cursor:not-allowed}
+  .result{min-height:60px;padding:15px 0 0;font-size:15px;font-weight:650;line-height:1.6}
+  .result.win{color:#16835c}.result.lose{color:#c34c52}.result.neutral{color:#67778a}
+  .chart-block{margin:8px 0 20px;padding:14px 12px 8px;border:1px solid #e2e9f3;border-radius:12px;background:#fbfdff}
+  .chart-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:6px}
+  .chart-head h2{font-size:14px;margin:0}
+  .chart-head span{font-size:12px;color:#72829a}
+  #trajectory{display:block;width:100%;height:auto;overflow:visible}
+  .foot{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:14px}
+  .foot h2{margin:0;font-size:15px}
+  ol{padding-left:23px;margin:12px 0 0;max-height:240px;overflow:auto;font-size:13px;color:#546681;line-height:1.9}
+  li:first-child{font-weight:650;color:#243d5e}
+  .disclaimer{font-size:12px;color:#8693a6;margin:14px 0;text-align:center}
+</style>
+</head>
+<body>
+<main>
+  <h1>抛硬币</h1>
+  <p class="intro">正面出现概率 <strong>60%</strong>，反面 <strong>40%</strong>。猜中赢得下注金额，猜错扣除下注金额。初始资金 $25，最多 300 局。</p>
+  <section class="panel" aria-label="下注游戏">
+    <div class="eyebrow">当前余额</div>
+    <div class="balance" id="balance">$25.00</div>
+    <div class="stats"><span>已玩 <strong id="round">0</strong> / 300 局</span><span>净收益 <strong id="profit">$0.00</strong></span></div>
+    <form id="bet-form">
+      <label>选择方向</label>
+      <div class="choices">
+        <label><input type="radio" name="side" value="heads" checked>正面 · 60%</label>
+        <label><input type="radio" name="side" value="tails">反面 · 40%</label>
+      </div>
+      <label for="amount">下注金额（美元）</label>
+      <div class="betrow"><input id="amount" type="number" min="0.01" max="25" step="0.01" value="5.00" inputmode="decimal" required></div>
+      <button class="primary" id="bet" type="submit">下注 · 抛硬币</button>
+    </form>
+    <div id="result" class="result neutral" aria-live="polite">请选择方向和金额，开始第一局。</div>
+    <div class="chart-block">
+      <div class="chart-head"><h2>资金轨迹</h2><span id="chart-value">初始 $25.00</span></div>
+      <svg id="trajectory" viewBox="0 0 440 190" role="img" aria-label="当前游戏资金变化曲线">
+        <defs><linearGradient id="area-fill" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#3c88de" stop-opacity=".22"/><stop offset="100%" stop-color="#3c88de" stop-opacity=".015"/></linearGradient></defs>
+        <g id="chart-grid"></g><path id="chart-area" fill="url(#area-fill)"></path><path id="chart-line" fill="none" stroke="#2166c4" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"></path><circle id="chart-dot" r="4" fill="#2166c4" stroke="#fff" stroke-width="2"></circle>
+      </svg>
+    </div>
+    <div class="foot"><h2>最近记录</h2><button type="button" class="reset" id="reset">重新开始</button></div>
+    <ol id="history"><li>尚无记录</li></ol>
+  </section>
+  <p class="disclaimer">仅供概率与风险管理学习，不涉及真实资金。</p>
+</main>
+<script>
+(function(){
+  'use strict';
+  const $=id=>document.getElementById(id);
+  const START=2500,MAX_ROUNDS=300;
+  let balance=START,round=0,history=[],balances=[START];
+  const money=cents=>'$'+(cents/100).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+  const SVGNS='http://www.w3.org/2000/svg';
+  function drawChart(){
+    const left=56,right=428,top=14,bottom=158;
+    const maximum=Math.max(START,...balances);
+    const yMax=Math.max(START*1.12,maximum*1.12);
+    const xMax=Math.max(10,round);
+    const x=i=>left+(right-left)*i/xMax;
+    const y=v=>bottom-(bottom-top)*v/yMax;
+    const pts=balances.map((v,i)=>[x(i),y(v)]);
+    const path=pts.map(([px,py],i)=>(i?'L':'M')+px.toFixed(2)+','+py.toFixed(2)).join(' ');
+    $('chart-line').setAttribute('d',path);
+    $('chart-area').setAttribute('d',path+' L'+x(round).toFixed(2)+','+bottom+' L'+left+','+bottom+' Z');
+    $('chart-dot').setAttribute('cx',x(round));
+    $('chart-dot').setAttribute('cy',y(balance));
+    $('chart-value').textContent='第 '+round+' 局 · '+money(balance);
+    const group=$('chart-grid');group.replaceChildren();
+    function element(tag,attrs,label){
+      const el=document.createElementNS(SVGNS,tag);
+      for(const [key,value] of Object.entries(attrs))el.setAttribute(key,value);
+      if(label!==undefined)el.textContent=label;
+      group.append(el);
+    }
+    const compact=v=>v>=1e9?'$'+(v/1e9).toFixed(1)+'B':v>=1e6?'$'+(v/1e6).toFixed(1)+'M':v>=1e3?'$'+(v/1e3).toFixed(v>=1e4?0:1)+'K':'$'+Math.round(v);
+    for(let i=0;i<=3;i++){
+      const val=yMax*i/3,yy=y(val);
+      element('line',{x1:left,x2:right,y1:yy,y2:yy,stroke:'#e5edf6','stroke-width':1});
+      element('text',{x:left-8,y:yy+4,'text-anchor':'end',fill:'#77869a','font-size':11},compact(val/100));
+    }
+    element('line',{x1:left,x2:right,y1:bottom,y2:bottom,stroke:'#b8c9df','stroke-width':1});
+    for(const i of [0,1,2,3]){
+      const v=Math.round(xMax*i/3);
+      element('text',{x:x(v),y:bottom+18,'text-anchor':i===0?'start':i===3?'end':'middle',fill:'#77869a','font-size':11},String(v));
+    }
+  }
+  function draw(){
+    $('balance').textContent=money(balance);
+    $('round').textContent=round;
+    const delta=balance-START;
+    $('profit').textContent=(delta>0?'+':delta<0?'-':'')+money(Math.abs(delta));
+    $('amount').max=(balance/100).toFixed(2);
+    $('bet').disabled=round>=MAX_ROUNDS||balance<1;
+    drawChart();
+    $('history').replaceChildren();
+    if(!history.length){const li=document.createElement('li');li.textContent='尚无记录';$('history').append(li);}
+    for(const s of history.slice(0,12)){const li=document.createElement('li');li.textContent=s;$('history').append(li);}
+  }
+  function random(){
+    if(window.crypto&&crypto.getRandomValues){const arr=new Uint32Array(1);crypto.getRandomValues(arr);return arr[0]/4294967296;}
+    return Math.random();
+  }
+  document.querySelectorAll('[data-fraction]').forEach(btn=>btn.addEventListener('click',()=>{
+    if(balance<1)return;
+    const frac=Number(btn.dataset.fraction);
+    const cents=Math.max(1,Math.min(balance,Math.round(balance*frac)));
+    $('amount').value=(cents/100).toFixed(2);
+  }));
+  $('bet-form').addEventListener('submit',ev=>{
+    ev.preventDefault();
+    if(round>=MAX_ROUNDS||balance<1)return;
+    const raw=$('amount').value.trim();
+    const parsed=Number(raw);
+    const cents=Math.round(parsed*100);
+    if(!raw||!Number.isFinite(parsed)||parsed<=0||Math.abs(parsed*100-cents)>0.000001||cents<1||cents>balance){
+      $('result').textContent='请输入 0.01 美元至当前余额之间的金额，最多两位小数。';
+      $('result').className='result lose';return;
+    }
+    const side=document.querySelector('input[name="side"]:checked').value;
+    const actual=random()<0.6?'heads':'tails';
+    const won=side===actual;
+    balance+=won?cents:-cents;
+    round++;
+    balances.push(balance);
+    const resultSide=actual==='heads'?'正面':'反面';
+    const choiceSide=side==='heads'?'正面':'反面';
+    $('result').textContent=`第 ${round} 局：开出${resultSide}。${won?'赢得':'损失'} ${money(cents)}。`;
+    $('result').className='result '+(won?'win':'lose');
+    history.unshift(`第 ${round} 局 · 押${choiceSide} · 出${resultSide} · ${won?'+':'−'}${money(cents)} · 余额 ${money(balance)}`);
+    if(round>=MAX_ROUNDS)$('result').textContent+=' 已完成 300 局。';
+    else if(balance===0)$('result').textContent+=' 余额已耗尽，游戏结束。';
+    if(balance>0&&Number($('amount').value)>balance/100)$('amount').value=(balance/100).toFixed(2);
+    draw();
+  });
+  $('reset').addEventListener('click',()=>{
+    balance=START;round=0;history=[];balances=[START];
+    $('amount').value='5.00';
+    document.querySelector('input[value="heads"]').checked=true;
+    $('result').textContent='已重置。请选择方向和金额。';
+    $('result').className='result neutral';draw();
+  });
+  draw();
+})();
+</script>
+</body>
+</html>
